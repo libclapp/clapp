@@ -1,0 +1,40 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+// Copyright (c) 2020 Martin Wölzer
+//
+// This code is licensed under the MIT License (MIT).
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+///////////////////////////////////////////////////////////////////////////////
+
+#ifndef LIBCLAPP_BUILD_INFO_H
+#define LIBCLAPP_BUILD_INFO_H
+
+#include <cstddef>
+#include <cstdint>
+namespace clapp {
+
+inline namespace build_info {
+constexpr const char* project_name = "@libClaPP_PROJECT_NAME@";
+constexpr std::size_t version_major = @project_VERSION_MAJOR@;
+constexpr std::size_t version_minor = @project_VERSION_MINOR@;
+constexpr std::size_t version_patch_level = @project_VERSION_PATCH_LEVEL@;
+constexpr const char* version =
+    "@project_VERSION_MAJOR@.@project_VERSION_MINOR@"
+    ".@project_VERSION_PATCH_LEVEL@";
+constexpr const char* git_hash = "@libClaPP_GIT_HASH@";
+constexpr const char* git_branch = "@libClaPP_GIT_BRANCH@";
+constexpr const char* config_time = "@project_CONFIG_TIME@";
+constexpr const char* build_type = "@CMAKE_BUILD_TYPE@";
+
+}  // namespace build_info
+
+}  // namespace clapp
+
+#endif
