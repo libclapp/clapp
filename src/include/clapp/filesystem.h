@@ -13,20 +13,24 @@
 // SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef LIBCLAPP_FILESYSTEM_H
-#define LIBCLAPP_FILESYSTEM_H
+#ifndef CLAPP_FILESYSTEM_H
+#define CLAPP_FILESYSTEM_H
 
 #if __has_include(<filesystem>)
+
 #include <filesystem>
 namespace clapp {
 namespace fs = std::filesystem;
-}
+}  // namespace clapp
+
 #define CLAPP_FS_AVAIL
 #elif __has_include(<experimental/filesystem>)
+
 #include <experimental/filesystem>
 namespace clapp {
 namespace fs = std::experimental::filesystem;
-}
+}  // namespace clapp
+
 #define CLAPP_FS_AVAIL
 #endif
 

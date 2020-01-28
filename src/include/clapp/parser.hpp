@@ -13,11 +13,15 @@
 // SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef LIBCLAPP_PARSER_HPP
-#define LIBCLAPP_PARSER_HPP
+#ifndef CLAPP_PARSER_HPP
+#define CLAPP_PARSER_HPP
 
 #include <clapp/parser.h>
+#include <numeric>
 #include <sstream>
+
+inline clapp::parser::arg_t::arg_t(const char* const* argv, int argc)
+    : base{gsl::make_span(argv, argc)} {}
 
 template <typename short_option_func_t, typename long_option_func_t>
 constexpr bool clapp::parser::basic_parser_t::is_param_opt() {
@@ -30,33 +34,32 @@ template <typename short_option_func_t, typename long_option_func_t,
 void clapp::parser::basic_parser_t::reg(
     reg_option_conf_t<short_option_func_t, long_option_func_t, option_type>&&
         config) {
-    if (config.option_string.size() == 0) {
-        throw std::runtime_error("Option string '' is too short.");
-    }
+    Expects(config.option_string.size() > 1);
 
-    if (config.short_option) {
-        std::pair<short_options_map_t::iterator, bool> ret{
-            get_short_options().emplace(
-                std::move(config.short_option.value().option),
-                std::move(config.short_option.value().func))};
-        if (!ret.second) {
-            std::stringstream ss;
-            ss << "Can't register option '"
-               << config.short_option.value().option
-               << "' as it is already registered.";
-            throw std::runtime_error(ss.str());
+    if (!config.short_option.empty()) {
+        for (auto& so : config.short_option) {
+            std::pair<short_options_map_t::iterator, bool> ret{
+                get_short_options().emplace(std::move(so.option),
+                                            std::move(so.func))};
+            if (!ret.second) {
+                std::stringstream ss;
+                ss << "Can't register option '" << so.option
+                   << "' as it is already registered.";
+                throw clapp::exception::option_exception_t(ss.str());
+            }
         }
     }
-    if (config.long_option) {
-        std::pair<long_options_map_t::iterator, bool> ret{
-            get_long_options().emplace(
-                std::move(config.long_option.value().option),
-                std::move(config.long_option.value().func))};
-        if (!ret.second) {
-            std::stringstream ss;
-            ss << "Can't register option '" << config.long_option.value().option
-               << "' as it is already registered.";
-            throw std::runtime_error(ss.str());
+    if (!config.long_option.empty()) {
+        for (auto& lo : config.long_option) {
+            std::pair<long_options_map_t::iterator, bool> ret{
+                get_long_options().emplace(std::move(lo.option),
+                                           std::move(lo.func))};
+            if (!ret.second) {
+                std::stringstream ss;
+                ss << "Can't register option '" << lo.option
+                   << "' as it is already registered.";
+                throw clapp::exception::option_exception_t(ss.str());
+            }
         }
     }
 
@@ -89,7 +92,7 @@ void clapp::parser::basic_parser_t::reg(
     if (config.argument_name.size() == 0) {
         std::stringstream ss;
         ss << "Argument name '" << config.argument_name << "' is too short.";
-        throw std::runtime_error(ss.str());
+        throw clapp::exception::argument_exception_t(ss.str());
     }
 
     const std::size_t num_arguments{get_arguments().size()};
@@ -98,7 +101,7 @@ void clapp::parser::basic_parser_t::reg(
         std::stringstream ss;
         ss << "Can't register argument '" << config.argument_name
            << "' when variadic arguments are already registered.";
-        throw std::runtime_error(ss.str());
+        throw clapp::exception::argument_exception_t(ss.str());
     }
 
     if (max_option_string_size < config.argument_name.size()) {
@@ -106,21 +109,21 @@ void clapp::parser::basic_parser_t::reg(
     }
 
     if (config.purpose == purpose_t::mandatory) {
-        if (get_optional_argument_descriptions().size() > 0) {
+        if (!get_optional_argument_descriptions().empty()) {
             std::stringstream ss;
             ss << "Can't register mandatory argument '" << config.argument_name
                << "' when optional arguments are already registered.";
-            throw std::runtime_error(ss.str());
+            throw clapp::exception::argument_exception_t(ss.str());
         }
         get_mandatory_argument_descriptions().push_back(
             {config.argument_name, std::move(config.description),
              argument_type});
     } else {
-        if (get_sub_parser_descriptions().size() > 0) {
+        if (!get_sub_parser_descriptions().empty()) {
             std::stringstream ss;
             ss << "Can't register optional argument '" << config.argument_name
                << "' when a sub-parser is already registered.";
-            throw std::runtime_error(ss.str());
+            throw clapp::exception::argument_exception_t(ss.str());
         }
         get_optional_argument_descriptions().push_back(
             {config.argument_name, std::move(config.description),
@@ -156,18 +159,25 @@ template <typename short_option_func_t, typename long_option_func_t,
           clapp::parser::basic_parser_t::option_type_t option_type>
 std::string clapp::parser::basic_parser_t::reg_option_conf_t<
     short_option_func_t, long_option_func_t,
-    option_type>::create_option_string(const std::optional<char> short_option,
-                                       const std::optional<std::string>&
+    option_type>::create_option_string(const std::vector<char> short_option,
+                                       const std::vector<std::string>&
                                            long_option) {
     std::string option_string;
-    if (short_option) {
-        option_string += create_option_string(short_option.value());
+    if (!short_option.empty()) {
+        option_string = std::accumulate(
+            short_option.begin(), short_option.end(), std::string(),
+            [](const std::string& a, const char b) -> std::string {
+                std::string opt_str{create_option_string(b)};
+                return a + (a.length() > 0 ? "|" : "") + opt_str;
+            });
     }
-    if (long_option) {
-        if (option_string != "") {
-            option_string += "|";
-        }
-        option_string += create_option_string(long_option.value());
+    if (!long_option.empty()) {
+        option_string = std::accumulate(
+            long_option.begin(), long_option.end(), option_string,
+            [](const std::string& a, const std::string& b) -> std::string {
+                std::string opt_str{create_option_string(b)};
+                return a + (a.length() > 0 ? "|" : "") + opt_str;
+            });
     }
     return option_string;
 }

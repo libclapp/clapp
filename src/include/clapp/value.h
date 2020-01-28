@@ -13,10 +13,11 @@
 // SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef LIBCLAPP_VALUE_H
-#define LIBCLAPP_VALUE_H
+#ifndef CLAPP_VALUE_H
+#define CLAPP_VALUE_H
 
 #include <clapp/filesystem.h>
+#include <functional>
 #include <string>
 #include <string_view>
 
@@ -24,11 +25,17 @@ namespace clapp {
 
 inline namespace value {
 template <typename T>
-T convert_value(const std::string_view param);
+T convert_value(std::string_view param);
+
+template <typename T>
+constexpr const char *get_chrono_postfix() noexcept;
+
+template <typename T>
+std::string to_string(const T &value);
 
 template <typename T>
 struct default_value_t {
-    constexpr default_value_t(T _value);
+    explicit default_value_t(T _value);
 
     std::string append_restriction_text() const;
 
@@ -41,7 +48,7 @@ struct default_value_t {
 template <typename T>
 class min_max_value_t {
    public:
-    constexpr min_max_value_t(T _min, T _max);
+    min_max_value_t(T _min, T _max);
 
     std::string append_restriction_text() const;
 
@@ -50,6 +57,17 @@ class min_max_value_t {
    private:
     T min;
     T max;
+};
+
+class found_func_t {
+   public:
+    using func_t = std::function<void()>;
+    explicit found_func_t(func_t &&func_arg);
+
+    void found();
+
+   private:
+    func_t func;
 };
 
 #ifdef CLAPP_FS_AVAIL

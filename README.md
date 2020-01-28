@@ -1,13 +1,15 @@
-      _____  _        _____   _____  
-     / ____|| | __ _ |  __ \ |  __ \ 
+      _____  _        _____   _____
+     / ____|| | __ _ |  __ \ |  __ \
     | |     | |/ _` || |__) || |__) |
-    | |     |_|\__,_||  ___/ |  ___/ 
-    | |____          | |     | |     
-     \_____|         |_|     |_|     
+    | |     |_|\__,_||  ___/ |  ___/
+    | |____          | |     | |
+     \_____|         |_|     |_|
 
 
 libClaPP:
 =========
+[![pipeline](../badges/master/pipeline.svg)](../commits/master/)
+[![coverage](../badges/master/coverage.svg)](../commits/master/)
 
 libClaPP is an open source command line argument processing library for C++.
 It supports the processing of GNU options (long and short options) as well as positional arguments.
@@ -35,6 +37,27 @@ But if all dependencies are installed on your system, the following steps are su
     cd build
     cmake ..
     make
+
+Build the library in debug mode with submodules, unitests and check code coverage:
+
+    git clone --recurse-submodules https://git.libclapp.org/libclapp/clapp.git
+    mkdir build
+    cd build
+    cmake -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Debug ..
+    make
+    ./tests/libclapp_tests
+    gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/
+
+Build the library in debug mode with submodules, unitests, examples and check code coverage:
+
+    git clone --recurse-submodules https://git.libclapp.org/libclapp/clapp.git
+    mkdir build
+    cd build
+    cmake -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Debug ..
+    make
+    ./tests/libclapp_tests
+    gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/
+
 
 ### Install the library
 
@@ -69,3 +92,8 @@ Coverage:
 
     cmake -DlibClaPP_BUILD_COVERAGE=On -DCMAKE_BUILD_TYPE=Debug -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DlibClaPP_BUILD_TESTS=On ..
     gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/
+
+Clang-Tidy:
+-----------
+
+    CXX=clang++-7 CC=clang-7 cmake -DCLANG_TIDY=clang-tidy-7 -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DlibClaPP_BUILD_COVERAGE=On -DCMAKE_BUILD_TYPE=Debug -DlibClaPP_CLANG_TIDY=On ..

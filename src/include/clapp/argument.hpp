@@ -13,8 +13,8 @@
 // SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef LIBCLAPP_ARGUMENT_HPP
-#define LIBCLAPP_ARGUMENT_HPP
+#ifndef CLAPP_ARGUMENT_HPP
+#define CLAPP_ARGUMENT_HPP
 
 #include <clapp/argument.h>
 #include <clapp/value.h>
@@ -26,7 +26,8 @@ inline void clapp::argument::gen_arg_conf_process_params(arg_params_t<T>&) {}
 template <typename T, typename Param>
 void clapp::argument::gen_arg_conf_process_params(arg_params_t<T>& arg_params,
                                                   Param&& param) {
-    if constexpr (has_append_restriction_text<typename std::decay<Param>::type>::value) {
+    if constexpr (has_append_restriction_text<
+                      typename std::decay<Param>::type>::value) {
         arg_params.restrictions.push_back(param.append_restriction_text());
     }
     if constexpr (has_default_value<typename std::decay<Param>::type>::value) {
@@ -38,7 +39,11 @@ void clapp::argument::gen_arg_conf_process_params(arg_params_t<T>& arg_params,
                 param.validate(value, argument_name);
             });
     }
-    if constexpr (std::is_same<typename std::decay<Param>::type, basic_parser_t::purpose_t>::value) {
+    if constexpr (has_found<typename std::decay<Param>::type>::value) {
+        arg_params.found.push_back(param);
+    }
+    if constexpr (std::is_same<typename std::decay<Param>::type,
+                               basic_parser_t::purpose_t>::value) {
         arg_params.purpose = param;
     }
 }
@@ -66,7 +71,7 @@ clapp::argument::gen_arg_validate_func(
                 argument_name, validate_funcs = std::move(validate_funcs)]() {
             if (purpose == basic_parser_t::purpose_t::mandatory && given_func) {
                 if (!given_func.value()()) {
-                    throw std::runtime_error(
+                    throw clapp::exception::argument_exception_t(
                         std::string{"Mandatory argument '"} + argument_name +
                         "' not given.");
                 }
@@ -93,7 +98,7 @@ clapp::argument::gen_arg_validate_func(
                 }
             } else {
                 if (validate_funcs.size() > 0) {
-                    throw std::runtime_error(
+                    throw clapp::exception::argument_exception_t(
                         std::string{"Cannot validate argument '"} +
                         argument_name + "' without a given value function.");
                 }
@@ -126,7 +131,8 @@ clapp::argument::gen_arg_conf(CALLBACKS&& callbacks,
     arg_params_t<T> arg_params;
     if (std::is_same<ARG_CONF, basic_parser_t::variadic_arg_conf_t>::value) {
         arg_params.restrictions.push_back(
-            clapp::argument::basic_variadic_argument_t<T>::variadic_argument_restrictions());
+            clapp::argument::basic_variadic_argument_t<
+                T>::variadic_argument_restrictions());
     }
     gen_arg_conf_process_params(arg_params,
                                 std::forward<Params>(parameters)...);
@@ -146,7 +152,7 @@ clapp::argument::gen_arg_conf(CALLBACKS&& callbacks,
             std::forward<CALLBACKS>(callbacks), argument_name,
             std::move(arg_params.validate_funcs), description + restriction,
             arg_params.purpose),
-        arg_params.default_value};
+        arg_params.default_value, std::move(arg_params.found)};
 }
 
 template <typename T>
@@ -171,20 +177,25 @@ clapp::argument::basic_argument_t<T>::basic_argument_t(
         std::forward<Params>(parameters)...)};
     parser.reg(std::move(conf.arg_conf));
     _value = conf.default_value;
+    _found = std::move(conf.found);
 }
 
 template <typename T>
-clapp::argument::basic_argument_t<T>::operator bool() const {
+constexpr clapp::argument::basic_argument_t<T>::operator bool() const noexcept {
     return _value.has_value();
 }
 
 template <typename T>
 T clapp::argument::basic_argument_t<T>::value() const {
-    return _value.value();
+    if (_value) {
+        return _value.value();
+    }
+    throw clapp::exception::value_undefined_t{
+        "Requested argument value is not defined."};
 }
 
 template <typename T>
-bool clapp::argument::basic_argument_t<T>::given() const {
+constexpr bool clapp::argument::basic_argument_t<T>::given() const noexcept {
     return _given;
 }
 
@@ -193,6 +204,9 @@ void clapp::argument::basic_argument_t<T>::found_entry(
     const std::string_view argument) {
     _given = true;
     _value = clapp::value::convert_value<T>(argument);
+    for (auto& found_func : _found) {
+        found_func.found();
+    }
 }
 
 template <typename T>
@@ -219,13 +233,15 @@ clapp::argument::basic_variadic_argument_t<T>::basic_variadic_argument_t(
         std::stringstream ss;
         ss << "No default value for variadic argument '"
            << conf.arg_conf.argument_name << "' allowed.";
-        throw std::runtime_error(ss.str());
+        throw clapp::exception::argument_exception_t(ss.str());
     }
+    _found = std::move(conf.found);
     parser.reg(std::move(conf.arg_conf));
 }
 
 template <typename T>
-clapp::argument::basic_variadic_argument_t<T>::operator bool() const {
+constexpr clapp::argument::basic_variadic_argument_t<T>::operator bool() const
+    noexcept {
     return _value.size() > 0;
 }
 
@@ -235,7 +251,8 @@ std::vector<T> clapp::argument::basic_variadic_argument_t<T>::value() const {
 }
 
 template <typename T>
-bool clapp::argument::basic_variadic_argument_t<T>::given() const {
+constexpr bool clapp::argument::basic_variadic_argument_t<T>::given() const
+    noexcept {
     return _given;
 }
 
@@ -244,10 +261,14 @@ void clapp::argument::basic_variadic_argument_t<T>::found_entry(
     const std::string_view argument) {
     _given = true;
     _value.push_back(clapp::value::convert_value<T>(argument));
+    for (auto& found_func : _found) {
+        found_func.found();
+    }
 }
 
 template <typename T>
-std::string clapp::argument::basic_variadic_argument_t<T>::variadic_argument_restrictions() {
+std::string clapp::argument::basic_variadic_argument_t<
+    T>::variadic_argument_restrictions() {
     return "variadic argument";
 }
 

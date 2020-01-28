@@ -13,9 +13,10 @@
 // SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef LIBCLAPP_PARSER_H
-#define LIBCLAPP_PARSER_H
+#ifndef CLAPP_PARSER_H
+#define CLAPP_PARSER_H
 
+#include <clapp/value.h>
 #include <functional>
 #include <gsl/gsl_assert>
 #include <gsl/span>
@@ -30,15 +31,15 @@ struct arg_t : public gsl::span<const char* const> {
    public:
     using base = gsl::span<const char* const>;
 
-    arg_t(const char* const* argv, int argc);
+    inline arg_t(const char* const* argv, int argc);
 };
+
+class basic_sub_parser_t;
 
 class basic_parser_t {
    public:
     using arg_iterator = arg_t::const_iterator;
     using long_opt_func_t = std::function<void(const std::string_view option)>;
-    using parse_func_t =
-        std::function<void(arg_iterator begin, arg_iterator end)>;
     using long_opt_param_func_t = std::function<void(
         const std::string_view option, const std::string_view param)>;
     using short_opt_func_t = std::function<void(const char option)>;
@@ -74,23 +75,23 @@ class basic_parser_t {
               option_type_t option_type>
     struct reg_option_conf_t {
         static std::string create_option_string(
-            const std::optional<char> short_option,
-            const std::optional<std::string>& long_option);
+            std::vector<char> short_option,
+            const std::vector<std::string>& long_option);
         static std::string create_option_string(const std::string& long_option);
-        static std::string create_option_string(const char short_option);
+        static std::string create_option_string(char short_option);
 
         using long_opt_conf_t = basic_long_opt_conf_t<long_option_func_t>;
         using short_opt_conf_t = basic_short_opt_conf_t<short_option_func_t>;
-        std::optional<short_opt_conf_t> short_option;
-        std::optional<long_opt_conf_t> long_option;
+        std::vector<short_opt_conf_t> short_option;
+        std::vector<long_opt_conf_t> long_option;
         std::optional<validate_func_t> validate_func;
         std::string option_string;
         std::string description;
-        purpose_t purpose;
+        purpose_t purpose{purpose_t::optional};
     };
 
     struct reg_sub_parser_conf_t {
-        parse_func_t parse;
+        basic_sub_parser_t& parser;
         std::string sub_parser_name;
         std::string description;
     };
@@ -101,7 +102,7 @@ class basic_parser_t {
         std::string argument_name;
         std::string description;
         std::optional<validate_func_t> validate_func;
-        purpose_t purpose;
+        purpose_t purpose{purpose_t::mandatory};
     };
 
     using single_arg_conf_t = reg_argument_conf_t<argument_type_t::single>;
@@ -121,7 +122,8 @@ class basic_parser_t {
     using short_opt_variant_t =
         std::variant<short_opt_func_t, short_opt_param_func_t>;
 
-    using sub_parsers_map_t = std::map<std::string, parse_func_t, std::less<>>;
+    using sub_parsers_map_t =
+        std::map<std::string, basic_sub_parser_t&, std::less<>>;
     using arguments_vector_t = std::vector<arg_conf_t>;
     using optional_argument_t = std::optional<arg_conf_t>;
     using long_options_map_t =
@@ -155,6 +157,11 @@ class basic_parser_t {
 
    public:
     basic_parser_t();
+    explicit basic_parser_t(const basic_parser_t&) = delete;
+    explicit basic_parser_t(basic_parser_t&&) noexcept = delete;
+    basic_parser_t& operator=(const basic_parser_t&) = delete;
+    basic_parser_t& operator=(basic_parser_t&&) noexcept = delete;
+
     virtual ~basic_parser_t();
 
     template <typename short_option_func_t, typename long_option_func_t>
@@ -176,7 +183,7 @@ class basic_parser_t {
         std::optional<std::string> long_option;
     };
 
-    arg_iterator process_parse_result(const arg_iterator it,
+    arg_iterator process_parse_result(arg_iterator it,
                                       const parse_result_t& parse_result) const;
     void parse(arg_iterator begin, arg_iterator end);
     parse_result_t parse(std::string_view option, arg_iterator it,
@@ -184,7 +191,11 @@ class basic_parser_t {
 
     void validate() const;
 
+    void validate_recursive() const;
+
+    virtual std::string gen_help_prefix() const;
     std::string gen_help_msg() const;
+    value::found_func_t gen_func_print_help_and_exit(int exit_code) const;
 
     std::size_t get_num_processed_arguments() const;
 
@@ -202,24 +213,24 @@ class basic_parser_t {
     argument_descriptions_vec_t& get_optional_argument_descriptions();
 
    private:
-    parse_result_t parse_arg(const std::string_view option, arg_iterator it,
+    parse_result_t parse_arg(std::string_view option, arg_iterator it,
                              arg_iterator end);
-    parse_result_t parse_long(const std::string_view option, arg_iterator it,
+    parse_result_t parse_long(std::string_view option, arg_iterator it,
                               arg_iterator end);
-    parse_result_t parse_short(const std::string_view option, arg_iterator it,
+    parse_result_t parse_short(std::string_view option, arg_iterator it,
                                arg_iterator end);
 
-    sub_parsers_map_t sub_parsers;
-    long_options_map_t long_options;
-    short_options_map_t short_options;
-    arguments_vector_t arguments;
-    optional_argument_t optional_argument;
-    validate_func_vec_t validate_functions;
-    option_descriptions_vec_t mandatory_option_descriptions;
-    option_descriptions_vec_t optional_option_descriptions;
-    sub_parser_descriptions_vec_t sub_parser_descriptions;
-    argument_descriptions_vec_t mandatory_argument_descriptions;
-    argument_descriptions_vec_t optional_argument_descriptions;
+    sub_parsers_map_t sub_parsers{};
+    long_options_map_t long_options{};
+    short_options_map_t short_options{};
+    arguments_vector_t arguments{};
+    optional_argument_t optional_argument{};
+    validate_func_vec_t validate_functions{};
+    option_descriptions_vec_t mandatory_option_descriptions{};
+    option_descriptions_vec_t optional_option_descriptions{};
+    sub_parser_descriptions_vec_t sub_parser_descriptions{};
+    argument_descriptions_vec_t mandatory_argument_descriptions{};
+    argument_descriptions_vec_t optional_argument_descriptions{};
     std::size_t max_option_string_size{0};
     std::size_t num_processed_arguments{0};
 };

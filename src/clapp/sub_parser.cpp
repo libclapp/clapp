@@ -37,16 +37,15 @@ void clapp::parser::basic_sub_parser_t::sub_parse(arg_iterator begin,
 }
 
 clapp::parser::basic_sub_parser_t::basic_sub_parser_t(
-    clapp::basic_parser_t& parser, const std::string& _sub_parser_name,
-    const std::string& _description, bool _parse_parent)
-    : basic_parser_t{},
-      parent_parser{parser},
-      sub_parser_name{_sub_parser_name},
-      description{_description},
-      parse_parent{_parse_parent} {
-    parser.reg(
-        reg_sub_parser_conf_t{[this](arg_iterator begin, arg_iterator end) {
-                                  return this->sub_parse(begin, end);
-                              },
-                              sub_parser_name, description});
+    clapp::basic_parser_t& parser, std::string sub_parser_name_arg,
+    std::string description_arg, bool parse_parent_arg)
+    : parent_parser{parser},
+      sub_parser_name{std::move(sub_parser_name_arg)},
+      description{std::move(description_arg)},
+      parse_parent{parse_parent_arg} {
+    parser.reg(reg_sub_parser_conf_t{*this, sub_parser_name, description});
+}
+
+std::string clapp::parser::basic_sub_parser_t::gen_help_prefix() const {
+    return parent_parser.gen_help_prefix() + ' ' + sub_parser_name;
 }

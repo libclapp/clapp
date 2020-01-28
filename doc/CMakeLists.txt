@@ -1,0 +1,6 @@
+add_executable(libclapp_doc_simple_main_parser simple_main_parser.cpp)
+target_link_libraries(libclapp_doc_simple_main_parser clapp)
+target_compile_options(libclapp_doc_simple_main_parser PRIVATE ${libClaPP_COMPILE_OPTIONS})
+if(CLANG_TIDY)
+  set_target_properties(libclapp_doc_simple_main_parser PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_ARGS}")
+endif()

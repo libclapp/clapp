@@ -13,8 +13,8 @@
 // SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef LIBCLAPP_SUB_PARSER_HPP
-#define LIBCLAPP_SUB_PARSER_HPP
+#ifndef CLAPP_SUB_PARSER_HPP
+#define CLAPP_SUB_PARSER_HPP
 
 #include <clapp/sub_parser.h>
 

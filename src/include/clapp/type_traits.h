@@ -13,22 +13,38 @@
 // SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef LIBCLAPP_TYPE_TRAITS_H
-#define LIBCLAPP_TYPE_TRAITS_H
+#ifndef CLAPP_TYPE_TRAITS_H
+#define CLAPP_TYPE_TRAITS_H
 
 #include <type_traits>
 
+#include <chrono>
 #include <iostream>
 #include <type_traits>
+#include <vector>
 
 namespace clapp {
 
 inline namespace type_traits {
 template <typename T>
+struct is_chrono_duration : std::false_type {};
+
+template <typename Rep, typename Period>
+struct is_chrono_duration<std::chrono::duration<Rep, Period>> : std::true_type {
+};
+
+template <typename T>
+struct is_vector : std::false_type {};
+
+template <typename T, typename A>
+struct is_vector<std::vector<T, A>> : std::true_type {};
+
+template <typename T>
 class has_append_restriction_text {
    private:
     template <typename C>
-    constexpr static bool test(decltype(&C::append_restriction_text)) {
+    constexpr static bool test([
+        [maybe_unused]] decltype(&C::append_restriction_text) func) {
         return true;
     }
     template <typename C>
@@ -44,7 +60,7 @@ template <typename T>
 class has_validate {
    private:
     template <typename C>
-    constexpr static bool test(decltype(&C::validate)) {
+    constexpr static bool test([[maybe_unused]] decltype(&C::validate) func) {
         return true;
     }
     template <typename C>
@@ -60,7 +76,24 @@ template <typename T>
 class has_default_value {
    private:
     template <typename C>
-    constexpr static bool test(decltype(&C::default_value)) {
+    constexpr static bool test([
+        [maybe_unused]] decltype(&C::default_value) func) {
+        return true;
+    }
+    template <typename C>
+    constexpr static bool test(...) {
+        return false;
+    }
+
+   public:
+    constexpr static bool value{test<T>(nullptr)};
+};
+
+template <typename T>
+class has_found {
+   private:
+    template <typename C>
+    constexpr static bool test([[maybe_unused]] decltype(&C::found) func) {
         return true;
     }
     template <typename C>

@@ -1,0 +1,573 @@
+stages:
+    - build
+    - test
+variables:
+    GIT_STRATEGY: clone
+    GIT_SUBMODULE_STRATEGY: recursive
+
+compile_install_g++9:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=g++-9 CC=gcc-9 cmake -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Release ..
+        - make -j2 VERBOSE=1
+        - make install
+        - echo -e '#include<clapp/main_parser.h>\n#include<clapp/build_info.h>\n#include<iostream>\nint main (int argc, char *argv[]) {\nstd::cout << clapp::build_info::project_name << " v" << clapp::build_info::version << std::endl;\n}' | g++-9 `pkg-config --libs --cflags libclapp` -I../third_party/GSL/include/ --std=c++17 -o out -x c++ -
+    tags:
+        - g++-9
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+compile_release_g++9:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=g++-9 CC=gcc-9 cmake -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Release ..
+        - make -j2 VERBOSE=1
+    tags:
+        - g++-9
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+test_release_g++9:
+    stage: test
+    script:
+        - cd build
+        - ./tests/libclapp_tests
+        - gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/ --gcov-executable="gcov-9"
+    tags:
+        - g++-9
+        - cmake
+    dependencies:
+        - compile_release_g++9
+
+compile_debug_g++9:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=g++-9 CC=gcc-9 cmake -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Debug ..
+        - make -j2 VERBOSE=1
+    tags:
+        - g++-9
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+test_debug_g++9:
+    stage: test
+    script:
+        - cd build
+        - ./tests/libclapp_tests
+        - gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/ --gcov-executable="gcov-9"
+    tags:
+        - g++-9
+        - cmake
+    coverage: '/^TOTAL.*\s+(\d+%)$/'
+    dependencies:
+        - compile_debug_g++9
+
+compile_example_release_g++9:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=g++-9 CC=gcc-9 cmake -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Release ..
+        - make -j2 VERBOSE=1
+    tags:
+        - g++-9
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+compile_install_g++8:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=g++-8 CC=gcc-8 cmake -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Release ..
+        - make -j2 VERBOSE=1
+        - make install
+        - echo -e '#include<clapp/main_parser.h>\n#include<clapp/build_info.h>\n#include<iostream>\nint main (int argc, char *argv[]) {\nstd::cout << clapp::build_info::project_name << " v" << clapp::build_info::version << std::endl;\n}' | g++-8 `pkg-config --libs --cflags libclapp` -I../third_party/GSL/include/ --std=c++17 -o out -x c++ -
+    tags:
+        - g++-8
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+compile_release_g++8:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=g++-8 CC=gcc-8 cmake -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Release ..
+        - make -j2 VERBOSE=1
+    tags:
+        - g++-8
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+test_release_g++8:
+    stage: test
+    script:
+        - cd build
+        - ./tests/libclapp_tests
+        - gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/ --gcov-executable="gcov-8"
+    tags:
+        - g++-8
+        - cmake
+    dependencies:
+        - compile_release_g++8
+
+compile_example_release_g++8:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=g++-8 CC=gcc-8 cmake -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Release ..
+        - make -j2 VERBOSE=1
+    tags:
+        - g++-8
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+compile_debug_g++8:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=g++-8 CC=gcc-8 cmake -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Debug ..
+        - make -j2 VERBOSE=1
+    tags:
+        - g++-8
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+test_debug_g++8:
+    stage: test
+    script:
+        - cd build
+        - ./tests/libclapp_tests
+        - gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/ --gcov-executable="gcov-8"
+    tags:
+        - g++-8
+        - cmake
+    coverage: '/^TOTAL.*\s+(\d+%)$/'
+    dependencies:
+        - compile_debug_g++8
+
+compile_install_g++7:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=g++-7 CC=gcc-7 cmake -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Release ..
+        - make -j2 VERBOSE=1
+        - make install
+        - echo -e '#include<clapp/main_parser.h>\n#include<clapp/build_info.h>\n#include<iostream>\nint main (int argc, char *argv[]) {\nstd::cout << clapp::build_info::project_name << " v" << clapp::build_info::version << std::endl;\n}' | g++-7 `pkg-config --libs --cflags libclapp` -I../third_party/GSL/include/ --std=c++17 -o out -x c++ -
+    tags:
+        - g++-7
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+compile_release_g++7:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=g++-7 CC=gcc-7 cmake -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Release ..
+        - make -j2 VERBOSE=1
+    tags:
+        - g++-7
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+test_release_g++7:
+    stage: test
+    script:
+        - cd build
+        - ./tests/libclapp_tests
+        - gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/ --gcov-executable="gcov-7"
+    tags:
+        - g++-7
+        - cmake
+    dependencies:
+        - compile_release_g++7
+
+compile_debug_g++7:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=g++-7 CC=gcc-7 cmake -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Debug ..
+        - make -j2 VERBOSE=1
+    tags:
+        - g++-7
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+test_debug_g++7:
+    stage: test
+    script:
+        - cd build
+        - ./tests/libclapp_tests
+        - gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/ --gcov-executable="gcov-7"
+    tags:
+        - g++-7
+        - cmake
+    coverage: '/^TOTAL.*\s+(\d+%)$/'
+    dependencies:
+        - compile_debug_g++7
+
+compile_example_release_g++7:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=g++-7 CC=gcc-7 cmake -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Release ..
+        - make -j2 VERBOSE=1
+    tags:
+        - g++-7
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+compile_install_clang++9:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=clang++-9 CC=clang-9 cmake -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Release ..
+        - make -j2 VERBOSE=1
+        - make install
+        - echo -e '#include<clapp/main_parser.h>\n#include<clapp/build_info.h>\n#include<iostream>\nint main (int argc, char *argv[]) {\nstd::cout << clapp::build_info::project_name << " v" << clapp::build_info::version << std::endl;\n}' | clang++-9 `pkg-config --libs --cflags libclapp` -I../third_party/GSL/include/ --std=c++17 -o out -x c++ -
+    tags:
+        - clang++-9
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+compile_debug_clang++9:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=clang++-9 CC=clang-9 cmake -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Debug ..
+        - make -j2 VERBOSE=1
+    tags:
+        - clang++-9
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+test_debug_clang++9:
+    stage: test
+    script:
+        - cd build
+        - ./tests/libclapp_tests
+        - gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/ --gcov-executable="llvm-cov-9 gcov"
+    tags:
+        - clang++-9
+        - cmake
+    coverage: '/^TOTAL.*\s+(\d+%)$/'
+    dependencies:
+        - compile_debug_clang++9
+
+clang-tidy-9:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=clang++-9 CC=clang-9 cmake -DCLANG_TIDY=clang-tidy-9 -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DlibClaPP_BUILD_COVERAGE=On -DCMAKE_BUILD_TYPE=Debug -DlibClaPP_CLANG_TIDY=On ..
+        - make VERBOSE=1
+    tags:
+        - clang++-8
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+compile_release_clang++9:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=clang++-9 CC=clang-9 cmake -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Release ..
+        - make -j2 VERBOSE=1
+    tags:
+        - clang++-9
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+test_release_clang++9:
+    stage: test
+    script:
+        - cd build
+        - ./tests/libclapp_tests
+        - gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/ --gcov-executable="llvm-cov-9 gcov"
+    tags:
+        - clang++-9
+        - cmake
+    dependencies:
+        - compile_release_clang++9
+
+compile_example_release_clang++9:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=clang++-9 CC=clang-9 cmake -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Release ..
+        - make -j2 VERBOSE=1
+    tags:
+        - clang++-9
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+compile_install_clang++8:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=clang++-8 CC=clang-8 cmake -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Release ..
+        - make -j2 VERBOSE=1
+        - make install
+        - echo -e '#include<clapp/main_parser.h>\n#include<clapp/build_info.h>\n#include<iostream>\nint main (int argc, char *argv[]) {\nstd::cout << clapp::build_info::project_name << " v" << clapp::build_info::version << std::endl;\n}' | clang++-8 `pkg-config --libs --cflags libclapp` -I../third_party/GSL/include/ --std=c++17 -o out -x c++ -
+    tags:
+        - clang++-8
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+compile_debug_clang++8:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=clang++-8 CC=clang-8 cmake -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Debug ..
+        - make -j2 VERBOSE=1
+    tags:
+        - clang++-8
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+test_debug_clang++8:
+    stage: test
+    script:
+        - cd build
+        - ./tests/libclapp_tests
+        - gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/ --gcov-executable="llvm-cov-8 gcov"
+    tags:
+        - clang++-8
+        - cmake
+    coverage: '/^TOTAL.*\s+(\d+%)$/'
+    dependencies:
+        - compile_debug_clang++8
+
+clang-tidy-8:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=clang++-8 CC=clang-8 cmake -DCLANG_TIDY=clang-tidy-8 -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DlibClaPP_BUILD_COVERAGE=On -DCMAKE_BUILD_TYPE=Debug -DlibClaPP_CLANG_TIDY=On ..
+        - make VERBOSE=1
+    tags:
+        - clang++-8
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+compile_release_clang++8:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=clang++-8 CC=clang-8 cmake -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Release ..
+        - make -j2 VERBOSE=1
+    tags:
+        - clang++-8
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+test_release_clang++8:
+    stage: test
+    script:
+        - cd build
+        - ./tests/libclapp_tests
+        - gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/ --gcov-executable="llvm-cov-8 gcov"
+    tags:
+        - clang++-8
+        - cmake
+    dependencies:
+        - compile_release_clang++8
+
+compile_example_release_clang++8:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=clang++-8 CC=clang-8 cmake -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Release ..
+        - make -j2 VERBOSE=1
+    tags:
+        - clang++-8
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+compile_install_clang++7:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=clang++-7 CC=clang-7 cmake -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Release ..
+        - make -j2 VERBOSE=1
+        - make install
+        - echo -e '#include<clapp/main_parser.h>\n#include<clapp/build_info.h>\n#include<iostream>\nint main (int argc, char *argv[]) {\nstd::cout << clapp::build_info::project_name << " v" << clapp::build_info::version << std::endl;\n}' | clang++-7 `pkg-config --libs --cflags libclapp` -I../third_party/GSL/include/ --std=c++17 -o out -x c++ -
+    tags:
+        - clang++-7
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+compile_debug_clang++7:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=clang++-7 CC=clang-7 cmake -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DlibClaPP_BUILD_COVERAGE=On -DCMAKE_BUILD_TYPE=Debug ..
+        - make -j2 VERBOSE=1
+    tags:
+        - clang++-7
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+test_debug_clang++7:
+    stage: test
+    script:
+        - cd build
+        - ./tests/libclapp_tests
+        - gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/ --gcov-executable="llvm-cov-7 gcov"
+    tags:
+        - clang++-7
+        - cmake
+    coverage: '/^TOTAL.*\s+(\d+%)$/'
+    dependencies:
+        - compile_debug_clang++7
+
+clang-tidy-7:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=clang++-7 CC=clang-7 cmake -DCLANG_TIDY=clang-tidy-7 -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DlibClaPP_BUILD_COVERAGE=On -DCMAKE_BUILD_TYPE=Debug -DlibClaPP_CLANG_TIDY=On ..
+        - make VERBOSE=1
+    tags:
+        - clang++-7
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+compile_release_clang++7:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=clang++-7 CC=clang-7 cmake -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Release ..
+        - make -j2 VERBOSE=1
+    tags:
+        - clang++-7
+        - cmake
+    artifacts:
+        paths:
+            - build
+
+test_release_clang++7:
+    stage: test
+    script:
+        - cd build
+        - ./tests/libclapp_tests
+        - gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/ --gcov-executable="llvm-cov-7 gcov"
+    tags:
+        - clang++-7
+        - cmake
+    dependencies:
+        - compile_release_clang++7
+
+compile_example_release_clang++7:
+    stage: build
+    script:
+        - mkdir build
+        - ./doc/sample_extractor.p6 doc
+        - cd build
+        - CXX=clang++-7 CC=clang-7 cmake -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Release ..
+        - make -j2 VERBOSE=1
+    tags:
+        - clang++-7
+        - cmake
+    artifacts:
+        paths:
+            - build

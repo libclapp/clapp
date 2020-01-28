@@ -21,7 +21,7 @@ void clapp::option::check_long_option(const std::string_view option) {
         ss << "Whitespaces and equalsigns are not allowed in long options: "
               "option='"
            << option << "'";
-        throw std::runtime_error(ss.str());
+        throw clapp::exception::option_exception_t(ss.str());
     }
 }
 
@@ -36,7 +36,7 @@ void clapp::option::check_short_option(const char option) {
             ss << "Whitespaces and equalsigns are not allowed in short "
                   "options: option='"
                << option << "'";
-            throw std::runtime_error(ss.str());
+            throw clapp::exception::option_exception_t(ss.str());
         }
         default:
             return;
@@ -56,11 +56,9 @@ clapp::option::bool_option_t::create_callbacks(bool_option_t* inst) {
 void clapp::option::bool_option_t::found_entry() {
     _given = true;
     _value = true;
-}
-
-clapp::option::bool_option_t::operator bool() const {
-    Expects(_value.has_value());
-    return _value.value();
+    for (auto& found_func : _found) {
+        found_func.found();
+    }
 }
 
 clapp::option::bool_option_t::~bool_option_t() = default;
@@ -78,11 +76,9 @@ clapp::option::count_option_t::create_callbacks(count_option_t* inst) {
 void clapp::option::count_option_t::found_entry() {
     _given = true;
     _value = _value.value() + 1;
-}
-
-clapp::option::count_option_t::operator bool() const {
-    Expects(_value.has_value());
-    return _value.value() > 0;
+    for (auto& found_func : _found) {
+        found_func.found();
+    }
 }
 
 clapp::option::count_option_t::~count_option_t() = default;

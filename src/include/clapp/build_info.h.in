@@ -13,8 +13,8 @@
 // SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef LIBCLAPP_BUILD_INFO_H
-#define LIBCLAPP_BUILD_INFO_H
+#ifndef CLAPP_BUILD_INFO_H
+#define CLAPP_BUILD_INFO_H
 
 #include <cstddef>
 #include <cstdint>

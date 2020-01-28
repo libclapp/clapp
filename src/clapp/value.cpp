@@ -14,13 +14,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <clapp/value.h>
-#include <stdexcept>
+#include <iostream>
 #include <string>
 
 template <typename T>
-static T convert_uint(const std::string_view param);
+static T convert_uint(std::string_view param);
 template <typename T>
-static T convert_int(const std::string_view param);
+static T convert_int(std::string_view param);
+
+clapp::value::found_func_t::found_func_t(func_t&& func_arg)
+    : func{std::move(func_arg)} {}
+
+void clapp::value::found_func_t::found() { func(); }
 
 template <>
 std::string clapp::value::convert_value<std::string>(
@@ -76,6 +81,78 @@ std::uint64_t clapp::value::convert_value<std::uint64_t>(
     return convert_uint<std::uint64_t>(param);
 }
 
+template <>
+std::chrono::nanoseconds clapp::value::convert_value<std::chrono::nanoseconds>(
+    const std::string_view param) {
+    return std::chrono::nanoseconds{convert_uint<std::uint64_t>(param)};
+}
+
+template <>
+std::chrono::microseconds
+clapp::value::convert_value<std::chrono::microseconds>(
+    const std::string_view param) {
+    return std::chrono::microseconds{convert_uint<std::uint64_t>(param)};
+}
+
+template <>
+std::chrono::milliseconds
+clapp::value::convert_value<std::chrono::milliseconds>(
+    const std::string_view param) {
+    return std::chrono::milliseconds{convert_uint<std::uint64_t>(param)};
+}
+
+template <>
+std::chrono::seconds clapp::value::convert_value<std::chrono::seconds>(
+    const std::string_view param) {
+    return std::chrono::seconds{convert_uint<std::uint64_t>(param)};
+}
+
+template <>
+std::chrono::minutes clapp::value::convert_value<std::chrono::minutes>(
+    const std::string_view param) {
+    return std::chrono::minutes{convert_uint<std::uint64_t>(param)};
+}
+
+template <>
+std::chrono::hours clapp::value::convert_value<std::chrono::hours>(
+    const std::string_view param) {
+    return std::chrono::hours{convert_uint<std::uint64_t>(param)};
+}
+
+template <>
+float clapp::value::convert_value<float>(const std::string_view param) {
+    try {
+        return std::stof(std::string{param}, nullptr);
+    } catch (std::out_of_range& e) {
+        std::stringstream ss;
+        ss << "convert_value: value " << param << " is out of float-range. ("
+           << e.what() << ")";
+        throw clapp::exception::out_of_range_t{ss.str()};
+    } catch (std::invalid_argument& e) {
+        std::stringstream ss;
+        ss << "convert_value: value " << param << " is invalid. (" << e.what()
+           << ")";
+        throw clapp::exception::invalid_value_t{ss.str()};
+    }
+}
+
+template <>
+double clapp::value::convert_value<double>(const std::string_view param) {
+    try {
+        return std::stod(std::string{param}, nullptr);
+    } catch (std::out_of_range& e) {
+        std::stringstream ss;
+        ss << "convert_value: value " << param << " is out of double-range. ("
+           << e.what() << ")";
+        throw clapp::exception::out_of_range_t{ss.str()};
+    } catch (std::invalid_argument& e) {
+        std::stringstream ss;
+        ss << "convert_value: value " << param << " is invalid. (" << e.what()
+           << ")";
+        throw clapp::exception::invalid_value_t{ss.str()};
+    }
+}
+
 #ifdef CLAPP_FS_AVAIL
 template <>
 clapp::fs::path clapp::value::convert_value<clapp::fs::path>(
@@ -87,13 +164,13 @@ std::string clapp::path_exists_t::append_restriction_text() {
     return "existing path";
 }
 
-void clapp::path_exists_t::validate(const clapp::fs::path &path,
-                                    const std::string &param_name) const {
+void clapp::path_exists_t::validate(const clapp::fs::path& path,
+                                    const std::string& param_name) const {
     if (!clapp::fs::exists(path)) {
         std::stringstream ss;
         ss << "CLI value " << path << " for '" << param_name
            << "' does not exist.";
-        throw std::runtime_error(ss.str());
+        throw clapp::exception::path_does_not_exist_t(ss.str());
     }
 }
 #endif
@@ -104,14 +181,28 @@ static T convert_uint(const std::string_view param) {
                   "Integral template parameter required.");
     static_assert(std::is_unsigned<T>::value,
                   "Unsigned template parameter required.");
-    const std::uint64_t value{std::stoull(std::string{param}, 0, 0)};
-    if (value > std::numeric_limits<T>::max()) {
+    try {
+        const std::uint64_t value{std::stoull(std::string{param}, nullptr, 0)};
+
+        if (value > std::numeric_limits<T>::max()) {
+            std::stringstream ss;
+            ss << "convert_value: value " << value << " is bigger than max "
+               << std::numeric_limits<T>::max();
+            throw clapp::exception::out_of_range_t{ss.str()};
+        }
+        return static_cast<T>(value);
+    } catch (std::out_of_range& e) {
         std::stringstream ss;
-        ss << "convert_value: value " << value << " is bigger than max "
-           << std::numeric_limits<T>::max();
-        throw std::out_of_range{ss.str()};
+        ss << "convert_value: value " << param << " is out of range. ("
+           << std::numeric_limits<T>::min() << " and "
+           << std::numeric_limits<T>::max() << ", " << e.what() << ")";
+        throw clapp::exception::out_of_range_t{ss.str()};
+    } catch (std::invalid_argument& e) {
+        std::stringstream ss;
+        ss << "convert_value: value " << param << " is invalid. (" << e.what()
+           << ")";
+        throw clapp::exception::invalid_value_t{ss.str()};
     }
-    return static_cast<T>(value);
 }
 
 template <typename T>
@@ -120,18 +211,33 @@ static T convert_int(const std::string_view param) {
                   "Integral template parameter required.");
     static_assert(std::is_signed<T>::value,
                   "Signed template parameter required.");
-    const std::int64_t value{std::stoll(std::string{param}, 0, 0)};
-    if (value > std::numeric_limits<T>::max()) {
+    try {
+        const std::int64_t value{std::stoll(std::string{param}, nullptr, 0)};
+
+        if (value > std::numeric_limits<T>::max()) {
+            std::stringstream ss;
+            ss << "convert_value: value " << value << " is bigger than max "
+               << std::numeric_limits<T>::max();
+            throw clapp::exception::out_of_range_t{ss.str()};
+        }
+
+        if (value < std::numeric_limits<T>::min()) {
+            std::stringstream ss;
+            ss << "convert_value: value " << value << " is smaller than min "
+               << std::numeric_limits<T>::max();
+            throw clapp::exception::out_of_range_t{ss.str()};
+        }
+        return static_cast<T>(value);
+    } catch (std::out_of_range& e) {
         std::stringstream ss;
-        ss << "convert_value: value " << value << " is bigger than max "
-           << std::numeric_limits<T>::max();
-        throw std::out_of_range{ss.str()};
-    }
-    if (value < std::numeric_limits<T>::min()) {
+        ss << "convert_value: value " << param << " is out of range. ("
+           << std::numeric_limits<T>::min() << " and "
+           << std::numeric_limits<T>::max() << ", " << e.what() << ")";
+        throw clapp::exception::out_of_range_t{ss.str()};
+    } catch (std::invalid_argument& e) {
         std::stringstream ss;
-        ss << "convert_value: value " << value << " is smaller than min "
-           << std::numeric_limits<T>::max();
-        throw std::out_of_range{ss.str()};
+        ss << "convert_value: value " << param << " is invalid. (" << e.what()
+           << ")";
+        throw clapp::exception::invalid_value_t{ss.str()};
     }
-    return static_cast<T>(value);
 }

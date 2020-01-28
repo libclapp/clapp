@@ -13,8 +13,8 @@
 // SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef LIBCLAPP_SUB_PARSER_H
-#define LIBCLAPP_SUB_PARSER_H
+#ifndef CLAPP_SUB_PARSER_H
+#define CLAPP_SUB_PARSER_H
 
 #include <clapp/parser.h>
 
@@ -23,14 +23,14 @@ namespace clapp {
 inline namespace parser {
 class basic_sub_parser_t : public basic_parser_t {
    public:
-    basic_sub_parser_t(basic_parser_t& parser,
-                       const std::string& sub_parser_name,
-                       const std::string& description,
-                       bool _parse_parent = true);
+    basic_sub_parser_t(basic_parser_t& parser, std::string sub_parser_name_arg,
+                       std::string description_arg,
+                       bool parse_parent_arg = true);
     ~basic_sub_parser_t() override;
     explicit operator bool() const;
     std::string get_sub_parser_name() const;
     void sub_parse(arg_iterator begin, arg_iterator end);
+    std::string gen_help_prefix() const override;
 
    private:
     basic_parser_t& parent_parser;

@@ -13,8 +13,8 @@
 // SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef LIBCLAPP_MAIN_PARSER_H
-#define LIBCLAPP_MAIN_PARSER_H
+#ifndef CLAPP_MAIN_PARSER_H
+#define CLAPP_MAIN_PARSER_H
 
 #include <clapp/parser.h>
 
@@ -30,11 +30,15 @@ class basic_main_parser_t : public basic_parser_t {
     void parse(int argc, const char* const* argv);
     void parse(const arg_t& arg);
 
+    void parse_and_validate(int argc, const char* const* argv);
+
     explicit operator bool() const;
     std::string get_executable() const;
 
+    std::string gen_help_prefix() const override;
+
    private:
-    std::optional<std::string> executable;
+    std::optional<std::string> executable{};
 };
 
 }  // namespace parser

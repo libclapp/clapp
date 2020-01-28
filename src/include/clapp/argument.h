@@ -13,11 +13,12 @@
 // SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef LIBCLAPP_ARGUMENT_H
-#define LIBCLAPP_ARGUMENT_H
+#ifndef CLAPP_ARGUMENT_H
+#define CLAPP_ARGUMENT_H
 
 #include <clapp/parser.h>
 #include <clapp/type_traits.h>
+#include <clapp/value.h>
 #include <functional>
 #include <optional>
 #include <string>
@@ -53,16 +54,18 @@ template <typename T>
 struct arg_params_t {
     using validate_func_t =
         std::function<void(const T&, const std::string& option_string)>;
-    std::vector<std::string> restrictions;
-    std::vector<validate_func_t> validate_funcs;
+    std::vector<std::string> restrictions{};
+    std::vector<validate_func_t> validate_funcs{};
     basic_parser_t::purpose_t purpose{basic_parser_t::purpose_t::mandatory};
-    std::optional<T> default_value;
+    std::optional<T> default_value{};
+    std::vector<clapp::value::found_func_t> found{};
 };
 
 template <typename T, typename ARG_CONF>
 struct arg_conf_container_t {
     ARG_CONF arg_conf;
     std::optional<T> default_value;
+    std::vector<clapp::value::found_func_t> found;
 };
 
 template <typename T>
@@ -103,9 +106,9 @@ class basic_argument_t {
     template <typename... Params>
     basic_argument_t(basic_parser_t& parser, const std::string& argument_name,
                      const std::string& description, Params&&... parameters);
-    explicit operator bool() const;
+    constexpr explicit operator bool() const noexcept;
     T value() const;
-    bool given() const;
+    constexpr bool given() const noexcept;
 
    protected:
     void validate() const;
@@ -114,7 +117,8 @@ class basic_argument_t {
    private:
     static callbacks_t create_callbacks(basic_argument_t<T>* inst);
 
-    std::optional<T> _value;
+    std::vector<clapp::value::found_func_t> _found{};
+    std::optional<T> _value{};
     bool _given{false};
 };
 
@@ -129,9 +133,9 @@ class basic_variadic_argument_t {
                               const std::string& argument_name,
                               const std::string& description,
                               Params&&... parameters);
-    explicit operator bool() const;
+    constexpr explicit operator bool() const noexcept;
     std::vector<T> value() const;
-    bool given() const;
+    constexpr bool given() const noexcept;
 
     static std::string variadic_argument_restrictions();
 
@@ -142,7 +146,8 @@ class basic_variadic_argument_t {
    private:
     static callbacks_t create_callbacks(basic_variadic_argument_t<T>* inst);
 
-    std::vector<T> _value;
+    std::vector<clapp::value::found_func_t> _found{};
+    std::vector<T> _value{};
     bool _given{false};
 };
 
@@ -158,6 +163,14 @@ using int32_argument_t = clapp::basic_argument_t<std::int32_t>;
 using uint32_argument_t = clapp::basic_argument_t<std::uint32_t>;
 using int64_argument_t = clapp::basic_argument_t<std::int64_t>;
 using uint64_argument_t = clapp::basic_argument_t<std::uint64_t>;
+using double_argument_t = clapp::basic_argument_t<double>;
+using float_argument_t = clapp::basic_argument_t<float>;
+using ns_argument_t = clapp::basic_argument_t<std::chrono::nanoseconds>;
+using us_argument_t = clapp::basic_argument_t<std::chrono::microseconds>;
+using ms_argument_t = clapp::basic_argument_t<std::chrono::milliseconds>;
+using sec_argument_t = clapp::basic_argument_t<std::chrono::seconds>;
+using min_argument_t = clapp::basic_argument_t<std::chrono::minutes>;
+using hours_argument_t = clapp::basic_argument_t<std::chrono::hours>;
 
 using variadic_string_argument_t =
     clapp::basic_variadic_argument_t<std::string>;
@@ -180,6 +193,20 @@ using variadic_int64_argument_t =
     clapp::basic_variadic_argument_t<std::int64_t>;
 using variadic_uint64_argument_t =
     clapp::basic_variadic_argument_t<std::uint64_t>;
+using variadic_double_argument_t = clapp::basic_variadic_argument_t<double>;
+using variadic_float_argument_t = clapp::basic_variadic_argument_t<float>;
+using variadic_ns_argument_t =
+    clapp::basic_variadic_argument_t<std::chrono::nanoseconds>;
+using variadic_us_argument_t =
+    clapp::basic_variadic_argument_t<std::chrono::microseconds>;
+using variadic_ms_argument_t =
+    clapp::basic_variadic_argument_t<std::chrono::milliseconds>;
+using variadic_sec_argument_t =
+    clapp::basic_variadic_argument_t<std::chrono::seconds>;
+using variadic_min_argument_t =
+    clapp::basic_variadic_argument_t<std::chrono::minutes>;
+using variadic_hours_argument_t =
+    clapp::basic_variadic_argument_t<std::chrono::hours>;
 
 }  // namespace argument
 

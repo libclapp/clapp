@@ -38,3 +38,13 @@ void clapp::parser::basic_main_parser_t::parse(const arg_t& arg) {
     executable = *it;
     parse(it + 1, arg.cend());
 }
+
+void clapp::parser::basic_main_parser_t::parse_and_validate(
+    int argc, const char* const* argv) {
+    parse(argc, argv);
+    validate_recursive();
+}
+
+std::string clapp::parser::basic_main_parser_t::gen_help_prefix() const {
+    return basic_parser_t::gen_help_prefix() + get_executable();
+}

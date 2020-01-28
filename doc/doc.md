@@ -185,3 +185,55 @@ This classes must contain at least one of these methods:
     The returend strig will be appended to the description of the argumen or option.
 * `void validate(const T &value, const std::string &param_name) const;`
     If this method is defined, it will be called during the `validate()`-call of the parser.
+
+Parser:
+=======
+
+Main Parser:
+------------
+The main parser is the key element of the libClaPP CLI parsing library.
+Typically, it is a derivied class with the base class `clapp::parser::basic_main_parser_t`.
+One of the benefit of the libClaPP library is that all arguments and options can be registered 
+as class members.
+Thus, by simply passing around a reference (or a pointer) to the main parser, all parsed options 
+or arguments are condensed in a class instance.
+
+[//]:#begin_cpp_listing_simple_main_parser
+```c++
+#include <clapp/argument.h>
+#include <clapp/main_parser.h>
+#include <clapp/option.h>
+
+class cli_parser_t : public clapp::basic_main_parser_t {
+   public:
+    cli_parser_t(int argc, const char *const *argv) {
+        parse_and_validate(argc, argv);
+    }
+
+    ~cli_parser_t() override;
+
+    clapp::help_option_t help{*this, "help", 'h', "Show help options."};
+
+    clapp::string_argument_t string_arg{*this, "string-arg", "String argument"};
+
+    //explicitly delete copy/move-ctors and assignmet operators 
+    explicit cli_parser_t(const cli_parser_t &) = delete;
+    explicit cli_parser_t(cli_parser_t &&) noexcept = delete;
+    cli_parser_t &operator=(const cli_parser_t &) = delete;
+    cli_parser_t &operator=(cli_parser_t &&) noexcept = delete;
+};
+
+cli_parser_t::~cli_parser_t() = default;
+
+int main(int argc, char *argv[]) {
+    try {
+        cli_parser_t cp{argc, argv};  // parses and validates cli-arguments
+
+        Expects(cp.string_arg);  // parser ensures mandatory arguments are given
+        std::cout << "string-arg: " << cp.string_arg.value() << std::endl;
+    } catch (std::exception &e) {
+        std::cout << "Caught Exception: " << e.what() << std::endl;
+    }
+}
+```
+[//]:#end_cpp_listing_simple_main_parser
