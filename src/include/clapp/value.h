@@ -73,9 +73,9 @@ class found_func_t {
 #ifdef CLAPP_FS_AVAIL
 class path_exists_t {
    public:
-    std::string append_restriction_text();
+    static std::string append_restriction_text();
 
-    void validate(const fs::path &path, const std::string &param_name) const;
+    static void validate(const fs::path &path, const std::string &param_name);
 };
 #endif
 

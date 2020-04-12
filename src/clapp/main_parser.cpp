@@ -13,6 +13,7 @@
 // SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <clapp/exception.h>
 #include <clapp/main_parser.h>
 
 clapp::parser::basic_main_parser_t::basic_main_parser_t() = default;
@@ -24,7 +25,10 @@ clapp::parser::basic_main_parser_t::operator bool() const {
 }
 
 std::string clapp::parser::basic_main_parser_t::get_executable() const {
-    return executable.value();
+    if (executable.has_value()) {
+        return executable.value();
+    }
+    throw no_executable_exception_t{"The parser does not know the executable."};
 }
 
 void clapp::parser::basic_main_parser_t::parse(int argc,
@@ -45,6 +49,16 @@ void clapp::parser::basic_main_parser_t::parse_and_validate(
     validate_recursive();
 }
 
-std::string clapp::parser::basic_main_parser_t::gen_help_prefix() const {
-    return basic_parser_t::gen_help_prefix() + get_executable();
+std::string clapp::parser::basic_main_parser_t::gen_short_line_prefix() const {
+    return get_executable() + gen_short_line();
+}
+
+void clapp::parser::basic_main_parser_t::set_max_option_string_size(
+    const std::size_t max_option_size) {
+    max_option_string_size = max_option_size;
+}
+
+std::size_t clapp::parser::basic_main_parser_t::get_max_option_string_size()
+    const {
+    return max_option_string_size;
 }

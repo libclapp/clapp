@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.8.0)
 
-message(STATUS "Resolving GIT Version")
+message(STATUS "Resolving GIT Version for libClaPP")
 
 find_package(Git)
 
@@ -19,7 +19,7 @@ endif()
 
 message(STATUS "trying git `${GIT_EXECUTABLE}`:")
 execute_process(
-  COMMAND ${GIT_EXECUTABLE} -C ${CMAKE_SOURCE_DIR} rev-parse --abbrev-ref HEAD
+  COMMAND ${GIT_EXECUTABLE} -C ${libClaPP_SOURCE_DIR} rev-parse --abbrev-ref HEAD
   WORKING_DIRECTORY "${local_dir}"
   OUTPUT_VARIABLE libClaPP_GIT_BRANCH
   ERROR_QUIET
@@ -27,15 +27,24 @@ execute_process(
   RESULT_VARIABLE libClaPP_result_branch
 )
 execute_process(
-  COMMAND ${GIT_EXECUTABLE} -C ${CMAKE_SOURCE_DIR} rev-parse --short HEAD
+  COMMAND ${GIT_EXECUTABLE} -C ${libClaPP_SOURCE_DIR} describe --dirty --broken --always
   WORKING_DIRECTORY "${local_dir}"
   OUTPUT_VARIABLE libClaPP_GIT_HASH
   ERROR_QUIET
   OUTPUT_STRIP_TRAILING_WHITESPACE
   RESULT_VARIABLE libClaPP_result_hash
 )
-if(NOT ((libClaPP_result_hash EQUAL 0) AND (libClaPP_result_branch EQUAL 0)))
+execute_process(
+  COMMAND ${GIT_EXECUTABLE} -C ${libClaPP_SOURCE_DIR} describe --dirty --broken --always --tags
+  WORKING_DIRECTORY "${local_dir}"
+  OUTPUT_VARIABLE libClaPP_GIT_DESCRIPTION
+  ERROR_QUIET
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  RESULT_VARIABLE libClaPP_result_description
+)
+if(NOT ((libClaPP_result_hash EQUAL 0) AND (libClaPP_result_branch EQUAL 0) AND (libClaPP_result_description EQUAL 0)))
     set(libClaPP_GIT_HASH "unknown")
     set(libClaPP_GIT_BRANCH "unknown")
+    set(libClaPP_GIT_DESCRIPTION "unknown")
 endif()
-message(STATUS "GIT branch: ${libClaPP_GIT_BRANCH}, GIT hash: ${libClaPP_GIT_HASH}")
+message(STATUS "GIT branch: ${libClaPP_GIT_BRANCH}, GIT hash: ${libClaPP_GIT_HASH}, GIT description: ${libClaPP_GIT_DESCRIPTION}")

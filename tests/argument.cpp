@@ -4,6 +4,8 @@
 
 class argument_test_parser_t : public clapp::parser::basic_parser_t {
    public:
+    ~argument_test_parser_t() override;
+
     using clapp::parser::basic_parser_t::purpose_t;
 
     using clapp::parser::basic_parser_t::argument_descriptions_vec_t;
@@ -16,11 +18,28 @@ class argument_test_parser_t : public clapp::parser::basic_parser_t {
     using clapp::parser::basic_parser_t::get_optional_argument_descriptions;
     using clapp::parser::basic_parser_t::get_validate_functions;
 
-   public:
-    ~argument_test_parser_t() override;
+    [[nodiscard]] std::string gen_short_line_prefix() const override;
+    void set_max_option_string_size(std::size_t max_option_size) override;
+    [[nodiscard]] std::size_t get_max_option_string_size() const override;
+
+   private:
+    std::size_t max_option_string_size{0};
 };
 
 argument_test_parser_t::~argument_test_parser_t() = default;
+
+std::string argument_test_parser_t::gen_short_line_prefix() const {
+    return "arg-test-parser" + gen_short_line();
+}
+
+void argument_test_parser_t::set_max_option_string_size(
+    const std::size_t max_option_size) {
+    max_option_string_size = max_option_size;
+}
+
+std::size_t argument_test_parser_t::get_max_option_string_size() const {
+    return max_option_string_size;
+}
 
 class simple_argument_sub_parser_t : public clapp::parser::basic_sub_parser_t {
     using clapp::parser::basic_sub_parser_t::basic_sub_parser_t;
@@ -31,7 +50,7 @@ class simple_argument_sub_parser_t : public clapp::parser::basic_sub_parser_t {
 
 simple_argument_sub_parser_t::~simple_argument_sub_parser_t() = default;
 
-TEST(argument, basic_argument_construct_to_short_argument_name_throws) {
+TEST(argument, basicArgumentConstructToShortArgumentNameThrows) {
     const std::string arg_name;
     const std::string arg_desc{"description"};
     argument_test_parser_t tp;
@@ -39,9 +58,8 @@ TEST(argument, basic_argument_construct_to_short_argument_name_throws) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST(
-    argument,
-    basic_argument_construct_variadic_argument_and_register_another_argument_throws) {
+TEST(argument,
+     basicArgumentConstructVariadicArgumentAndRegisterAnotherArgumentThrows) {
     const std::string variadic_arg_name{"variadic"};
     const std::string arg_name{"arg"};
     const std::string arg_desc{"description"};
@@ -52,9 +70,8 @@ TEST(
                  clapp::exception::argument_exception_t);
 }
 
-TEST(
-    argument,
-    basic_argument_construct_optional_argument_and_register_mandatory_argument_throws) {
+TEST(argument,
+     basicArgumentConstructOptionalArgumentAndRegisterMandatoryArgumentThrows) {
     const std::string optional_arg_name{"variadic"};
     const std::string arg_name{"arg"};
     const std::string arg_desc{"description"};
@@ -66,8 +83,7 @@ TEST(
                  clapp::exception::argument_exception_t);
 }
 
-TEST(argument,
-     basic_argument_construct_sub_parser_and_register_argument_throws) {
+TEST(argument, basicArgumentConstructSubParserAndRegisterArgumentThrows) {
     const std::string arg_name{"arg"};
     const std::string arg_desc{"description"};
     argument_test_parser_t tp;
@@ -79,7 +95,7 @@ TEST(argument,
                  clapp::exception::argument_exception_t);
 }
 
-TEST(argument, basic_argument_found_func_long) {
+TEST(argument, basicArgumentFoundFuncLong) {
     const std::string arg_name{"arg"};
     const std::string arg_desc{"description"};
 
@@ -101,7 +117,7 @@ TEST(argument, basic_argument_found_func_long) {
     ASSERT_THAT(ss.str(), testing::StrEq("this is a test"));
 }
 
-TEST(argument, basic_argument_construct_simple) {
+TEST(argument, basicArgumentConstructSimple) {
     const std::string arg_name{"argument name"};
     const std::string arg_desc{"description"};
     argument_test_parser_t tp;
@@ -136,7 +152,7 @@ TEST(argument, basic_argument_construct_simple) {
     ASSERT_NO_THROW(validate_funcs[0]());
 }
 
-TEST(argument, basic_argument_construct_mandatory) {
+TEST(argument, basicArgumentConstructMandatory) {
     const std::string arg_name{"argument name"};
     const std::string arg_desc{"description"};
     argument_test_parser_t tp;
@@ -172,7 +188,7 @@ TEST(argument, basic_argument_construct_mandatory) {
     ASSERT_NO_THROW(validate_funcs[0]());
 }
 
-TEST(argument, basic_argument_construct_optional) {
+TEST(argument, basicArgumentConstructOptional) {
     const std::string arg_name{"argument name"};
     const std::string arg_desc{"description"};
     argument_test_parser_t tp;
@@ -206,7 +222,7 @@ TEST(argument, basic_argument_construct_optional) {
     ASSERT_THAT(arg.value(), testing::Eq(12345));
 }
 
-TEST(argument, basic_argument_construct_optional_default_value) {
+TEST(argument, basicArgumentConstructOptionalDefaultValue) {
     const std::string arg_name{"argument name"};
     const std::string arg_desc{"description"};
     argument_test_parser_t tp;
@@ -244,7 +260,7 @@ TEST(argument, basic_argument_construct_optional_default_value) {
     ASSERT_THAT(arg.value(), testing::Eq(123));
 }
 
-TEST(argument, basic_argument_construct_mandatory_default_value) {
+TEST(argument, basicArgumentConstructMandatoryDefaultValue) {
     const std::string arg_name{"argument name"};
     const std::string arg_desc{"desciption"};
     const std::uint32_t default_value{1123};
@@ -286,10 +302,10 @@ TEST(argument, basic_argument_construct_mandatory_default_value) {
     args[0].func("0x12341234");
     ASSERT_THAT(static_cast<bool>(arg), testing::Eq(true));
     ASSERT_THAT(arg.given(), testing::Eq(true));
-    ASSERT_THAT(arg.value(), testing::Eq(0x12341234u));
+    ASSERT_THAT(arg.value(), testing::Eq(0x12341234U));
 }
 
-TEST(argument, basic_argument_construct_optional_default_value_min_max) {
+TEST(argument, basicArgumentConstructOptionalDefaultValueMinMax) {
     const std::string arg_name{"argument name"};
     const std::string arg_desc{"desciption"};
     argument_test_parser_t tp;
@@ -341,7 +357,7 @@ TEST(argument, basic_argument_construct_optional_default_value_min_max) {
     ASSERT_THROW(validate_funcs[0](), clapp::exception::out_of_range_t);
 }
 
-TEST(argument, basic_argument_construct_mandatory_path_exists) {
+TEST(argument, basicArgumentConstructMandatoryPathExists) {
     const std::string arg_name1{"arg"};
     const std::string arg_desc1{"desc"};
     argument_test_parser_t tp;
@@ -389,7 +405,7 @@ TEST(argument, basic_argument_construct_mandatory_path_exists) {
     ASSERT_NO_THROW(validate_funcs[0]());
 }
 
-TEST(argument, basic_variadic_argument_found_func_long) {
+TEST(argument, basicVariadicArgumentFoundFuncLong) {
     const std::string arg_name{"arg"};
     const std::string arg_desc{"description"};
 
@@ -417,7 +433,7 @@ TEST(argument, basic_variadic_argument_found_func_long) {
     ASSERT_THAT(ss.str(), testing::StrEq("this is a testthis is a test"));
 }
 
-TEST(argument, basic_variadic_argument_construct_simple) {
+TEST(argument, basicVariadicArgumentConstructSimple) {
     const std::string arg_name{"argument name"};
     const std::string arg_desc{"desc"};
     argument_test_parser_t tp;
@@ -467,7 +483,7 @@ TEST(argument, basic_variadic_argument_construct_simple) {
     ASSERT_NO_THROW(validate_funcs[0]());
 }
 
-TEST(argument, basic_variadic_argument_construct_simple_optional) {
+TEST(argument, basicVariadicArgumentConstructSimpleOptional) {
     const std::string arg_name{"argument name"};
     const std::string arg_desc{"desc"};
     argument_test_parser_t tp;
@@ -512,7 +528,7 @@ TEST(argument, basic_variadic_argument_construct_simple_optional) {
                 testing::Eq(std::vector<std::string>{"ccc", "aba"}));
 }
 
-TEST(argument, basic_variadic_argument_construct_simple_optional_min_max) {
+TEST(argument, basicVariadicArgumentConstructSimpleOptionalMinMax) {
     const std::string arg_name{"argument name"};
     const std::string arg_desc{"desc"};
     const clapp::value::min_max_value_t<std::int64_t> min_max{-2, 10};
@@ -569,7 +585,7 @@ TEST(argument, basic_variadic_argument_construct_simple_optional_min_max) {
     ASSERT_THROW(validate_funcs[0](), clapp::exception::out_of_range_t);
 }
 
-TEST(argument, basic_variadic_argument_construct_simple_default_value_throws) {
+TEST(argument, basicVariadicArgumentConstructSimpleDefaultValueThrows) {
     const std::string arg_name{"argument name"};
     const std::string arg_desc{"desc"};
     const clapp::value::default_value_t<std::int8_t> default_value{10};

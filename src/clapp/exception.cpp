@@ -160,10 +160,10 @@ clapp::exception::parser_exception_t::~parser_exception_t() noexcept = default;
 
 clapp::exception::sub_parser_exception_t::sub_parser_exception_t(
     const char* message)
-    : clapp_exception_t(message) {}
+    : parser_exception_t(message) {}
 clapp::exception::sub_parser_exception_t::sub_parser_exception_t(
     const std::string& message)
-    : clapp_exception_t(message) {}
+    : parser_exception_t(message) {}
 clapp::exception::sub_parser_exception_t::sub_parser_exception_t(
     const sub_parser_exception_t&) = default;
 clapp::exception::sub_parser_exception_t&
@@ -176,3 +176,41 @@ clapp::exception::sub_parser_exception_t::operator=(
     sub_parser_exception_t&&) noexcept = default;
 clapp::exception::sub_parser_exception_t::~sub_parser_exception_t() noexcept =
     default;
+
+clapp::exception::main_parser_exception_t::main_parser_exception_t(
+    const char* message)
+    : parser_exception_t(message) {}
+clapp::exception::main_parser_exception_t::main_parser_exception_t(
+    const std::string& message)
+    : parser_exception_t(message) {}
+clapp::exception::main_parser_exception_t::main_parser_exception_t(
+    const main_parser_exception_t&) = default;
+clapp::exception::main_parser_exception_t&
+clapp::exception::main_parser_exception_t::operator=(
+    const main_parser_exception_t&) = default;
+clapp::exception::main_parser_exception_t::main_parser_exception_t(
+    main_parser_exception_t&&) noexcept = default;
+clapp::exception::main_parser_exception_t&
+clapp::exception::main_parser_exception_t::operator=(
+    main_parser_exception_t&&) noexcept = default;
+clapp::exception::main_parser_exception_t::~main_parser_exception_t() noexcept =
+    default;
+
+clapp::exception::no_executable_exception_t::no_executable_exception_t(
+    const char* message)
+    : main_parser_exception_t(message) {}
+clapp::exception::no_executable_exception_t::no_executable_exception_t(
+    const std::string& message)
+    : main_parser_exception_t(message) {}
+clapp::exception::no_executable_exception_t::no_executable_exception_t(
+    const no_executable_exception_t&) = default;
+clapp::exception::no_executable_exception_t&
+clapp::exception::no_executable_exception_t::operator=(
+    const no_executable_exception_t&) = default;
+clapp::exception::no_executable_exception_t::no_executable_exception_t(
+    no_executable_exception_t&&) noexcept = default;
+clapp::exception::no_executable_exception_t&
+clapp::exception::no_executable_exception_t::operator=(
+    no_executable_exception_t&&) noexcept = default;
+clapp::exception::no_executable_exception_t::
+    ~no_executable_exception_t() noexcept = default;

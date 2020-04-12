@@ -2,33 +2,33 @@
 #include <clapp/value.h>
 #include <gmock/gmock.h>
 
-TEST(value, convert_value_string) {
+TEST(value, convertValueString) {
     ASSERT_THAT(clapp::value::convert_value<std::string>("aba"),
                 testing::Eq(std::string{"aba"}));
     ASSERT_THAT(clapp::value::convert_value<std::string>("abba"),
                 testing::Eq(std::string{"abba"}));
 }
 
-TEST(value, convert_value_path) {
+TEST(value, convertValuePath) {
     ASSERT_THAT(clapp::value::convert_value<clapp::fs::path>("/tmp/test"),
                 testing::Eq(clapp::fs::path{"/tmp/test"}));
 }
 
-TEST(value, convert_value_uint8_t) {
+TEST(value, convertValueUint8T) {
     ASSERT_THAT(clapp::value::convert_value<std::uint8_t>("0"),
-                testing::Eq(std::uint8_t{0u}));
+                testing::Eq(std::uint8_t{0U}));
     ASSERT_THAT(clapp::value::convert_value<std::uint8_t>("100"),
-                testing::Eq(std::uint8_t{100u}));
+                testing::Eq(std::uint8_t{100U}));
     ASSERT_THAT(clapp::value::convert_value<std::uint8_t>("255"),
-                testing::Eq(std::uint8_t{255u}));
+                testing::Eq(std::uint8_t{255U}));
     ASSERT_THAT(clapp::value::convert_value<std::uint8_t>("2.555"),
-                testing::Eq(std::uint8_t{2}));
+                testing::Eq(std::uint8_t{2U}));
     ASSERT_THAT(clapp::value::convert_value<std::uint8_t>("0xab"),
-                testing::Eq(std::uint8_t{0xabu}));
+                testing::Eq(std::uint8_t{0xabU}));
     ASSERT_THAT(clapp::value::convert_value<std::uint8_t>("0xff"),
-                testing::Eq(std::uint8_t{0xffu}));
+                testing::Eq(std::uint8_t{0xffU}));
     ASSERT_THAT(clapp::value::convert_value<std::uint8_t>("077"),
-                testing::Eq(std::uint8_t{077}));
+                testing::Eq(std::uint8_t{077U}));
     ASSERT_THROW(clapp::value::convert_value<std::uint8_t>("256"),
                  clapp::exception::out_of_range_t);
     ASSERT_THROW(clapp::value::convert_value<std::uint8_t>("-1"),
@@ -37,21 +37,21 @@ TEST(value, convert_value_uint8_t) {
                  clapp::exception::invalid_value_t);
 }
 
-TEST(value, convert_value_uint16_t) {
+TEST(value, convertValueUint16T) {
     ASSERT_THAT(clapp::value::convert_value<std::uint16_t>("0"),
-                testing::Eq(std::uint16_t{0u}));
+                testing::Eq(std::uint16_t{0U}));
     ASSERT_THAT(clapp::value::convert_value<std::uint16_t>("1000"),
-                testing::Eq(std::uint16_t{1000u}));
+                testing::Eq(std::uint16_t{1000U}));
     ASSERT_THAT(clapp::value::convert_value<std::uint16_t>("65535"),
-                testing::Eq(std::uint16_t{65535u}));
+                testing::Eq(std::uint16_t{65535U}));
     ASSERT_THAT(clapp::value::convert_value<std::uint16_t>("2222.555"),
-                testing::Eq(std::uint16_t{2222}));
+                testing::Eq(std::uint16_t{2222U}));
     ASSERT_THAT(clapp::value::convert_value<std::uint16_t>("0xffab"),
-                testing::Eq(std::uint16_t{0xffabu}));
+                testing::Eq(std::uint16_t{0xffabU}));
     ASSERT_THAT(clapp::value::convert_value<std::uint16_t>("0xffff"),
-                testing::Eq(std::uint16_t{0xffffu}));
+                testing::Eq(std::uint16_t{0xffffU}));
     ASSERT_THAT(clapp::value::convert_value<std::uint16_t>("01234"),
-                testing::Eq(std::uint16_t{01234u}));
+                testing::Eq(std::uint16_t{01234U}));
     ASSERT_THROW(clapp::value::convert_value<std::uint16_t>("65536"),
                  clapp::exception::out_of_range_t);
     ASSERT_THROW(clapp::value::convert_value<std::uint16_t>("-100"),
@@ -60,19 +60,19 @@ TEST(value, convert_value_uint16_t) {
                  clapp::exception::invalid_value_t);
 }
 
-TEST(value, convert_value_uint32_t) {
+TEST(value, convertValueUint32T) {
     ASSERT_THAT(clapp::value::convert_value<std::uint32_t>("0"),
-                testing::Eq(std::uint32_t{0u}));
+                testing::Eq(std::uint32_t{0U}));
     ASSERT_THAT(clapp::value::convert_value<std::uint32_t>("10000"),
-                testing::Eq(std::uint32_t{10000u}));
+                testing::Eq(std::uint32_t{10000U}));
     ASSERT_THAT(clapp::value::convert_value<std::uint32_t>("4294967295"),
-                testing::Eq(std::uint32_t{4294967295u}));
+                testing::Eq(std::uint32_t{4294967295U}));
     ASSERT_THAT(clapp::value::convert_value<std::uint32_t>("0xffab"),
-                testing::Eq(std::uint32_t{0xffabu}));
+                testing::Eq(std::uint32_t{0xffabU}));
     ASSERT_THAT(clapp::value::convert_value<std::uint32_t>("0xffffffff"),
-                testing::Eq(std::uint32_t{0xffffffffu}));
+                testing::Eq(std::uint32_t{0xffffffffU}));
     ASSERT_THAT(clapp::value::convert_value<std::uint32_t>("0123456"),
-                testing::Eq(std::uint32_t{0123456u}));
+                testing::Eq(std::uint32_t{0123456U}));
     ASSERT_THROW(clapp::value::convert_value<std::uint32_t>("4294967296"),
                  clapp::exception::out_of_range_t);
     ASSERT_THROW(clapp::value::convert_value<std::uint32_t>("-10000"),
@@ -81,21 +81,21 @@ TEST(value, convert_value_uint32_t) {
                  clapp::exception::invalid_value_t);
 }
 
-TEST(value, convert_value_uint64_t) {
+TEST(value, convertValueUint64T) {
     ASSERT_THAT(clapp::value::convert_value<std::uint64_t>("0"),
-                testing::Eq(std::uint64_t{0u}));
+                testing::Eq(std::uint64_t{0U}));
     ASSERT_THAT(clapp::value::convert_value<std::uint64_t>("1000000"),
-                testing::Eq(std::uint64_t{1000000u}));
+                testing::Eq(std::uint64_t{1000000U}));
     ASSERT_THAT(
         clapp::value::convert_value<std::uint64_t>("18446744073709551615"),
-        testing::Eq(std::uint64_t{18446744073709551615ull}));
+        testing::Eq(std::uint64_t{18446744073709551615ULL}));
     ASSERT_THAT(clapp::value::convert_value<std::uint64_t>("0xffab"),
-                testing::Eq(std::uint64_t{0xffabu}));
+                testing::Eq(std::uint64_t{0xffabU}));
     ASSERT_THAT(
         clapp::value::convert_value<std::uint64_t>("0xffffffffffffffff"),
-        testing::Eq(std::uint64_t{0xffffffffffffffffull}));
+        testing::Eq(std::uint64_t{0xffffffffffffffffULL}));
     ASSERT_THAT(clapp::value::convert_value<std::uint64_t>("012345671234"),
-                testing::Eq(std::uint64_t{012345671234ull}));
+                testing::Eq(std::uint64_t{012345671234ULL}));
     ASSERT_THROW(
         clapp::value::convert_value<std::uint64_t>("18446744073709551616"),
         clapp::exception::out_of_range_t);
@@ -103,7 +103,7 @@ TEST(value, convert_value_uint64_t) {
                  clapp::exception::invalid_value_t);
 }
 
-TEST(value, convert_value_int8_t) {
+TEST(value, convertValueInt8T) {
     ASSERT_THAT(clapp::value::convert_value<std::int8_t>("0"),
                 testing::Eq(std::int8_t{0}));
     ASSERT_THAT(clapp::value::convert_value<std::int8_t>("100"),
@@ -128,7 +128,7 @@ TEST(value, convert_value_int8_t) {
                  clapp::exception::invalid_value_t);
 }
 
-TEST(value, convert_value_int16_t) {
+TEST(value, convertValueInt16T) {
     ASSERT_THAT(clapp::value::convert_value<std::int16_t>("0"),
                 testing::Eq(std::int16_t{0}));
     ASSERT_THAT(clapp::value::convert_value<std::int16_t>("10000"),
@@ -144,7 +144,7 @@ TEST(value, convert_value_int16_t) {
     ASSERT_THAT(clapp::value::convert_value<std::int16_t>("-0x7fff"),
                 testing::Eq(std::int16_t{-0x7fff}));
     ASSERT_THAT(clapp::value::convert_value<std::int16_t>("-01234"),
-                testing::Eq(std::int16_t{-01234ll}));
+                testing::Eq(std::int16_t{-01234LL}));
     ASSERT_THROW(clapp::value::convert_value<std::int16_t>("32768"),
                  clapp::exception::out_of_range_t);
     ASSERT_THROW(clapp::value::convert_value<std::int16_t>("-32769"),
@@ -153,7 +153,7 @@ TEST(value, convert_value_int16_t) {
                  clapp::exception::invalid_value_t);
 }
 
-TEST(value, convert_value_int32_t) {
+TEST(value, convertValueInt32T) {
     ASSERT_THAT(clapp::value::convert_value<std::int32_t>("0"),
                 testing::Eq(std::int32_t{0}));
     ASSERT_THAT(clapp::value::convert_value<std::int32_t>("1000000"),
@@ -165,11 +165,11 @@ TEST(value, convert_value_int32_t) {
     ASSERT_THAT(clapp::value::convert_value<std::int32_t>("-2147483648"),
                 testing::Eq(std::int32_t{-2147483648}));
     ASSERT_THAT(clapp::value::convert_value<std::int32_t>("0xffab"),
-                testing::Eq(std::int32_t{0xffabu}));
+                testing::Eq(std::int32_t{0xffab}));
     ASSERT_THAT(clapp::value::convert_value<std::int32_t>("-0x3fffffff"),
                 testing::Eq(std::int32_t{-0x3fffffff}));
     ASSERT_THAT(clapp::value::convert_value<std::int32_t>("-0123456"),
-                testing::Eq(std::int32_t{-0123456ll}));
+                testing::Eq(std::int32_t{-0123456LL}));
     ASSERT_THROW(clapp::value::convert_value<std::int32_t>("2147483648"),
                  clapp::exception::out_of_range_t);
     ASSERT_THROW(clapp::value::convert_value<std::int32_t>("-2147483649"),
@@ -178,27 +178,27 @@ TEST(value, convert_value_int32_t) {
                  clapp::exception::invalid_value_t);
 }
 
-TEST(value, convert_value_int64_t) {
+TEST(value, convertValueInt64T) {
     ASSERT_THAT(clapp::value::convert_value<std::int64_t>("0"),
                 testing::Eq(std::int64_t{0}));
     ASSERT_THAT(clapp::value::convert_value<std::int64_t>("10000000000"),
-                testing::Eq(std::int64_t{10000000000ll}));
+                testing::Eq(std::int64_t{10000000000LL}));
     ASSERT_THAT(
         clapp::value::convert_value<std::int64_t>("9223372036854775807"),
-        testing::Eq(std::int64_t{9223372036854775807ll}));
+        testing::Eq(std::int64_t{9223372036854775807LL}));
     ASSERT_THAT(
         clapp::value::convert_value<std::int64_t>("-9223372036854775807"),
-        testing::Eq(std::int64_t{-9223372036854775807ll}));
+        testing::Eq(std::int64_t{-9223372036854775807LL}));
     ASSERT_THAT(
         clapp::value::convert_value<std::int64_t>("-9223372036854775808"),
-        testing::Eq(std::int64_t{-9223372036854775807ll - 1ll}));
+        testing::Eq(std::int64_t{-9223372036854775807LL - 1LL}));
     ASSERT_THAT(clapp::value::convert_value<std::int64_t>("0x3fffffffffffff"),
                 testing::Eq(std::int64_t{0x3fffffffffffffLL}));
     ASSERT_THAT(
         clapp::value::convert_value<std::int64_t>("-0x3fffffffffffffff"),
         testing::Eq(std::int64_t{-0x3fffffffffffffffLL}));
     ASSERT_THAT(clapp::value::convert_value<std::int64_t>("-012345671234"),
-                testing::Eq(std::int64_t{-012345671234ll}));
+                testing::Eq(std::int64_t{-012345671234LL}));
     ASSERT_THROW(
         clapp::value::convert_value<std::int64_t>("9223372036854775808"),
         clapp::exception::out_of_range_t);
@@ -209,7 +209,7 @@ TEST(value, convert_value_int64_t) {
                  clapp::exception::invalid_value_t);
 }
 
-TEST(value, convert_value_double) {
+TEST(value, convertValueDouble) {
     ASSERT_THAT(clapp::value::convert_value<double>("0"),
                 testing::Eq(double{0}));
     ASSERT_THAT(clapp::value::convert_value<double>("10000000000"),
@@ -230,67 +230,67 @@ TEST(value, convert_value_double) {
                  clapp::exception::invalid_value_t);
 }
 
-TEST(value, convert_value_float) {
+TEST(value, convertValueFloat) {
     ASSERT_THAT(clapp::value::convert_value<float>("0"),
-                testing::Eq(float{0.f}));
+                testing::Eq(float{0.F}));
     ASSERT_THAT(clapp::value::convert_value<float>("10000000000"),
-                testing::Eq(float{10000000000.f}));
+                testing::Eq(float{10000000000.F}));
     ASSERT_THAT(clapp::value::convert_value<float>("0.125"),
-                testing::Eq(float{0.125f}));
+                testing::Eq(float{0.125F}));
     ASSERT_THAT(clapp::value::convert_value<float>("5e-1"),
-                testing::Eq(float{.5f}));
+                testing::Eq(float{.5F}));
     ASSERT_THROW(clapp::value::convert_value<float>("10e-600"),
                  clapp::exception::out_of_range_t);
     ASSERT_THROW(clapp::value::convert_value<float>("z"),
                  clapp::exception::invalid_value_t);
 }
 
-TEST(value, convert_value_chrono_nanoseconds) {
+TEST(value, convertValueChronoNanoseconds) {
     ASSERT_THAT(clapp::value::convert_value<std::chrono::nanoseconds>("0"),
-                testing::Eq(std::chrono::nanoseconds{0u}));
+                testing::Eq(std::chrono::nanoseconds{0U}));
     ASSERT_THAT(
         clapp::value::convert_value<std::chrono::nanoseconds>("1000000"),
-        testing::Eq(std::chrono::nanoseconds{1000000u}));
+        testing::Eq(std::chrono::nanoseconds{1000000U}));
 }
 
-TEST(value, convert_value_chrono_microseconds) {
+TEST(value, convertValueChronoMicroseconds) {
     ASSERT_THAT(clapp::value::convert_value<std::chrono::microseconds>("0"),
-                testing::Eq(std::chrono::microseconds{0u}));
+                testing::Eq(std::chrono::microseconds{0U}));
     ASSERT_THAT(
         clapp::value::convert_value<std::chrono::microseconds>("1000000"),
-        testing::Eq(std::chrono::microseconds{1000000u}));
+        testing::Eq(std::chrono::microseconds{1000000U}));
 }
 
-TEST(value, convert_value_chrono_milliseconds) {
+TEST(value, convertValueChronoMilliseconds) {
     ASSERT_THAT(clapp::value::convert_value<std::chrono::milliseconds>("0"),
-                testing::Eq(std::chrono::milliseconds{0u}));
+                testing::Eq(std::chrono::milliseconds{0U}));
     ASSERT_THAT(
         clapp::value::convert_value<std::chrono::milliseconds>("1000000"),
-        testing::Eq(std::chrono::milliseconds{1000000u}));
+        testing::Eq(std::chrono::milliseconds{1000000U}));
 }
 
-TEST(value, convert_value_chrono_seconds) {
+TEST(value, convertValueChronoSeconds) {
     ASSERT_THAT(clapp::value::convert_value<std::chrono::seconds>("0"),
-                testing::Eq(std::chrono::seconds{0u}));
+                testing::Eq(std::chrono::seconds{0U}));
     ASSERT_THAT(clapp::value::convert_value<std::chrono::seconds>("1000000"),
-                testing::Eq(std::chrono::seconds{1000000u}));
+                testing::Eq(std::chrono::seconds{1000000U}));
 }
 
-TEST(value, convert_value_chrono_minutes) {
+TEST(value, convertValueChronoMinutes) {
     ASSERT_THAT(clapp::value::convert_value<std::chrono::minutes>("0"),
-                testing::Eq(std::chrono::minutes{0u}));
+                testing::Eq(std::chrono::minutes{0U}));
     ASSERT_THAT(clapp::value::convert_value<std::chrono::minutes>("1000000"),
-                testing::Eq(std::chrono::minutes{1000000u}));
+                testing::Eq(std::chrono::minutes{1000000U}));
 }
 
-TEST(value, convert_value_chrono_hours) {
+TEST(value, convertValueChronoHours) {
     ASSERT_THAT(clapp::value::convert_value<std::chrono::hours>("0"),
-                testing::Eq(std::chrono::hours{0u}));
+                testing::Eq(std::chrono::hours{0U}));
     ASSERT_THAT(clapp::value::convert_value<std::chrono::hours>("1000000"),
-                testing::Eq(std::chrono::hours{1000000u}));
+                testing::Eq(std::chrono::hours{1000000U}));
 }
 
-TEST(value, get_chrono_postfix) {
+TEST(value, getChronoPostfix) {
     ASSERT_THAT(clapp::value::get_chrono_postfix<std::chrono::nanoseconds>(),
                 testing::StrEq("ns"));
     ASSERT_THAT(clapp::value::get_chrono_postfix<std::chrono::microseconds>(),
@@ -305,7 +305,7 @@ TEST(value, get_chrono_postfix) {
                 testing::StrEq("h"));
 }
 
-TEST(value, default_value_uint8_t) {
+TEST(value, defaultValueUint8T) {
     constexpr std::uint8_t value{10};
     clapp::value::default_value_t<std::uint8_t> dv{value};
     std::stringstream ss;
@@ -314,7 +314,7 @@ TEST(value, default_value_uint8_t) {
     ASSERT_THAT(dv.default_value(), testing::Eq(std::uint8_t{value}));
 }
 
-TEST(value, default_value_int8_t) {
+TEST(value, defaultValueInt8T) {
     constexpr std::int8_t value{-10};
     clapp::value::default_value_t<std::int8_t> dv{value};
     std::stringstream ss;
@@ -323,7 +323,7 @@ TEST(value, default_value_int8_t) {
     ASSERT_THAT(dv.default_value(), testing::Eq(std::int8_t{value}));
 }
 
-TEST(value, default_value_int32_t) {
+TEST(value, defaultValueInt32T) {
     constexpr std::int32_t value{100'000};
     clapp::value::default_value_t<std::int32_t> dv{value};
     std::stringstream ss;
@@ -332,7 +332,7 @@ TEST(value, default_value_int32_t) {
     ASSERT_THAT(dv.default_value(), testing::Eq(value));
 }
 
-TEST(value, default_value_string) {
+TEST(value, defaultValueString) {
     const std::string value{"value"};
     clapp::value::default_value_t<std::string> dv{value};
     std::stringstream ss;
@@ -341,7 +341,7 @@ TEST(value, default_value_string) {
     ASSERT_THAT(dv.default_value(), testing::Eq(value));
 }
 
-TEST(value, default_value_milliseconds) {
+TEST(value, defaultValueMilliseconds) {
     constexpr std::uint64_t value{30};
     clapp::value::default_value_t<std::chrono::milliseconds> dv{
         std::chrono::milliseconds{value}};
@@ -352,7 +352,7 @@ TEST(value, default_value_milliseconds) {
                 testing::Eq(std::chrono::milliseconds{value}));
 }
 
-TEST(value, min_max_value_uint8_t) {
+TEST(value, minMaxValueUint8T) {
     constexpr std::uint8_t min{10};
     constexpr std::uint8_t max{50};
     clapp::value::min_max_value_t<std::uint8_t> mmv{min, max};
@@ -367,7 +367,7 @@ TEST(value, min_max_value_uint8_t) {
     ASSERT_THROW(mmv.validate(55, "option"), clapp::exception::out_of_range_t);
 }
 
-TEST(value, min_max_value_int32_t) {
+TEST(value, minMaxValueInt32T) {
     constexpr std::int32_t min{-1024};
     constexpr std::int32_t max{50};
     clapp::value::min_max_value_t<std::int32_t> mmv{min, max};
@@ -382,9 +382,10 @@ TEST(value, min_max_value_int32_t) {
     ASSERT_THROW(mmv.validate(55, "option"), clapp::exception::out_of_range_t);
 }
 
-TEST(value, min_max_value_double_t) {
+TEST(value, minMaxValueDoubleT) {
     const double min{100.};
     const double max{200.5};
+    const double above{max + 0.1};
     clapp::value::min_max_value_t<double> mmv{min, max};
     std::stringstream ss;
     ss << "constraint: [" << min << "," << max << "]";
@@ -393,11 +394,11 @@ TEST(value, min_max_value_double_t) {
     EXPECT_NO_THROW(mmv.validate(max, "option"));
     EXPECT_NO_THROW(mmv.validate(130, "option"));
     ASSERT_THROW(mmv.validate(5, "option"), clapp::exception::out_of_range_t);
-    ASSERT_THROW(mmv.validate(200.6, "option"),
+    ASSERT_THROW(mmv.validate(above, "option"),
                  clapp::exception::out_of_range_t);
 }
 
-TEST(value, min_max_value_milliseconds_t) {
+TEST(value, minMaxValueMillisecondsT) {
     const std::chrono::milliseconds min{std::chrono::milliseconds{100}};
     const std::chrono::milliseconds max{std::chrono::milliseconds{200}};
     clapp::value::min_max_value_t<std::chrono::milliseconds> mmv{min, max};
@@ -413,7 +414,7 @@ TEST(value, min_max_value_milliseconds_t) {
                  clapp::exception::out_of_range_t);
 }
 
-TEST(value, path_exists_t) {
+TEST(value, pathExistsT) {
     clapp::value::path_exists_t pe;
     ASSERT_THAT(pe.append_restriction_text(), testing::StrEq("existing path"));
     EXPECT_NO_THROW(pe.validate(clapp::fs::path{"/tmp"}, "option"));
@@ -422,7 +423,7 @@ TEST(value, path_exists_t) {
         clapp::exception::path_does_not_exist_t);
 }
 
-TEST(value, found_func_t) {
+TEST(value, foundFuncT) {
     std::stringstream ss;
     clapp::value::found_func_t ff{[&ss]() { ss << "called func"; }};
     ff.found();

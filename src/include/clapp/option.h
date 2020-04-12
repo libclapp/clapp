@@ -35,8 +35,10 @@ using vector_value_func_t = std::function<std::vector<T>(void)>;
 
 template <typename T>
 struct option_callbacks_t {
-    basic_parser_t::long_opt_func_t loh;
-    basic_parser_t::short_opt_func_t soh;
+    using long_opt_func_t = basic_parser_t::long_opt_func_t;
+    using short_opt_func_t = basic_parser_t::short_opt_func_t;
+    long_opt_func_t loh;
+    short_opt_func_t soh;
     std::optional<given_func_t> given;
     std::optional<has_value_func_t> has_value;
     std::optional<value_func_t<T>> value;
@@ -44,8 +46,10 @@ struct option_callbacks_t {
 
 template <typename T>
 struct option_param_callbacks_t {
-    basic_parser_t::long_opt_param_func_t loh;
-    basic_parser_t::short_opt_param_func_t soh;
+    using long_opt_func_t = basic_parser_t::long_opt_param_func_t;
+    using short_opt_func_t = basic_parser_t::short_opt_param_func_t;
+    long_opt_func_t loh;
+    short_opt_func_t soh;
     std::optional<given_func_t> given;
     std::optional<has_value_func_t> has_value;
     std::optional<value_func_t<T>> value;
@@ -53,8 +57,10 @@ struct option_param_callbacks_t {
 
 template <typename T>
 struct option_vector_param_callbacks_t {
-    basic_parser_t::long_opt_param_func_t loh;
-    basic_parser_t::short_opt_param_func_t soh;
+    using long_opt_func_t = basic_parser_t::long_opt_param_func_t;
+    using short_opt_func_t = basic_parser_t::short_opt_param_func_t;
+    long_opt_func_t loh;
+    short_opt_func_t soh;
     std::optional<given_func_t> given;
     std::optional<has_value_func_t> has_value;
     std::optional<vector_value_func_t<T>> value;
@@ -97,7 +103,8 @@ class basic_param_option_t {
     basic_param_option_t& operator=(const basic_param_option_t&) = delete;
     basic_param_option_t& operator=(basic_param_option_t&&) noexcept = delete;
 
-    inline explicit operator bool() const;
+    constexpr explicit operator bool() const noexcept;
+    constexpr bool has_value() const noexcept;
     T value() const;
     constexpr bool given() const noexcept;
 
@@ -130,7 +137,8 @@ class basic_vector_param_option_t {
     basic_vector_param_option_t& operator=(
         basic_vector_param_option_t&&) noexcept = delete;
 
-    inline explicit operator bool() const;
+    inline explicit operator bool() const noexcept;
+    inline bool has_value() const noexcept;
     std::vector<T> value() const;
     constexpr bool given() const noexcept;
 
@@ -161,6 +169,8 @@ class basic_option_t {
 
     virtual ~basic_option_t();
 
+    constexpr explicit operator bool() const noexcept;
+    constexpr bool has_value() const noexcept;
     T value() const;
     bool given() const;
 
@@ -180,8 +190,6 @@ class bool_option_t : public basic_option_t<bool> {
     bool_option_t& operator=(bool_option_t&&) noexcept = delete;
 
     ~bool_option_t() override;
-
-    inline explicit operator bool() const;
 
    private:
     void found_entry();
@@ -214,8 +222,6 @@ class count_option_t : public basic_option_t<std::uint32_t> {
     count_option_t& operator=(count_option_t&&) noexcept = delete;
 
     ~count_option_t() override;
-
-    inline explicit operator bool() const;
 
    private:
     void found_entry();
@@ -327,8 +333,6 @@ using vector_int64_param_option_t =
     clapp::basic_vector_param_option_t<std::int64_t>;
 using vector_uint64_param_option_t =
     clapp::basic_vector_param_option_t<std::uint64_t>;
-using vector_double_param_option_t = clapp::basic_vector_param_option_t<double>;
-using vector_float_param_option_t = clapp::basic_vector_param_option_t<float>;
 using vector_double_param_option_t = clapp::basic_vector_param_option_t<double>;
 using vector_float_param_option_t = clapp::basic_vector_param_option_t<float>;
 using vector_ns_param_option_t =

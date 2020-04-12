@@ -7,8 +7,7 @@
 [[noreturn]] void print_version_and_exit();
 
 [[noreturn]] void print_version_and_exit() {
-    std::cout << clapp::build_info::project_name << " "
-              << clapp::build_info::version << "" << std::endl;
+    std::cout << clapp::build_info::build_info_string << std::endl;
     exit(EXIT_SUCCESS);
 }
 
@@ -101,7 +100,10 @@ int main(int argc, char *argv[]) {
         }
     } catch (clapp::exception::clapp_exception_t &e) {
         std::cout << "Caught ClaPP-Exception: " << e.what() << std::endl;
+        return EXIT_FAILURE;
     } catch (std::exception &e) {
         std::cout << "Caught Exception: " << e.what() << std::endl;
+        return EXIT_FAILURE;
     }
+    return EXIT_SUCCESS;
 }

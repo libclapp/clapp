@@ -72,8 +72,8 @@ void clapp::parser::basic_parser_t::reg(
         config.option_string += "=<arg>";
     }
 
-    if (max_option_string_size < config.option_string.size()) {
-        max_option_string_size = config.option_string.size();
+    if (get_max_option_string_size() < config.option_string.size()) {
+        set_max_option_string_size(config.option_string.size());
     }
 
     option_description_container_t desc{std::move(config.option_string),
@@ -99,13 +99,13 @@ void clapp::parser::basic_parser_t::reg(
     if (num_arguments > 0 && get_arguments()[num_arguments - 1].argument_type ==
                                  argument_type_t::variadic) {
         std::stringstream ss;
-        ss << "Can't register argument '" << config.argument_name
+        ss << "Can't register regular argument '" << config.argument_name
            << "' when variadic arguments are already registered.";
         throw clapp::exception::argument_exception_t(ss.str());
     }
 
-    if (max_option_string_size < config.argument_name.size()) {
-        max_option_string_size = config.argument_name.size();
+    if (get_max_option_string_size() < config.argument_name.size()) {
+        set_max_option_string_size(config.argument_name.size());
     }
 
     if (config.purpose == purpose_t::mandatory) {
@@ -180,6 +180,10 @@ std::string clapp::parser::basic_parser_t::reg_option_conf_t<
             });
     }
     return option_string;
+}
+
+inline bool clapp::parser::basic_parser_t::is_active() const noexcept {
+    return true;
 }
 
 #endif

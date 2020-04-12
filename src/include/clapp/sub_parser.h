@@ -24,24 +24,31 @@ inline namespace parser {
 class basic_sub_parser_t : public basic_parser_t {
    public:
     basic_sub_parser_t(basic_parser_t& parser, std::string sub_parser_name_arg,
-                       std::string description_arg,
-                       bool parse_parent_arg = true);
+                       std::string description_arg);
     ~basic_sub_parser_t() override;
-    explicit operator bool() const;
-    std::string get_sub_parser_name() const;
+
+    inline bool is_active() const noexcept override;
+    constexpr explicit operator bool() const noexcept;
+
+    inline std::string get_sub_parser_name() const;
     void sub_parse(arg_iterator begin, arg_iterator end);
-    std::string gen_help_prefix() const override;
+
+    std::string gen_short_line_prefix() const override;
+
+    void set_max_option_string_size(const std::size_t max_option_size) override;
+    std::size_t get_max_option_string_size() const override;
 
    private:
     basic_parser_t& parent_parser;
     std::string sub_parser_name;
     std::string description;
     bool active{false};
-    bool parse_parent;
 };
 
 }  // namespace parser
 
 }  // namespace clapp
+
+#include <clapp/sub_parser.hpp>
 
 #endif

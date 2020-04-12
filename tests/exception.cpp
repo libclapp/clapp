@@ -1,7 +1,10 @@
 #include <clapp/exception.h>
 #include <gmock/gmock.h>
 
-TEST(exception, clapp_exception_t) {
+TEST(exception, clappExceptionT) {
+    static_assert(std::is_base_of<std::runtime_error,
+                                  clapp::exception::clapp_exception_t>::value);
+
     const std::string msg{"message"};
     const std::string msg2{"message2"};
 
@@ -18,7 +21,12 @@ TEST(exception, clapp_exception_t) {
     ASSERT_THAT(ce4.what(), testing::StrEq(msg));
 }
 
-TEST(exception, invalid_value_t) {
+TEST(exception, invalidValueT) {
+    static_assert(std::is_base_of<std::runtime_error,
+                                  clapp::exception::invalid_value_t>::value);
+    static_assert(std::is_base_of<clapp::exception::clapp_exception_t,
+                                  clapp::exception::invalid_value_t>::value);
+
     const std::string msg{"message"};
     const std::string msg2{"message2"};
 
@@ -35,7 +43,12 @@ TEST(exception, invalid_value_t) {
     ASSERT_THAT(ce4.what(), testing::StrEq(msg));
 }
 
-TEST(exception, value_undefined_t) {
+TEST(exception, valueUndefinedT) {
+    static_assert(std::is_base_of<std::runtime_error,
+                                  clapp::exception::value_undefined_t>::value);
+    static_assert(std::is_base_of<clapp::exception::clapp_exception_t,
+                                  clapp::exception::value_undefined_t>::value);
+
     const std::string msg{"message"};
     const std::string msg2{"message2"};
 
@@ -52,7 +65,12 @@ TEST(exception, value_undefined_t) {
     ASSERT_THAT(ce4.what(), testing::StrEq(msg));
 }
 
-TEST(exception, out_of_range_t) {
+TEST(exception, outOfRangeT) {
+    static_assert(std::is_base_of<std::runtime_error,
+                                  clapp::exception::out_of_range_t>::value);
+    static_assert(std::is_base_of<clapp::exception::clapp_exception_t,
+                                  clapp::exception::out_of_range_t>::value);
+
     const std::string msg{"message"};
     const std::string msg2{"message2"};
 
@@ -69,7 +87,14 @@ TEST(exception, out_of_range_t) {
     ASSERT_THAT(ce4.what(), testing::StrEq(msg));
 }
 
-TEST(exception, path_does_not_exist_t) {
+TEST(exception, pathDoesNotExistT) {
+    static_assert(
+        std::is_base_of<std::runtime_error,
+                        clapp::exception::path_does_not_exist_t>::value);
+    static_assert(
+        std::is_base_of<clapp::exception::clapp_exception_t,
+                        clapp::exception::path_does_not_exist_t>::value);
+
     const std::string msg{"message"};
     const std::string msg2{"message2"};
 
@@ -86,7 +111,12 @@ TEST(exception, path_does_not_exist_t) {
     ASSERT_THAT(ce4.what(), testing::StrEq(msg));
 }
 
-TEST(exception, option_exception_t) {
+TEST(exception, optionExceptionT) {
+    static_assert(std::is_base_of<std::runtime_error,
+                                  clapp::exception::option_exception_t>::value);
+    static_assert(std::is_base_of<clapp::exception::clapp_exception_t,
+                                  clapp::exception::option_exception_t>::value);
+
     const std::string msg{"message"};
     const std::string msg2{"message2"};
 
@@ -103,7 +133,14 @@ TEST(exception, option_exception_t) {
     ASSERT_THAT(ce4.what(), testing::StrEq(msg));
 }
 
-TEST(exception, option_param_exception_t) {
+TEST(exception, optionParamExceptionT) {
+    static_assert(
+        std::is_base_of<std::runtime_error,
+                        clapp::exception::option_param_exception_t>::value);
+    static_assert(
+        std::is_base_of<clapp::exception::clapp_exception_t,
+                        clapp::exception::option_param_exception_t>::value);
+
     const std::string msg{"message"};
     const std::string msg2{"message2"};
 
@@ -120,7 +157,14 @@ TEST(exception, option_param_exception_t) {
     ASSERT_THAT(ce4.what(), testing::StrEq(msg));
 }
 
-TEST(exception, argument_exception_t) {
+TEST(exception, argumentExceptionT) {
+    static_assert(
+        std::is_base_of<std::runtime_error,
+                        clapp::exception::argument_exception_t>::value);
+    static_assert(
+        std::is_base_of<clapp::exception::clapp_exception_t,
+                        clapp::exception::argument_exception_t>::value);
+
     const std::string msg{"message"};
     const std::string msg2{"message2"};
 
@@ -137,7 +181,12 @@ TEST(exception, argument_exception_t) {
     ASSERT_THAT(ce4.what(), testing::StrEq(msg));
 }
 
-TEST(exception, parser_exception_t) {
+TEST(exception, parserExceptionT) {
+    static_assert(std::is_base_of<std::runtime_error,
+                                  clapp::exception::parser_exception_t>::value);
+    static_assert(std::is_base_of<clapp::exception::clapp_exception_t,
+                                  clapp::exception::parser_exception_t>::value);
+
     const std::string msg{"message"};
     const std::string msg2{"message2"};
 
@@ -154,7 +203,17 @@ TEST(exception, parser_exception_t) {
     ASSERT_THAT(ce4.what(), testing::StrEq(msg));
 }
 
-TEST(exception, sub_parser_exception_t) {
+TEST(exception, subParserExceptionT) {
+    static_assert(
+        std::is_base_of<std::runtime_error,
+                        clapp::exception::sub_parser_exception_t>::value);
+    static_assert(
+        std::is_base_of<clapp::exception::clapp_exception_t,
+                        clapp::exception::sub_parser_exception_t>::value);
+    static_assert(
+        std::is_base_of<clapp::exception::parser_exception_t,
+                        clapp::exception::sub_parser_exception_t>::value);
+
     const std::string msg{"message"};
     const std::string msg2{"message2"};
 
@@ -163,6 +222,63 @@ TEST(exception, sub_parser_exception_t) {
 
     clapp::exception::sub_parser_exception_t ce3{ce1};
     clapp::exception::sub_parser_exception_t ce4{std::move(ce1)};
+
+    ce4 = ce3;
+    ce3 = std::move(ce2);
+
+    ASSERT_THAT(ce3.what(), testing::StrEq(msg2));
+    ASSERT_THAT(ce4.what(), testing::StrEq(msg));
+}
+
+TEST(exception, mainParserExceptionT) {
+    static_assert(
+        std::is_base_of<std::runtime_error,
+                        clapp::exception::main_parser_exception_t>::value);
+    static_assert(
+        std::is_base_of<clapp::exception::clapp_exception_t,
+                        clapp::exception::main_parser_exception_t>::value);
+    static_assert(
+        std::is_base_of<clapp::exception::parser_exception_t,
+                        clapp::exception::main_parser_exception_t>::value);
+
+    const std::string msg{"message"};
+    const std::string msg2{"message2"};
+
+    clapp::exception::main_parser_exception_t ce1{msg.c_str()};
+    clapp::exception::main_parser_exception_t ce2{msg2};
+
+    clapp::exception::main_parser_exception_t ce3{ce1};
+    clapp::exception::main_parser_exception_t ce4{std::move(ce1)};
+
+    ce4 = ce3;
+    ce3 = std::move(ce2);
+
+    ASSERT_THAT(ce3.what(), testing::StrEq(msg2));
+    ASSERT_THAT(ce4.what(), testing::StrEq(msg));
+}
+
+TEST(exception, noExecutableExceptionT) {
+    static_assert(
+        std::is_base_of<std::runtime_error,
+                        clapp::exception::no_executable_exception_t>::value);
+    static_assert(
+        std::is_base_of<clapp::exception::clapp_exception_t,
+                        clapp::exception::no_executable_exception_t>::value);
+    static_assert(
+        std::is_base_of<clapp::exception::parser_exception_t,
+                        clapp::exception::no_executable_exception_t>::value);
+    static_assert(
+        std::is_base_of<clapp::exception::main_parser_exception_t,
+                        clapp::exception::no_executable_exception_t>::value);
+
+    const std::string msg{"message"};
+    const std::string msg2{"message2"};
+
+    clapp::exception::no_executable_exception_t ce1{msg.c_str()};
+    clapp::exception::no_executable_exception_t ce2{msg2};
+
+    clapp::exception::no_executable_exception_t ce3{ce1};
+    clapp::exception::no_executable_exception_t ce4{std::move(ce1)};
 
     ce4 = ce3;
     ce3 = std::move(ce2);

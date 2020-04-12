@@ -36,7 +36,8 @@ using variadic_value_func_t = std::function<std::vector<T>(void)>;
 
 template <typename T>
 struct argument_callbacks_t {
-    basic_parser_t::argument_func_t af;
+    using argument_func_t = basic_parser_t::argument_func_t;
+    argument_func_t af;
     std::optional<given_func_t> given;
     std::optional<has_value_func_t> has_value;
     std::optional<arg_value_func_t<T>> value;
@@ -44,7 +45,8 @@ struct argument_callbacks_t {
 
 template <typename T>
 struct variadic_argument_callbacks_t {
-    basic_parser_t::argument_func_t af;
+    using argument_func_t = basic_parser_t::argument_func_t;
+    argument_func_t af;
     std::optional<given_func_t> given;
     std::optional<has_value_func_t> has_value;
     std::optional<variadic_value_func_t<T>> value;
@@ -107,6 +109,7 @@ class basic_argument_t {
     basic_argument_t(basic_parser_t& parser, const std::string& argument_name,
                      const std::string& description, Params&&... parameters);
     constexpr explicit operator bool() const noexcept;
+    constexpr bool has_value() const noexcept;
     T value() const;
     constexpr bool given() const noexcept;
 
@@ -133,7 +136,8 @@ class basic_variadic_argument_t {
                               const std::string& argument_name,
                               const std::string& description,
                               Params&&... parameters);
-    constexpr explicit operator bool() const noexcept;
+    inline explicit operator bool() const noexcept;
+    inline bool has_value() const noexcept;
     std::vector<T> value() const;
     constexpr bool given() const noexcept;
 

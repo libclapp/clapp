@@ -19,22 +19,22 @@
 #include <cstddef>
 #include <cstdint>
 namespace clapp {
-
 inline namespace build_info {
-constexpr const char* project_name = "@libClaPP_PROJECT_NAME@";
-constexpr std::size_t version_major = @project_VERSION_MAJOR@;
-constexpr std::size_t version_minor = @project_VERSION_MINOR@;
-constexpr std::size_t version_patch_level = @project_VERSION_PATCH_LEVEL@;
-constexpr const char* version =
-    "@project_VERSION_MAJOR@.@project_VERSION_MINOR@"
-    ".@project_VERSION_PATCH_LEVEL@";
-constexpr const char* git_hash = "@libClaPP_GIT_HASH@";
-constexpr const char* git_branch = "@libClaPP_GIT_BRANCH@";
-constexpr const char* config_time = "@project_CONFIG_TIME@";
-constexpr const char* build_type = "@CMAKE_BUILD_TYPE@";
-
+constexpr const char * project_name = "@CMAKE_PROJECT_NAME@";
+constexpr std::size_t version_major = @libClaPP_VERSION_MAJOR@;
+constexpr std::size_t version_minor = @libClaPP_VERSION_MINOR@;
+constexpr std::size_t version_patch = @libClaPP_VERSION_PATCH@;
+constexpr const char *version = "@libClaPP_VERSION@";
+constexpr const char *git_hash = "@libClaPP_GIT_HASH@";
+constexpr const char *git_branch = "@libClaPP_GIT_BRANCH@";
+constexpr const char *git_description = "@libClaPP_GIT_DESCRIPTION@";
+constexpr const char *config_time = "@libClaPP_CONFIG_TIME@";
+constexpr const char *build_type = "@CMAKE_BUILD_TYPE@";
+constexpr const char *build_info_string = "@CMAKE_PROJECT_NAME@ "
+        "v.@libClaPP_VERSION@ @CMAKE_BUILD_TYPE@-Build: "
+        "@libClaPP_GIT_BRANCH@:@libClaPP_GIT_HASH@ "
+        "(@libClaPP_GIT_DESCRIPTION@)";
 }  // namespace build_info
-
 }  // namespace clapp
 
 #endif

@@ -165,7 +165,7 @@ std::string clapp::path_exists_t::append_restriction_text() {
 }
 
 void clapp::path_exists_t::validate(const clapp::fs::path& path,
-                                    const std::string& param_name) const {
+                                    const std::string& param_name) {
     if (!clapp::fs::exists(path)) {
         std::stringstream ss;
         ss << "CLI value " << path << " for '" << param_name

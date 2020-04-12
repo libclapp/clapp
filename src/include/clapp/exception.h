@@ -119,7 +119,7 @@ class parser_exception_t : public clapp_exception_t {
     ~parser_exception_t() noexcept override;
 };
 
-class sub_parser_exception_t : public clapp_exception_t {
+class sub_parser_exception_t : public parser_exception_t {
    public:
     explicit sub_parser_exception_t(const char* message);
     explicit sub_parser_exception_t(const std::string& message);
@@ -128,6 +128,28 @@ class sub_parser_exception_t : public clapp_exception_t {
     sub_parser_exception_t(sub_parser_exception_t&&) noexcept;
     sub_parser_exception_t& operator=(sub_parser_exception_t&&) noexcept;
     ~sub_parser_exception_t() noexcept override;
+};
+
+class main_parser_exception_t : public parser_exception_t {
+   public:
+    explicit main_parser_exception_t(const char* message);
+    explicit main_parser_exception_t(const std::string& message);
+    main_parser_exception_t(const main_parser_exception_t&);
+    main_parser_exception_t& operator=(const main_parser_exception_t&);
+    main_parser_exception_t(main_parser_exception_t&&) noexcept;
+    main_parser_exception_t& operator=(main_parser_exception_t&&) noexcept;
+    ~main_parser_exception_t() noexcept override;
+};
+
+class no_executable_exception_t : public main_parser_exception_t {
+   public:
+    explicit no_executable_exception_t(const char* message);
+    explicit no_executable_exception_t(const std::string& message);
+    no_executable_exception_t(const no_executable_exception_t&);
+    no_executable_exception_t& operator=(const no_executable_exception_t&);
+    no_executable_exception_t(no_executable_exception_t&&) noexcept;
+    no_executable_exception_t& operator=(no_executable_exception_t&&) noexcept;
+    ~no_executable_exception_t() noexcept override;
 };
 
 }  // namespace exception

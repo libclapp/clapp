@@ -113,13 +113,15 @@ ARG_CONF clapp::argument::gen_arg_conf(
     CALLBACKS&& callbacks, const std::string& argument_name,
     std::vector<typename arg_params_t<T>::validate_func_t>&& validate_funcs,
     const std::string& description, basic_parser_t::purpose_t purpose) {
+    using optional_arg_validate_func_t =
+        std::optional<basic_parser_t::validate_func_t>;
+    optional_arg_validate_func_t arg_validate_func{gen_arg_validate_func<T>(
+        std::move(callbacks.value), std::move(callbacks.has_value),
+        std::move(callbacks.given), std::move(validate_funcs), argument_name,
+        purpose)};
+
     return ARG_CONF{std::move(callbacks.af), argument_name, description,
-                    gen_arg_validate_func<T>(std::move(callbacks.value),
-                                             std::move(callbacks.has_value),
-                                             std::move(callbacks.given),
-                                             std::move(validate_funcs),
-                                             argument_name, purpose),
-                    purpose};
+                    std::move(arg_validate_func), purpose};
 }
 
 template <typename T, typename ARG_CONF, typename CALLBACKS, typename... Params>
@@ -186,6 +188,12 @@ constexpr clapp::argument::basic_argument_t<T>::operator bool() const noexcept {
 }
 
 template <typename T>
+constexpr bool clapp::argument::basic_argument_t<T>::has_value() const
+    noexcept {
+    return _value.has_value();
+}
+
+template <typename T>
 T clapp::argument::basic_argument_t<T>::value() const {
     if (_value) {
         return _value.value();
@@ -240,9 +248,15 @@ clapp::argument::basic_variadic_argument_t<T>::basic_variadic_argument_t(
 }
 
 template <typename T>
-constexpr clapp::argument::basic_variadic_argument_t<T>::operator bool() const
+inline clapp::argument::basic_variadic_argument_t<T>::operator bool() const
     noexcept {
-    return _value.size() > 0;
+    return !_value.empty();
+}
+
+template <typename T>
+inline bool clapp::argument::basic_variadic_argument_t<T>::has_value() const
+    noexcept {
+    return !_value.empty();
 }
 
 template <typename T>

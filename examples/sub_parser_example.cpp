@@ -8,8 +8,7 @@
 [[noreturn]] void print_version_and_exit();
 
 [[noreturn]] void print_version_and_exit() {
-    std::cout << clapp::build_info::project_name << " "
-              << clapp::build_info::version << "" << std::endl;
+    std::cout << clapp::build_info::build_info_string << std::endl;
     exit(EXIT_SUCCESS);
 }
 
@@ -56,7 +55,6 @@ class cli_parser_t : public clapp::basic_main_parser_t {
 
         ~first_parser_t() override;
 
-        // if a help message for subparser is required, define it...
         clapp::help_option_t help{*this, "help", 'h', "Show help options."};
 
         clapp::bool_option_t short_bool{*this, 'b', "Short bool option.",
@@ -85,7 +83,6 @@ class cli_parser_t : public clapp::basic_main_parser_t {
 
         ~second_parser_t() override;
 
-        // if a help message for subparser is required, define it...
         clapp::help_option_t help{*this, "help", 'h', "Show help options."};
 
         clapp::int32_argument_t int_arg{
@@ -186,7 +183,10 @@ int main(int argc, char *argv[]) {
         }
     } catch (clapp::exception::clapp_exception_t &e) {
         std::cout << "Caught ClaPP-Exception: " << e.what() << std::endl;
+        return EXIT_FAILURE;
     } catch (std::exception &e) {
         std::cout << "Caught Exception: " << e.what() << std::endl;
+        return EXIT_FAILURE;
     }
+    return EXIT_SUCCESS;
 }

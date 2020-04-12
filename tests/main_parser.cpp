@@ -10,26 +10,64 @@ class empty_main_parser_t : public clapp::parser::basic_main_parser_t {
 
 empty_main_parser_t::~empty_main_parser_t() = default;
 
-TEST(main_parser, construct_main_parser) {
+TEST(mainParser, constructMainParser) {
     constexpr const char* const argv[]{"main", nullptr};
-    empty_main_parser_t tp;
+    empty_main_parser_t emp;
 
-    tp.parse(1, static_cast<const char* const*>(argv));
-    ASSERT_THAT(static_cast<bool>(tp), testing::Eq(true));
-    ASSERT_THAT(tp.get_executable(), testing::StrEq("main"));
+    emp.parse(1, static_cast<const char* const*>(argv));
 }
 
-TEST(parser, construct_main_parser_and_gen_help_prefix) {
-    constexpr const char* const argv[]{"main", nullptr};
-    empty_main_parser_t tp;
+TEST(mainParser, constructMainParserBoolOperator) {
+    constexpr const char* const argv[]{"main-exec", nullptr};
+    empty_main_parser_t emp;
+    ASSERT_THAT(static_cast<bool>(emp), testing::Eq(false));
 
-    tp.parse(1, static_cast<const char* const*>(argv));
-    ASSERT_THAT(tp.gen_help_prefix(), testing::StrEq("Usage: \nmain"));
+    emp.parse(1, static_cast<const char* const*>(argv));
+    ASSERT_THAT(static_cast<bool>(emp), testing::Eq(true));
 }
 
-TEST(parser, construct_main_parser_parse_and_validate) {
-    constexpr const char* const argv[]{"main", nullptr};
-    empty_main_parser_t tp;
+TEST(mainParser, constructMainParserGetExecutable) {
+    constexpr const char* const argv[]{"main-exec", nullptr};
+    empty_main_parser_t emp;
+    ASSERT_THROW(emp.get_executable(),
+                 clapp::exception::no_executable_exception_t);
 
-    tp.parse_and_validate(1, static_cast<const char* const*>(argv));
+    emp.parse(1, static_cast<const char* const*>(argv));
+    ASSERT_THAT(emp.get_executable(), testing::StrEq("main-exec"));
+}
+
+TEST(mainParser, constructMainParserAndGenHelpPrefix) {
+    constexpr const char* const argv[]{"main", nullptr};
+    empty_main_parser_t emp;
+
+    emp.parse(1, static_cast<const char* const*>(argv));
+    ASSERT_THAT(emp.gen_short_line_prefix(), testing::StrEq("main"));
+}
+
+TEST(mainParser, constructMainParserParseAndValidate) {
+    constexpr const char* const argv[]{"main", nullptr};
+    empty_main_parser_t emp;
+
+    emp.parse_and_validate(1, static_cast<const char* const*>(argv));
+}
+
+TEST(mainParser, constructMainParserIsActiveIsTrue) {
+    empty_main_parser_t emp;
+    ASSERT_THAT(emp.is_active(), testing::Eq(true));
+}
+
+TEST(mainParser, constructMainParserGetActiveReturnsThisRef) {
+    empty_main_parser_t emp;
+    ASSERT_THAT(&emp.get_active_parser(), testing::Eq(&emp));
+}
+
+TEST(mainParser, constructMainParserGetMaxOptionStringSize) {
+    empty_main_parser_t emp;
+    ASSERT_THAT(emp.get_max_option_string_size(), testing::Eq(0));
+}
+
+TEST(mainParser, constructMainParserSetMaxOptionStringSize) {
+    empty_main_parser_t emp;
+    emp.set_max_option_string_size(4);
+    ASSERT_THAT(emp.get_max_option_string_size(), testing::Eq(4));
 }

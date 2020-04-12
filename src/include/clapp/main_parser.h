@@ -35,9 +35,13 @@ class basic_main_parser_t : public basic_parser_t {
     explicit operator bool() const;
     std::string get_executable() const;
 
-    std::string gen_help_prefix() const override;
+    std::string gen_short_line_prefix() const override;
+
+    void set_max_option_string_size(const std::size_t max_option_size) override;
+    std::size_t get_max_option_string_size() const override;
 
    private:
+    std::size_t max_option_string_size{0};
     std::optional<std::string> executable{};
 };
 

@@ -181,7 +181,7 @@ clapp::option::opt_conf_container_t<T, OPT_CONF> clapp::option::gen_opt_conf(
     }
     return gen_opt_conf1<T, OPT_CONF>(
         std::forward<CALLBACKS>(callbacks),
-        std::vector<std::string>{std::string{std::forward<T1>(single_option)}},
+        std::vector<std::string>{{std::forward<T1>(single_option)}},
         std::vector<char>{}, std::move(description),
         std::forward<Params>(parameters)...);
 }
@@ -261,13 +261,30 @@ OPT_CONF clapp::option::gen_opt_conf2(
     const std::string& description, basic_parser_t::purpose_t purpose) {
     std::string option_string{
         OPT_CONF::create_option_string(short_option, long_option)};
-    return OPT_CONF{gen_short_option(std::move(callbacks.soh), short_option),
-                    gen_long_option(std::move(callbacks.loh), long_option),
-                    gen_opt_validate_func<T>(std::move(callbacks.value),
-                                             std::move(callbacks.has_value),
-                                             std::move(callbacks.given),
-                                             std::move(validate_funcs),
-                                             option_string, purpose),
+
+    using short_opt_func_t = typename std::decay_t<CALLBACKS>::short_opt_func_t;
+    using short_opt_conf_vec_t =
+        std::vector<clapp::parser::basic_parser_t::basic_short_opt_conf_t<
+            short_opt_func_t>>;
+    short_opt_conf_vec_t short_options{
+        gen_short_option(std::move(callbacks.soh), short_option)};
+
+    using long_opt_func_t = typename std::decay_t<CALLBACKS>::long_opt_func_t;
+    using long_opt_conf_vec_t = std::vector<
+        clapp::parser::basic_parser_t::basic_long_opt_conf_t<long_opt_func_t>>;
+    long_opt_conf_vec_t long_options{
+        gen_long_option(std::move(callbacks.loh), long_option)};
+
+    using optional_validate_func_t =
+        std::optional<basic_parser_t::validate_func_t>;
+    optional_validate_func_t opt_validate_func{gen_opt_validate_func<T>(
+        std::move(callbacks.value), std::move(callbacks.has_value),
+        std::move(callbacks.given), std::move(validate_funcs), option_string,
+        purpose)};
+
+    return OPT_CONF{std::move(short_options),
+                    std::move(long_options),
+                    std::move(opt_validate_func),
                     std::move(option_string),
                     description,
                     purpose};
@@ -313,7 +330,14 @@ void clapp::option::basic_param_option_t<T>::found_entry(
 }
 
 template <typename T>
-inline clapp::option::basic_param_option_t<T>::operator bool() const {
+constexpr clapp::option::basic_param_option_t<T>::operator bool() const
+    noexcept {
+    return _value.has_value();
+}
+
+template <typename T>
+constexpr bool clapp::option::basic_param_option_t<T>::has_value() const
+    noexcept {
     return _value.has_value();
 }
 
@@ -377,8 +401,15 @@ void clapp::option::basic_vector_param_option_t<T>::found_entry(
 }
 
 template <typename T>
-inline clapp::option::basic_vector_param_option_t<T>::operator bool() const {
-    return _value.size() > 0;
+inline clapp::option::basic_vector_param_option_t<T>::operator bool() const
+    noexcept {
+    return !_value.empty();
+}
+
+template <typename T>
+inline bool clapp::option::basic_vector_param_option_t<T>::has_value() const
+    noexcept {
+    return !_value.empty();
 }
 
 template <typename T>
@@ -421,6 +452,16 @@ bool clapp::option::basic_option_t<T>::given() const {
     return _given;
 }
 
+template <typename T>
+constexpr clapp::option::basic_option_t<T>::operator bool() const noexcept {
+    return _value.has_value();
+}
+
+template <typename T>
+constexpr bool clapp::option::basic_option_t<T>::has_value() const noexcept {
+    return _value.has_value();
+}
+
 template <typename... Params>
 clapp::option::bool_option_t::bool_option_t(clapp::basic_parser_t& parser,
                                             Params... parameters)
@@ -456,16 +497,6 @@ clapp::option::count_option_t::count_option_t(clapp::basic_parser_t& parser,
     if (!_value) {
         _value = 0;
     }
-}
-
-inline clapp::option::bool_option_t::operator bool() const {
-    Expects(_value.has_value());
-    return _value.value();
-}
-
-inline clapp::option::count_option_t::operator bool() const {
-    Expects(_value.has_value());
-    return _value.value() > 0;
 }
 
 #endif

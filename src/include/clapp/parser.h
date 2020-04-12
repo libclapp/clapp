@@ -71,6 +71,25 @@ class basic_parser_t {
         argument_type_t argument_type;
     };
 
+    struct help_line_t {
+        std::string name;
+        std::string description;
+    };
+
+    struct sub_parser_line_t {
+        std::string name;
+        std::string description;
+        basic_sub_parser_t& parser;
+    };
+
+    struct help_contents_t {
+        std::vector<help_line_t> mandatory_arguments{};
+        std::vector<help_line_t> optional_arguments{};
+        std::vector<help_line_t> mandatory_options{};
+        std::vector<help_line_t> optional_options{};
+        std::map<std::string, sub_parser_line_t> sub_parser{};
+    };
+
     template <typename short_option_func_t, typename long_option_func_t,
               option_type_t option_type>
     struct reg_option_conf_t {
@@ -140,6 +159,7 @@ class basic_parser_t {
     struct sub_parser_description_container_t {
         std::string sub_parser_string;
         std::string description;
+        basic_sub_parser_t& parser;
     };
 
     struct argument_description_container_t {
@@ -183,8 +203,8 @@ class basic_parser_t {
         std::optional<std::string> long_option;
     };
 
-    arg_iterator process_parse_result(arg_iterator it,
-                                      const parse_result_t& parse_result) const;
+    static arg_iterator process_parse_result(
+        arg_iterator it, const parse_result_t& parse_result);
     void parse(arg_iterator begin, arg_iterator end);
     parse_result_t parse(std::string_view option, arg_iterator it,
                          arg_iterator end);
@@ -193,11 +213,27 @@ class basic_parser_t {
 
     void validate_recursive() const;
 
-    virtual std::string gen_help_prefix() const;
-    std::string gen_help_msg() const;
+    std::string gen_short_line() const;
+    std::string gen_short_lines(std::size_t rec_depth) const;
+    virtual std::string gen_short_line_prefix() const = 0;
+    static std::string gen_usage_prefix();
+    virtual help_contents_t gen_detailed_help_contents() const;
+    static std::string gen_opt_arg_lines(const help_contents_t& help_contents,
+                                         const std::size_t num_spaces);
+
+    std::string gen_help_desc(std::size_t num_spaces,
+                              std::size_t rec_depth) const;
+    std::string gen_help_msg(std::size_t rec_depth) const;
     value::found_func_t gen_func_print_help_and_exit(int exit_code) const;
 
     std::size_t get_num_processed_arguments() const;
+
+    virtual void set_max_option_string_size(
+        const std::size_t max_option_size) = 0;
+    virtual std::size_t get_max_option_string_size() const = 0;
+
+    inline virtual bool is_active() const noexcept;
+    const basic_parser_t& get_active_parser() const;
 
    protected:
     sub_parsers_map_t& get_sub_parsers();
@@ -231,8 +267,10 @@ class basic_parser_t {
     sub_parser_descriptions_vec_t sub_parser_descriptions{};
     argument_descriptions_vec_t mandatory_argument_descriptions{};
     argument_descriptions_vec_t optional_argument_descriptions{};
-    std::size_t max_option_string_size{0};
     std::size_t num_processed_arguments{0};
+
+   public:
+    constexpr static std::size_t num_sub_spaces{2u};
 };
 
 }  // namespace parser
