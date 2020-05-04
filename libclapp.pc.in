@@ -3,7 +3,7 @@ includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
 
 Name: @CMAKE_PROJECT_NAME@
 Description: libClaPP is an open source command line argument processing library for C++.
-Version: @project_VERSION_MAJOR@.@project_VERSION_MINOR@.@project_VERSION_PATCH_LEVEL@
+Version: @libClaPP_VERSION_MAJOR@.@libClaPP_VERSION_MINOR@.@libClaPP_VERSION_PATCH@
 Requires: 
 Libs: -L${libdir} -lclapp @libClaPP_FS_LINKER_FLAG@
 Cflags: -I${includedir}
