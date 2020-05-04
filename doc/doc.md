@@ -499,7 +499,6 @@ string argument:
 
 [//]:#begin_cpp_listing_simple_main_parser
 ```c++
-#include <cassert>
 #include <clapp/argument.h>
 #include <clapp/main_parser.h>
 #include <clapp/option.h>
@@ -661,7 +660,6 @@ this sub-parser.
 
 [//]:#begin_cpp_listing_simple_sub_parser
 ```c++
-#include <cassert>
 #include <clapp/argument.h>
 #include <clapp/main_parser.h>
 #include <clapp/option.h>
