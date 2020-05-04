@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8.0)
-project("libClaPP" VERSION 0.2.1)
+project("libClaPP" VERSION 0.2.2)
 include(CTest)
 include(CheckCXXCompilerFlag)
 include(GNUInstallDirs)
