@@ -290,6 +290,7 @@ using string_param_option_t = clapp::basic_param_option_t<std::string>;
 using path_param_option_t = clapp::basic_param_option_t<clapp::fs::path>;
 #endif
 
+using bool_param_option_t = clapp::basic_param_option_t<bool>;
 using int8_param_option_t = clapp::basic_param_option_t<std::int8_t>;
 using uint8_param_option_t = clapp::basic_param_option_t<std::uint8_t>;
 using int16_param_option_t = clapp::basic_param_option_t<std::int16_t>;
