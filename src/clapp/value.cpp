@@ -125,12 +125,12 @@ float clapp::value::convert_value<float>(const std::string_view param) {
         return std::stof(std::string{param}, nullptr);
     } catch (std::out_of_range& e) {
         std::stringstream ss;
-        ss << "convert_value: value " << param << " is out of float-range. ("
+        ss << "convert_value: value '" << param << "' is out of float-range. ("
            << e.what() << ")";
         throw clapp::exception::out_of_range_t{ss.str()};
     } catch (std::invalid_argument& e) {
         std::stringstream ss;
-        ss << "convert_value: value " << param << " is invalid. (" << e.what()
+        ss << "convert_value: value '" << param << "' is invalid. (" << e.what()
            << ")";
         throw clapp::exception::invalid_value_t{ss.str()};
     }
@@ -142,12 +142,12 @@ double clapp::value::convert_value<double>(const std::string_view param) {
         return std::stod(std::string{param}, nullptr);
     } catch (std::out_of_range& e) {
         std::stringstream ss;
-        ss << "convert_value: value " << param << " is out of double-range. ("
+        ss << "convert_value: value '" << param << "' is out of double-range. ("
            << e.what() << ")";
         throw clapp::exception::out_of_range_t{ss.str()};
     } catch (std::invalid_argument& e) {
         std::stringstream ss;
-        ss << "convert_value: value " << param << " is invalid. (" << e.what()
+        ss << "convert_value: value '" << param << "' is invalid. (" << e.what()
            << ")";
         throw clapp::exception::invalid_value_t{ss.str()};
     }
@@ -168,7 +168,7 @@ void clapp::path_exists_t::validate(const clapp::fs::path& path,
                                     const std::string& param_name) {
     if (!clapp::fs::exists(path)) {
         std::stringstream ss;
-        ss << "CLI value " << path << " for '" << param_name
+        ss << "CLI value '" << path << "' for '" << param_name
            << "' does not exist.";
         throw clapp::exception::path_does_not_exist_t(ss.str());
     }
@@ -186,20 +186,20 @@ static T convert_uint(const std::string_view param) {
 
         if (value > std::numeric_limits<T>::max()) {
             std::stringstream ss;
-            ss << "convert_value: value " << value << " is bigger than max "
+            ss << "convert_value: value '" << value << "' is bigger than max "
                << std::numeric_limits<T>::max();
             throw clapp::exception::out_of_range_t{ss.str()};
         }
         return static_cast<T>(value);
     } catch (std::out_of_range& e) {
         std::stringstream ss;
-        ss << "convert_value: value " << param << " is out of range. ("
+        ss << "convert_value: value '" << param << "' is out of range. ("
            << std::numeric_limits<T>::min() << " and "
            << std::numeric_limits<T>::max() << ", " << e.what() << ")";
         throw clapp::exception::out_of_range_t{ss.str()};
     } catch (std::invalid_argument& e) {
         std::stringstream ss;
-        ss << "convert_value: value " << param << " is invalid. (" << e.what()
+        ss << "convert_value: value '" << param << "' is invalid. (" << e.what()
            << ")";
         throw clapp::exception::invalid_value_t{ss.str()};
     }
@@ -216,27 +216,27 @@ static T convert_int(const std::string_view param) {
 
         if (value > std::numeric_limits<T>::max()) {
             std::stringstream ss;
-            ss << "convert_value: value " << value << " is bigger than max "
+            ss << "convert_value: value '" << value << "' is bigger than max "
                << std::numeric_limits<T>::max();
             throw clapp::exception::out_of_range_t{ss.str()};
         }
 
         if (value < std::numeric_limits<T>::min()) {
             std::stringstream ss;
-            ss << "convert_value: value " << value << " is smaller than min "
+            ss << "convert_value: value '" << value << "' is smaller than min "
                << std::numeric_limits<T>::max();
             throw clapp::exception::out_of_range_t{ss.str()};
         }
         return static_cast<T>(value);
     } catch (std::out_of_range& e) {
         std::stringstream ss;
-        ss << "convert_value: value " << param << " is out of range. ("
+        ss << "convert_value: value '" << param << "' is out of range. ("
            << std::numeric_limits<T>::min() << " and "
            << std::numeric_limits<T>::max() << ", " << e.what() << ")";
         throw clapp::exception::out_of_range_t{ss.str()};
     } catch (std::invalid_argument& e) {
         std::stringstream ss;
-        ss << "convert_value: value " << param << " is invalid. (" << e.what()
+        ss << "convert_value: value '" << param << "' is invalid. (" << e.what()
            << ")";
         throw clapp::exception::invalid_value_t{ss.str()};
     }
