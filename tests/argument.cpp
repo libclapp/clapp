@@ -152,6 +152,47 @@ TEST(argument, basicArgumentConstructSimple) {
     ASSERT_NO_THROW(validate_funcs[0]());
 }
 
+TEST(argument, boolArgumentConstructSimple) {
+    const std::string arg_name{"argument name"};
+    const std::string arg_desc{"description"};
+    argument_test_parser_t tp;
+    clapp::argument::bool_argument_t arg{tp, arg_name, arg_desc};
+    argument_test_parser_t::arguments_vector_t args{tp.get_arguments()};
+    argument_test_parser_t::argument_descriptions_vec_t descs{
+        tp.get_mandatory_argument_descriptions()};
+    argument_test_parser_t::validate_func_vec_t validate_funcs{
+        tp.get_validate_functions()};
+    ASSERT_THAT(validate_funcs.size(), testing::Eq(1));
+
+    ASSERT_THAT(descs.size(), testing::Eq(1));
+    ASSERT_THAT(descs[0].argument_string, testing::StrEq(arg_name));
+    ASSERT_THAT(descs[0].description, testing::StrEq(arg_desc));
+    ASSERT_THAT(descs[0].argument_type,
+                testing::Eq(argument_test_parser_t::argument_type_t::single));
+
+    ASSERT_THAT(args.size(), testing::Eq(1));
+    ASSERT_THAT(args[0].argument, testing::StrEq(arg_name));
+    ASSERT_THAT(args[0].argument_type,
+                testing::Eq(argument_test_parser_t::argument_type_t::single));
+
+    ASSERT_THAT(static_cast<bool>(arg), testing::Eq(false));
+    ASSERT_THAT(arg.given(), testing::Eq(false));
+    ASSERT_THROW(arg.value(), clapp::exception::value_undefined_t);
+    ASSERT_THROW(validate_funcs[0](), clapp::exception::argument_exception_t);
+
+    args[0].func("true");
+    ASSERT_THAT(static_cast<bool>(arg), testing::Eq(true));
+    ASSERT_THAT(arg.given(), testing::Eq(true));
+    ASSERT_THAT(arg.value(), testing::Eq(true));
+    ASSERT_NO_THROW(validate_funcs[0]());
+
+    args[0].func("FALSE");
+    ASSERT_THAT(static_cast<bool>(arg), testing::Eq(true));
+    ASSERT_THAT(arg.given(), testing::Eq(true));
+    ASSERT_THAT(arg.value(), testing::Eq(false));
+    ASSERT_NO_THROW(validate_funcs[0]());
+}
+
 TEST(argument, basicArgumentConstructMandatory) {
     const std::string arg_name{"argument name"};
     const std::string arg_desc{"description"};

@@ -155,6 +155,7 @@ class basic_variadic_argument_t {
     bool _given{false};
 };
 
+using bool_argument_t = clapp::basic_argument_t<bool>;
 using string_argument_t = clapp::basic_argument_t<std::string>;
 #ifdef CLAPP_FS_AVAIL
 using path_argument_t = clapp::basic_argument_t<clapp::fs::path>;
