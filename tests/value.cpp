@@ -14,6 +14,21 @@ TEST(value, convertValuePath) {
                 testing::Eq(clapp::fs::path{"/tmp/test"}));
 }
 
+TEST(value, convertValueBool) {
+    ASSERT_THAT(clapp::value::convert_value<bool>("0"), testing::Eq(false));
+    ASSERT_THAT(clapp::value::convert_value<bool>("false"), testing::Eq(false));
+    ASSERT_THAT(clapp::value::convert_value<bool>("FALSE"), testing::Eq(false));
+    ASSERT_THAT(clapp::value::convert_value<bool>("1"), testing::Eq(true));
+    ASSERT_THAT(clapp::value::convert_value<bool>("true"), testing::Eq(true));
+    ASSERT_THAT(clapp::value::convert_value<bool>("TRUE"), testing::Eq(true));
+    ASSERT_THROW(clapp::value::convert_value<bool>("falSe"),
+                 clapp::exception::invalid_value_t);
+    ASSERT_THROW(clapp::value::convert_value<bool>("TRue"),
+                 clapp::exception::invalid_value_t);
+    ASSERT_THROW(clapp::value::convert_value<bool>("abc"),
+                 clapp::exception::invalid_value_t);
+}
+
 TEST(value, convertValueUint8T) {
     ASSERT_THAT(clapp::value::convert_value<std::uint8_t>("0"),
                 testing::Eq(std::uint8_t{0U}));

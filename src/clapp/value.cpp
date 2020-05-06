@@ -34,6 +34,20 @@ std::string clapp::value::convert_value<std::string>(
 }
 
 template <>
+bool clapp::value::convert_value<bool>(const std::string_view param) {
+    if (param == "TRUE" || param == "true" || param == "1") {
+        return true;
+    }
+    if (param == "FALSE" || param == "false" || param == "0") {
+        return false;
+    }
+    std::stringstream ss;
+    ss << "convert_value: value '" << param << "' is invalid. "
+       << "(valid values: TRUE, true, 1, FALSE, false, 0)";
+    throw clapp::exception::invalid_value_t{ss.str()};
+}
+
+template <>
 std::int8_t clapp::value::convert_value<std::int8_t>(
     const std::string_view param) {
     return convert_int<std::int8_t>(param);

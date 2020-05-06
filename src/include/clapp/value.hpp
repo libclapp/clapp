@@ -99,6 +99,9 @@ template <>
 std::string clapp::value::convert_value<std::string>(std::string_view param);
 
 template <>
+bool clapp::value::convert_value<bool>(std::string_view param);
+
+template <>
 std::int8_t clapp::value::convert_value<std::int8_t>(std::string_view param);
 
 template <>
