@@ -229,6 +229,22 @@ If integral values should be used as option parameters, the following types can 
 * `clapp::option::vector_int32_param_option_t`
 * `clapp::option::vector_int64_param_option_t`
 
+### Bool values:
+It is also possible to use `bool` values.
+
+As input format for these values the following formats can be used:
+* `true` becomes `true`
+* `TRUE` becomes `true`
+* `1` becomes  `true`
+* `false` becomes `false`
+* `FALSE` becomes `false`
+* `0` becomes  `false`
+
+If bool values should be used for positional arguments, the following type can be used:
+* `clapp::argument::bool_argument_t`
+
+If integral values should be used as option parameters, the following type can be used:
+* `clapp::option::bool_option_t`
 
 ### Filesystem path values:
 It is also possible to pass regular filesystem paths as argument or option parameter. 
