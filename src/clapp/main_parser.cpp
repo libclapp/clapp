@@ -38,9 +38,9 @@ void clapp::parser::basic_main_parser_t::parse(int argc,
 }
 
 void clapp::parser::basic_main_parser_t::parse(const arg_t& arg) {
-    arg_iterator it{arg.cbegin()};
+    arg_iterator it{arg.begin()};
     executable = *it;
-    parse(it + 1, arg.cend());
+    parse(it + 1, arg.end());
 }
 
 void clapp::parser::basic_main_parser_t::parse_and_validate(
