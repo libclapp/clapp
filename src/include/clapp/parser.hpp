@@ -21,7 +21,9 @@
 #include <sstream>
 
 inline clapp::parser::arg_t::arg_t(const char* const* argv, int argc)
-    : base{gsl::make_span(argv, argc)} {}
+    : base{gsl::span{argv, static_cast<std::size_t>(argc)}} {
+    Expects(argc >= 0);
+}
 
 template <typename short_option_func_t, typename long_option_func_t>
 constexpr bool clapp::parser::basic_parser_t::is_param_opt() {
