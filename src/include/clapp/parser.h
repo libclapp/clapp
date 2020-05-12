@@ -38,7 +38,7 @@ class basic_sub_parser_t;
 
 class basic_parser_t {
    public:
-    using arg_iterator = arg_t::const_iterator;
+    using arg_iterator = arg_t::iterator;
     using long_opt_func_t = std::function<void(const std::string_view option)>;
     using long_opt_param_func_t = std::function<void(
         const std::string_view option, const std::string_view param)>;
