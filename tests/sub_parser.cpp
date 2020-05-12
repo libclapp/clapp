@@ -192,7 +192,7 @@ TEST(subParser, constructEmptySubParserAndParseEmptyArguments) {
     ASSERT_THAT(static_cast<bool>(sub), testing::Eq(false));
     ASSERT_THAT(sub.get_sub_parser_name(), testing::StrEq(sub_parser));
 
-    tp.parse(arg.cbegin(), arg.cend());
+    tp.parse(arg.begin(), arg.end());
 }
 
 TEST(subParser, constructSimpleSubParserAndParseSubOption) {
@@ -220,7 +220,7 @@ TEST(subParser, constructSimpleSubParserAndParseSubOption) {
     ASSERT_THAT(static_cast<bool>(sub.bool_option), testing::Eq(true));
     ASSERT_THAT(sub.bool_option.has_value(), testing::Eq(true));
     ASSERT_THAT(sub.bool_option.value(), testing::Eq(false));
-    tp.parse(arg.cbegin(), arg.cend());
+    tp.parse(arg.begin(), arg.end());
     ASSERT_THAT(static_cast<bool>(sub.bool_option), testing::Eq(true));
 }
 
@@ -247,7 +247,7 @@ TEST(subParser, constructSimpleSubParserAndParseBaseOption) {
     ASSERT_THAT(sub.get_sub_parser_name(), testing::StrEq(sub_parser));
 
     ASSERT_THAT(tp.count_option.value(), testing::Eq(0));
-    tp.parse(arg.cbegin(), arg.cend());
+    tp.parse(arg.begin(), arg.end());
     ASSERT_THAT(tp.count_option.value(), testing::Eq(1));
 }
 
@@ -311,7 +311,7 @@ TEST(subParser, constructSubParserAfterParsingSubBecomesActive) {
     ASSERT_THAT(&tp.get_active_parser(), testing::Eq(&tp));
     ASSERT_THAT(sub.is_active(), testing::Eq(false));
 
-    tp.parse(arg.cbegin(), arg.cend());
+    tp.parse(arg.begin(), arg.end());
     ASSERT_THAT(sub.is_active(), testing::Eq(true));
     ASSERT_THAT(&tp.get_active_parser(), testing::Eq(&sub));
 }
@@ -325,7 +325,7 @@ TEST(subParser, constructSubParserAndValidateRecursiveDoNotThrow) {
     empty_test_parser_t tp;
     simple_sub_parser_t sub{tp, sub_parser, description};
 
-    tp.parse(arg.cbegin(), arg.cend());
+    tp.parse(arg.begin(), arg.end());
     ASSERT_NO_THROW(tp.validate_recursive());
 }
 
@@ -338,6 +338,6 @@ TEST(subParser, constructSubParserAndValidateRecursiveDoThrow) {
     empty_test_parser_t tp;
     simple_sub_parser_t sub{tp, sub_parser, description};
 
-    tp.parse(arg.cbegin(), arg.cend());
+    tp.parse(arg.begin(), arg.end());
     ASSERT_THROW(tp.validate_recursive(), clapp::clapp_exception_t);
 }
