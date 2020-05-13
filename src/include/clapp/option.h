@@ -299,6 +299,8 @@ using int32_param_option_t = clapp::basic_param_option_t<std::int32_t>;
 using uint32_param_option_t = clapp::basic_param_option_t<std::uint32_t>;
 using int64_param_option_t = clapp::basic_param_option_t<std::int64_t>;
 using uint64_param_option_t = clapp::basic_param_option_t<std::uint64_t>;
+using ptrdiff_param_option_t = clapp::basic_param_option_t<std::ptrdiff_t>;
+using size_param_option_t = clapp::basic_param_option_t<std::size_t>;
 using double_param_option_t = clapp::basic_param_option_t<double>;
 using float_param_option_t = clapp::basic_param_option_t<float>;
 using ns_param_option_t = clapp::basic_param_option_t<std::chrono::nanoseconds>;
@@ -334,6 +336,10 @@ using vector_int64_param_option_t =
     clapp::basic_vector_param_option_t<std::int64_t>;
 using vector_uint64_param_option_t =
     clapp::basic_vector_param_option_t<std::uint64_t>;
+using vector_ptrdiff_param_option_t =
+    clapp::basic_vector_param_option_t<std::ptrdiff_t>;
+using vector_size_param_option_t =
+    clapp::basic_vector_param_option_t<std::size_t>;
 using vector_double_param_option_t = clapp::basic_vector_param_option_t<double>;
 using vector_float_param_option_t = clapp::basic_vector_param_option_t<float>;
 using vector_ns_param_option_t =
