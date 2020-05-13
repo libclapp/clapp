@@ -179,6 +179,8 @@ The following integral types are supported:
 * `std::uint16_t`
 * `std::uint32_t`
 * `std::uint64_t`
+* `std::ptrdiff_t`
+* `std::size_t`
 
 As input format for these values the following formats can be used:
 * `[+-]?[1-9][0-9]*`: Decimal numbers
@@ -202,6 +204,8 @@ If integral values should be used for positional arguments, the following types 
 * `clapp::argument::int16_argument_t`
 * `clapp::argument::int32_argument_t`
 * `clapp::argument::int64_argument_t`
+* `clapp::argument::ptrdiff_argument_t`
+* `clapp::argument::size_argument_t`
 * `clapp::argument::variadic_uint8_argument_t`
 * `clapp::argument::variadic_uint16_argument_t`
 * `clapp::argument::variadic_uint32_argument_t`
@@ -210,6 +214,8 @@ If integral values should be used for positional arguments, the following types 
 * `clapp::argument::variadic_int16_argument_t`
 * `clapp::argument::variadic_int32_argument_t`
 * `clapp::argument::variadic_int64_argument_t`
+* `clapp::argument::variadic_ptrdiff_argument_t`
+* `clapp::argument::variadic_size_argument_t`
 
 If integral values should be used as option parameters, the following types can be used:
 * `clapp::option::uint8_param_option_t`
@@ -220,6 +226,8 @@ If integral values should be used as option parameters, the following types can 
 * `clapp::option::int16_param_option_t`
 * `clapp::option::int32_param_option_t`
 * `clapp::option::int64_param_option_t`
+* `clapp::option::ptrdiff_param_option_t`
+* `clapp::option::size_param_option_t`
 * `clapp::option::vector_uint8_param_option_t`
 * `clapp::option::vector_uint16_param_option_t`
 * `clapp::option::vector_uint32_param_option_t`
@@ -228,6 +236,8 @@ If integral values should be used as option parameters, the following types can 
 * `clapp::option::vector_int16_param_option_t`
 * `clapp::option::vector_int32_param_option_t`
 * `clapp::option::vector_int64_param_option_t`
+* `clapp::option::vector_ptrdiff_param_option_t`
+* `clapp::option::vector_size_param_option_t`
 
 ### Bool values:
 It is also possible to use `bool` values.
