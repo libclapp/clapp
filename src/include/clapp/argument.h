@@ -168,6 +168,8 @@ using int32_argument_t = clapp::basic_argument_t<std::int32_t>;
 using uint32_argument_t = clapp::basic_argument_t<std::uint32_t>;
 using int64_argument_t = clapp::basic_argument_t<std::int64_t>;
 using uint64_argument_t = clapp::basic_argument_t<std::uint64_t>;
+using ptrdiff_argument_t = clapp::basic_argument_t<std::ptrdiff_t>;
+using size_argument_t = clapp::basic_argument_t<std::size_t>;
 using double_argument_t = clapp::basic_argument_t<double>;
 using float_argument_t = clapp::basic_argument_t<float>;
 using ns_argument_t = clapp::basic_argument_t<std::chrono::nanoseconds>;
@@ -198,6 +200,9 @@ using variadic_int64_argument_t =
     clapp::basic_variadic_argument_t<std::int64_t>;
 using variadic_uint64_argument_t =
     clapp::basic_variadic_argument_t<std::uint64_t>;
+using variadic_ptrdiff_argument_t =
+    clapp::basic_variadic_argument_t<std::ptrdiff_t>;
+using variadic_size_argument_t = clapp::basic_variadic_argument_t<std::size_t>;
 using variadic_double_argument_t = clapp::basic_variadic_argument_t<double>;
 using variadic_float_argument_t = clapp::basic_variadic_argument_t<float>;
 using variadic_ns_argument_t =
