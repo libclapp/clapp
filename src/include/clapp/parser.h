@@ -92,7 +92,7 @@ class basic_parser_t {
 
     template <typename short_option_func_t, typename long_option_func_t,
               option_type_t option_type>
-    struct reg_option_conf_t {
+    struct basic_reg_option_conf_t {
         static std::string create_option_string(
             std::vector<char> short_option,
             const std::vector<std::string>& long_option);
@@ -108,14 +108,15 @@ class basic_parser_t {
         std::string description;
         purpose_t purpose{purpose_t::optional};
     };
-    using opt_conf_t = reg_option_conf_t<short_opt_func_t, long_opt_func_t,
-                                         option_type_t::scalar>;
+    using opt_conf_t =
+        basic_reg_option_conf_t<short_opt_func_t, long_opt_func_t,
+                                option_type_t::scalar>;
     using opt_scalar_param_conf_t =
-        reg_option_conf_t<short_opt_param_func_t, long_opt_param_func_t,
-                          option_type_t::scalar>;
+        basic_reg_option_conf_t<short_opt_param_func_t, long_opt_param_func_t,
+                                option_type_t::scalar>;
     using opt_vector_param_conf_t =
-        reg_option_conf_t<short_opt_param_func_t, long_opt_param_func_t,
-                          option_type_t::vector>;
+        basic_reg_option_conf_t<short_opt_param_func_t, long_opt_param_func_t,
+                                option_type_t::vector>;
 
     template <argument_type_t argument_type>
     struct reg_argument_conf_t {
@@ -189,8 +190,8 @@ class basic_parser_t {
 
     template <typename short_option_func_t, typename long_option_func_t,
               option_type_t option_type>
-    void reg(reg_option_conf_t<short_option_func_t, long_option_func_t,
-                               option_type>&& config);
+    void reg(basic_reg_option_conf_t<short_option_func_t, long_option_func_t,
+                                     option_type>&& config);
 
     template <argument_type_t argument_type>
     void reg(reg_argument_conf_t<argument_type>&& config);

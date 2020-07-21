@@ -34,8 +34,8 @@ constexpr bool clapp::parser::basic_parser_t::is_param_opt() {
 template <typename short_option_func_t, typename long_option_func_t,
           clapp::parser::basic_parser_t::option_type_t option_type>
 void clapp::parser::basic_parser_t::reg(
-    reg_option_conf_t<short_option_func_t, long_option_func_t, option_type>&&
-        config) {
+    basic_reg_option_conf_t<short_option_func_t, long_option_func_t,
+                            option_type>&& config) {
     Expects(config.option_string.size() > 1);
 
     if (!config.short_options.empty()) {
@@ -143,7 +143,7 @@ void clapp::parser::basic_parser_t::reg(
 
 template <typename short_option_func_t, typename long_option_func_t,
           clapp::parser::basic_parser_t::option_type_t option_type>
-std::string clapp::parser::basic_parser_t::reg_option_conf_t<
+std::string clapp::parser::basic_parser_t::basic_reg_option_conf_t<
     short_option_func_t, long_option_func_t,
     option_type>::create_option_string(const std::string& long_option) {
     return std::string{"--"} + long_option;
@@ -151,7 +151,7 @@ std::string clapp::parser::basic_parser_t::reg_option_conf_t<
 
 template <typename short_option_func_t, typename long_option_func_t,
           clapp::parser::basic_parser_t::option_type_t option_type>
-std::string clapp::parser::basic_parser_t::reg_option_conf_t<
+std::string clapp::parser::basic_parser_t::basic_reg_option_conf_t<
     short_option_func_t, long_option_func_t,
     option_type>::create_option_string(const char short_option) {
     return std::string{"-"} + short_option;
@@ -159,7 +159,7 @@ std::string clapp::parser::basic_parser_t::reg_option_conf_t<
 
 template <typename short_option_func_t, typename long_option_func_t,
           clapp::parser::basic_parser_t::option_type_t option_type>
-std::string clapp::parser::basic_parser_t::reg_option_conf_t<
+std::string clapp::parser::basic_parser_t::basic_reg_option_conf_t<
     short_option_func_t, long_option_func_t,
     option_type>::create_option_string(const std::vector<char> short_option,
                                        const std::vector<std::string>&
