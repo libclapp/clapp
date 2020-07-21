@@ -240,7 +240,6 @@ class basic_parser_t {
     long_options_map_t& get_long_options();
     short_options_map_t& get_short_options();
     arguments_vector_t& get_arguments();
-    optional_argument_t& get_optional_argument();
     validate_func_vec_t& get_validate_functions();
     option_descriptions_vec_t& get_mandatory_option_descriptions();
     option_descriptions_vec_t& get_optional_option_descriptions();
