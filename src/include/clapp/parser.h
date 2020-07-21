@@ -101,8 +101,8 @@ class basic_parser_t {
 
         using long_opt_conf_t = basic_long_opt_conf_t<long_option_func_t>;
         using short_opt_conf_t = basic_short_opt_conf_t<short_option_func_t>;
-        std::vector<short_opt_conf_t> short_option;
-        std::vector<long_opt_conf_t> long_option;
+        std::vector<short_opt_conf_t> short_options;
+        std::vector<long_opt_conf_t> long_options;
         std::optional<validate_func_t> validate_func;
         std::string option_string;
         std::string description;

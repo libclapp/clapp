@@ -38,8 +38,8 @@ void clapp::parser::basic_parser_t::reg(
         config) {
     Expects(config.option_string.size() > 1);
 
-    if (!config.short_option.empty()) {
-        for (auto& so : config.short_option) {
+    if (!config.short_options.empty()) {
+        for (auto& so : config.short_options) {
             std::pair<short_options_map_t::iterator, bool> ret{
                 get_short_options().emplace(std::move(so.option),
                                             std::move(so.func))};
@@ -51,8 +51,8 @@ void clapp::parser::basic_parser_t::reg(
             }
         }
     }
-    if (!config.long_option.empty()) {
-        for (auto& lo : config.long_option) {
+    if (!config.long_options.empty()) {
+        for (auto& lo : config.long_options) {
             std::pair<long_options_map_t::iterator, bool> ret{
                 get_long_options().emplace(std::move(lo.option),
                                            std::move(lo.func))};
