@@ -108,12 +108,14 @@ class basic_parser_t {
         std::string description;
         purpose_t purpose{purpose_t::optional};
     };
-
-    struct reg_sub_parser_conf_t {
-        basic_sub_parser_t& parser;
-        std::string sub_parser_name;
-        std::string description;
-    };
+    using opt_conf_t = reg_option_conf_t<short_opt_func_t, long_opt_func_t,
+                                         option_type_t::scalar>;
+    using opt_scalar_param_conf_t =
+        reg_option_conf_t<short_opt_param_func_t, long_opt_param_func_t,
+                          option_type_t::scalar>;
+    using opt_vector_param_conf_t =
+        reg_option_conf_t<short_opt_param_func_t, long_opt_param_func_t,
+                          option_type_t::vector>;
 
     template <argument_type_t argument_type>
     struct reg_argument_conf_t {
@@ -126,14 +128,12 @@ class basic_parser_t {
 
     using single_arg_conf_t = reg_argument_conf_t<argument_type_t::single>;
     using variadic_arg_conf_t = reg_argument_conf_t<argument_type_t::variadic>;
-    using opt_conf_t = reg_option_conf_t<short_opt_func_t, long_opt_func_t,
-                                         option_type_t::scalar>;
-    using opt_scalar_param_conf_t =
-        reg_option_conf_t<short_opt_param_func_t, long_opt_param_func_t,
-                          option_type_t::scalar>;
-    using opt_vector_param_conf_t =
-        reg_option_conf_t<short_opt_param_func_t, long_opt_param_func_t,
-                          option_type_t::vector>;
+
+    struct reg_sub_parser_conf_t {
+        basic_sub_parser_t& parser;
+        std::string sub_parser_name;
+        std::string description;
+    };
 
    protected:
     using long_opt_variant_t =
