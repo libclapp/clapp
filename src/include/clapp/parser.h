@@ -108,7 +108,7 @@ class basic_parser_t {
         std::string description;
         purpose_t purpose{purpose_t::optional};
     };
-    using opt_conf_t =
+    using opt_no_param_conf_t =
         basic_reg_option_conf_t<short_opt_func_t, long_opt_func_t,
                                 option_type_t::scalar>;
     using opt_scalar_param_conf_t =

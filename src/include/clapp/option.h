@@ -157,7 +157,7 @@ template <typename T>
 class basic_option_t {
    public:
     using callbacks_t = option_callbacks_t<T>;
-    using opt_conf_t = basic_parser_t::opt_conf_t;
+    using opt_conf_t = basic_parser_t::opt_no_param_conf_t;
 
     template <typename... Params>
     basic_option_t(basic_parser_t& parser, callbacks_t&& callbacks,
