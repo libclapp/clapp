@@ -9,7 +9,9 @@ add_custom_command( OUTPUT simple_sub_parser.cpp simple_main_parser.cpp DEPENDS 
 
 add_executable(libclapp_doc_simple_main_parser simple_main_parser.cpp)
 target_link_libraries(libclapp_doc_simple_main_parser clapp)
-target_compile_options(libclapp_doc_simple_main_parser PRIVATE ${libClaPP_COMPILE_OPTIONS})
+if(libClaPP_PEDANTIC_COMPILER_FLAGS)
+  target_compile_options(libclapp_doc_simple_main_parser PRIVATE ${libClaPP_PEDANTIC_COMPILE_OPTIONS})
+endif()
 if(CLANG_TIDY)
   set_target_properties(libclapp_doc_simple_main_parser PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_DOC_ARGS}")
 endif()
@@ -17,7 +19,9 @@ add_test(NAME libclapp_doc_simple_main_parser_test COMMAND ${RAKU_EXECUTABLE} ${
 
 add_executable(libclapp_doc_simple_sub_parser simple_sub_parser.cpp)
 target_link_libraries(libclapp_doc_simple_sub_parser clapp)
-target_compile_options(libclapp_doc_simple_sub_parser PRIVATE ${libClaPP_COMPILE_OPTIONS})
+if(libClaPP_PEDANTIC_COMPILER_FLAGS)
+  target_compile_options(libclapp_doc_simple_sub_parser PRIVATE ${libClaPP_PEDANTIC_COMPILE_OPTIONS})
+endif()
 if(CLANG_TIDY)
   set_target_properties(libclapp_doc_simple_sub_parser PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_DOC_ARGS}")
 endif()

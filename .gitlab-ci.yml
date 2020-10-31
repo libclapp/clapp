@@ -12,7 +12,7 @@ variables:
         - SRC_DIR=`pwd`
         - mkdir build
         - cd build
-        - cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${SRC_DIR}
+        - cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DlibClaPP_PEDANTIC_COMPILER_FLAGS=On -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${SRC_DIR}
         - cmake --build .
         - make install
         - echo -e '#include<clapp/main_parser.h>\n#include<clapp/build_info.h>\n#include<iostream>\nint main (int argc, char *argv[]) {\nstd::cout << clapp::build_info::project_name << " v" << clapp::build_info::version << std::endl;\n}' | ${CXX} `pkg-config --libs --cflags libclapp` -I${SRC_DIR}/third_party/GSL/include/ --std=c++17 -o out -x c++ -
@@ -23,7 +23,7 @@ variables:
         - SRC_DIR=`pwd`
         - mkdir build
         - cd build
-        - cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${ADDITIONAL_OPTION} -G "${GENERATOR}" ${SRC_DIR}
+        - cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DlibClaPP_PEDANTIC_COMPILER_FLAGS=On -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${ADDITIONAL_OPTION} -G "${GENERATOR}" ${SRC_DIR}
         - cmake --build .
     artifacts:
         paths:
@@ -35,7 +35,7 @@ variables:
         - SRC_DIR=`pwd`
         - mkdir build
         - cd build
-        - cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCLANG_TIDY=${CLANG_TIDY} -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DlibClaPP_BUILD_COVERAGE=On -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DlibClaPP_CLANG_TIDY=On ${SRC_DIR}
+        - cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DlibClaPP_PEDANTIC_COMPILER_FLAGS=On -DCLANG_TIDY=${CLANG_TIDY} -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DlibClaPP_BUILD_COVERAGE=On -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DlibClaPP_CLANG_TIDY=On ${SRC_DIR}
         - cmake --build .
 
 .test_gcov_template: &test_gcov_definition
