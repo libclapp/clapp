@@ -91,6 +91,13 @@ class basic_parser_t {
         std::map<std::string, sub_parser_line_t> sub_parser{};
     };
 
+    struct help_entry_t {
+        std::string option_string;
+        std::string description;
+    };
+
+    using help_entry_vec_t = std::vector<help_entry_t>;
+
     template <typename short_option_func_t, typename long_option_func_t,
               option_type_t option_type>
     struct basic_reg_option_conf_t {
