@@ -51,6 +51,7 @@ class basic_parser_t {
 
     enum class argument_type_t { single, variadic };
     enum class option_type_t { scalar, vector };
+    enum class logic_operator_type_t { logic_and, logic_or };
     enum class purpose_t { optional, mandatory };
 
     template <typename short_option_func_t>
