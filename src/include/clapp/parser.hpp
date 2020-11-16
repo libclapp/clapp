@@ -230,6 +230,15 @@ std::string clapp::parser::basic_parser_t::basic_reg_option_conf_t<
     }
 }
 
+template <typename short_option_func_t, typename long_option_func_t,
+          clapp::parser::basic_parser_t::option_type_t option_type>
+clapp::parser::basic_parser_t::help_entry_t
+clapp::parser::basic_parser_t::basic_reg_option_conf_t<
+    short_option_func_t, long_option_func_t, option_type>::get_option_help()
+    const {
+    return help_entry_t{create_basic_option_string(), description};
+}
+
 inline bool clapp::parser::basic_parser_t::is_active() const noexcept {
     return true;
 }
