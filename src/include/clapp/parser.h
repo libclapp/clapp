@@ -125,6 +125,9 @@ class basic_parser_t {
     using opt_vector_param_conf_t =
         basic_reg_option_conf_t<short_opt_param_func_t, long_opt_param_func_t,
                                 option_type_t::vector>;
+    using variant_opt_conf_t =
+        std::variant<opt_no_param_conf_t, opt_scalar_param_conf_t,
+                     opt_vector_param_conf_t>;
 
     template <argument_type_t argument_type>
     struct reg_argument_conf_t {
@@ -276,6 +279,8 @@ class basic_parser_t {
     argument_descriptions_vec_t mandatory_argument_descriptions{};
     argument_descriptions_vec_t optional_argument_descriptions{};
     std::size_t num_processed_arguments{0};
+
+    std::vector<variant_opt_conf_t> options{};
 
    public:
     constexpr static std::size_t num_sub_spaces{2u};

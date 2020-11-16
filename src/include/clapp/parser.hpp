@@ -41,8 +41,7 @@ void clapp::parser::basic_parser_t::reg(
     if (!config.short_options.empty()) {
         for (auto& so : config.short_options) {
             std::pair<short_options_map_t::iterator, bool> ret{
-                get_short_options().emplace(std::move(so.option),
-                                            std::move(so.func))};
+                get_short_options().emplace(so.option, so.func)};
             if (!ret.second) {
                 std::stringstream ss;
                 ss << "Can't register option '" << so.option
@@ -54,8 +53,7 @@ void clapp::parser::basic_parser_t::reg(
     if (!config.long_options.empty()) {
         for (auto& lo : config.long_options) {
             std::pair<long_options_map_t::iterator, bool> ret{
-                get_long_options().emplace(std::move(lo.option),
-                                           std::move(lo.func))};
+                get_long_options().emplace(lo.option, lo.func)};
             if (!ret.second) {
                 std::stringstream ss;
                 ss << "Can't register option '" << lo.option
@@ -78,14 +76,14 @@ void clapp::parser::basic_parser_t::reg(
         set_max_option_string_size(config.option_string.size());
     }
 
-    option_description_container_t desc{std::move(config.option_string),
-                                        std::move(config.description),
-                                        option_type};
+    option_description_container_t desc{config.option_string,
+                                        config.description, option_type};
     if (config.purpose == purpose_t::mandatory) {
         get_mandatory_option_descriptions().push_back(std::move(desc));
     } else {
         get_optional_option_descriptions().push_back(std::move(desc));
     }
+    options.push_back(config);
 }
 
 template <clapp::parser::basic_parser_t::argument_type_t argument_type>
