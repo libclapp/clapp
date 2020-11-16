@@ -31,6 +31,17 @@ clapp::parser::basic_parser_t::get_long_options() {
     return long_options;
 }
 
+typename clapp::parser::basic_parser_t::help_entry_vec_t
+clapp::parser::basic_parser_t::get_option_help() const {
+    typename clapp::parser::basic_parser_t::help_entry_vec_t ret;
+    for (auto& option : options) {
+        ret.push_back(std::visit(
+            [](auto&& o) -> help_entry_t { return o.get_option_help(); },
+            option));
+    }
+    return ret;
+}
+
 clapp::parser::basic_parser_t::short_options_map_t&
 clapp::parser::basic_parser_t::get_short_options() {
     return short_options;

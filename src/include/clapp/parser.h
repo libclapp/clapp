@@ -252,6 +252,7 @@ class basic_parser_t {
 
    protected:
     sub_parsers_map_t& get_sub_parsers();
+    help_entry_vec_t get_option_help() const;
     long_options_map_t& get_long_options();
     short_options_map_t& get_short_options();
     arguments_vector_t& get_arguments();
