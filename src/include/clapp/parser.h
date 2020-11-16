@@ -106,6 +106,8 @@ class basic_parser_t {
             const std::vector<std::string>& long_option);
         static std::string create_option_string(const std::string& long_option);
         static std::string create_option_string(char short_option);
+        std::string create_basic_option_string() const;
+        std::string create_option_string() const;
 
         using long_opt_conf_t = basic_long_opt_conf_t<long_option_func_t>;
         using short_opt_conf_t = basic_short_opt_conf_t<short_option_func_t>;

@@ -182,6 +182,54 @@ std::string clapp::parser::basic_parser_t::basic_reg_option_conf_t<
     return option_string;
 }
 
+template <typename short_option_func_t, typename long_option_func_t,
+          clapp::parser::basic_parser_t::option_type_t option_type>
+std::string clapp::parser::basic_parser_t::basic_reg_option_conf_t<
+    short_option_func_t, long_option_func_t,
+    option_type>::create_basic_option_string() const {
+    std::string ret;
+    if (!short_options.empty()) {
+        ret = std::accumulate(
+            short_options.begin(), short_options.end(), ret,
+            [](const std::string& a,
+               const basic_short_opt_conf_t<short_option_func_t>& b)
+                -> std::string {
+                std::string opt_str{std::string{"-"} + b.option};
+                return a + (a.length() > 0 ? "|" : "") + opt_str;
+            });
+    }
+    if (!long_options.empty()) {
+        ret = std::accumulate(
+            long_options.begin(), long_options.end(), ret,
+            [](const std::string& a,
+               const basic_long_opt_conf_t<long_option_func_t>& b)
+                -> std::string {
+                std::string opt_str{std::string{"--"} + b.option};
+                return a + (a.length() > 0 ? "|" : "") + opt_str;
+            });
+    }
+    if constexpr (is_param_opt<short_option_func_t, long_option_func_t>()) {
+        ret += "=<param>";
+    }
+    return ret;
+}
+
+template <typename short_option_func_t, typename long_option_func_t,
+          clapp::parser::basic_parser_t::option_type_t option_type>
+std::string clapp::parser::basic_parser_t::basic_reg_option_conf_t<
+    short_option_func_t, long_option_func_t,
+    option_type>::create_option_string() const {
+    std::string ret{create_basic_option_string()};
+    if constexpr (option_type == option_type_t::vector) {
+        ret += "...";
+    }
+    if (purpose == purpose_t::optional) {
+        return "[" + ret + "]";
+    } else {
+        return ret;
+    }
+}
+
 inline bool clapp::parser::basic_parser_t::is_active() const noexcept {
     return true;
 }
