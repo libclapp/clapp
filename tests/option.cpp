@@ -757,18 +757,16 @@ TEST(option, helpOptionConstructLong) {
     ASSERT_EXIT(long_opt_func(long_opt_name), ::testing::ExitedWithCode(0), "");
     ASSERT_THAT(
         testing::internal::GetCapturedStdout(),
-        testing::StrEq(
-            "Usage:\nopt-test-parser [-s|--long]\n\n  Optional Options:\n    "
-            "-s|--long description\n"));
+        testing::StrEq("Usage:\nopt-test-parser [-s|--long]\n\n  Options:\n    "
+                       "-s|--long description\n"));
 
     testing::internal::CaptureStdout();
     ASSERT_EXIT(short_opt_func(short_opt_name), ::testing::ExitedWithCode(0),
                 "");
     ASSERT_THAT(
         testing::internal::GetCapturedStdout(),
-        testing::StrEq(
-            "Usage:\nopt-test-parser [-s|--long]\n\n  Optional Options:\n    "
-            "-s|--long description\n"));
+        testing::StrEq("Usage:\nopt-test-parser [-s|--long]\n\n  Options:\n    "
+                       "-s|--long description\n"));
 }
 
 TEST(option, countOptionConstructLong) {

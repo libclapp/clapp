@@ -239,15 +239,6 @@ std::string clapp::parser::basic_parser_t::gen_opt_arg_lines(
         }
     }
 
-    if (!help_contents.mandatory_options.empty()) {
-        ret += "\n" + std::string(num_spaces + num_sub_spaces, ' ') +
-               "Mandatory Options:\n";
-        for (const help_line_t& line : help_contents.mandatory_options) {
-            ret += std::string(num_spaces + num_sub_spaces, ' ') + line.name +
-                   line.description + '\n';
-        }
-    }
-
     if (!help_contents.optional_arguments.empty()) {
         ret += "\n" + std::string(num_spaces + num_sub_spaces, ' ') +
                "Optional Arguments:\n";
@@ -257,14 +248,20 @@ std::string clapp::parser::basic_parser_t::gen_opt_arg_lines(
         }
     }
 
-    if (!help_contents.optional_options.empty()) {
-        ret += "\n" + std::string(num_spaces + num_sub_spaces, ' ') +
-               "Optional Options:\n";
-        for (const help_line_t& line : help_contents.optional_options) {
-            ret += std::string(num_spaces + num_sub_spaces, ' ') + line.name +
-                   line.description + '\n';
+    std::vector<help_entry_t> option_help_entries{get_option_help()};
+    if (!option_help_entries.empty()) {
+        ret +=
+            "\n" + std::string(num_spaces + num_sub_spaces, ' ') + "Options:\n";
+        for (const help_entry_t& entry : option_help_entries) {
+            ret += "  " + std::string(num_spaces + num_sub_spaces, ' ') +
+                   entry.option_string +
+                   std::string(get_max_option_string_size() + 1 -
+                                   entry.option_string.size(),
+                               ' ') +
+                   entry.description + '\n';
         }
     }
+
     return ret;
 }
 
