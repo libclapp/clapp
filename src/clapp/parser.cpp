@@ -228,7 +228,7 @@ std::string clapp::parser::basic_parser_t::gen_short_line() const {
 
 std::string clapp::parser::basic_parser_t::gen_opt_arg_lines(
     const clapp::parser::basic_parser_t::help_contents_t& help_contents,
-    const std::size_t num_spaces) {
+    const std::size_t num_spaces) const {
     std::string ret;
     if (!help_contents.mandatory_arguments.empty()) {
         ret += "\n" + std::string(num_spaces + num_sub_spaces, ' ') +
