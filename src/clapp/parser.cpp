@@ -185,6 +185,13 @@ clapp::parser::basic_parser_t::gen_detailed_help_contents() const {
 
 std::string clapp::parser::basic_parser_t::gen_short_line() const {
     std::string short_line;
+
+    for (auto& option : options) {
+        short_line +=
+            " " + std::visit([](auto&& o) { return o.create_option_string(); },
+                             option);
+    }
+
     for (const argument_description_container_t& desc_cont :
          mandatory_argument_descriptions) {
         short_line += " <" + desc_cont.argument_string + ">";
@@ -194,30 +201,11 @@ std::string clapp::parser::basic_parser_t::gen_short_line() const {
         }
     }
 
-    for (const option_description_container_t& desc_cont :
-         mandatory_option_descriptions) {
-        short_line += " " + desc_cont.option_string;
-        if (desc_cont.option_type ==
-            clapp::basic_parser_t::option_type_t::vector) {
-            short_line += "...";
-        }
-    }
-
     for (const argument_description_container_t& desc_cont :
          optional_argument_descriptions) {
         short_line += " [<" + desc_cont.argument_string + ">";
         if (desc_cont.argument_type ==
             clapp::basic_parser_t::argument_type_t::variadic) {
-            short_line += "...";
-        }
-        short_line += "]";
-    }
-
-    for (const option_description_container_t& desc_cont :
-         optional_option_descriptions) {
-        short_line += " [" + desc_cont.option_string;
-        if (desc_cont.option_type ==
-            clapp::basic_parser_t::option_type_t::vector) {
             short_line += "...";
         }
         short_line += "]";

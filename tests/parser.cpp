@@ -280,8 +280,8 @@ TEST(parser, constructSimpleTestParserAndGenHelpMessage) {
     ASSERT_THAT(
         stp.gen_help_msg(255),
         testing::StrEq(
-            "simple-test-parser <arg-name> [<variadic-arg-name>...] "
-            "[-b|--bool] [-i|--int=<arg>]\n\n  Mandatory Arguments:\n    "
+            "simple-test-parser [-b|--bool] [-i|--int=<param>] <arg-name> "
+            "[<variadic-arg-name>...]\n\n  Mandatory Arguments:\n    "
             "arg-name                  Arg desc\n\n  Optional Arguments:\n    "
             "variadic-arg-name         Variadic arg desc (variadic "
             "argument)\n\n  Options:\n    -b|--bool                 "
@@ -307,8 +307,8 @@ TEST(parser, constructSimpleTestParser3AndGenHelpMessage) {
     ASSERT_THAT(
         stp.gen_help_msg(255),
         testing::StrEq(
-            "simple-test-parser3 <variadic-arg-name>... -i|--int=<arg>... "
-            "[-s|--str=<arg>...]\n\n  Mandatory Arguments:\n    "
+            "simple-test-parser3 -i|--int=<param>... [-s|--str=<param>...] "
+            "<variadic-arg-name>...\n\n  Mandatory Arguments:\n    "
             "variadic-arg-name              Variadic arg desc (variadic "
             "argument)\n\n  Options:\n    -i|--int=<param>           "
             "    Int option. (vector option, constraint: [10,200])\n  "
@@ -323,10 +323,10 @@ TEST(parser, constructSubParserContainerAndGenHelpMessage) {
     ASSERT_THAT(
         spc.gen_help_msg(255),
         testing::StrEq(
-            "sub_parser_container <arg-name> [-b|--bool] [-2|--second] "
-            "sub-parser [<sub-arg-name>] [-b|--bool] "
-            "[-s|--string=<arg>]\nsub_parser_container <arg-name> [-b|--bool] "
-            "[-2|--second]\n\n  Subparser:\n    sub-parser                Sub "
+            "sub_parser_container [-b|--bool] [-2|--second] <arg-name> "
+            "sub-parser [-b|--bool] [-s|--string=<param>] [<sub-arg-name>]\n"
+            "sub_parser_container [-b|--bool] [-2|--second] <arg-name>\n\n"
+            "  Subparser:\n    sub-parser                Sub "
             "parser desc\n      Optional Arguments:\n        sub-arg-name      "
             "    Sub arg desc\n\n      Options:\n        -b|--bool    "
             "         Bool option.\n        -s|--string=<param>   String "
@@ -343,8 +343,9 @@ TEST(parser, constructSubParserContainerAndGenSubParserHelpMessage) {
     ASSERT_THAT(
         spc.sub_parser.gen_help_msg(255),
         testing::StrEq(
-            "sub_parser_container <arg-name> [-b|--bool] [-2|--second] "
-            "sub-parser [<sub-arg-name>] [-b|--bool] [-s|--string=<arg>]\n\n  "
+            "sub_parser_container [-b|--bool] [-2|--second] <arg-name> "
+            "sub-parser [-b|--bool] [-s|--string=<param>] [<sub-arg-name>]\n\n "
+            " "
             "Optional Arguments:\n    sub-arg-name                    Sub arg "
             "desc\n\n  Options:\n    -b|--bool                       "
             "Bool option.\n    -s|--string=<param>             String "
