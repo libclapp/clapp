@@ -128,6 +128,17 @@ std::string clapp::parser::basic_parser_t::gen_usage_prefix() {
 clapp::parser::basic_parser_t::help_contents_t
 clapp::parser::basic_parser_t::gen_detailed_help_contents() const {
     help_contents_t ret;
+
+    help_entry_vec_t option_help_entries{get_option_help()};
+    for (auto& entry : option_help_entries) {
+        ret.options.emplace_back(
+            help_line_t{"  " + entry.option_string +
+                            std::string(get_max_option_string_size() + 1 -
+                                            entry.option_string.size(),
+                                        ' '),
+                        entry.description});
+    }
+
     for (const argument_description_container_t& desc_cont :
          mandatory_argument_descriptions) {
         ret.mandatory_arguments.emplace_back(
@@ -138,32 +149,12 @@ clapp::parser::basic_parser_t::gen_detailed_help_contents() const {
                         desc_cont.description});
     }
 
-    for (const option_description_container_t& desc_cont :
-         mandatory_option_descriptions) {
-        ret.mandatory_options.emplace_back(
-            help_line_t{"  " + desc_cont.option_string +
-                            std::string(get_max_option_string_size() + 1 -
-                                            desc_cont.option_string.size(),
-                                        ' '),
-                        desc_cont.description});
-    }
-
     for (const argument_description_container_t& desc_cont :
          optional_argument_descriptions) {
         ret.optional_arguments.emplace_back(
             help_line_t{"  " + desc_cont.argument_string +
                             std::string(get_max_option_string_size() + 1 -
                                             desc_cont.argument_string.size(),
-                                        ' '),
-                        desc_cont.description});
-    }
-
-    for (const option_description_container_t& desc_cont :
-         optional_option_descriptions) {
-        ret.optional_options.emplace_back(
-            help_line_t{"  " + desc_cont.option_string +
-                            std::string(get_max_option_string_size() + 1 -
-                                            desc_cont.option_string.size(),
                                         ' '),
                         desc_cont.description});
     }

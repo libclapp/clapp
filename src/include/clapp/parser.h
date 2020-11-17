@@ -86,8 +86,7 @@ class basic_parser_t {
     struct help_contents_t {
         std::vector<help_line_t> mandatory_arguments{};
         std::vector<help_line_t> optional_arguments{};
-        std::vector<help_line_t> mandatory_options{};
-        std::vector<help_line_t> optional_options{};
+        std::vector<help_line_t> options{};
         std::map<std::string, sub_parser_line_t> sub_parser{};
     };
 
