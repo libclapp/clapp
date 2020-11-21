@@ -159,31 +159,32 @@ template <typename T, typename OPT_CONF, typename CALLBACKS, typename T1,
 clapp::option::opt_conf_container_t<T, OPT_CONF> clapp::option::gen_opt_conf(
     CALLBACKS&& callbacks, T1&& single_option, const std::string& description,
     Params&&... parameters) {
-    if constexpr (clapp::is_vector<typename std::decay<T1>::type>::value) {
-        if constexpr (std::is_same<typename std::decay<T1>::type,
+    if constexpr (clapp::is_vector<std::decay_t<T1>>::value) {
+        if constexpr (std::is_same<std::decay_t<T1>,
                                    std::vector<char>>::value) {
             return gen_opt_conf1<T, OPT_CONF>(
                 std::forward<CALLBACKS>(callbacks), std::vector<std::string>{},
                 std::forward<T1>(single_option), std::move(description),
                 std::forward<Params>(parameters)...);
+        } else {
+            return gen_opt_conf1<T, OPT_CONF>(
+                std::forward<CALLBACKS>(callbacks),
+                gen_string_vec(std::forward<T1>(single_option)),
+                std::vector<char>{}, std::move(description),
+                std::forward<Params>(parameters)...);
         }
-        return gen_opt_conf1<T, OPT_CONF>(
-            std::forward<CALLBACKS>(callbacks),
-            gen_string_vec(std::forward<T1>(single_option)),
-            std::vector<char>{}, std::move(description),
-            std::forward<Params>(parameters)...);
-    }
-    if constexpr (std::is_same<typename std::decay<T1>::type, char>::value) {
+    } else if constexpr (std::is_same<std::decay_t<T1>, char>::value) {
         return gen_opt_conf1<T, OPT_CONF>(
             std::forward<CALLBACKS>(callbacks), std::vector<std::string>{},
             std::vector<char>{std::forward<T1>(single_option)},
             std::move(description), std::forward<Params>(parameters)...);
+    } else {
+        return gen_opt_conf1<T, OPT_CONF>(
+            std::forward<CALLBACKS>(callbacks),
+            std::vector<std::string>{{std::forward<T1>(single_option)}},
+            std::vector<char>{}, std::move(description),
+            std::forward<Params>(parameters)...);
     }
-    return gen_opt_conf1<T, OPT_CONF>(
-        std::forward<CALLBACKS>(callbacks),
-        std::vector<std::string>{{std::forward<T1>(single_option)}},
-        std::vector<char>{}, std::move(description),
-        std::forward<Params>(parameters)...);
 }
 
 template <typename T, typename OPT_CONF, typename CALLBACKS, typename T1,
