@@ -259,8 +259,7 @@ class basic_parser_t {
     short_options_map_t& get_short_options();
     arguments_vector_t& get_arguments();
     validate_func_vec_t& get_validate_functions();
-    option_descriptions_vec_t& get_mandatory_option_descriptions();
-    option_descriptions_vec_t& get_optional_option_descriptions();
+    std::vector<variant_opt_conf_t> get_options() const;
     sub_parser_descriptions_vec_t& get_sub_parser_descriptions();
     argument_descriptions_vec_t& get_mandatory_argument_descriptions();
     argument_descriptions_vec_t& get_optional_argument_descriptions();
@@ -279,8 +278,6 @@ class basic_parser_t {
     arguments_vector_t arguments{};
     optional_argument_t optional_argument{};
     validate_func_vec_t validate_functions{};
-    option_descriptions_vec_t mandatory_option_descriptions{};
-    option_descriptions_vec_t optional_option_descriptions{};
     sub_parser_descriptions_vec_t sub_parser_descriptions{};
     argument_descriptions_vec_t mandatory_argument_descriptions{};
     argument_descriptions_vec_t optional_argument_descriptions{};

@@ -72,16 +72,6 @@ clapp::parser::basic_parser_t::get_validate_functions() {
     return validate_functions;
 }
 
-clapp::parser::basic_parser_t::option_descriptions_vec_t&
-clapp::parser::basic_parser_t::get_mandatory_option_descriptions() {
-    return mandatory_option_descriptions;
-}
-
-clapp::parser::basic_parser_t::option_descriptions_vec_t&
-clapp::parser::basic_parser_t::get_optional_option_descriptions() {
-    return optional_option_descriptions;
-}
-
 clapp::parser::basic_parser_t::sub_parser_descriptions_vec_t&
 clapp::parser::basic_parser_t::get_sub_parser_descriptions() {
     return sub_parser_descriptions;
@@ -95,6 +85,11 @@ clapp::parser::basic_parser_t::get_mandatory_argument_descriptions() {
 clapp::parser::basic_parser_t::argument_descriptions_vec_t&
 clapp::parser::basic_parser_t::get_optional_argument_descriptions() {
     return optional_argument_descriptions;
+}
+
+std::vector<clapp::parser::basic_parser_t::variant_opt_conf_t>
+clapp::parser::basic_parser_t::get_options() const {
+    return options;
 }
 
 void clapp::parser::basic_parser_t::reg(reg_sub_parser_conf_t&& config) {

@@ -64,8 +64,7 @@ void clapp::parser::basic_parser_t::reg(
     }
 
     if (config.validate_func) {
-        get_validate_functions().push_back(
-            std::move(config.validate_func.value()));
+        get_validate_functions().push_back(config.validate_func.value());
     }
 
     if (is_param_opt<short_option_func_t, long_option_func_t>()) {
@@ -76,13 +75,6 @@ void clapp::parser::basic_parser_t::reg(
         set_max_option_string_size(config.option_string.size());
     }
 
-    option_description_container_t desc{config.option_string,
-                                        config.description, option_type};
-    if (config.purpose == purpose_t::mandatory) {
-        get_mandatory_option_descriptions().push_back(std::move(desc));
-    } else {
-        get_optional_option_descriptions().push_back(std::move(desc));
-    }
     options.push_back(config);
 }
 
