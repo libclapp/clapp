@@ -21,6 +21,17 @@
 
 clapp::parser::basic_parser_t::basic_parser_t() = default;
 
+bool clapp::parser::basic_parser_t::help_entry_t::operator==(
+    const help_entry_t& inst) const {
+    return option_string == inst.option_string &&
+           description == inst.description;
+}
+
+bool clapp::parser::basic_parser_t::help_entry_t::operator!=(
+    const help_entry_t& inst) const {
+    return !(*this == inst);
+}
+
 clapp::parser::basic_parser_t::sub_parsers_map_t&
 clapp::parser::basic_parser_t::get_sub_parsers() {
     return sub_parsers;

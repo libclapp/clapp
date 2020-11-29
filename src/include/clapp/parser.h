@@ -93,6 +93,9 @@ class basic_parser_t {
     struct help_entry_t {
         std::string option_string;
         std::string description;
+
+        bool operator==(const help_entry_t& inst) const;
+        bool operator!=(const help_entry_t& inst) const;
     };
 
     using help_entry_vec_t = std::vector<help_entry_t>;

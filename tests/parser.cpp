@@ -5,6 +5,31 @@
 #include <clapp/sub_parser.h>
 #include <gmock/gmock.h>
 
+TEST(help_entry_t, Construct) {
+    clapp::parser::basic_parser_t::help_entry_t he{"option-string",
+                                                   "description"};
+}
+
+TEST(help_entry_t, ConstructAndCompare) {
+    const std::string option_str{"option-string"};
+    const std::string description_str{"desc"};
+    const std::string option_str2{"os2"};
+    const std::string description_str2{"ds2"};
+    clapp::parser::basic_parser_t::help_entry_t he{option_str, description_str};
+    ASSERT_THAT((clapp::parser::basic_parser_t::help_entry_t{option_str,
+                                                             description_str}),
+                testing::Eq(he));
+    ASSERT_THAT((clapp::parser::basic_parser_t::help_entry_t{option_str2,
+                                                             description_str}),
+                testing::Ne(he));
+    ASSERT_THAT((clapp::parser::basic_parser_t::help_entry_t{option_str2,
+                                                             description_str2}),
+                testing::Ne(he));
+    ASSERT_THAT((clapp::parser::basic_parser_t::help_entry_t{option_str,
+                                                             description_str2}),
+                testing::Ne(he));
+}
+
 template <class T, size_t N>
 inline clapp::parser::arg_t parser_make_arg_t(T (&arg)[N]) {
     return clapp::parser::arg_t{static_cast<const char* const*>(arg), N - 1};
