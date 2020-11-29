@@ -294,7 +294,7 @@ TEST(parser, genFuncPrintHelpAndExit) {
         ebp.gen_func_print_help_and_exit(EXIT_SUCCESS)};
     testing::internal::CaptureStdout();
     ASSERT_EXIT(ff.found(), ::testing::ExitedWithCode(0), "");
-    std::string output = testing::internal::GetCapturedStdout();
+    std::string output{testing::internal::GetCapturedStdout()};
     ASSERT_THAT(output, testing::StrEq("Usage:\narg-test-parser\n"));
 }
 
