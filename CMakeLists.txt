@@ -20,7 +20,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     list(APPEND libClaPP_PEDANTIC_COMPILE_OPTIONS -Weffc++)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     list(APPEND libClaPP_PEDANTIC_COMPILE_OPTIONS -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-padded -Werror -pedantic-errors)
-    set(libClaPP_TEST_PEDANTIC_COMPILE_OPTIONS ${libClaPP_PEDANTiC_COMPILE_OPTIONS})
+    set(libClaPP_TEST_PEDANTIC_COMPILE_OPTIONS ${libClaPP_PEDANTIC_COMPILE_OPTIONS})
     list(APPEND libClaPP_TEST_PEDANTIC_COMPILE_OPTION -Wno-global-constructors)
 endif()
 
