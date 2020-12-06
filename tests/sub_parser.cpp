@@ -5,6 +5,12 @@
 #include <clapp/sub_parser.h>
 #include <gmock/gmock.h>
 
+class print_and_exit_t {
+   public:
+    MOCK_METHOD2(print_and_exit, void(const std::string_view print_msg,
+                                      std::optional<int> exit_code));
+};
+
 template <class T, size_t N>
 inline clapp::parser::arg_t sub_parser_make_arg_t(T (&arg)[N]) {
     return clapp::parser::arg_t{static_cast<const char* const*>(arg), N - 1};
@@ -340,4 +346,22 @@ TEST(subParser, constructSubParserAndValidateRecursiveDoThrow) {
 
     tp.parse(arg.begin(), arg.end());
     ASSERT_THROW(tp.validate_recursive(), clapp::clapp_exception_t);
+}
+
+TEST(subParser, constructSubParserSetAndCallPrintAndExitWithStringAndExitCode) {
+    print_and_exit_t pae;
+    empty_test_parser_t tp;
+    tp.set_print_and_exit_func([&pae](const std::string_view text,
+                                      const std::optional<int> exit_code) {
+        pae.print_and_exit(text, exit_code);
+    });
+
+    const std::string sub_parser{"sub"};
+    const std::string description{"sub parser"};
+    simple_sub_parser_t sub{tp, sub_parser, description};
+
+    const std::string text{"text-string"};
+    const std::optional<int> exit_code{10};
+    EXPECT_CALL(pae, print_and_exit(std::string_view{text}, exit_code));
+    sub.get_print_and_exit_func()(text, exit_code);
 }
