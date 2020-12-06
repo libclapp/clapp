@@ -484,4 +484,23 @@ clapp::parser::basic_parser_t::get_active_parser() const {
     return *this;
 }
 
+void clapp::parser::basic_parser_t::default_print_and_exit(
+    const std::string_view print_msg, const std::optional<int> exit_code) {
+    std::cout << print_msg;
+    std::cout.flush();
+    if (exit_code) {
+        exit(exit_code.value());
+    }
+}
+
+void clapp::parser::basic_parser_t::set_print_and_exit_func(
+    print_and_exit_func_t&& func) {
+    print_and_exit_func = std::move(func);
+}
+
+clapp::parser::basic_parser_t::print_and_exit_func_t&
+clapp::parser::basic_parser_t::get_print_and_exit_func() {
+    return print_and_exit_func;
+}
+
 clapp::parser::basic_parser_t::~basic_parser_t() = default;

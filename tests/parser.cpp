@@ -30,6 +30,12 @@ TEST(help_entry_t, ConstructAndCompare) {
                 testing::Ne(he));
 }
 
+class print_and_exit_t {
+   public:
+    MOCK_METHOD2(print_and_exit, void(const std::string_view print_msg,
+                                      std::optional<int> exit_code));
+};
+
 template <class T, size_t N>
 inline clapp::parser::arg_t parser_make_arg_t(T (&arg)[N]) {
     return clapp::parser::arg_t{static_cast<const char* const*>(arg), N - 1};
@@ -286,6 +292,52 @@ TEST(parser, constructEmptyBasicParserIsActiveIsTrue) {
 TEST(parser, constructEmptyBasicParserGetActiveReturnsThisRef) {
     empty_basic_parser_t ebp;
     ASSERT_THAT(&ebp.get_active_parser(), testing::Eq(&ebp));
+}
+
+TEST(parser, callDefaultPrintAndExitWithString) {
+    const std::string text{"text-to-print"};
+    testing::internal::CaptureStdout();
+    empty_basic_parser_t::default_print_and_exit(text, std::nullopt);
+    const std::string output{testing::internal::GetCapturedStdout()};
+    ASSERT_THAT(output, testing::StrEq(text));
+}
+
+TEST(parser, callDefaultPrintAndExitWithStringAndExitCode) {
+    const std::string text{"text"};
+    const int exit_code{2};
+    testing::internal::CaptureStdout();
+    ASSERT_EXIT(empty_basic_parser_t::default_print_and_exit(text, exit_code),
+                ::testing::ExitedWithCode(exit_code), "");
+    const std::string output{testing::internal::GetCapturedStdout()};
+    ASSERT_THAT(output, testing::StrEq(text));
+}
+
+TEST(parser, setAndCallPrintAndExitWithString) {
+    print_and_exit_t pae;
+    simple_test_parser_t stp;
+    stp.set_print_and_exit_func([&pae](const std::string_view text,
+                                       const std::optional<int> exit_code) {
+        pae.print_and_exit(text, exit_code);
+    });
+
+    const std::string text{"text"};
+    const std::optional<int> exit_code;
+    EXPECT_CALL(pae, print_and_exit(std::string_view{text}, exit_code));
+    stp.get_print_and_exit_func()(text, exit_code);
+}
+
+TEST(parser, setAndCallPrintAndExitWithStringAndExitCode) {
+    print_and_exit_t pae;
+    simple_test_parser_t stp;
+    stp.set_print_and_exit_func([&pae](const std::string_view text,
+                                       const std::optional<int> exit_code) {
+        pae.print_and_exit(text, exit_code);
+    });
+
+    const std::string text{"text-string"};
+    const std::optional<int> exit_code{10};
+    EXPECT_CALL(pae, print_and_exit(std::string_view{text}, exit_code));
+    stp.get_print_and_exit_func()(text, exit_code);
 }
 
 TEST(parser, genFuncPrintHelpAndExit) {

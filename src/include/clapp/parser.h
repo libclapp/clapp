@@ -48,6 +48,8 @@ class basic_parser_t {
     using argument_func_t =
         std::function<void(const std::string_view argument)>;
     using validate_func_t = std::function<void(void)>;
+    using print_and_exit_func_t = std::function<void(
+        const std::string_view print_msg, std::optional<int> exit_code)>;
 
     enum class argument_type_t { single, variadic };
     enum class option_type_t { scalar, vector };
@@ -252,6 +254,11 @@ class basic_parser_t {
     inline virtual bool is_active() const noexcept;
     const basic_parser_t& get_active_parser() const;
 
+    static void default_print_and_exit(const std::string_view print_msg,
+                                       std::optional<int> exit_code);
+    void set_print_and_exit_func(print_and_exit_func_t&& func);
+    print_and_exit_func_t& get_print_and_exit_func();
+
    protected:
     sub_parsers_map_t& get_sub_parsers();
     help_entry_vec_t get_option_help() const;
@@ -282,6 +289,7 @@ class basic_parser_t {
     argument_descriptions_vec_t mandatory_argument_descriptions{};
     argument_descriptions_vec_t optional_argument_descriptions{};
     std::size_t num_processed_arguments{0};
+    print_and_exit_func_t print_and_exit_func{default_print_and_exit};
 
     std::vector<variant_opt_conf_t> options{};
 
