@@ -469,8 +469,8 @@ clapp::parser::basic_parser_t::gen_func_print_help_and_exit(
     const int exit_code) const {
     return found_func_t{[this, exit_code]() {
         constexpr std::size_t max_rec_depth{65535};
-        std::cout << gen_usage_prefix() + gen_help_msg(max_rec_depth);
-        exit(exit_code);
+        print_and_exit_func(gen_usage_prefix() + gen_help_msg(max_rec_depth),
+                            exit_code);
     }};
 }
 
