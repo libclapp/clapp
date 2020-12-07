@@ -105,6 +105,9 @@ class basic_parser_t {
     template <typename short_option_func_t, typename long_option_func_t,
               option_type_t option_type>
     struct basic_reg_option_conf_t {
+        using long_opt_conf_t = basic_long_opt_conf_t<long_option_func_t>;
+        using short_opt_conf_t = basic_short_opt_conf_t<short_option_func_t>;
+
         static std::string create_option_string(
             std::vector<char> short_option,
             const std::vector<std::string>& long_option);
@@ -114,8 +117,6 @@ class basic_parser_t {
         std::string create_option_string() const;
         help_entry_t get_option_help() const;
 
-        using long_opt_conf_t = basic_long_opt_conf_t<long_option_func_t>;
-        using short_opt_conf_t = basic_short_opt_conf_t<short_option_func_t>;
         std::vector<short_opt_conf_t> short_options;
         std::vector<long_opt_conf_t> long_options;
         std::optional<validate_func_t> validate_func;
