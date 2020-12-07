@@ -281,16 +281,7 @@ MATCHER_P(ContainsLongOption, option, "") {
     *result_listener << "Found parser-option doesn't contain option '" << option
                      << "'";
     return std::visit(
-        [this](auto&& argument) -> bool {
-            if (argument.long_options.size() == 0) {
-                return false;
-            }
-            return std::find_if(std::begin(argument.long_options),
-                                std::end(argument.long_options),
-                                [this](auto&& long_opt_conf) {
-                                    return long_opt_conf.option == option;
-                                }) != std::end(argument.long_options);
-        },
+        [this](auto&& opt) -> bool { return opt.contains_option(option); },
         found_opt.value());
 }
 
@@ -305,16 +296,7 @@ MATCHER_P(ContainsShortOption, option, "") {
     *result_listener << "Found parser-option doesn't contain option '" << option
                      << "'";
     return std::visit(
-        [this](auto&& argument) -> bool {
-            if (argument.short_options.size() == 0) {
-                return false;
-            }
-            return std::find_if(std::begin(argument.short_options),
-                                std::end(argument.short_options),
-                                [this](auto&& short_opt_conf) {
-                                    return short_opt_conf.option == option;
-                                }) != std::end(argument.short_options);
-        },
+        [this](auto&& opt) -> bool { return opt.contains_option(option); },
         found_opt.value());
 }
 
