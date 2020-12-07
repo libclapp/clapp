@@ -231,6 +231,56 @@ clapp::parser::basic_parser_t::basic_reg_option_conf_t<
     return help_entry_t{create_basic_option_string(), description};
 }
 
+template <typename short_option_func_t, typename long_option_func_t,
+          clapp::parser::basic_parser_t::option_type_t option_type>
+typename clapp::parser::basic_parser_t::basic_reg_option_conf_t<
+    short_option_func_t, long_option_func_t,
+    option_type>::long_opt_conf_vec_cit_t
+clapp::parser::basic_parser_t::basic_reg_option_conf_t<
+    short_option_func_t, long_option_func_t,
+    option_type>::find_option(const std::string_view long_option) const {
+    return std::find_if(std::begin(long_options), std::end(long_options),
+                        [long_option](auto&& long_opt_conf) {
+                            return long_opt_conf.option == long_option;
+                        });
+}
+
+template <typename short_option_func_t, typename long_option_func_t,
+          clapp::parser::basic_parser_t::option_type_t option_type>
+typename clapp::parser::basic_parser_t::basic_reg_option_conf_t<
+    short_option_func_t, long_option_func_t,
+    option_type>::short_opt_conf_vec_cit_t
+clapp::parser::basic_parser_t::basic_reg_option_conf_t<
+    short_option_func_t, long_option_func_t,
+    option_type>::find_option(const char short_option) const {
+    return std::find_if(std::begin(short_options), std::end(short_options),
+                        [short_option](auto&& short_opt_conf) {
+                            return short_opt_conf.option == short_option;
+                        });
+}
+
+template <typename short_option_func_t, typename long_option_func_t,
+          clapp::parser::basic_parser_t::option_type_t option_type>
+bool clapp::parser::basic_parser_t::basic_reg_option_conf_t<
+    short_option_func_t, long_option_func_t,
+    option_type>::contains_option(const std::string_view long_option) const {
+    if (long_options.size() == 0) {
+        return false;
+    }
+    return find_option(long_option) != std::end(long_options);
+}
+
+template <typename short_option_func_t, typename long_option_func_t,
+          clapp::parser::basic_parser_t::option_type_t option_type>
+bool clapp::parser::basic_parser_t::basic_reg_option_conf_t<
+    short_option_func_t, long_option_func_t,
+    option_type>::contains_option(const char short_option) const {
+    if (short_options.size() == 0) {
+        return false;
+    }
+    return find_option(short_option) != std::end(short_options);
+}
+
 inline bool clapp::parser::basic_parser_t::is_active() const noexcept {
     return true;
 }

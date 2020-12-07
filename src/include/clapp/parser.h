@@ -109,6 +109,10 @@ class basic_parser_t {
         using short_opt_conf_t = basic_short_opt_conf_t<short_option_func_t>;
         using short_opt_conf_vec_t = std::vector<short_opt_conf_t>;
         using long_opt_conf_vec_t = std::vector<long_opt_conf_t>;
+        using short_opt_conf_vec_cit_t =
+            typename short_opt_conf_vec_t::const_iterator;
+        using long_opt_conf_vec_cit_t =
+            typename long_opt_conf_vec_t::const_iterator;
 
         static std::string create_option_string(
             std::vector<char> short_option,
@@ -118,6 +122,10 @@ class basic_parser_t {
         std::string create_basic_option_string() const;
         std::string create_option_string() const;
         help_entry_t get_option_help() const;
+        long_opt_conf_vec_cit_t find_option(std::string_view long_option) const;
+        short_opt_conf_vec_cit_t find_option(char short_option) const;
+        bool contains_option(std::string_view long_option) const;
+        bool contains_option(char short_option) const;
 
         short_opt_conf_vec_t short_options;
         long_opt_conf_vec_t long_options;
