@@ -87,7 +87,7 @@ clapp::parser::basic_parser_t::get_optional_argument_descriptions() {
     return optional_argument_descriptions;
 }
 
-std::vector<clapp::parser::basic_parser_t::variant_opt_conf_t>
+clapp::parser::basic_parser_t::variant_opt_conf_vec_t
 clapp::parser::basic_parser_t::get_options() const {
     return options;
 }

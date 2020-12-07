@@ -179,6 +179,7 @@ class basic_parser_t {
         std::map<std::string, long_opt_variant_t, std::less<>>;
     using short_options_map_t = std::map<char, short_opt_variant_t>;
     using validate_func_vec_t = std::vector<validate_func_t>;
+    using variant_opt_conf_vec_t = std::vector<variant_opt_conf_t>;
 
     struct option_description_container_t {
         std::string option_string;
@@ -277,7 +278,7 @@ class basic_parser_t {
     short_options_map_t& get_short_options();
     arguments_vector_t& get_arguments();
     validate_func_vec_t& get_validate_functions();
-    std::vector<variant_opt_conf_t> get_options() const;
+    variant_opt_conf_vec_t get_options() const;
     sub_parser_descriptions_vec_t& get_sub_parser_descriptions();
     argument_descriptions_vec_t& get_mandatory_argument_descriptions();
     argument_descriptions_vec_t& get_optional_argument_descriptions();
@@ -302,7 +303,7 @@ class basic_parser_t {
     std::size_t num_processed_arguments{0};
     print_and_exit_func_t print_and_exit_func{default_print_and_exit};
 
-    std::vector<variant_opt_conf_t> options{};
+    variant_opt_conf_vec_t options{};
 
    public:
     constexpr static std::size_t num_sub_spaces{2u};
