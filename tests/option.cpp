@@ -312,8 +312,8 @@ static LONG_OPT_FUNC_T get_long_opt_func(option_test_parser_t& tp,
                                  "' registered.");
     }
     return std::visit(
-        [&long_opt_name](auto&& argument) -> LONG_OPT_FUNC_T {
-            for (auto& opt : argument.long_options) {
+        [&long_opt_name](auto&& option) -> LONG_OPT_FUNC_T {
+            for (auto& opt : option.long_options) {
                 if (opt.option == long_opt_name) {
                     if constexpr (std::is_same<LONG_OPT_FUNC_T,
                                                decltype(opt.func)>::value) {
@@ -342,8 +342,8 @@ static SHORT_OPT_FUNC_T get_short_opt_func(option_test_parser_t& tp,
                                  std::string{short_opt_name} + "' registered.");
     }
     return std::visit(
-        [&short_opt_name](auto&& argument) -> SHORT_OPT_FUNC_T {
-            for (auto& opt : argument.short_options) {
+        [&short_opt_name](auto&& option) -> SHORT_OPT_FUNC_T {
+            for (auto& opt : option.short_options) {
                 if (opt.option == short_opt_name) {
                     if constexpr (std::is_same<SHORT_OPT_FUNC_T,
                                                decltype(opt.func)>::value) {
@@ -373,7 +373,7 @@ static std::optional<option_test_parser_t::validate_func_t> get_validate_func(
                                  "' registered.");
     }
 
-    return std::visit([](auto&& argument) { return argument.validate_func; },
+    return std::visit([](auto&& vf) { return vf.validate_func; },
                       found_opt.value());
 }
 
