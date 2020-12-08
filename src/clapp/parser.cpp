@@ -412,35 +412,44 @@ clapp::parser::basic_parser_t::parse_long(const std::string_view option,
     const std::size_t equal_index{option.find_first_of("=")};
     const std::string_view opt{option.data(),
                                std::min(equal_index, option.size())};
-    auto found{get_long_options().find(opt)};
-    if (found == get_long_options().end()) {
+    variant_opt_conf_vec_t::const_iterator found{find_option(opt)};
+    if (found == get_options().end()) {
         return parse_result_t{it, std::nullopt, std::string{opt}};
     }
-    if (equal_index != std::string_view::npos) {
-        if (!std::holds_alternative<long_opt_param_func_t>(found->second)) {
-            std::stringstream ss;
-            ss << "No param allowed for option '--" << opt << "'";
-            throw clapp::exception::option_param_exception_t(ss.str());
-        }
-        std::get<long_opt_param_func_t>(found->second)(
-            opt, std::string_view{&(option[equal_index + 1])});
-        return parse_result_t{it + 1, std::nullopt, std::nullopt};
-    }
-    if (std::holds_alternative<long_opt_param_func_t>(found->second)) {
-        if (it + 1 == end) {
-            std::stringstream ss;
-            ss << "No param given for option '--" << opt << "'";
-            throw clapp::exception::option_param_exception_t(ss.str());
-        }
-
-        it++;
-        std::get<long_opt_param_func_t>(found->second)(opt,
-                                                       std::string_view{*(it)});
-        return parse_result_t{it + 1, std::nullopt, std::nullopt};
-    }
-    Expects(std::holds_alternative<long_opt_func_t>(found->second));
-    std::get<long_opt_func_t>(found->second)(opt);
-    return parse_result_t{it + 1, std::nullopt, std::nullopt};
+    return std::visit(
+        [option, equal_index, &it, opt, end](auto&& o) -> parse_result_t {
+            using current_option_type_t = std::decay_t<decltype(o)>;
+            typename current_option_type_t::long_opt_conf_vec_cit_t opt_it{
+                o.find_option(opt)};
+            Ensures(opt_it != std::end(o.long_options));
+            if (equal_index != std::string_view::npos) {
+                if constexpr (std::is_same<current_option_type_t,
+                                           opt_no_param_conf_t>::value) {
+                    std::stringstream ss;
+                    ss << "No param allowed for option '--" << opt << "'";
+                    throw clapp::exception::option_param_exception_t(ss.str());
+                } else {
+                    opt_it->func(opt,
+                                 std::string_view{&(option[equal_index + 1])});
+                    return parse_result_t{it + 1, std::nullopt, std::nullopt};
+                }
+            }
+            if constexpr (!std::is_same<current_option_type_t,
+                                        opt_no_param_conf_t>::value) {
+                if (it + 1 == end) {
+                    std::stringstream ss;
+                    ss << "No param given for option '--" << opt << "'";
+                    throw clapp::exception::option_param_exception_t(ss.str());
+                }
+                it++;
+                opt_it->func(opt, std::string_view{*it});
+                return parse_result_t{it + 1, std::nullopt, std::nullopt};
+            } else {
+                opt_it->func(opt);
+                return parse_result_t{it + 1, std::nullopt, std::nullopt};
+            }
+        },
+        *found);
 }
 
 clapp::parser::basic_parser_t::parse_result_t
@@ -449,42 +458,67 @@ clapp::parser::basic_parser_t::parse_short(const std::string_view option,
     Expects(!option.empty());
     const std::size_t equal_index{option.find_first_of("=")};
     for (std::size_t i{0}; i < option.size(); i++) {
-        auto found{get_short_options().find(option[i])};
-        if (found == get_short_options().end()) {
+        variant_opt_conf_vec_t::const_iterator found{find_option(option[i])};
+        if (found == get_options().end()) {
             return parse_result_t{it, option[i], std::nullopt};
         }
-        if (equal_index == i + 1) {
-            if (!std::holds_alternative<short_opt_param_func_t>(
-                    found->second)) {
-                std::stringstream ss;
-                ss << "No param allowed for option '-" << option[i] << "'";
-                throw clapp::exception::option_param_exception_t(ss.str());
-            }
-            std::get<short_opt_param_func_t>(found->second)(
-                option[i], std::string_view{&(option[equal_index + 1])});
-            return parse_result_t{it + 1, std::nullopt, std::nullopt};
-        }
-        if (i == option.size() - 1) {
-            if (std::holds_alternative<short_opt_param_func_t>(found->second)) {
-                if (it + 1 == end) {
+        std::optional<parse_result_t> ret{std::visit(
+            [option, i, equal_index, &it,
+             end](auto&& o) -> std::optional<parse_result_t> {
+                using current_option_type_t = std::decay_t<decltype(o)>;
+                typename current_option_type_t::short_opt_conf_vec_cit_t opt_it{
+                    o.find_option(option[i])};
+                Ensures(opt_it != std::end(o.short_options));
+                if (equal_index == i + 1) {
+                    if constexpr (std::is_same<current_option_type_t,
+                                               opt_no_param_conf_t>::value) {
+                        std::stringstream ss;
+                        ss << "No param allowed for option '-" << option[i]
+                           << "'";
+                        throw clapp::exception::option_param_exception_t(
+                            ss.str());
+                    } else {
+                        opt_it->func(
+                            option[i],
+                            std::string_view{&(option[equal_index + 1])});
+                        return parse_result_t{it + 1, std::nullopt,
+                                              std::nullopt};
+                    }
+                }
+                if (i == option.size() - 1) {
+                    if constexpr (!std::is_same<current_option_type_t,
+                                                opt_no_param_conf_t>::value) {
+                        if (it + 1 == end) {
+                            std::stringstream ss;
+                            ss << "No param given for option '-" << option[i]
+                               << "'";
+                            throw clapp::exception::option_param_exception_t(
+                                ss.str());
+                        }
+                        it++;
+                        opt_it->func(option[i], std::string_view{*it});
+                        return parse_result_t{it + 1, std::nullopt,
+                                              std::nullopt};
+                    } else {
+                        opt_it->func(option[i]);
+                        return parse_result_t{it + 1, std::nullopt,
+                                              std::nullopt};
+                    }
+                }
+                if constexpr (!std::is_same<current_option_type_t,
+                                            opt_no_param_conf_t>::value) {
                     std::stringstream ss;
                     ss << "No param given for option '-" << option[i] << "'";
                     throw clapp::exception::option_param_exception_t(ss.str());
+                } else {
+                    opt_it->func(option[i]);
+                    return std::nullopt;
                 }
-                it++;
-                std::get<short_opt_param_func_t>(found->second)(
-                    option[i], std::string_view{*(it)});
-                return parse_result_t{it + 1, std::nullopt, std::nullopt};
-            }
-            std::get<short_opt_func_t>(found->second)(option[i]);
-            return parse_result_t{it + 1, std::nullopt, std::nullopt};
+            },
+            *found)};
+        if (ret) {
+            return ret.value();
         }
-        if (std::holds_alternative<short_opt_param_func_t>(found->second)) {
-            std::stringstream ss;
-            ss << "No param given for option '-" << option[i] << "'";
-            throw clapp::exception::option_param_exception_t(ss.str());
-        }
-        std::get<short_opt_func_t>(found->second)(option[i]);
     }
     throw clapp::exception::clapp_exception_t(
         "This exection should not be thrown.");
