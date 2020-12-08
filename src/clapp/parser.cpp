@@ -153,7 +153,7 @@ clapp::parser::basic_parser_t::gen_detailed_help_contents() const {
     help_entry_vec_t option_help_entries{get_option_help()};
     for (auto& entry : option_help_entries) {
         Expects((get_max_option_string_size() + 1) > entry.name.size());
-        ret.options.emplace_back(help_line_t{
+        ret.options.emplace_back(help_entry_t{
             "  " + entry.name +
                 std::string(
                     get_max_option_string_size() + 1 - entry.name.size(), ' '),
@@ -165,11 +165,11 @@ clapp::parser::basic_parser_t::gen_detailed_help_contents() const {
         Expects((get_max_option_string_size() + 1) >
                 desc_cont.argument_string.size());
         ret.mandatory_arguments.emplace_back(
-            help_line_t{"  " + desc_cont.argument_string +
-                            std::string(get_max_option_string_size() + 1 -
-                                            desc_cont.argument_string.size(),
-                                        ' '),
-                        desc_cont.description});
+            help_entry_t{"  " + desc_cont.argument_string +
+                             std::string(get_max_option_string_size() + 1 -
+                                             desc_cont.argument_string.size(),
+                                         ' '),
+                         desc_cont.description});
     }
 
     for (const argument_description_container_t& desc_cont :
@@ -177,11 +177,11 @@ clapp::parser::basic_parser_t::gen_detailed_help_contents() const {
         Expects((get_max_option_string_size() + 1) >
                 desc_cont.argument_string.size());
         ret.optional_arguments.emplace_back(
-            help_line_t{"  " + desc_cont.argument_string +
-                            std::string(get_max_option_string_size() + 1 -
-                                            desc_cont.argument_string.size(),
-                                        ' '),
-                        desc_cont.description});
+            help_entry_t{"  " + desc_cont.argument_string +
+                             std::string(get_max_option_string_size() + 1 -
+                                             desc_cont.argument_string.size(),
+                                         ' '),
+                         desc_cont.description});
     }
 
     for (const sub_parser_description_container_t& desc_cont :
@@ -239,7 +239,7 @@ std::string clapp::parser::basic_parser_t::gen_opt_arg_lines(
     if (!help_contents.mandatory_arguments.empty()) {
         ret += "\n" + std::string(num_spaces + num_sub_spaces, ' ') +
                "Mandatory Arguments:\n";
-        for (const help_line_t& line : help_contents.mandatory_arguments) {
+        for (const help_entry_t& line : help_contents.mandatory_arguments) {
             ret += std::string(num_spaces + num_sub_spaces, ' ') + line.name +
                    line.description + '\n';
         }
@@ -248,7 +248,7 @@ std::string clapp::parser::basic_parser_t::gen_opt_arg_lines(
     if (!help_contents.optional_arguments.empty()) {
         ret += "\n" + std::string(num_spaces + num_sub_spaces, ' ') +
                "Optional Arguments:\n";
-        for (const help_line_t& line : help_contents.optional_arguments) {
+        for (const help_entry_t& line : help_contents.optional_arguments) {
             ret += std::string(num_spaces + num_sub_spaces, ' ') + line.name +
                    line.description + '\n';
         }

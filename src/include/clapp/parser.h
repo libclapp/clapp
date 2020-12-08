@@ -74,22 +74,10 @@ class basic_parser_t {
         argument_type_t argument_type;
     };
 
-    struct help_line_t {
-        std::string name;
-        std::string description;
-    };
-
     struct sub_parser_line_t {
         std::string name;
         std::string description;
         basic_sub_parser_t& parser;
-    };
-
-    struct help_contents_t {
-        std::vector<help_line_t> mandatory_arguments{};
-        std::vector<help_line_t> optional_arguments{};
-        std::vector<help_line_t> options{};
-        std::map<std::string, sub_parser_line_t> sub_parser{};
     };
 
     struct help_entry_t {
@@ -101,6 +89,13 @@ class basic_parser_t {
     };
 
     using help_entry_vec_t = std::vector<help_entry_t>;
+
+    struct help_contents_t {
+        help_entry_vec_t mandatory_arguments{};
+        help_entry_vec_t optional_arguments{};
+        help_entry_vec_t options{};
+        std::map<std::string, sub_parser_line_t> sub_parser{};
+    };
 
     template <typename short_option_func_t, typename long_option_func_t,
               option_type_t option_type>
