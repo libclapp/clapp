@@ -38,28 +38,45 @@ void clapp::parser::basic_parser_t::reg(
                             option_type>&& config) {
     Expects(config.option_string.size() > 1);
 
-    if (!config.short_options.empty()) {
-        for (auto& so : config.short_options) {
-            std::pair<short_options_map_t::iterator, bool> ret{
-                get_short_options().emplace(so.option, so.func)};
-            if (!ret.second) {
-                std::stringstream ss;
-                ss << "Can't register option '" << so.option
-                   << "' as it is already registered.";
-                throw clapp::exception::option_exception_t(ss.str());
-            }
+    for (auto it{std::begin(config.short_options)};
+         it != std::end(config.short_options); it++) {
+        if (find_option(it->option) != options.end()) {
+            std::stringstream ss;
+            ss << "can't register option '" << it->option
+               << "', as it is already registered.";
+            throw clapp::exception::option_exception_t(ss.str());
+        }
+        auto next_it{
+            std::find_if(std::next(it), std::end(config.short_options),
+                         [short_option = it->option](auto&& short_opt_conf) {
+                             return short_opt_conf.option == short_option;
+                         })};
+        if (next_it != std::end(config.short_options)) {
+            std::stringstream ss;
+            ss << "can't register option '" << it->option
+               << "', as it is contained twice in the same config.";
+            throw clapp::exception::option_exception_t(ss.str());
         }
     }
-    if (!config.long_options.empty()) {
-        for (auto& lo : config.long_options) {
-            std::pair<long_options_map_t::iterator, bool> ret{
-                get_long_options().emplace(lo.option, lo.func)};
-            if (!ret.second) {
-                std::stringstream ss;
-                ss << "Can't register option '" << lo.option
-                   << "' as it is already registered.";
-                throw clapp::exception::option_exception_t(ss.str());
-            }
+
+    for (auto it{std::begin(config.long_options)};
+         it != std::end(config.long_options); it++) {
+        if (find_option(it->option) != options.end()) {
+            std::stringstream ss;
+            ss << "can't register option '" << it->option
+               << "', as it is already registered.";
+            throw clapp::exception::option_exception_t(ss.str());
+        }
+        auto next_it{
+            std::find_if(std::next(it), std::end(config.long_options),
+                         [long_option = it->option](auto&& long_opt_conf) {
+                             return long_opt_conf.option == long_option;
+                         })};
+        if (next_it != std::end(config.long_options)) {
+            std::stringstream ss;
+            ss << "can't register option '" << it->option
+               << "', as it is contained twice in the same config.";
+            throw clapp::exception::option_exception_t(ss.str());
         }
     }
 

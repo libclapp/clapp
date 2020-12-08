@@ -519,15 +519,16 @@ TEST_F(option_t, boolOptionConstructLongStringVec) {
     ASSERT_THAT(opt, BoolOptionNotGiven());
 }
 
-TEST_F(option_t, boolOptionConstructLongOptionTwiceThrows) {
+TEST_F(option_t, boolOptionConstructLongStringVecTwiceThrows) {
     clapp::option::bool_option_t opt{tp, long_opt_str, opt_desc_str};
     ASSERT_THROW((clapp::option::bool_option_t{tp, long_opt_str, opt_desc_str}),
                  clapp::exception::option_exception_t);
 }
 
-TEST_F(option_t, boolOptionConstructShortOptionTwiceThrows) {
-    clapp::option::bool_option_t opt{tp, short_opt, opt_desc_str};
-    ASSERT_THROW((clapp::option::bool_option_t{tp, short_opt, opt_desc_str}),
+TEST_F(option_t, boolOptionConstructLongStringVecWithSameOptionThrows) {
+    ASSERT_THROW((clapp::option::bool_option_t{
+                     tp, std::vector<std::string>{long_opt_str, long_opt_str},
+                     opt_desc_str}),
                  clapp::exception::option_exception_t);
 }
 
@@ -539,6 +540,21 @@ TEST_F(option_t, boolOptionConstructLongStringVecAndCallGetOptionHelp) {
         tp.get_option_help(),
         testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
             {"--" + long_opt_str + "|--" + long_opt_cstr, opt_desc_str}}));
+}
+
+TEST_F(option_t, boolOptionConstructShortCharVecWithSameOptionThrows) {
+    ASSERT_THROW(
+        (clapp::option::bool_option_t{
+            tp, std::vector<char>{short_opt, short_opt}, opt_desc_str}),
+        clapp::exception::option_exception_t);
+}
+
+TEST_F(option_t, boolOptionConstructShortCharVecTwiceThrows) {
+    clapp::option::bool_option_t opt{tp, std::vector<char>{short_opt},
+                                     opt_desc_str};
+    ASSERT_THROW((clapp::option::bool_option_t{tp, std::vector<char>{short_opt},
+                                               opt_desc_str}),
+                 clapp::exception::option_exception_t);
 }
 
 TEST_F(option_t, boolOptionConstructShortVecAndCallGetOptionHelp) {
