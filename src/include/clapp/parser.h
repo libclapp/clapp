@@ -175,9 +175,6 @@ class basic_parser_t {
         std::map<std::string, basic_sub_parser_t&, std::less<>>;
     using arguments_vector_t = std::vector<arg_conf_t>;
     using optional_argument_t = std::optional<arg_conf_t>;
-    using long_options_map_t =
-        std::map<std::string, long_opt_variant_t, std::less<>>;
-    using short_options_map_t = std::map<char, short_opt_variant_t>;
     using validate_func_vec_t = std::vector<validate_func_t>;
     using variant_opt_conf_vec_t = std::vector<variant_opt_conf_t>;
 
@@ -277,8 +274,6 @@ class basic_parser_t {
     variant_opt_conf_vec_t::const_iterator find_option(
         std::string_view opt) const;
     variant_opt_conf_vec_t::const_iterator find_option(char opt) const;
-    long_options_map_t& get_long_options();
-    short_options_map_t& get_short_options();
     arguments_vector_t& get_arguments();
     validate_func_vec_t& get_validate_functions();
     variant_opt_conf_vec_t get_options() const;
@@ -295,8 +290,6 @@ class basic_parser_t {
                                arg_iterator end);
 
     sub_parsers_map_t sub_parsers{};
-    long_options_map_t long_options{};
-    short_options_map_t short_options{};
     arguments_vector_t arguments{};
     optional_argument_t optional_argument{};
     validate_func_vec_t validate_functions{};

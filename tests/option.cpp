@@ -11,12 +11,10 @@ class option_test_parser_t : public clapp::parser::basic_parser_t {
     using clapp::parser::basic_parser_t::long_opt_func_t;
     using clapp::parser::basic_parser_t::long_opt_param_func_t;
     using clapp::parser::basic_parser_t::long_opt_variant_t;
-    using clapp::parser::basic_parser_t::long_options_map_t;
 
     using clapp::parser::basic_parser_t::short_opt_func_t;
     using clapp::parser::basic_parser_t::short_opt_param_func_t;
     using clapp::parser::basic_parser_t::short_opt_variant_t;
-    using clapp::parser::basic_parser_t::short_options_map_t;
 
     using clapp::parser::basic_parser_t::option_descriptions_vec_t;
     using clapp::parser::basic_parser_t::validate_func_vec_t;

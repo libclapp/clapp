@@ -37,11 +37,6 @@ clapp::parser::basic_parser_t::get_sub_parsers() {
     return sub_parsers;
 }
 
-clapp::parser::basic_parser_t::long_options_map_t&
-clapp::parser::basic_parser_t::get_long_options() {
-    return long_options;
-}
-
 typename clapp::parser::basic_parser_t::variant_opt_conf_vec_t::const_iterator
 clapp::parser::basic_parser_t::find_option(const std::string_view opt) const {
     for (variant_opt_conf_vec_t::const_iterator it{options.begin()};
@@ -77,11 +72,6 @@ clapp::parser::basic_parser_t::get_option_help() const {
             option));
     }
     return ret;
-}
-
-clapp::parser::basic_parser_t::short_options_map_t&
-clapp::parser::basic_parser_t::get_short_options() {
-    return short_options;
 }
 
 clapp::parser::basic_parser_t::arguments_vector_t&
