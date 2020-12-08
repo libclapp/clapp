@@ -56,24 +56,6 @@ class basic_parser_t {
     enum class logic_operator_type_t { logic_and, logic_or };
     enum class purpose_t { optional, mandatory };
 
-    template <typename short_option_func_t>
-    struct basic_short_opt_conf_t {
-        char option;
-        short_option_func_t func;
-    };
-
-    template <typename long_option_func_t>
-    struct basic_long_opt_conf_t {
-        std::string option;
-        long_option_func_t func;
-    };
-
-    struct arg_conf_t {
-        std::string argument;
-        argument_func_t func;
-        argument_type_t argument_type;
-    };
-
     struct sub_parser_line_t {
         std::string name;
         std::string description;
@@ -95,6 +77,24 @@ class basic_parser_t {
         help_entry_vec_t optional_arguments{};
         help_entry_vec_t options{};
         std::map<std::string, sub_parser_line_t> sub_parser{};
+    };
+
+    template <typename short_option_func_t>
+    struct basic_short_opt_conf_t {
+        char option;
+        short_option_func_t func;
+    };
+
+    template <typename long_option_func_t>
+    struct basic_long_opt_conf_t {
+        std::string option;
+        long_option_func_t func;
+    };
+
+    struct arg_conf_t {
+        std::string argument;
+        argument_func_t func;
+        argument_type_t argument_type;
     };
 
     template <typename short_option_func_t, typename long_option_func_t,
