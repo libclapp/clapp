@@ -153,6 +153,8 @@ clapp::parser::basic_parser_t::gen_detailed_help_contents() const {
 
     help_entry_vec_t option_help_entries{get_option_help()};
     for (auto& entry : option_help_entries) {
+        Expects((get_max_option_string_size() + 1) >
+                entry.option_string.size());
         ret.options.emplace_back(
             help_line_t{"  " + entry.option_string +
                             std::string(get_max_option_string_size() + 1 -
@@ -163,6 +165,8 @@ clapp::parser::basic_parser_t::gen_detailed_help_contents() const {
 
     for (const argument_description_container_t& desc_cont :
          mandatory_argument_descriptions) {
+        Expects((get_max_option_string_size() + 1) >
+                desc_cont.argument_string.size());
         ret.mandatory_arguments.emplace_back(
             help_line_t{"  " + desc_cont.argument_string +
                             std::string(get_max_option_string_size() + 1 -
@@ -173,6 +177,8 @@ clapp::parser::basic_parser_t::gen_detailed_help_contents() const {
 
     for (const argument_description_container_t& desc_cont :
          optional_argument_descriptions) {
+        Expects((get_max_option_string_size() + 1) >
+                desc_cont.argument_string.size());
         ret.optional_arguments.emplace_back(
             help_line_t{"  " + desc_cont.argument_string +
                             std::string(get_max_option_string_size() + 1 -
@@ -183,6 +189,8 @@ clapp::parser::basic_parser_t::gen_detailed_help_contents() const {
 
     for (const sub_parser_description_container_t& desc_cont :
          sub_parser_descriptions) {
+        Expects((get_max_option_string_size() + 1) >
+                desc_cont.sub_parser_string.size());
         ret.sub_parser.emplace(
             desc_cont.sub_parser_string,
             sub_parser_line_t{
@@ -254,6 +262,8 @@ std::string clapp::parser::basic_parser_t::gen_opt_arg_lines(
         ret +=
             "\n" + std::string(num_spaces + num_sub_spaces, ' ') + "Options:\n";
         for (const help_entry_t& entry : option_help_entries) {
+            Expects((get_max_option_string_size() + 1) >
+                    entry.option_string.size());
             ret += "  " + std::string(num_spaces + num_sub_spaces, ' ') +
                    entry.option_string +
                    std::string(get_max_option_string_size() + 1 -
