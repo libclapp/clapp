@@ -462,6 +462,22 @@ TEST(parser, constructEmptyBasicParserAndParseUnknownShortOptionThrows) {
                  clapp::exception::option_exception_t);
 }
 
+TEST(parser, constructSimpleTestParserAndParseUnknownLongOptionThrows) {
+    constexpr const char* const argv[]{"--long-option", nullptr};
+    const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
+    simple_test_parser_t ebp;
+    ASSERT_THROW(ebp.parse(arg.begin(), arg.end()),
+                 clapp::exception::option_exception_t);
+}
+
+TEST(parser, constructSimpleTestParserAndParseUnknownShortOptionThrows) {
+    constexpr const char* const argv[]{"-s", nullptr};
+    const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
+    simple_test_parser_t ebp;
+    ASSERT_THROW(ebp.parse(arg.begin(), arg.end()),
+                 clapp::exception::option_exception_t);
+}
+
 TEST(parser, constructSimpleTestParserAndParseLongBoolOptionWithParamThrows) {
     constexpr const char* const argv[]{"--bool=param", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
