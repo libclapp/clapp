@@ -42,6 +42,32 @@ clapp::parser::basic_parser_t::get_long_options() {
     return long_options;
 }
 
+typename clapp::parser::basic_parser_t::variant_opt_conf_vec_t::const_iterator
+clapp::parser::basic_parser_t::find_option(const std::string_view opt) const {
+    for (variant_opt_conf_vec_t::const_iterator it{options.begin()};
+         it != options.end(); it++) {
+        if (std::visit(
+                [opt](auto&& o) -> bool { return o.contains_option(opt); },
+                *it)) {
+            return it;
+        }
+    }
+    return options.end();
+}
+
+typename clapp::parser::basic_parser_t::variant_opt_conf_vec_t::const_iterator
+clapp::parser::basic_parser_t::find_option(const char opt) const {
+    for (variant_opt_conf_vec_t::const_iterator it{options.begin()};
+         it != options.end(); it++) {
+        if (std::visit(
+                [opt](auto&& o) -> bool { return o.contains_option(opt); },
+                *it)) {
+            return it;
+        }
+    }
+    return options.end();
+}
+
 typename clapp::parser::basic_parser_t::help_entry_vec_t
 clapp::parser::basic_parser_t::get_option_help() const {
     typename clapp::parser::basic_parser_t::help_entry_vec_t ret;
