@@ -23,8 +23,7 @@ clapp::parser::basic_parser_t::basic_parser_t() = default;
 
 bool clapp::parser::basic_parser_t::help_entry_t::operator==(
     const help_entry_t& inst) const {
-    return option_string == inst.option_string &&
-           description == inst.description;
+    return name == inst.name && description == inst.description;
 }
 
 bool clapp::parser::basic_parser_t::help_entry_t::operator!=(
@@ -153,14 +152,12 @@ clapp::parser::basic_parser_t::gen_detailed_help_contents() const {
 
     help_entry_vec_t option_help_entries{get_option_help()};
     for (auto& entry : option_help_entries) {
-        Expects((get_max_option_string_size() + 1) >
-                entry.option_string.size());
-        ret.options.emplace_back(
-            help_line_t{"  " + entry.option_string +
-                            std::string(get_max_option_string_size() + 1 -
-                                            entry.option_string.size(),
-                                        ' '),
-                        entry.description});
+        Expects((get_max_option_string_size() + 1) > entry.name.size());
+        ret.options.emplace_back(help_line_t{
+            "  " + entry.name +
+                std::string(
+                    get_max_option_string_size() + 1 - entry.name.size(), ' '),
+            entry.description});
     }
 
     for (const argument_description_container_t& desc_cont :
@@ -262,14 +259,13 @@ std::string clapp::parser::basic_parser_t::gen_opt_arg_lines(
         ret +=
             "\n" + std::string(num_spaces + num_sub_spaces, ' ') + "Options:\n";
         for (const help_entry_t& entry : option_help_entries) {
-            Expects((get_max_option_string_size() + 1) >
-                    entry.option_string.size());
-            ret += "  " + std::string(num_spaces + num_sub_spaces, ' ') +
-                   entry.option_string +
-                   std::string(get_max_option_string_size() + 1 -
-                                   entry.option_string.size(),
-                               ' ') +
-                   entry.description + '\n';
+            Expects((get_max_option_string_size() + 1) > entry.name.size());
+            ret +=
+                "  " + std::string(num_spaces + num_sub_spaces, ' ') +
+                entry.name +
+                std::string(
+                    get_max_option_string_size() + 1 - entry.name.size(), ' ') +
+                entry.description + '\n';
         }
     }
 

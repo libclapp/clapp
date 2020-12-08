@@ -93,7 +93,7 @@ class basic_parser_t {
     };
 
     struct help_entry_t {
-        std::string option_string;
+        std::string name;
         std::string description;
 
         bool operator==(const help_entry_t& inst) const;
