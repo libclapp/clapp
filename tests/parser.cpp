@@ -55,27 +55,12 @@ class empty_basic_parser_t : public clapp::basic_parser_t {
     using clapp::basic_parser_t::basic_parser_t;
     ~empty_basic_parser_t() override;
     [[nodiscard]] std::string gen_short_line_prefix() const override;
-    void set_max_option_string_size(std::size_t max_option_size) override;
-    [[nodiscard]] std::size_t get_max_option_string_size() const override;
-
-   private:
-    std::size_t max_option_string_size{0};
 };
 
 empty_basic_parser_t::~empty_basic_parser_t() = default;
 
 [[nodiscard]] std::string empty_basic_parser_t::gen_short_line_prefix() const {
     return "arg-test-parser" + gen_short_line();
-}
-
-void empty_basic_parser_t::set_max_option_string_size(
-    const std::size_t max_option_size) {
-    max_option_string_size = max_option_size;
-}
-
-[[nodiscard]] std::size_t empty_basic_parser_t::get_max_option_string_size()
-    const {
-    return max_option_string_size;
 }
 
 class simple_test_parser_t : public clapp::basic_parser_t {
@@ -101,27 +86,12 @@ class simple_test_parser_t : public clapp::basic_parser_t {
         clapp::basic_parser_t::purpose_t::optional};
 
     [[nodiscard]] std::string gen_short_line_prefix() const override;
-    void set_max_option_string_size(std::size_t max_option_size) override;
-    [[nodiscard]] std::size_t get_max_option_string_size() const override;
-
-   private:
-    std::size_t max_option_string_size{0};
 };
 
 simple_test_parser_t::~simple_test_parser_t() = default;
 
 [[nodiscard]] std::string simple_test_parser_t::gen_short_line_prefix() const {
     return "simple-test-parser" + gen_short_line();
-}
-
-void simple_test_parser_t::set_max_option_string_size(
-    const std::size_t max_option_size) {
-    max_option_string_size = max_option_size;
-}
-
-[[nodiscard]] std::size_t simple_test_parser_t::get_max_option_string_size()
-    const {
-    return max_option_string_size;
 }
 
 class simple_test_parser2_t : public clapp::basic_parser_t {
@@ -138,27 +108,12 @@ class simple_test_parser2_t : public clapp::basic_parser_t {
         clapp::basic_parser_t::purpose_t::optional};
 
     [[nodiscard]] std::string gen_short_line_prefix() const override;
-    void set_max_option_string_size(std::size_t max_option_size) override;
-    [[nodiscard]] std::size_t get_max_option_string_size() const override;
-
-   private:
-    std::size_t max_option_string_size{0};
 };
 
 simple_test_parser2_t::~simple_test_parser2_t() = default;
 
 [[nodiscard]] std::string simple_test_parser2_t::gen_short_line_prefix() const {
     return "simple-test-parser2" + gen_short_line();
-}
-
-void simple_test_parser2_t::set_max_option_string_size(
-    const std::size_t max_option_size) {
-    max_option_string_size = max_option_size;
-}
-
-[[nodiscard]] std::size_t simple_test_parser2_t::get_max_option_string_size()
-    const {
-    return max_option_string_size;
 }
 
 class simple_test_parser3_t : public clapp::basic_parser_t {
@@ -186,11 +141,6 @@ class simple_test_parser3_t : public clapp::basic_parser_t {
         clapp::basic_parser_t::purpose_t::mandatory};
 
     [[nodiscard]] std::string gen_short_line_prefix() const override;
-    void set_max_option_string_size(std::size_t max_option_size) override;
-    [[nodiscard]] std::size_t get_max_option_string_size() const override;
-
-   private:
-    std::size_t max_option_string_size{0};
 };
 
 simple_test_parser3_t::~simple_test_parser3_t() = default;
@@ -199,24 +149,12 @@ simple_test_parser3_t::~simple_test_parser3_t() = default;
     return "simple-test-parser3" + gen_short_line();
 }
 
-void simple_test_parser3_t::set_max_option_string_size(
-    const std::size_t max_option_size) {
-    max_option_string_size = max_option_size;
-}
-
-[[nodiscard]] std::size_t simple_test_parser3_t::get_max_option_string_size()
-    const {
-    return max_option_string_size;
-}
-
 class sub_parser_container_t : public clapp::basic_parser_t {
    public:
     using clapp::basic_parser_t::basic_parser_t;
     ~sub_parser_container_t() override;
 
     [[nodiscard]] std::string gen_short_line_prefix() const override;
-    void set_max_option_string_size(std::size_t max_option_size) override;
-    [[nodiscard]] std::size_t get_max_option_string_size() const override;
 
     clapp::option::bool_option_t bool_option{*this, "bool", 'b',
                                              "Bool option."};
@@ -243,9 +181,6 @@ class sub_parser_container_t : public clapp::basic_parser_t {
     };
 
     simple_sub_parser_t sub_parser{*this, "sub-parser", "Sub parser desc"};
-
-   private:
-    std::size_t max_option_string_size{0};
 };
 
 sub_parser_container_t::simple_sub_parser_t::~simple_sub_parser_t() = default;
@@ -254,16 +189,6 @@ sub_parser_container_t::~sub_parser_container_t() = default;
 [[nodiscard]] std::string sub_parser_container_t::gen_short_line_prefix()
     const {
     return "sub_parser_container" + gen_short_line();
-}
-
-void sub_parser_container_t::set_max_option_string_size(
-    const std::size_t max_option_size) {
-    max_option_string_size = max_option_size;
-}
-
-[[nodiscard]] std::size_t sub_parser_container_t::get_max_option_string_size()
-    const {
-    return max_option_string_size;
 }
 
 TEST(parser, constructEmptyBasicParser) { empty_basic_parser_t ebp; }
@@ -361,8 +286,6 @@ TEST(parser, genFuncPrintHelpAndExit) {
 
 TEST(parser, constructSimpleTestParserAndGenHelpMessage) {
     simple_test_parser_t stp;
-    constexpr std::size_t max_option_string_size{25};
-    stp.set_max_option_string_size(max_option_string_size);
     ASSERT_THAT(
         stp.gen_help_msg(255),
         testing::StrEq(
@@ -377,8 +300,6 @@ TEST(parser, constructSimpleTestParserAndGenHelpMessage) {
 
 TEST(parser, constructSimpleTestParser2AndGenHelpMessage) {
     simple_test_parser2_t stp;
-    constexpr std::size_t max_option_string_size{20};
-    stp.set_max_option_string_size(max_option_string_size);
     ASSERT_THAT(stp.gen_help_msg(255),
                 testing::StrEq(
                     "simple-test-parser2 -c|--count [<arg-name>]\n\n  Optional "
@@ -388,8 +309,6 @@ TEST(parser, constructSimpleTestParser2AndGenHelpMessage) {
 
 TEST(parser, constructSimpleTestParser3AndGenHelpMessage) {
     simple_test_parser3_t stp;
-    constexpr std::size_t max_option_string_size{30};
-    stp.set_max_option_string_size(max_option_string_size);
     ASSERT_THAT(
         stp.gen_help_msg(255),
         testing::StrEq(
@@ -404,8 +323,6 @@ TEST(parser, constructSimpleTestParser3AndGenHelpMessage) {
 
 TEST(parser, constructSubParserContainerAndGenHelpMessage) {
     sub_parser_container_t spc;
-    constexpr std::size_t max_option_string_size{25};
-    spc.set_max_option_string_size(max_option_string_size);
     ASSERT_THAT(
         spc.gen_help_msg(255),
         testing::StrEq(
@@ -425,8 +342,6 @@ TEST(parser, constructSubParserContainerAndGenHelpMessage) {
 
 TEST(parser, constructSubParserContainerAndGenSubParserHelpMessage) {
     sub_parser_container_t spc;
-    constexpr std::size_t max_option_string_size{35};
-    spc.set_max_option_string_size(max_option_string_size);
     ASSERT_THAT(
         spc.sub_parser.gen_help_msg(255),
         testing::StrEq(

@@ -60,14 +60,3 @@ TEST(mainParser, constructMainParserGetActiveReturnsThisRef) {
     empty_main_parser_t emp;
     ASSERT_THAT(&emp.get_active_parser(), testing::Eq(&emp));
 }
-
-TEST(mainParser, constructMainParserGetMaxOptionStringSize) {
-    empty_main_parser_t emp;
-    ASSERT_THAT(emp.get_max_option_string_size(), testing::Eq(0));
-}
-
-TEST(mainParser, constructMainParserSetMaxOptionStringSize) {
-    empty_main_parser_t emp;
-    emp.set_max_option_string_size(4);
-    ASSERT_THAT(emp.get_max_option_string_size(), testing::Eq(4));
-}

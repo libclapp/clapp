@@ -27,27 +27,12 @@ class empty_test_parser_t : public clapp::parser::basic_parser_t {
     ~empty_test_parser_t() override;
 
     [[nodiscard]] std::string gen_short_line_prefix() const override;
-    void set_max_option_string_size(std::size_t max_option_size) override;
-    [[nodiscard]] std::size_t get_max_option_string_size() const override;
-
-   private:
-    std::size_t max_option_string_size{0};
 };
 
 empty_test_parser_t::~empty_test_parser_t() = default;
 
 [[nodiscard]] std::string empty_test_parser_t::gen_short_line_prefix() const {
     return "empty-test-parser" + gen_short_line();
-}
-
-void empty_test_parser_t::set_max_option_string_size(
-    const std::size_t max_option_size) {
-    max_option_string_size = max_option_size;
-}
-
-[[nodiscard]] std::size_t empty_test_parser_t::get_max_option_string_size()
-    const {
-    return max_option_string_size;
 }
 
 class empty_sub_parser_t : public clapp::parser::basic_sub_parser_t {
@@ -73,11 +58,6 @@ class simple_test_sub_parser_t : public clapp::parser::basic_parser_t {
     ~simple_test_sub_parser_t() override;
 
     [[nodiscard]] std::string gen_short_line_prefix() const override;
-    void set_max_option_string_size(std::size_t max_option_size) override;
-    [[nodiscard]] std::size_t get_max_option_string_size() const override;
-
-   private:
-    std::size_t max_option_string_size{0};
 };
 
 simple_test_sub_parser_t::~simple_test_sub_parser_t() = default;
@@ -85,16 +65,6 @@ simple_test_sub_parser_t::~simple_test_sub_parser_t() = default;
 [[nodiscard]] std::string simple_test_sub_parser_t::gen_short_line_prefix()
     const {
     return "simple-test-sub-parser" + gen_short_line();
-}
-
-void simple_test_sub_parser_t::set_max_option_string_size(
-    const std::size_t max_option_size) {
-    max_option_string_size = max_option_size;
-}
-
-[[nodiscard]] std::size_t simple_test_sub_parser_t::get_max_option_string_size()
-    const {
-    return max_option_string_size;
 }
 
 class simple_sub_parser_t : public clapp::parser::basic_sub_parser_t {
@@ -118,11 +88,6 @@ class variadic_argument_test_sub_parser_t
     ~variadic_argument_test_sub_parser_t() override;
 
     [[nodiscard]] std::string gen_short_line_prefix() const override;
-    void set_max_option_string_size(std::size_t max_option_size) override;
-    [[nodiscard]] std::size_t get_max_option_string_size() const override;
-
-   private:
-    std::size_t max_option_string_size{0};
 };
 
 variadic_argument_test_sub_parser_t::~variadic_argument_test_sub_parser_t() =
@@ -131,16 +96,6 @@ variadic_argument_test_sub_parser_t::~variadic_argument_test_sub_parser_t() =
 [[nodiscard]] std::string
 variadic_argument_test_sub_parser_t::gen_short_line_prefix() const {
     return "variadic-argument-test-sub-parser" + gen_short_line();
-}
-
-void variadic_argument_test_sub_parser_t::set_max_option_string_size(
-    const std::size_t max_option_size) {
-    max_option_string_size = max_option_size;
-}
-
-[[nodiscard]] std::size_t
-variadic_argument_test_sub_parser_t::get_max_option_string_size() const {
-    return max_option_string_size;
 }
 
 class optional_argument_test_sub_parser_t
@@ -152,11 +107,6 @@ class optional_argument_test_sub_parser_t
     ~optional_argument_test_sub_parser_t() override;
 
     [[nodiscard]] std::string gen_short_line_prefix() const override;
-    void set_max_option_string_size(std::size_t max_option_size) override;
-    [[nodiscard]] std::size_t get_max_option_string_size() const override;
-
-   private:
-    std::size_t max_option_string_size{0};
 };
 
 optional_argument_test_sub_parser_t::~optional_argument_test_sub_parser_t() =
@@ -165,16 +115,6 @@ optional_argument_test_sub_parser_t::~optional_argument_test_sub_parser_t() =
 [[nodiscard]] std::string
 optional_argument_test_sub_parser_t::gen_short_line_prefix() const {
     return "optional-argument-test-sub-parser" + gen_short_line();
-}
-
-void optional_argument_test_sub_parser_t::set_max_option_string_size(
-    const std::size_t max_option_size) {
-    max_option_string_size = max_option_size;
-}
-
-[[nodiscard]] std::size_t
-optional_argument_test_sub_parser_t::get_max_option_string_size() const {
-    return max_option_string_size;
 }
 
 TEST(subParser, constructEmptySubParserAndParseEmptyArguments) {

@@ -108,10 +108,6 @@ clapp::parser::basic_parser_t::get_options() const {
 }
 
 void clapp::parser::basic_parser_t::reg(reg_sub_parser_conf_t&& config) {
-    if (get_max_option_string_size() < config.sub_parser_name.size()) {
-        set_max_option_string_size(config.sub_parser_name.size());
-    }
-
     if (!get_optional_argument_descriptions().empty()) {
         std::stringstream ss;
         ss << "Can't register sub-parser '" << config.sub_parser_name

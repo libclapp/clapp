@@ -88,10 +88,6 @@ void clapp::parser::basic_parser_t::reg(
         config.option_string += "=<arg>";
     }
 
-    if (get_max_option_string_size() < config.option_string.size()) {
-        set_max_option_string_size(config.option_string.size());
-    }
-
     options.push_back(config);
 }
 
@@ -111,10 +107,6 @@ void clapp::parser::basic_parser_t::reg(
         ss << "Can't register regular argument '" << config.argument_name
            << "' when variadic arguments are already registered.";
         throw clapp::exception::argument_exception_t(ss.str());
-    }
-
-    if (get_max_option_string_size() < config.argument_name.size()) {
-        set_max_option_string_size(config.argument_name.size());
     }
 
     if (config.purpose == purpose_t::mandatory) {

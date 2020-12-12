@@ -254,10 +254,6 @@ class basic_parser_t {
 
     std::size_t get_num_processed_arguments() const;
 
-    virtual void set_max_option_string_size(
-        const std::size_t max_option_size) = 0;
-    virtual std::size_t get_max_option_string_size() const = 0;
-
     inline virtual bool is_active() const noexcept;
     const basic_parser_t& get_active_parser() const;
 

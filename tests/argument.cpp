@@ -19,26 +19,12 @@ class argument_test_parser_t : public clapp::parser::basic_parser_t {
     using clapp::parser::basic_parser_t::get_validate_functions;
 
     [[nodiscard]] std::string gen_short_line_prefix() const override;
-    void set_max_option_string_size(std::size_t max_option_size) override;
-    [[nodiscard]] std::size_t get_max_option_string_size() const override;
-
-   private:
-    std::size_t max_option_string_size{0};
 };
 
 argument_test_parser_t::~argument_test_parser_t() = default;
 
 std::string argument_test_parser_t::gen_short_line_prefix() const {
     return "arg-test-parser" + gen_short_line();
-}
-
-void argument_test_parser_t::set_max_option_string_size(
-    const std::size_t max_option_size) {
-    max_option_string_size = max_option_size;
-}
-
-std::size_t argument_test_parser_t::get_max_option_string_size() const {
-    return max_option_string_size;
 }
 
 class simple_argument_sub_parser_t : public clapp::parser::basic_sub_parser_t {

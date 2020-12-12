@@ -44,14 +44,3 @@ std::string clapp::parser::basic_sub_parser_t::gen_short_line_prefix() const {
     return parent_parser.gen_short_line_prefix() + " " + sub_parser_name +
            gen_short_line();
 }
-
-void clapp::parser::basic_sub_parser_t::set_max_option_string_size(
-    const std::size_t max_option_size) {
-    parent_parser.set_max_option_string_size(max_option_size +
-                                             num_sub_spaces * 2);
-}
-
-std::size_t clapp::parser::basic_sub_parser_t::get_max_option_string_size()
-    const {
-    return parent_parser.get_max_option_string_size() - num_sub_spaces * 2;
-}
