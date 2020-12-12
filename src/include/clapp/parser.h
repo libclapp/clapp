@@ -77,6 +77,7 @@ class basic_parser_t {
         help_entry_vec_t optional_arguments{};
         help_entry_vec_t options{};
         std::map<std::string, sub_parser_line_t> sub_parser{};
+        std::size_t max_name_size{0};
     };
 
     template <typename short_option_func_t>
