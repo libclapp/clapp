@@ -280,15 +280,11 @@ OPT_CONF clapp::option::gen_opt_conf2(
         std::optional<basic_parser_t::validate_func_t>;
     optional_validate_func_t opt_validate_func{gen_opt_validate_func<T>(
         std::move(callbacks.value), std::move(callbacks.has_value),
-        std::move(callbacks.given), std::move(validate_funcs), option_string,
-        purpose)};
+        std::move(callbacks.given), std::move(validate_funcs),
+        std::move(option_string), purpose)};
 
-    return OPT_CONF{std::move(short_options),
-                    std::move(long_options),
-                    std::move(opt_validate_func),
-                    std::move(option_string),
-                    description,
-                    purpose};
+    return OPT_CONF{std::move(short_options), std::move(long_options),
+                    std::move(opt_validate_func), description, purpose};
 }
 
 template <typename T>
@@ -365,7 +361,7 @@ clapp::option::basic_vector_param_option_t<T>::basic_vector_param_option_t(
     if (conf.default_value) {
         std::stringstream ss;
         ss << "No default value for vector based param option '"
-           << conf.opt_conf.option_string << "' possible.";
+           << conf.opt_conf.create_basic_option_string() << "' possible.";
         throw clapp::exception::option_param_exception_t(ss.str());
     }
     parser.reg(std::move(conf.opt_conf));

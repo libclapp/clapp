@@ -36,8 +36,6 @@ template <typename short_option_func_t, typename long_option_func_t,
 void clapp::parser::basic_parser_t::reg(
     basic_reg_option_conf_t<short_option_func_t, long_option_func_t,
                             option_type>&& config) {
-    Expects(config.option_string.size() > 1);
-
     for (auto it{std::begin(config.short_options)};
          it != std::end(config.short_options); it++) {
         if (find_option(it->option) != options.end()) {
@@ -82,10 +80,6 @@ void clapp::parser::basic_parser_t::reg(
 
     if (config.validate_func) {
         get_validate_functions().push_back(config.validate_func.value());
-    }
-
-    if (is_param_opt<short_option_func_t, long_option_func_t>()) {
-        config.option_string += "=<arg>";
     }
 
     options.push_back(config);

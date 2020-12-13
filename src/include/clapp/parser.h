@@ -126,10 +126,10 @@ class basic_parser_t {
         short_opt_conf_vec_t short_options;
         long_opt_conf_vec_t long_options;
         std::optional<validate_func_t> validate_func;
-        std::string option_string;
         std::string description;
         purpose_t purpose{purpose_t::optional};
     };
+
     using opt_no_param_conf_t =
         basic_reg_option_conf_t<short_opt_func_t, long_opt_func_t,
                                 option_type_t::scalar>;
