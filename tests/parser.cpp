@@ -567,6 +567,124 @@ TEST_F(opt_conf_t, ConstructOptVectorParamConfContainsOptionShortOption2) {
     ASSERT_THAT(ovpc.contains_option(short_option2), testing::Eq(true));
 }
 
+class arg_conf_t : public ::testing::Test {
+   protected:
+    using single_arg_conf_t = clapp::parser::basic_parser_t::single_arg_conf_t;
+    using variadic_arg_conf_t =
+        clapp::parser::basic_parser_t::variadic_arg_conf_t;
+
+    using argument_func_t = clapp::parser::basic_parser_t::argument_func_t;
+    using validate_func_t = clapp::parser::basic_parser_t::validate_func_t;
+    using purpose_t = clapp::parser::basic_parser_t::purpose_t;
+    using help_entry_t = clapp::parser::basic_parser_t::help_entry_t;
+    static inline const std::string arg_1{"arg"};
+    static inline const std::string arg_2{"argument"};
+    static inline const std::string description{"desc"};
+    argument_func_t arg_func{[](const std::string_view) -> void { return; }};
+    validate_func_t valid{[]() -> void { return; }};
+    purpose_t purpose_mandatory{purpose_t::mandatory};
+    purpose_t purpose_optional{purpose_t::optional};
+
+    void SetUp() override {}
+    void TearDown() override {}
+};
+
+TEST_F(arg_conf_t, ConstructSingleArgConfT) {
+    ASSERT_NO_THROW(static_cast<void>(single_arg_conf_t{
+        std::move(arg_func), std::move(arg_1), description, std::move(valid)}));
+}
+
+TEST_F(arg_conf_t, ConstructMandatorySingleArgConfT) {
+    ASSERT_NO_THROW(static_cast<void>(
+        single_arg_conf_t{std::move(arg_func), std::move(arg_1), description,
+                          std::move(valid), purpose_t::mandatory}));
+}
+
+TEST_F(arg_conf_t, ConstructOptionalSingleArgConfT) {
+    ASSERT_NO_THROW(static_cast<void>(
+        single_arg_conf_t{std::move(arg_func), std::move(arg_1), description,
+                          std::move(valid), purpose_t::optional}));
+}
+
+TEST_F(arg_conf_t, ConstructSingleArgConfTCreateBasicArgumentString) {
+    const single_arg_conf_t sac{std::move(arg_func), std::move(arg_1),
+                                description, std::move(valid)};
+    ASSERT_THAT(sac.create_basic_argument_string(), testing::StrEq(arg_1));
+}
+
+TEST_F(arg_conf_t, ConstructMandatorySingleArgConfTCreateArgumentString) {
+    const single_arg_conf_t sac{std::move(arg_func), std::move(arg_1),
+                                description, std::move(valid),
+                                purpose_t::mandatory};
+    ASSERT_THAT(sac.create_argument_string(),
+                testing::StrEq(sac.create_basic_argument_string()));
+}
+
+TEST_F(arg_conf_t, ConstructOptionalSingleArgConfTCreateArgumentString) {
+    const single_arg_conf_t sac{std::move(arg_func), std::move(arg_1),
+                                description, std::move(valid),
+                                purpose_t::optional};
+    ASSERT_THAT(sac.create_argument_string(),
+                testing::StrEq(std::string{"["} +
+                               sac.create_basic_argument_string() + "]"));
+}
+
+TEST_F(arg_conf_t, ConstructSingleArgConfTGetArgumentHelp) {
+    const single_arg_conf_t sac{std::move(arg_func), std::move(arg_1),
+                                description, std::move(valid)};
+    ASSERT_THAT(sac.get_argument_help(),
+                testing::Eq(help_entry_t{sac.create_basic_argument_string(),
+                                         description}));
+}
+
+TEST_F(arg_conf_t, ConstructVariadicArgConfT) {
+    ASSERT_NO_THROW(static_cast<void>(variadic_arg_conf_t{
+        std::move(arg_func), std::move(arg_2), description, std::move(valid)}));
+}
+
+TEST_F(arg_conf_t, ConstructMandatoryVariadicArgConfT) {
+    ASSERT_NO_THROW(static_cast<void>(
+        variadic_arg_conf_t{std::move(arg_func), std::move(arg_2), description,
+                            std::move(valid), purpose_t::mandatory}));
+}
+
+TEST_F(arg_conf_t, ConstructOptionalVariadicArgConfT) {
+    ASSERT_NO_THROW(static_cast<void>(
+        variadic_arg_conf_t{std::move(arg_func), std::move(arg_2), description,
+                            std::move(valid), purpose_t::optional}));
+}
+
+TEST_F(arg_conf_t, ConstructVariadicArgConfTCreateBasicArgumentString) {
+    const variadic_arg_conf_t sac{std::move(arg_func), std::move(arg_2),
+                                  description, std::move(valid)};
+    ASSERT_THAT(sac.create_basic_argument_string(), testing::StrEq(arg_2));
+}
+
+TEST_F(arg_conf_t, ConstructMandatoryVariadicArgConfTCreateArgumentString) {
+    const variadic_arg_conf_t sac{std::move(arg_func), std::move(arg_2),
+                                  description, std::move(valid),
+                                  purpose_t::mandatory};
+    ASSERT_THAT(sac.create_argument_string(),
+                testing::StrEq(sac.create_basic_argument_string() + "..."));
+}
+
+TEST_F(arg_conf_t, ConstructOptionalVariadicArgConfTCreateArgumentString) {
+    const variadic_arg_conf_t sac{std::move(arg_func), std::move(arg_2),
+                                  description, std::move(valid),
+                                  purpose_t::optional};
+    ASSERT_THAT(sac.create_argument_string(),
+                testing::StrEq(std::string{"["} +
+                               sac.create_basic_argument_string() + "...]"));
+}
+
+TEST_F(arg_conf_t, ConstructVariadicArgConfTGetArgumentHelp) {
+    const variadic_arg_conf_t sac{std::move(arg_func), std::move(arg_2),
+                                  description, std::move(valid)};
+    ASSERT_THAT(sac.get_argument_help(),
+                testing::Eq(help_entry_t{sac.create_basic_argument_string(),
+                                         description}));
+}
+
 class print_and_exit_t {
    public:
     MOCK_METHOD2(print_and_exit, void(const std::string_view print_msg,

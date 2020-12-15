@@ -144,7 +144,11 @@ class basic_parser_t {
                      opt_vector_param_conf_t>;
 
     template <argument_type_t argument_type>
-    struct reg_argument_conf_t {
+    struct basic_reg_argument_conf_t {
+        std::string create_basic_argument_string() const;
+        std::string create_argument_string() const;
+        help_entry_t get_argument_help() const;
+
         argument_func_t argument;
         std::string argument_name;
         std::string description;
@@ -152,8 +156,12 @@ class basic_parser_t {
         purpose_t purpose{purpose_t::mandatory};
     };
 
-    using single_arg_conf_t = reg_argument_conf_t<argument_type_t::single>;
-    using variadic_arg_conf_t = reg_argument_conf_t<argument_type_t::variadic>;
+    using single_arg_conf_t =
+        basic_reg_argument_conf_t<argument_type_t::single>;
+    using variadic_arg_conf_t =
+        basic_reg_argument_conf_t<argument_type_t::variadic>;
+    using variant_arg_conf_t =
+        std::variant<single_arg_conf_t, variadic_arg_conf_t>;
 
     struct reg_sub_parser_conf_t {
         basic_sub_parser_t& parser;
@@ -175,6 +183,7 @@ class basic_parser_t {
     using optional_argument_t = std::optional<arg_conf_t>;
     using validate_func_vec_t = std::vector<validate_func_t>;
     using variant_opt_conf_vec_t = std::vector<variant_opt_conf_t>;
+    using variant_arg_conf_vec_t = std::vector<variant_arg_conf_t>;
 
     struct option_description_container_t {
         std::string option_string;
@@ -196,10 +205,10 @@ class basic_parser_t {
 
     using option_descriptions_vec_t =
         std::vector<option_description_container_t>;
-    using sub_parser_descriptions_vec_t =
-        std::vector<sub_parser_description_container_t>;
     using argument_descriptions_vec_t =
         std::vector<argument_description_container_t>;
+    using sub_parser_descriptions_vec_t =
+        std::vector<sub_parser_description_container_t>;
 
    public:
     basic_parser_t();
@@ -219,7 +228,7 @@ class basic_parser_t {
                                      option_type>&& config);
 
     template <argument_type_t argument_type>
-    void reg(reg_argument_conf_t<argument_type>&& config);
+    void reg(basic_reg_argument_conf_t<argument_type>&& config);
 
     void reg(reg_sub_parser_conf_t&& config);
 

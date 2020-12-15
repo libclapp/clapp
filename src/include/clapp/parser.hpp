@@ -87,7 +87,7 @@ void clapp::parser::basic_parser_t::reg(
 
 template <clapp::parser::basic_parser_t::argument_type_t argument_type>
 void clapp::parser::basic_parser_t::reg(
-    reg_argument_conf_t<argument_type>&& config) {
+    basic_reg_argument_conf_t<argument_type>&& config) {
     if (config.argument_name.size() == 0) {
         std::stringstream ss;
         ss << "Argument name '" << config.argument_name << "' is too short.";
@@ -282,6 +282,32 @@ bool clapp::parser::basic_parser_t::basic_reg_option_conf_t<
         return false;
     }
     return find_option(short_option) != std::end(short_options);
+}
+
+template <clapp::parser::basic_parser_t::argument_type_t argument_type>
+std::string clapp::parser::basic_parser_t::basic_reg_argument_conf_t<
+    argument_type>::create_basic_argument_string() const {
+    return argument_name;
+}
+
+template <clapp::parser::basic_parser_t::argument_type_t argument_type>
+std::string clapp::parser::basic_parser_t::basic_reg_argument_conf_t<
+    argument_type>::create_argument_string() const {
+    std::string ret{create_basic_argument_string()};
+    if constexpr (argument_type == argument_type_t::variadic) {
+        ret += "...";
+    }
+    if (purpose == purpose_t::optional) {
+        return "[" + ret + "]";
+    } else {
+        return ret;
+    }
+}
+
+template <clapp::parser::basic_parser_t::argument_type_t argument_type>
+clapp::parser::basic_parser_t::help_entry_t clapp::parser::basic_parser_t::
+    basic_reg_argument_conf_t<argument_type>::get_argument_help() const {
+    return help_entry_t{create_basic_argument_string(), description};
 }
 
 inline bool clapp::parser::basic_parser_t::is_active() const noexcept {
