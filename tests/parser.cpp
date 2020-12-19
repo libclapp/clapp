@@ -617,7 +617,7 @@ TEST_F(arg_conf_t, ConstructMandatorySingleArgConfTCreateArgumentString) {
                                 description, std::move(valid),
                                 purpose_t::mandatory};
     ASSERT_THAT(sac.create_argument_string(),
-                testing::StrEq(sac.create_basic_argument_string()));
+                testing::StrEq("<" + sac.create_basic_argument_string() + ">"));
 }
 
 TEST_F(arg_conf_t, ConstructOptionalSingleArgConfTCreateArgumentString) {
@@ -625,8 +625,8 @@ TEST_F(arg_conf_t, ConstructOptionalSingleArgConfTCreateArgumentString) {
                                 description, std::move(valid),
                                 purpose_t::optional};
     ASSERT_THAT(sac.create_argument_string(),
-                testing::StrEq(std::string{"["} +
-                               sac.create_basic_argument_string() + "]"));
+                testing::StrEq(std::string{"[<"} +
+                               sac.create_basic_argument_string() + ">]"));
 }
 
 TEST_F(arg_conf_t, ConstructSingleArgConfTGetArgumentHelp) {
@@ -664,8 +664,9 @@ TEST_F(arg_conf_t, ConstructMandatoryVariadicArgConfTCreateArgumentString) {
     const variadic_arg_conf_t sac{std::move(arg_func), std::move(arg_2),
                                   description, std::move(valid),
                                   purpose_t::mandatory};
-    ASSERT_THAT(sac.create_argument_string(),
-                testing::StrEq(sac.create_basic_argument_string() + "..."));
+    ASSERT_THAT(
+        sac.create_argument_string(),
+        testing::StrEq("<" + sac.create_basic_argument_string() + ">..."));
 }
 
 TEST_F(arg_conf_t, ConstructOptionalVariadicArgConfTCreateArgumentString) {
@@ -673,8 +674,8 @@ TEST_F(arg_conf_t, ConstructOptionalVariadicArgConfTCreateArgumentString) {
                                   description, std::move(valid),
                                   purpose_t::optional};
     ASSERT_THAT(sac.create_argument_string(),
-                testing::StrEq(std::string{"["} +
-                               sac.create_basic_argument_string() + "...]"));
+                testing::StrEq(std::string{"[<"} +
+                               sac.create_basic_argument_string() + ">...]"));
 }
 
 TEST_F(arg_conf_t, ConstructVariadicArgConfTGetArgumentHelp) {
@@ -936,9 +937,9 @@ TEST(parser, constructSimpleTestParserAndGenHelpMessage) {
         stp.gen_help_msg(255),
         testing::StrEq(
             "simple-test-parser [-b|--bool] [-i|--int=<param>] <arg-name> "
-            "[<variadic-arg-name>...]\n\n  Mandatory Arguments:\n    "
-            "arg-name          Arg desc\n\n  Optional Arguments:\n    "
-            "variadic-arg-name Variadic arg desc (variadic "
+            "[<variadic-arg-name>...]\n\n  Arguments:\n    "
+            "arg-name          Arg desc (mandatory)\n    "
+            "variadic-arg-name Variadic arg desc (optional, variadic "
             "argument)\n\n  Options:\n    -b|--bool         "
             "Bool option. (optional)\n    -i|--int=<param>  Int option. "
             "(optional, constraint: [10,200])\n"));
@@ -946,11 +947,11 @@ TEST(parser, constructSimpleTestParserAndGenHelpMessage) {
 
 TEST(parser, constructSimpleTestParser2AndGenHelpMessage) {
     simple_test_parser2_t stp;
-    ASSERT_THAT(stp.gen_help_msg(255),
-                testing::StrEq(
-                    "simple-test-parser2 -c|--count [<arg-name>]\n\n  Optional "
-                    "Arguments:\n    arg-name   Arg desc\n\n  "
-                    "Options:\n    -c|--count Count option. (mandatory)\n"));
+    ASSERT_THAT(
+        stp.gen_help_msg(255),
+        testing::StrEq("simple-test-parser2 -c|--count [<arg-name>]\n\n  "
+                       "Arguments:\n    arg-name   Arg desc (optional)\n\n  "
+                       "Options:\n    -c|--count Count option. (mandatory)\n"));
 }
 
 TEST(parser, constructSimpleTestParser3AndGenHelpMessage) {
@@ -959,8 +960,8 @@ TEST(parser, constructSimpleTestParser3AndGenHelpMessage) {
         stp.gen_help_msg(255),
         testing::StrEq(
             "simple-test-parser3 -i|--int=<param>... [-s|--str=<param>...] "
-            "<variadic-arg-name>...\n\n  Mandatory Arguments:\n    "
-            "variadic-arg-name Variadic arg desc (variadic "
+            "<variadic-arg-name>...\n\n  Arguments:\n    "
+            "variadic-arg-name Variadic arg desc (mandatory, variadic "
             "argument)\n\n  Options:\n    -i|--int=<param>  Int option. "
             "(mandatory, vector option, constraint: [10,200])\n  "
             "  -s|--str=<param>  String "
@@ -975,13 +976,13 @@ TEST(parser, constructSubParserContainerAndGenHelpMessage) {
             "sub_parser_container [-b|--bool] [-2|--second] <arg-name> "
             "sub-parser [-b|--bool] [-s|--string=<param>] [<sub-arg-name>]\n"
             "sub_parser_container [-b|--bool] [-2|--second] <arg-name>\n\n"
-            "  Mandatory Arguments:\n    arg-name    "
-            "Arg desc\n\n  Options:\n    -b|--bool   "
+            "  Arguments:\n    arg-name    "
+            "Arg desc (mandatory)\n\n  Options:\n    -b|--bool   "
             "Bool option. (optional)\n    -2|--second Second bool "
             "option. (optional)\n\n"
             "  Subparser:\n    sub-parser  Sub "
-            "parser desc\n      Optional Arguments:\n        sub-arg-name      "
-            "  Sub arg desc\n\n      Options:\n        -b|--bool    "
+            "parser desc\n      Arguments:\n        sub-arg-name      "
+            "  Sub arg desc (optional)\n\n      Options:\n        -b|--bool    "
             "       Bool option. (optional)\n        -s|--string=<param> "
             "String "
             "option. (optional)\n\n"));
@@ -995,8 +996,8 @@ TEST(parser, constructSubParserContainerAndGenSubParserHelpMessage) {
             "sub_parser_container [-b|--bool] [-2|--second] <arg-name> "
             "sub-parser [-b|--bool] [-s|--string=<param>] [<sub-arg-name>]\n\n "
             " "
-            "Optional Arguments:\n    sub-arg-name        Sub arg "
-            "desc\n\n  Options:\n    -b|--bool           "
+            "Arguments:\n    sub-arg-name        Sub arg "
+            "desc (optional)\n\n  Options:\n    -b|--bool           "
             "Bool option. (optional)\n    -s|--string=<param> String "
             "option. (optional)\n"));
 }

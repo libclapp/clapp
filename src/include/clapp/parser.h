@@ -73,8 +73,7 @@ class basic_parser_t {
     using help_entry_vec_t = std::vector<help_entry_t>;
 
     struct help_contents_t {
-        help_entry_vec_t mandatory_arguments{};
-        help_entry_vec_t optional_arguments{};
+        help_entry_vec_t arguments{};
         help_entry_vec_t options{};
         std::map<std::string, sub_parser_line_t> sub_parser{};
         std::size_t max_name_size{0};
@@ -275,10 +274,11 @@ class basic_parser_t {
    protected:
     sub_parsers_map_t& get_sub_parsers();
     help_entry_vec_t get_option_help() const;
+    help_entry_vec_t get_argument_help() const;
     variant_opt_conf_vec_t::const_iterator find_option(
         std::string_view opt) const;
     variant_opt_conf_vec_t::const_iterator find_option(char opt) const;
-    arguments_vector_t& get_arguments();
+    variant_arg_conf_vec_t get_arguments() const;
     validate_func_vec_t& get_validate_functions();
     variant_opt_conf_vec_t get_options() const;
     sub_parser_descriptions_vec_t& get_sub_parser_descriptions();
@@ -304,6 +304,7 @@ class basic_parser_t {
     print_and_exit_func_t print_and_exit_func{default_print_and_exit};
 
     variant_opt_conf_vec_t options{};
+    variant_arg_conf_vec_t arguments{};
 
    public:
     constexpr static std::size_t num_sub_spaces{2u};

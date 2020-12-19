@@ -101,10 +101,10 @@ arg_conf_container_t<T, ARG_CONF> gen_arg_conf(CALLBACKS&& callbacks,
 
 template <typename T>
 class basic_argument_t {
+   public:
     using callbacks_t = argument_callbacks_t<T>;
     using arg_conf_t = basic_parser_t::single_arg_conf_t;
 
-   public:
     template <typename... Params>
     basic_argument_t(basic_parser_t& parser, const std::string& argument_name,
                      const std::string& description, Params&&... parameters);
@@ -113,11 +113,11 @@ class basic_argument_t {
     T value() const;
     constexpr bool given() const noexcept;
 
+    virtual ~basic_argument_t();
+
    protected:
     void validate() const;
     void found_entry(const std::string_view argument);
-
-   private:
     static callbacks_t create_callbacks(basic_argument_t<T>* inst);
 
     std::vector<clapp::value::found_func_t> _found{};
@@ -127,10 +127,10 @@ class basic_argument_t {
 
 template <typename T>
 class basic_variadic_argument_t {
+   public:
     using callbacks_t = variadic_argument_callbacks_t<T>;
     using arg_conf_t = basic_parser_t::variadic_arg_conf_t;
 
-   public:
     template <typename... Params>
     basic_variadic_argument_t(basic_parser_t& parser,
                               const std::string& argument_name,
@@ -146,8 +146,6 @@ class basic_variadic_argument_t {
    protected:
     void validate() const;
     void found_entry(const std::string_view argument);
-
-   private:
     static callbacks_t create_callbacks(basic_variadic_argument_t<T>* inst);
 
     std::vector<clapp::value::found_func_t> _found{};
@@ -179,6 +177,7 @@ using sec_argument_t = clapp::basic_argument_t<std::chrono::seconds>;
 using min_argument_t = clapp::basic_argument_t<std::chrono::minutes>;
 using hours_argument_t = clapp::basic_argument_t<std::chrono::hours>;
 
+using variadic_bool_argument_t = clapp::basic_variadic_argument_t<bool>;
 using variadic_string_argument_t =
     clapp::basic_variadic_argument_t<std::string>;
 #ifdef CLAPP_FS_AVAIL

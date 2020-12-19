@@ -2,7 +2,7 @@
 #define TESTS_HELPER_H
 
 template <typename ARG, typename T>
-bool compare_value(const ARG& arg, T value,
+bool compare_value(const ARG& arg, const T& value,
                    ::testing::MatchResultListener* result_listener) {
     if constexpr (std::is_same<T, double>::value) {
         ::testing::Matcher<double> matcher{
@@ -30,7 +30,8 @@ bool compare_value(const ARG& arg, T value,
 }
 
 template <typename ARG, typename T>
-bool compare_value_vector(const std::vector<ARG>& arg, std::vector<T> value,
+bool compare_value_vector(const std::vector<ARG>& arg,
+                          const std::vector<T>& value,
                           ::testing::MatchResultListener* result_listener) {
     if (arg.size() != value.size()) {
         *result_listener

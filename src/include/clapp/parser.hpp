@@ -82,7 +82,7 @@ void clapp::parser::basic_parser_t::reg(
         get_validate_functions().push_back(config.validate_func.value());
     }
 
-    options.push_back(config);
+    options.push_back(std::move(config));
 }
 
 template <clapp::parser::basic_parser_t::argument_type_t argument_type>
@@ -94,11 +94,11 @@ void clapp::parser::basic_parser_t::reg(
         throw clapp::exception::argument_exception_t(ss.str());
     }
 
-    const std::size_t num_arguments{get_arguments().size()};
-    if (num_arguments > 0 && get_arguments()[num_arguments - 1].argument_type ==
-                                 argument_type_t::variadic) {
+    const std::size_t num_arguments{arguments.size()};
+    if (num_arguments > 0 && std::holds_alternative<variadic_arg_conf_t>(
+                                 arguments[num_arguments - 1])) {
         std::stringstream ss;
-        ss << "Can't register regular argument '" << config.argument_name
+        ss << "Can't register argument '" << config.argument_name
            << "' when variadic arguments are already registered.";
         throw clapp::exception::argument_exception_t(ss.str());
     }
@@ -111,8 +111,7 @@ void clapp::parser::basic_parser_t::reg(
             throw clapp::exception::argument_exception_t(ss.str());
         }
         get_mandatory_argument_descriptions().push_back(
-            {config.argument_name, std::move(config.description),
-             argument_type});
+            {config.argument_name, config.description, argument_type});
     } else {
         if (!get_sub_parser_descriptions().empty()) {
             std::stringstream ss;
@@ -121,17 +120,28 @@ void clapp::parser::basic_parser_t::reg(
             throw clapp::exception::argument_exception_t(ss.str());
         }
         get_optional_argument_descriptions().push_back(
-            {config.argument_name, std::move(config.description),
-             argument_type});
+            {config.argument_name, config.description, argument_type});
     }
 
-    get_arguments().push_back({std::move(config.argument_name),
-                               std::move(config.argument), argument_type});
+    for (const auto& arg : arguments) {
+        std::visit(
+            [&config](auto&& a) {
+                if (a.argument_name == config.argument_name) {
+                    std::stringstream ss;
+                    ss << "Can't register argument '" << config.argument_name
+                       << "', as another argument with this name is already "
+                          "registered.";
+                    throw clapp::exception::argument_exception_t(ss.str());
+                }
+            },
+            arg);
+    }
 
     if (config.validate_func) {
-        get_validate_functions().push_back(
-            std::move(config.validate_func.value()));
+        get_validate_functions().push_back(config.validate_func.value());
     }
+
+    arguments.push_back(config);
 }
 
 template <typename short_option_func_t, typename long_option_func_t,
@@ -293,7 +303,7 @@ std::string clapp::parser::basic_parser_t::basic_reg_argument_conf_t<
 template <clapp::parser::basic_parser_t::argument_type_t argument_type>
 std::string clapp::parser::basic_parser_t::basic_reg_argument_conf_t<
     argument_type>::create_argument_string() const {
-    std::string ret{create_basic_argument_string()};
+    std::string ret{"<" + create_basic_argument_string() + ">"};
     if constexpr (argument_type == argument_type_t::variadic) {
         ret += "...";
     }

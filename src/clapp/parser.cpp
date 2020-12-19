@@ -73,9 +73,20 @@ clapp::parser::basic_parser_t::get_option_help() const {
     return ret;
 }
 
-clapp::parser::basic_parser_t::arguments_vector_t&
-clapp::parser::basic_parser_t::get_arguments() {
-    return mandatory_arguments;
+typename clapp::parser::basic_parser_t::help_entry_vec_t
+clapp::parser::basic_parser_t::get_argument_help() const {
+    typename clapp::parser::basic_parser_t::help_entry_vec_t ret;
+    for (auto& argument : arguments) {
+        ret.push_back(std::visit(
+            [](auto&& a) -> help_entry_t { return a.get_argument_help(); },
+            argument));
+    }
+    return ret;
+}
+
+clapp::parser::basic_parser_t::variant_arg_conf_vec_t
+clapp::parser::basic_parser_t::get_arguments() const {
+    return arguments;
 }
 
 std::size_t clapp::parser::basic_parser_t::get_num_processed_arguments() const {
@@ -115,9 +126,9 @@ void clapp::parser::basic_parser_t::reg(reg_sub_parser_conf_t&& config) {
         throw clapp::exception::sub_parser_exception_t(ss.str());
     }
 
-    const std::size_t num_arguments{get_arguments().size()};
-    if (num_arguments > 0 && get_arguments().at(num_arguments - 1).argument_type ==
-                                 argument_type_t::variadic) {
+    const std::size_t num_arguments{arguments.size()};
+    if (num_arguments > 0 && std::holds_alternative<variadic_arg_conf_t>(
+                                 arguments.at(num_arguments - 1))) {
         std::stringstream ss;
         ss << "Can't register sub-parser '" << config.sub_parser_name
            << "' as a variadic argument is already registered.";
@@ -158,20 +169,16 @@ clapp::parser::basic_parser_t::gen_detailed_help_contents() const {
                          ->name.size());
     }
 
-    for (const argument_description_container_t& desc_cont :
-         mandatory_argument_descriptions) {
-        ret.mandatory_arguments.emplace_back(
-            help_entry_t{desc_cont.argument_string, desc_cont.description});
+    ret.arguments = get_argument_help();
+    if (!ret.arguments.empty()) {
         ret.max_name_size =
-            std::max(ret.max_name_size, desc_cont.argument_string.size());
-    }
-
-    for (const argument_description_container_t& desc_cont :
-         optional_argument_descriptions) {
-        ret.optional_arguments.emplace_back(
-            help_entry_t{desc_cont.argument_string, desc_cont.description});
-        ret.max_name_size =
-            std::max(ret.max_name_size, desc_cont.argument_string.size());
+            std::max(ret.max_name_size,
+                     std::max_element(
+                         std::begin(ret.arguments), std::end(ret.arguments),
+                         [](const help_entry_t& lhs, const help_entry_t& rhs) {
+                             return lhs.name.size() < rhs.name.size();
+                         })
+                         ->name.size());
     }
 
     for (const sub_parser_description_container_t& desc_cont :
@@ -194,23 +201,11 @@ std::string clapp::parser::basic_parser_t::gen_short_line() const {
                              option);
     }
 
-    for (const argument_description_container_t& desc_cont :
-         mandatory_argument_descriptions) {
-        short_line += " <" + desc_cont.argument_string + ">";
-        if (desc_cont.argument_type ==
-            clapp::basic_parser_t::argument_type_t::variadic) {
-            short_line += "...";
-        }
-    }
-
-    for (const argument_description_container_t& desc_cont :
-         optional_argument_descriptions) {
-        short_line += " [<" + desc_cont.argument_string + ">";
-        if (desc_cont.argument_type ==
-            clapp::basic_parser_t::argument_type_t::variadic) {
-            short_line += "...";
-        }
-        short_line += "]";
+    for (auto& argument : arguments) {
+        short_line +=
+            " " +
+            std::visit([](auto&& a) { return a.create_argument_string(); },
+                       argument);
     }
 
     return short_line;
@@ -220,31 +215,19 @@ std::string clapp::parser::basic_parser_t::gen_opt_arg_lines(
     const clapp::parser::basic_parser_t::help_contents_t& help_contents,
     const std::size_t num_spaces) const {
     std::string ret;
-    if (!help_contents.mandatory_arguments.empty()) {
-        ret += "\n" + std::string(num_spaces + num_sub_spaces, ' ') +
-               "Mandatory Arguments:\n";
-        for (const help_entry_t& line : help_contents.mandatory_arguments) {
-            Expects((help_contents.max_name_size + 1) > line.name.size());
-            ret +=
-                "  " + std::string(num_spaces + num_sub_spaces, ' ') +
-                line.name +
-                std::string(help_contents.max_name_size + 1 - line.name.size(),
-                            ' ') +
-                line.description + '\n';
-        }
-    }
 
-    if (!help_contents.optional_arguments.empty()) {
+    std::vector<help_entry_t> argument_help_entries{get_argument_help()};
+    if (!argument_help_entries.empty()) {
         ret += "\n" + std::string(num_spaces + num_sub_spaces, ' ') +
-               "Optional Arguments:\n";
-        for (const help_entry_t& line : help_contents.optional_arguments) {
-            Expects((help_contents.max_name_size + 1) > line.name.size());
+               "Arguments:\n";
+        for (const help_entry_t& entry : argument_help_entries) {
+            Expects((help_contents.max_name_size + 1) > entry.name.size());
             ret +=
                 "  " + std::string(num_spaces + num_sub_spaces, ' ') +
-                line.name +
-                std::string(help_contents.max_name_size + 1 - line.name.size(),
+                entry.name +
+                std::string(help_contents.max_name_size + 1 - entry.name.size(),
                             ' ') +
-                line.description + '\n';
+                entry.description + '\n';
         }
     }
 
@@ -376,18 +359,27 @@ void clapp::parser::basic_parser_t::validate_recursive() const {
 clapp::parser::basic_parser_t::parse_result_t
 clapp::parser::basic_parser_t::parse_arg(const std::string_view argument,
                                          arg_iterator it, arg_iterator end) {
-    const std::size_t num_arguments{get_arguments().size()};
+    const std::size_t num_arguments{arguments.size()};
     if (num_arguments > 0) {
         if (num_processed_arguments < num_arguments) {
-            get_arguments().at(num_processed_arguments).func(argument);
-            num_processed_arguments++;
-            return parse_result_t{it + 1, std::nullopt, std::nullopt};
+            return std::visit(
+                [this, argument, it](auto&& a) -> parse_result_t {
+                    a.argument(argument);
+                    num_processed_arguments++;
+                    return parse_result_t{it + 1, std::nullopt, std::nullopt};
+                },
+                arguments.at(num_processed_arguments));
         }
-        auto& arg{get_arguments().at(get_arguments().size() - 1)};
-        if (arg.argument_type == argument_type_t::variadic) {
-            arg.func(argument);
-            num_processed_arguments++;
-            return parse_result_t{it + 1, std::nullopt, std::nullopt};
+        const auto& arg{arguments.at(arguments.size() - 1)};
+        if (std::holds_alternative<variadic_arg_conf_t>(
+                arguments.at(num_arguments - 1))) {
+            return std::visit(
+                [this, argument, it](auto&& a) -> parse_result_t {
+                    a.argument(argument);
+                    num_processed_arguments++;
+                    return parse_result_t{it + 1, std::nullopt, std::nullopt};
+                },
+                arg);
         }
     }
 

@@ -82,9 +82,15 @@ clapp::argument::gen_arg_validate_func(
                                       VALUE_FUNC,
                                       variadic_value_func_t<T>>::value) {
                         const std::vector<T> values{value_func.value()()};
-                        for (const auto& value : values) {
-                            for (const auto& func : validate_funcs) {
-                                func(value, argument_name);
+                        for (const auto& func : validate_funcs) {
+                            if constexpr (std::is_same<T, bool>::value) {
+                                for (const auto value : values) {
+                                    func(value, argument_name);
+                                }
+                            } else {
+                                for (const auto& value : values) {
+                                    func(value, argument_name);
+                                }
                             }
                         }
                     } else if constexpr (std::is_same<
@@ -139,9 +145,10 @@ clapp::argument::gen_arg_conf(CALLBACKS&& callbacks,
     gen_arg_conf_process_params(arg_params,
                                 std::forward<Params>(parameters)...);
 
+    const std::string purpose{basic_parser_t::to_cstring(arg_params.purpose)};
+
     std::string restriction{std::accumulate(
-        arg_params.restrictions.begin(), arg_params.restrictions.end(),
-        std::string(),
+        arg_params.restrictions.begin(), arg_params.restrictions.end(), purpose,
         [](const std::string& a, const std::string& b) -> std::string {
             return a + (a.length() > 0 && b.length() > 0 ? ", " : "") + b;
         })};
@@ -206,6 +213,9 @@ template <typename T>
 constexpr bool clapp::argument::basic_argument_t<T>::given() const noexcept {
     return _given;
 }
+
+template <typename T>
+clapp::argument::basic_argument_t<T>::~basic_argument_t() = default;
 
 template <typename T>
 void clapp::argument::basic_argument_t<T>::found_entry(
