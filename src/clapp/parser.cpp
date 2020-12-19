@@ -75,7 +75,7 @@ clapp::parser::basic_parser_t::get_option_help() const {
 
 clapp::parser::basic_parser_t::arguments_vector_t&
 clapp::parser::basic_parser_t::get_arguments() {
-    return arguments;
+    return mandatory_arguments;
 }
 
 std::size_t clapp::parser::basic_parser_t::get_num_processed_arguments() const {

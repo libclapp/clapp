@@ -293,7 +293,7 @@ class basic_parser_t {
                                arg_iterator end);
 
     sub_parsers_map_t sub_parsers{};
-    arguments_vector_t arguments{};
+    arguments_vector_t mandatory_arguments{};
     optional_argument_t optional_argument{};
     validate_func_vec_t validate_functions{};
     sub_parser_descriptions_vec_t sub_parser_descriptions{};
