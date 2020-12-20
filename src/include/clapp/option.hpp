@@ -236,9 +236,10 @@ clapp::option::opt_conf_container_t<T, OPT_CONF> clapp::option::gen_opt_conf1(
     gen_opt_conf_process_params(opt_params,
                                 std::forward<Params>(parameters)...);
 
+    const std::string purpose{basic_parser_t::to_cstring(opt_params.purpose)};
+
     std::string restriction{std::accumulate(
-        opt_params.restrictions.begin(), opt_params.restrictions.end(),
-        std::string(),
+        opt_params.restrictions.begin(), opt_params.restrictions.end(), purpose,
         [](const std::string& a, const std::string& b) -> std::string {
             return a + (a.length() > 0 && b.length() > 0 ? ", " : "") + b;
         })};

@@ -438,6 +438,8 @@ class option_t : public ::testing::Test {
     inline static constexpr const char* opt_desc_cstr{"opt-desc-cstr"};
     inline static constexpr const char* value_cstr{"value-cstr"};
     inline static const std::string value_str{"value-str"};
+    inline static const std::string purpose_optional_str{"optional"};
+    inline static const std::string purpose_mandatory_str{"mandatory"};
     inline static constexpr std::int64_t value_int64{0x12345678abcdef0LL};
     inline static constexpr std::int32_t value_int32{0x12345678};
     inline static constexpr std::int16_t value_int16{0x1234};
@@ -520,10 +522,10 @@ TEST_F(option_t, boolOptionConstructLongStringVecAndCallGetOptionHelp) {
     clapp::option::bool_option_t opt{
         tp, std::vector<std::string>{long_opt_str, long_opt_cstr},
         opt_desc_str};
-    ASSERT_THAT(
-        tp.get_option_help(),
-        testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
-            {"--" + long_opt_str + "|--" + long_opt_cstr, opt_desc_str}}));
+    ASSERT_THAT(tp.get_option_help(),
+                testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
+                    {"--" + long_opt_str + "|--" + long_opt_cstr,
+                     opt_desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
 TEST_F(option_t, boolOptionConstructShortCharVecWithSameOptionThrows) {
@@ -542,11 +544,13 @@ TEST_F(option_t, boolOptionConstructShortCharVecTwiceThrows) {
 }
 
 TEST_F(option_t, boolOptionConstructShortVecAndCallGetOptionHelp) {
-    clapp::option::bool_option_t opt{tp, std::vector<char>{short_opt},
-                                     opt_desc_str};
+    clapp::option::bool_option_t opt{
+        tp, std::vector<char>{short_opt}, opt_desc_str,
+        clapp::basic_parser_t::purpose_t::mandatory};
     ASSERT_THAT(tp.get_option_help(),
                 testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
-                    {std::string{"-"} + short_opt, opt_desc_str}}));
+                    {std::string{"-"} + short_opt,
+                     opt_desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
 TEST_F(option_t,
@@ -558,15 +562,17 @@ TEST_F(option_t,
                 testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
                     {std::string{"-"} + short_opt + "|--" + long_opt_str +
                          "|--" + long_opt_cstr,
-                     opt_desc_str}}));
+                     opt_desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
 TEST_F(option_t, boolOptionConstructLongStringAndShortAndCallGetOptionHelp) {
-    clapp::option::bool_option_t opt{tp, long_opt_str, short_opt, opt_desc_str};
+    clapp::option::bool_option_t opt{
+        tp, long_opt_str, short_opt, opt_desc_str,
+        clapp::basic_parser_t::purpose_t::mandatory};
     ASSERT_THAT(tp.get_option_help(),
                 testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
                     {std::string{"-"} + short_opt + "|--" + long_opt_str,
-                     opt_desc_str}}));
+                     opt_desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
 TEST_F(option_t, boolOptionConstructLongCStringAndShortAndCallGetOptionHelp) {
@@ -575,7 +581,7 @@ TEST_F(option_t, boolOptionConstructLongCStringAndShortAndCallGetOptionHelp) {
     ASSERT_THAT(tp.get_option_help(),
                 testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
                     {std::string{"-"} + short_opt + "|--" + long_opt_cstr,
-                     opt_desc_str}}));
+                     opt_desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
 TEST_F(option_t, boolOptionConstructLongStringVecAndCallLongOptFunc) {
@@ -674,15 +680,17 @@ TEST_F(option_t,
                 testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
                     {std::string{"-"} + short_opt + "|--" + long_opt_str +
                          "|--" + long_opt_cstr,
-                     opt_desc_str}}));
+                     opt_desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
 TEST_F(option_t, helpOptionConstructLongStringAndShortAndCallGetOptionHelp) {
-    clapp::option::help_option_t opt{tp, long_opt_str, short_opt, opt_desc_str};
+    clapp::option::help_option_t opt{
+        tp, long_opt_str, short_opt, opt_desc_str,
+        clapp::basic_parser_t::purpose_t::mandatory};
     ASSERT_THAT(tp.get_option_help(),
                 testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
                     {std::string{"-"} + short_opt + "|--" + long_opt_str,
-                     opt_desc_str}}));
+                     opt_desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
 TEST_F(option_t, helpOptionConstructLongCStringAndShortAndCallGetOptionHelp) {
@@ -691,7 +699,7 @@ TEST_F(option_t, helpOptionConstructLongCStringAndShortAndCallGetOptionHelp) {
     ASSERT_THAT(tp.get_option_help(),
                 testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
                     {std::string{"-"} + short_opt + "|--" + long_opt_cstr,
-                     opt_desc_str}}));
+                     opt_desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
 TEST_F(option_t, helpOptionConstructLongStringCallLongOptFunc) {
@@ -740,16 +748,17 @@ TEST_F(option_t,
                 testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
                     {std::string{"-"} + short_opt + "|--" + long_opt_str +
                          "|--" + long_opt_cstr,
-                     opt_desc_str}}));
+                     opt_desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
 TEST_F(option_t, countOptionConstructLongStringAndShortAndCallGetOptionHelp) {
-    clapp::option::count_option_t opt{tp, long_opt_str, short_opt,
-                                      opt_desc_str};
+    clapp::option::count_option_t opt{
+        tp, long_opt_str, short_opt, opt_desc_str,
+        clapp::basic_parser_t::purpose_t::mandatory};
     ASSERT_THAT(tp.get_option_help(),
                 testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
                     {std::string{"-"} + short_opt + "|--" + long_opt_str,
-                     opt_desc_str}}));
+                     opt_desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
 TEST_F(option_t, countOptionConstructLongCStringAndShortAndCallGetOptionHelp) {
@@ -758,7 +767,7 @@ TEST_F(option_t, countOptionConstructLongCStringAndShortAndCallGetOptionHelp) {
     ASSERT_THAT(tp.get_option_help(),
                 testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
                     {std::string{"-"} + short_opt + "|--" + long_opt_cstr,
-                     opt_desc_str}}));
+                     opt_desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
 TEST_F(option_t, countOptionConstructLongStringCallLongOptFuncTwice) {
@@ -917,16 +926,16 @@ TEST_F(option_t, stringParamOptionConstructLongStringVecAndCallGetOptionHelp) {
         tp.get_option_help(),
         testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
             {"--" + long_opt_str + "|--" + long_opt_cstr + param_opt_postfix,
-             opt_desc_str}}));
+             opt_desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
 TEST_F(option_t, stringParamOptionConstructShortVecAndCallGetOptionHelp) {
     clapp::option::string_param_option_t opt{tp, std::vector<char>{short_opt},
                                              opt_desc_str};
-    ASSERT_THAT(
-        tp.get_option_help(),
-        testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
-            {std::string{"-"} + short_opt + param_opt_postfix, opt_desc_str}}));
+    ASSERT_THAT(tp.get_option_help(),
+                testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
+                    {std::string{"-"} + short_opt + param_opt_postfix,
+                     opt_desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
 TEST_F(option_t,
@@ -938,18 +947,19 @@ TEST_F(option_t,
                 testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
                     {std::string{"-"} + short_opt + "|--" + long_opt_str +
                          "|--" + long_opt_cstr + param_opt_postfix,
-                     opt_desc_str}}));
+                     opt_desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
 TEST_F(option_t,
        stringParamOptionConstructLongStringAndShortAndCallGetOptionHelp) {
-    clapp::option::string_param_option_t opt{tp, long_opt_str, short_opt,
-                                             opt_desc_str};
+    clapp::option::string_param_option_t opt{
+        tp, long_opt_str, short_opt, opt_desc_str,
+        clapp::basic_parser_t::purpose_t::mandatory};
     ASSERT_THAT(tp.get_option_help(),
                 testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
                     {std::string{"-"} + short_opt + "|--" + long_opt_str +
                          param_opt_postfix,
-                     opt_desc_str}}));
+                     opt_desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
 TEST_F(option_t,
@@ -960,7 +970,7 @@ TEST_F(option_t,
                 testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
                     {std::string{"-"} + short_opt + "|--" + long_opt_cstr +
                          param_opt_postfix,
-                     opt_desc_str}}));
+                     opt_desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
 TEST_F(option_t, stringParamOptionConstructLongStringAndCallLongOpt) {
@@ -1079,16 +1089,16 @@ TEST_F(option_t, int64ParamOptionConstructLongStringVecAndCallGetOptionHelp) {
         tp.get_option_help(),
         testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
             {"--" + long_opt_str + "|--" + long_opt_cstr + param_opt_postfix,
-             opt_desc_str}}));
+             opt_desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
 TEST_F(option_t, int64ParamOptionConstructShortVecAndCallGetOptionHelp) {
     clapp::option::int64_param_option_t opt{tp, std::vector<char>{short_opt},
                                             opt_desc_str};
-    ASSERT_THAT(
-        tp.get_option_help(),
-        testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
-            {std::string{"-"} + short_opt + param_opt_postfix, opt_desc_str}}));
+    ASSERT_THAT(tp.get_option_help(),
+                testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
+                    {std::string{"-"} + short_opt + param_opt_postfix,
+                     opt_desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
 TEST_F(option_t,
@@ -1100,18 +1110,19 @@ TEST_F(option_t,
                 testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
                     {std::string{"-"} + short_opt + "|--" + long_opt_str +
                          "|--" + long_opt_cstr + param_opt_postfix,
-                     opt_desc_str}}));
+                     opt_desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
 TEST_F(option_t,
        int64ParamOptionConstructLongStringAndShortAndCallGetOptionHelp) {
-    clapp::option::int64_param_option_t opt{tp, long_opt_str, short_opt,
-                                            opt_desc_str};
+    clapp::option::int64_param_option_t opt{
+        tp, long_opt_str, short_opt, opt_desc_str,
+        clapp::basic_parser_t::purpose_t::mandatory};
     ASSERT_THAT(tp.get_option_help(),
                 testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
                     {std::string{"-"} + short_opt + "|--" + long_opt_str +
                          param_opt_postfix,
-                     opt_desc_str}}));
+                     opt_desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
 TEST_F(option_t,
@@ -1122,7 +1133,7 @@ TEST_F(option_t,
                 testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
                     {std::string{"-"} + short_opt + "|--" + long_opt_cstr +
                          param_opt_postfix,
-                     opt_desc_str}}));
+                     opt_desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
 TEST_F(option_t,
@@ -1132,13 +1143,13 @@ TEST_F(option_t,
     clapp::option::int64_param_option_t opt{
         tp, std::vector<std::string>{long_opt_str}, short_opt, opt_desc_str,
         clapp::value::min_max_value_t<std::int64_t>{min_value, max_value}};
-    ASSERT_THAT(
-        tp.get_option_help(),
-        testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
-            {std::string{"-"} + short_opt + "|--" + long_opt_str +
-                 param_opt_postfix,
-             opt_desc_str + " (constraint: [" + std::to_string(min_value) +
-                 "," + std::to_string(max_value) + "])"}}));
+    ASSERT_THAT(tp.get_option_help(),
+                testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
+                    {std::string{"-"} + short_opt + "|--" + long_opt_str +
+                         param_opt_postfix,
+                     opt_desc_str + " (" + purpose_optional_str +
+                         ", constraint: [" + std::to_string(min_value) + "," +
+                         std::to_string(max_value) + "])"}}));
 }
 
 TEST_F(option_t, int64ParamOptionConstructLongStringAndCallLongOpt) {
@@ -1512,17 +1523,18 @@ TEST_F(option_t,
         tp.get_option_help(),
         testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
             {"--" + long_opt_str + "|--" + long_opt_cstr + param_opt_postfix,
-             opt_desc_str + " (" + vector_opt_desc_restriction + ")"}}));
+             opt_desc_str + " (" + purpose_optional_str + ", " +
+                 vector_opt_desc_restriction + ")"}}));
 }
 
 TEST_F(option_t, vectorStringParamOptionConstructShortVecAndCallGetOptionHelp) {
     clapp::option::vector_string_param_option_t opt{
         tp, std::vector<char>{short_opt}, opt_desc_str};
-    ASSERT_THAT(
-        tp.get_option_help(),
-        testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
-            {std::string{"-"} + short_opt + param_opt_postfix,
-             opt_desc_str + " (" + vector_opt_desc_restriction + ")"}}));
+    ASSERT_THAT(tp.get_option_help(),
+                testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
+                    {std::string{"-"} + short_opt + param_opt_postfix,
+                     opt_desc_str + " (" + purpose_optional_str + ", " +
+                         vector_opt_desc_restriction + ")"}}));
 }
 
 TEST_F(
@@ -1530,25 +1542,26 @@ TEST_F(
     vectorStringParamOptionConstructLongStringVecAndShortVecAndCallGetOptionHelp) {
     clapp::option::vector_string_param_option_t opt{
         tp, std::vector<std::string>{long_opt_str, long_opt_cstr},
-        std::vector<char>{short_opt}, opt_desc_str};
-    ASSERT_THAT(
-        tp.get_option_help(),
-        testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
-            {std::string{"-"} + short_opt + "|--" + long_opt_str + "|--" +
-                 long_opt_cstr + param_opt_postfix,
-             opt_desc_str + " (" + vector_opt_desc_restriction + ")"}}));
+        std::vector<char>{short_opt}, opt_desc_str,
+        clapp::basic_parser_t::purpose_t::mandatory};
+    ASSERT_THAT(tp.get_option_help(),
+                testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
+                    {std::string{"-"} + short_opt + "|--" + long_opt_str +
+                         "|--" + long_opt_cstr + param_opt_postfix,
+                     opt_desc_str + " (" + purpose_mandatory_str + ", " +
+                         vector_opt_desc_restriction + ")"}}));
 }
 
 TEST_F(option_t,
        vectorStringParamOptionConstructLongStringAndShortAndCallGetOptionHelp) {
     clapp::option::vector_string_param_option_t opt{tp, long_opt_str, short_opt,
                                                     opt_desc_str};
-    ASSERT_THAT(
-        tp.get_option_help(),
-        testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
-            {std::string{"-"} + short_opt + "|--" + long_opt_str +
-                 param_opt_postfix,
-             opt_desc_str + " (" + vector_opt_desc_restriction + ")"}}));
+    ASSERT_THAT(tp.get_option_help(),
+                testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
+                    {std::string{"-"} + short_opt + "|--" + long_opt_str +
+                         param_opt_postfix,
+                     opt_desc_str + " (" + purpose_optional_str + ", " +
+                         vector_opt_desc_restriction + ")"}}));
 }
 
 TEST_F(
@@ -1556,12 +1569,12 @@ TEST_F(
     vectorStringParamOptionConstructLongCStringAndShortAndCallGetOptionHelp) {
     clapp::option::vector_string_param_option_t opt{tp, long_opt_cstr,
                                                     short_opt, opt_desc_str};
-    ASSERT_THAT(
-        tp.get_option_help(),
-        testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
-            {std::string{"-"} + short_opt + "|--" + long_opt_cstr +
-                 param_opt_postfix,
-             opt_desc_str + " (" + vector_opt_desc_restriction + ")"}}));
+    ASSERT_THAT(tp.get_option_help(),
+                testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
+                    {std::string{"-"} + short_opt + "|--" + long_opt_cstr +
+                         param_opt_postfix,
+                     opt_desc_str + " (" + purpose_optional_str + ", " +
+                         vector_opt_desc_restriction + ")"}}));
 }
 
 TEST_F(option_t, vectorStringParamOptionConstructLongStringAndCallLongOpt) {
@@ -1725,17 +1738,18 @@ TEST_F(option_t,
         tp.get_option_help(),
         testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
             {"--" + long_opt_str + "|--" + long_opt_cstr + param_opt_postfix,
-             opt_desc_str + " (" + vector_opt_desc_restriction + ")"}}));
+             opt_desc_str + " (" + purpose_optional_str + ", " +
+                 vector_opt_desc_restriction + ")"}}));
 }
 
 TEST_F(option_t, vectorInt64ParamOptionConstructShortVecAndCallGetOptionHelp) {
     clapp::option::vector_int64_param_option_t opt{
         tp, std::vector<char>{short_opt}, opt_desc_str};
-    ASSERT_THAT(
-        tp.get_option_help(),
-        testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
-            {std::string{"-"} + short_opt + param_opt_postfix,
-             opt_desc_str + " (" + vector_opt_desc_restriction + ")"}}));
+    ASSERT_THAT(tp.get_option_help(),
+                testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
+                    {std::string{"-"} + short_opt + param_opt_postfix,
+                     opt_desc_str + " (" + purpose_optional_str + ", " +
+                         vector_opt_desc_restriction + ")"}}));
 }
 
 TEST_F(
@@ -1743,37 +1757,38 @@ TEST_F(
     vectorInt64ParamOptionConstructLongStringVecAndShortVecAndCallGetOptionHelp) {
     clapp::option::vector_int64_param_option_t opt{
         tp, std::vector<std::string>{long_opt_str, long_opt_cstr},
-        std::vector<char>{short_opt}, opt_desc_str};
-    ASSERT_THAT(
-        tp.get_option_help(),
-        testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
-            {std::string{"-"} + short_opt + "|--" + long_opt_str + "|--" +
-                 long_opt_cstr + param_opt_postfix,
-             opt_desc_str + " (" + vector_opt_desc_restriction + ")"}}));
+        std::vector<char>{short_opt}, opt_desc_str,
+        clapp::basic_parser_t::purpose_t::mandatory};
+    ASSERT_THAT(tp.get_option_help(),
+                testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
+                    {std::string{"-"} + short_opt + "|--" + long_opt_str +
+                         "|--" + long_opt_cstr + param_opt_postfix,
+                     opt_desc_str + " (" + purpose_mandatory_str + ", " +
+                         vector_opt_desc_restriction + ")"}}));
 }
 
 TEST_F(option_t,
        vectorInt64ParamOptionConstructLongStringAndShortAndCallGetOptionHelp) {
     clapp::option::vector_int64_param_option_t opt{tp, long_opt_str, short_opt,
                                                    opt_desc_str};
-    ASSERT_THAT(
-        tp.get_option_help(),
-        testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
-            {std::string{"-"} + short_opt + "|--" + long_opt_str +
-                 param_opt_postfix,
-             opt_desc_str + " (" + vector_opt_desc_restriction + ")"}}));
+    ASSERT_THAT(tp.get_option_help(),
+                testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
+                    {std::string{"-"} + short_opt + "|--" + long_opt_str +
+                         param_opt_postfix,
+                     opt_desc_str + " (" + purpose_optional_str + ", " +
+                         vector_opt_desc_restriction + ")"}}));
 }
 
 TEST_F(option_t,
        vectorInt64ParamOptionConstructLongCStringAndShortAndCallGetOptionHelp) {
     clapp::option::vector_int64_param_option_t opt{tp, long_opt_cstr, short_opt,
                                                    opt_desc_str};
-    ASSERT_THAT(
-        tp.get_option_help(),
-        testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
-            {std::string{"-"} + short_opt + "|--" + long_opt_cstr +
-                 param_opt_postfix,
-             opt_desc_str + " (" + vector_opt_desc_restriction + ")"}}));
+    ASSERT_THAT(tp.get_option_help(),
+                testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
+                    {std::string{"-"} + short_opt + "|--" + long_opt_cstr +
+                         param_opt_postfix,
+                     opt_desc_str + " (" + purpose_optional_str + ", " +
+                         vector_opt_desc_restriction + ")"}}));
 }
 
 TEST_F(
@@ -1788,8 +1803,9 @@ TEST_F(
                 testing::ContainerEq(option_test_parser_t::help_entry_vec_t{
                     {std::string{"-"} + short_opt + "|--" + long_opt_str +
                          param_opt_postfix,
-                     opt_desc_str + " (" + vector_opt_desc_restriction + ", " +
-                         "constraint: [" + std::to_string(min_value) + "," +
+                     opt_desc_str + " (" + purpose_optional_str + ", " +
+                         vector_opt_desc_restriction + ", " + "constraint: [" +
+                         std::to_string(min_value) + "," +
                          std::to_string(max_value) + "])"}}));
 }
 

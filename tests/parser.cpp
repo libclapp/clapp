@@ -822,8 +822,8 @@ TEST(parser, constructSimpleTestParserAndGenHelpMessage) {
             "arg-name          Arg desc\n\n  Optional Arguments:\n    "
             "variadic-arg-name Variadic arg desc (variadic "
             "argument)\n\n  Options:\n    -b|--bool         "
-            "Bool option.\n    -i|--int=<param>  Int option. "
-            "(constraint: [10,200])\n"));
+            "Bool option. (optional)\n    -i|--int=<param>  Int option. "
+            "(optional, constraint: [10,200])\n"));
 }
 
 TEST(parser, constructSimpleTestParser2AndGenHelpMessage) {
@@ -832,7 +832,7 @@ TEST(parser, constructSimpleTestParser2AndGenHelpMessage) {
                 testing::StrEq(
                     "simple-test-parser2 -c|--count [<arg-name>]\n\n  Optional "
                     "Arguments:\n    arg-name   Arg desc\n\n  "
-                    "Options:\n    -c|--count Count option.\n"));
+                    "Options:\n    -c|--count Count option. (mandatory)\n"));
 }
 
 TEST(parser, constructSimpleTestParser3AndGenHelpMessage) {
@@ -844,9 +844,9 @@ TEST(parser, constructSimpleTestParser3AndGenHelpMessage) {
             "<variadic-arg-name>...\n\n  Mandatory Arguments:\n    "
             "variadic-arg-name Variadic arg desc (variadic "
             "argument)\n\n  Options:\n    -i|--int=<param>  Int option. "
-            "(vector option, constraint: [10,200])\n  "
+            "(mandatory, vector option, constraint: [10,200])\n  "
             "  -s|--str=<param>  String "
-            "option. (vector option)\n"));
+            "option. (optional, vector option)\n"));
 }
 
 TEST(parser, constructSubParserContainerAndGenHelpMessage) {
@@ -859,13 +859,14 @@ TEST(parser, constructSubParserContainerAndGenHelpMessage) {
             "sub_parser_container [-b|--bool] [-2|--second] <arg-name>\n\n"
             "  Mandatory Arguments:\n    arg-name    "
             "Arg desc\n\n  Options:\n    -b|--bool   "
-            "Bool option.\n    -2|--second Second bool "
-            "option.\n\n"
+            "Bool option. (optional)\n    -2|--second Second bool "
+            "option. (optional)\n\n"
             "  Subparser:\n    sub-parser  Sub "
             "parser desc\n      Optional Arguments:\n        sub-arg-name      "
             "  Sub arg desc\n\n      Options:\n        -b|--bool    "
-            "       Bool option.\n        -s|--string=<param> String "
-            "option.\n\n"));
+            "       Bool option. (optional)\n        -s|--string=<param> "
+            "String "
+            "option. (optional)\n\n"));
 }
 
 TEST(parser, constructSubParserContainerAndGenSubParserHelpMessage) {
@@ -878,8 +879,8 @@ TEST(parser, constructSubParserContainerAndGenSubParserHelpMessage) {
             " "
             "Optional Arguments:\n    sub-arg-name        Sub arg "
             "desc\n\n  Options:\n    -b|--bool           "
-            "Bool option.\n    -s|--string=<param> String "
-            "option.\n"));
+            "Bool option. (optional)\n    -s|--string=<param> String "
+            "option. (optional)\n"));
 }
 
 TEST(parser, constructEmptyBasicParserAndParseUnknownArgumentsThrows) {
