@@ -160,6 +160,8 @@ class basic_parser_t {
         std::string description;
     };
 
+    static inline const char* to_cstring(const purpose_t purpose) noexcept;
+
    protected:
     using long_opt_variant_t =
         std::variant<long_opt_func_t, long_opt_param_func_t>;

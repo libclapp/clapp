@@ -30,6 +30,15 @@ TEST(help_entry_t, ConstructAndCompare) {
                 testing::Ne(he));
 }
 
+TEST(purpose_t, ToCstring) {
+    ASSERT_THAT(clapp::parser::basic_parser_t::to_cstring(
+                    clapp::parser::basic_parser_t::purpose_t::optional),
+                testing::StrEq("optional"));
+    ASSERT_THAT(clapp::parser::basic_parser_t::to_cstring(
+                    clapp::parser::basic_parser_t::purpose_t::optional),
+                testing::StrEq("optional"));
+}
+
 class print_and_exit_t {
    public:
     MOCK_METHOD2(print_and_exit, void(const std::string_view print_msg,

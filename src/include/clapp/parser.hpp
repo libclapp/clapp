@@ -302,4 +302,15 @@ inline bool clapp::parser::basic_parser_t::is_active() const noexcept {
     return true;
 }
 
+inline const char* clapp::parser::basic_parser_t::to_cstring(
+    const purpose_t purpose) noexcept {
+    switch (purpose) {
+        case purpose_t::optional:
+            return "optional";
+        case purpose_t::mandatory:
+            return "mandatory";
+    }
+    Expects(false);
+}
+
 #endif
