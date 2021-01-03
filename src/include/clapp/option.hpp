@@ -67,7 +67,7 @@ clapp::option::gen_short_option(short_option_func_t&& sof,
     std::vector<
         clapp::basic_parser_t::basic_short_opt_conf_t<short_option_func_t>>
         ret;
-    for (auto opt : short_option) {
+    for (const auto opt : short_option) {
         check_short_option(opt);
         ret.emplace_back(
             basic_parser_t::basic_short_opt_conf_t<short_option_func_t>{opt,
@@ -83,7 +83,7 @@ clapp::option::gen_long_option(long_option_func_t&& lof,
     std::vector<
         clapp::basic_parser_t::basic_long_opt_conf_t<long_option_func_t>>
         ret;
-    for (auto opt : long_option) {
+    for (const auto& opt : long_option) {
         check_long_option(opt);
         ret.emplace_back(
             basic_parser_t::basic_long_opt_conf_t<long_option_func_t>{opt,
@@ -100,7 +100,12 @@ clapp::option::gen_opt_validate_func(
     std::vector<typename opt_params_t<T>::validate_func_t>&& validate_funcs,
     const std::string& option_string, const basic_parser_t::purpose_t purpose) {
     if (validate_funcs.size() > 0 ||
-        purpose == basic_parser_t::purpose_t::mandatory) {
+        purpose ==
+            basic_parser_t::purpose_t::
+                mandatory) {  // TODO: get rid of creating a validate function,
+                              // for all mandatory options. (this is the parsers
+                              // responsibility, just iterate in the parser over
+                              // all configured options...)
         return [purpose, value_func = std::move(vf),
                 has_value_func = std::move(hvf), given_func = std::move(gf),
                 option_string, validate_funcs = std::move(validate_funcs)]() {
@@ -116,15 +121,15 @@ clapp::option::gen_opt_validate_func(
                     if constexpr (std::is_same<VALUE_FUNC,
                                                vector_value_func_t<T>>::value) {
                         const std::vector<T> values{value_func.value()()};
-                        for (auto& value : values) {
-                            for (auto& func : validate_funcs) {
+                        for (const auto& value : values) {
+                            for (const auto& func : validate_funcs) {
                                 func(value, option_string);
                             }
                         }
                     } else if constexpr (std::is_same<VALUE_FUNC,
                                                       value_func_t<T>>::value) {
                         const T value{value_func.value()()};
-                        for (auto& func : validate_funcs) {
+                        for (const auto& func : validate_funcs) {
                             func(value, option_string);
                         }
                     }
