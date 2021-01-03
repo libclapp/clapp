@@ -143,12 +143,13 @@ class basic_parser_t {
         std::variant<opt_no_param_conf_t, opt_scalar_param_conf_t,
                      opt_vector_param_conf_t>;
 
-    template <argument_type_t argument_type>
+    template <argument_type_t arg_type>
     struct basic_reg_argument_conf_t {
         std::string create_basic_argument_string() const;
         std::string create_argument_string() const;
         help_entry_t get_argument_help() const;
 
+        static constexpr argument_type_t argument_type = arg_type;
         argument_func_t argument;
         std::string argument_name;
         std::string description;
