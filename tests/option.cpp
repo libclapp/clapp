@@ -594,14 +594,12 @@ TEST_F(option_t, twoBoolOptionsConstructAndCallShortOptAndLongOptFunc) {
 }
 
 TEST_F(option_t, boolOptionConstructLongStringCallLongOptFuncCallsFoundFunc) {
-    std::stringstream ss;
     clapp::option::bool_option_t opt{
         tp, long_opt_str, opt_desc_str,
-        clapp::value::found_func_t{[&ss]() { ss << "this is a test"; }}};
-    ASSERT_THAT(ss.str().size(), testing::Eq(0));
+        clapp::value::found_func_t{[this]() { found_func_called++; }}};
     get_long_opt_func<option_test_parser_t::long_opt_func_t>(
         tp, long_opt_str)(long_opt_str);
-    ASSERT_THAT(ss.str(), testing::StrEq("this is a test"));
+    ASSERT_THAT(found_func_called, testing::Eq(1));
 }
 
 TEST_F(option_t, boolOptionConstructShortOptionalNoValidateFunc) {
@@ -805,14 +803,12 @@ TEST_F(
 }
 
 TEST_F(option_t, countOptionConstructLongStringCallLongOptFuncCallsFoundFunc) {
-    std::stringstream ss;
     clapp::option::count_option_t opt{
         tp, long_opt_str, opt_desc_str,
-        clapp::value::found_func_t{[&ss]() { ss << "this is a test"; }}};
-    ASSERT_THAT(ss.str().size(), testing::Eq(0));
+        clapp::value::found_func_t{[this]() { found_func_called++; }}};
     get_long_opt_func<option_test_parser_t::long_opt_func_t>(
         tp, long_opt_str)(long_opt_str);
-    ASSERT_THAT(ss.str(), testing::StrEq("this is a test"));
+    ASSERT_THAT(found_func_called, testing::Eq(1));
 }
 
 TEST_F(option_t, countOptionConstructMandatoryLongCallValidateFunc) {
@@ -953,15 +949,13 @@ TEST_F(option_t, stringParamOptionConstructShortAndCallShortOpt) {
 TEST_F(
     option_t,
     stringParamOptionConstructLongStringAndShortAndCallShortOptCallsFoundFunc) {
-    std::stringstream ss;
     clapp::option::string_param_option_t opt{
         tp, long_opt_str, short_opt, opt_desc_str,
-        clapp::value::found_func_t{[&ss]() { ss << "this is a test"; }}};
-    ASSERT_THAT(ss.str().size(), testing::Eq(0));
+        clapp::value::found_func_t{[this]() { found_func_called++; }}};
     ASSERT_NO_THROW(
         (get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
             tp, short_opt)(short_opt, value_str)));
-    ASSERT_THAT(ss.str(), testing::StrEq("this is a test"));
+    ASSERT_THAT(found_func_called, testing::Eq(1));
 }
 
 TEST_F(option_t,
@@ -1296,15 +1290,13 @@ TEST_F(option_t, int64ParamOptionConstructShortAndCallShortOpt) {
 TEST_F(
     option_t,
     int64ParamOptionConstructLongStringAndShortAndCallShortOptCallsFoundFunc) {
-    std::stringstream ss;
     clapp::option::int64_param_option_t opt{
         tp, long_opt_str, short_opt, opt_desc_str,
-        clapp::value::found_func_t{[&ss]() { ss << "this is a test"; }}};
-    ASSERT_THAT(ss.str().size(), testing::Eq(0));
+        clapp::value::found_func_t{[this]() { found_func_called++; }}};
     ASSERT_NO_THROW(
         (get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
             tp, short_opt)(short_opt, std::to_string(value_int64))));
-    ASSERT_THAT(ss.str(), testing::StrEq("this is a test"));
+    ASSERT_THAT(found_func_called, testing::Eq(1));
 }
 
 TEST_F(
@@ -1765,15 +1757,13 @@ TEST_F(
 TEST_F(
     option_t,
     vectorStringParamOptionConstructLongStringAndShortAndCallShortOptCallsFoundFunc) {
-    std::stringstream ss;
     clapp::option::vector_string_param_option_t opt{
         tp, long_opt_str, short_opt, opt_desc_str,
-        clapp::value::found_func_t{[&ss]() { ss << "this is a test"; }}};
-    ASSERT_THAT(ss.str().size(), testing::Eq(0));
+        clapp::value::found_func_t{[this]() { found_func_called++; }}};
     ASSERT_NO_THROW(
         (get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
             tp, short_opt)(short_opt, value_str)));
-    ASSERT_THAT(ss.str(), testing::StrEq("this is a test"));
+    ASSERT_THAT(found_func_called, testing::Eq(1));
 }
 
 TEST_F(
@@ -2168,18 +2158,17 @@ TEST_F(option_t, vectorInt64ParamOptionConstructShortAndCallShortOpt) {
 TEST_F(
     option_t,
     vectorInt64ParamOptionConstructLongStringAndShortAndCallShortOptCallsFoundFunc) {
-    std::stringstream ss;
     clapp::option::vector_int64_param_option_t opt{
         tp, long_opt_str, short_opt, opt_desc_str,
-        clapp::value::found_func_t{[&ss]() { ss << "testaa"; }}};
-    ASSERT_THAT(ss.str().size(), testing::Eq(0));
+        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+
     ASSERT_NO_THROW(
         (get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
             tp, short_opt)(short_opt, std::to_string(value_int64))));
     ASSERT_NO_THROW(
         (get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
             tp, short_opt)(short_opt, std::to_string(value_int32))));
-    ASSERT_THAT(ss.str(), testing::StrEq("testaatestaa"));
+    ASSERT_THAT(found_func_called, testing::Eq(2));
 }
 
 TEST_F(
