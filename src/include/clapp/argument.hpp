@@ -82,8 +82,8 @@ clapp::argument::gen_arg_validate_func(
                                       VALUE_FUNC,
                                       variadic_value_func_t<T>>::value) {
                         const std::vector<T> values{value_func.value()()};
-                        for (auto& value : values) {
-                            for (auto& func : validate_funcs) {
+                        for (const auto& value : values) {
+                            for (const auto& func : validate_funcs) {
                                 func(value, argument_name);
                             }
                         }
@@ -91,7 +91,7 @@ clapp::argument::gen_arg_validate_func(
                                              VALUE_FUNC,
                                              arg_value_func_t<T>>::value) {
                         const T value{value_func.value()()};
-                        for (auto& func : validate_funcs) {
+                        for (const auto& func : validate_funcs) {
                             func(value, argument_name);
                         }
                     }
