@@ -116,7 +116,7 @@ void clapp::parser::basic_parser_t::reg(reg_sub_parser_conf_t&& config) {
     }
 
     const std::size_t num_arguments{get_arguments().size()};
-    if (num_arguments > 0 && get_arguments()[num_arguments - 1].argument_type ==
+    if (num_arguments > 0 && get_arguments().at(num_arguments - 1).argument_type ==
                                  argument_type_t::variadic) {
         std::stringstream ss;
         ss << "Can't register sub-parser '" << config.sub_parser_name
@@ -379,11 +379,11 @@ clapp::parser::basic_parser_t::parse_arg(const std::string_view argument,
     const std::size_t num_arguments{get_arguments().size()};
     if (num_arguments > 0) {
         if (num_processed_arguments < num_arguments) {
-            get_arguments()[num_processed_arguments].func(argument);
+            get_arguments().at(num_processed_arguments).func(argument);
             num_processed_arguments++;
             return parse_result_t{it + 1, std::nullopt, std::nullopt};
         }
-        auto& arg{get_arguments()[get_arguments().size() - 1]};
+        auto& arg{get_arguments().at(get_arguments().size() - 1)};
         if (arg.argument_type == argument_type_t::variadic) {
             arg.func(argument);
             num_processed_arguments++;
