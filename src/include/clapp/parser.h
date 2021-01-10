@@ -286,7 +286,7 @@ class basic_parser_t {
     argument_descriptions_vec_t& get_optional_argument_descriptions();
 
    private:
-    parse_result_t parse_arg(std::string_view option, arg_iterator it,
+    parse_result_t parse_arg(std::string_view argument, arg_iterator it,
                              arg_iterator end);
     parse_result_t parse_long(std::string_view option, arg_iterator it,
                               arg_iterator end);

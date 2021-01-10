@@ -374,27 +374,27 @@ void clapp::parser::basic_parser_t::validate_recursive() const {
 }
 
 clapp::parser::basic_parser_t::parse_result_t
-clapp::parser::basic_parser_t::parse_arg(const std::string_view option,
+clapp::parser::basic_parser_t::parse_arg(const std::string_view argument,
                                          arg_iterator it, arg_iterator end) {
     const std::size_t num_arguments{get_arguments().size()};
     if (num_arguments > 0) {
         if (num_processed_arguments < num_arguments) {
-            get_arguments()[num_processed_arguments].func(option);
+            get_arguments()[num_processed_arguments].func(argument);
             num_processed_arguments++;
             return parse_result_t{it + 1, std::nullopt, std::nullopt};
         }
         auto& arg{get_arguments()[get_arguments().size() - 1]};
         if (arg.argument_type == argument_type_t::variadic) {
-            arg.func(option);
+            arg.func(argument);
             num_processed_arguments++;
             return parse_result_t{it + 1, std::nullopt, std::nullopt};
         }
     }
 
-    auto found_sub_parser{get_sub_parsers().find(option)};
+    auto found_sub_parser{get_sub_parsers().find(argument)};
     if (found_sub_parser == get_sub_parsers().end()) {
         std::stringstream ss;
-        ss << "Unknown argument/sub-parser '" << option << "'.";
+        ss << "Unknown argument/sub-parser '" << argument << "'.";
         throw clapp::exception::clapp_exception_t(ss.str());
     }
     found_sub_parser->second.sub_parse(it + 1, end);
