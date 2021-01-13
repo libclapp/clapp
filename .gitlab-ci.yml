@@ -9,713 +9,772 @@ variables:
 .compile_install_template: &compile_install_definition
     stage: build
     script:
+        - if [ "${COMPILER}" == "gcc" ]; then export CC="gcc-${COMPILER_VERSION}"; export CXX="g++-${COMPILER_VERSION}"; fi
+        - if [ "${COMPILER}" == "clang" ]; then export CC="clang-${COMPILER_VERSION}"; export CXX="clang++-${COMPILER_VERSION}"; fi
+        - export GENERATOR_WO_SPACES=$(echo $GENERATOR | tr -s ' ' '_')
+        - export BUILD_DIR="build_${COMPILER}_${COMPILER_VERSION}_${GENERATOR_WO_SPACES}_${BUILD_TYPE}"
+        - echo "Using ${CXX} and ${CC} with ${GENERATOR} to build ${BUILD_TYPE}, build dir ${BUILD_DIR}"
         - SRC_DIR=`pwd`
-        - mkdir build
-        - cd build
-        - cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DlibClaPP_PEDANTIC_COMPILER_FLAGS=On -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${SRC_DIR}
-        - cmake --build .
-        - make install
+        - mkdir "${BUILD_DIR}"
+        - cd "${BUILD_DIR}"
+        - cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DlibClaPP_PEDANTIC_COMPILER_FLAGS=On -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -G "${GENERATOR}" ${SRC_DIR}
+        - cmake --build . --target install
         - echo -e '#include<clapp/main_parser.h>\n#include<clapp/build_info.h>\n#include<iostream>\nint main (int argc, char *argv[]) {\nstd::cout << clapp::build_info::project_name << " v" << clapp::build_info::version << std::endl;\n}' | ${CXX} `pkg-config --libs --cflags libclapp` -I${SRC_DIR}/third_party/GSL/include/ --std=c++17 -o out -x c++ -
 
 .compile_template: &compile_definition
     stage: build
     script:
+        - if [ "${COMPILER}" == "gcc" ]; then export CC="gcc-${COMPILER_VERSION}"; export CXX="g++-${COMPILER_VERSION}"; fi
+        - if [ "${COMPILER}" == "clang" ]; then export CC="clang-${COMPILER_VERSION}"; export CXX="clang++-${COMPILER_VERSION}"; fi
+        - export GENERATOR_WO_SPACES=$(echo $GENERATOR | tr -s ' ' '_')
+        - export BUILD_DIR="build_${COMPILER}_${COMPILER_VERSION}_${GENERATOR_WO_SPACES}_${BUILD_TYPE}"
+        - echo "Using ${CXX} and ${CC} with ${GENERATOR} to build ${BUILD_TYPE}, build dir ${BUILD_DIR}"
         - SRC_DIR=`pwd`
-        - mkdir build
-        - cd build
+        - mkdir "${BUILD_DIR}"
+        - cd "${BUILD_DIR}"
         - cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DlibClaPP_PEDANTIC_COMPILER_FLAGS=On -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${ADDITIONAL_OPTION} -G "${GENERATOR}" ${SRC_DIR}
         - cmake --build .
     artifacts:
         paths:
-            - build
+            - build*
+        expire_in: 1 week
 
 .compile_clang_tidy_template: &compile_clang_tidy_definition
     stage: build
     script:
+        - if [ "${COMPILER}" == "clang" ]; then export CC="clang-${COMPILER_VERSION}"; export CXX="clang++-${COMPILER_VERSION}"; export CLANG_TIDY="clang-tidy-${COMPILER_VERSION}"; fi
+        - export GENERATOR_WO_SPACES=$(echo $GENERATOR | tr -s ' ' '_')
+        - export BUILD_DIR="build_${CLANG_TIDY}_${GENERATOR_WO_SPACES}_${BUILD_TYPE}"
+        - echo "Using ${CXX}, ${CC}, ${CLANG_TIDY} with ${GENERATOR} to build ${BUILD_TYPE}, build dir ${BUILD_DIR}"
         - SRC_DIR=`pwd`
-        - mkdir build
-        - cd build
-        - cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DlibClaPP_PEDANTIC_COMPILER_FLAGS=On -DCLANG_TIDY=${CLANG_TIDY} -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DlibClaPP_BUILD_COVERAGE=On -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DlibClaPP_CLANG_TIDY=On ${SRC_DIR}
+        - mkdir "${BUILD_DIR}"
+        - cd "${BUILD_DIR}"
+        - cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DlibClaPP_PEDANTIC_COMPILER_FLAGS=On -DlibClaPP_CLANG_TIDY_BIN=${CLANG_TIDY} -DlibClaPP_BUILD_DOC_CODE=On -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DlibClaPP_BUILD_COVERAGE=On -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DlibClaPP_CLANG_TIDY=On -G "${GENERATOR}" ${SRC_DIR}
         - cmake --build .
 
 .test_gcov_template: &test_gcov_definition
     stage: test
     script:
-        - cd build
+        - if [ "${COMPILER}" == "gcc" ]; then export GCOV_EXECUTABLE="gcov-${COMPILER_VERSION}"; fi
+        - if [ "${COMPILER}" == "clang" ]; then export GCOV_EXECUTABLE="llvm-cov-${COMPILER_VERSION} gcov"; fi
+        - export GENERATOR_WO_SPACES=$(echo $GENERATOR | tr -s ' ' '_')
+        - export BUILD_DIR="build_${COMPILER}_${COMPILER_VERSION}_${GENERATOR_WO_SPACES}_${BUILD_TYPE}"
+        - echo "Using ${GCOV_EXECUTABLE} for ${BUILD_TYPE}-build with ${GENERATOR}, build dir ${BUILD_DIR}"
+        - find -type d -name 'build_*' | grep -v "${BUILD_DIR}" | xargs rm -rf
+        - cd "${BUILD_DIR}"
         - ctest -V -R libclapp_tests
-        - gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/ -e doc -e ../doc/ --gcov-executable="${GCOV_EXECUTABLE}"
+        - gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/ -e doc/ -e ../doc/ --gcov-executable="${GCOV_EXECUTABLE}"
         - ctest -V -E libclapp_tests
-        - cd ../
+    coverage: '/^TOTAL.*\s+(\d+%)$/'
 
 .test_template: &test_definition
     stage: test
     script:
-        - cd build
+        - export GENERATOR_WO_SPACES=$(echo $GENERATOR | tr -s ' ' '_')
+        - export BUILD_DIR="build_${COMPILER}_${COMPILER_VERSION}_${GENERATOR_WO_SPACES}_${BUILD_TYPE}"
+        - echo "Using ${CXX} and ${CC} with ${GENERATOR} to build ${BUILD_TYPE}, build dir ${BUILD_DIR}"
+        - cd "${BUILD_DIR}"
         - ctest -V
-        - cd ../
 
-compile_install_release_g++9:
-    variables:
-        CXX: "g++-9"
-        CC: "gcc-9"
-        BUILD_TYPE: "Release"
+clang_format:
+    stage: build
+    script:
+        - find src tests examples -iname *.h -o -iname *.cpp -o -iname *.c -o -iname *.hpp | xargs clang-format-11 -i
+        - git diff HEAD
+        - git diff-index --quiet HEAD --
     tags:
-        - g++-9
-        - cmake
-    <<: *compile_install_definition
+        - compiler
+        - ubuntu-21.04-amd64
 
-compile_install_debug_g++9:
-    variables:
-        CXX: "g++-9"
-        CC: "gcc-9"
-        BUILD_TYPE: "Release"
+compile_debian_10_amd64:
     tags:
-        - g++-9
-        - cmake
-    <<: *compile_install_definition
-
-compile_install_debug_g++8:
-    variables:
-        CXX: "g++-8"
-        CC: "gcc-8"
-        BUILD_TYPE: "Debug"
-    tags:
-        - g++-8
-        - cmake
-    <<: *compile_install_definition
-
-compile_install_release_g++8:
-    variables:
-        CXX: "g++-8"
-        CC: "gcc-8"
-        BUILD_TYPE: "Release"
-    tags:
-        - g++-8
-        - cmake
-    <<: *compile_install_definition
-
-compile_install_debug_g++7:
-    variables:
-        CXX: "g++-7"
-        CC: "gcc-7"
-        BUILD_TYPE: "Debug"
-    tags:
-        - g++-7
-        - cmake
-    <<: *compile_install_definition
-
-compile_install_release_g++7:
-    variables:
-        CXX: "g++-7"
-        CC: "gcc-7"
-        BUILD_TYPE: "Release"
-    tags:
-        - g++-7
-        - cmake
-    <<: *compile_install_definition
-
-compile_install_debug_clang++7:
-    variables:
-        CXX: "clang++-7"
-        CC: "clang-7"
-        BUILD_TYPE: "Debug"
-    tags:
-        - clang++-7
-        - cmake
-    <<: *compile_install_definition
-
-compile_install_release_clang++7:
-    variables:
-        CXX: "clang++-7"
-        CC: "clang-7"
-        BUILD_TYPE: "Release"
-    tags:
-        - clang++-7
-        - cmake
-    <<: *compile_install_definition
-
-compile_install_debug_clang++8:
-    variables:
-        CXX: "clang++-8"
-        CC: "clang-8"
-        BUILD_TYPE: "Debug"
-    tags:
-        - clang++-8
-        - cmake
-    <<: *compile_install_definition
-
-compile_install_release_clang++8:
-    variables:
-        CXX: "clang++-8"
-        CC: "clang-8"
-        BUILD_TYPE: "Release"
-    tags:
-        - clang++-8
-        - cmake
-    <<: *compile_install_definition
-
-compile_install_debug_clang++9:
-    variables:
-        CXX: "clang++-9"
-        CC: "clang-9"
-        BUILD_TYPE: "Debug"
-    tags:
-        - clang++-9
-        - cmake
-    <<: *compile_install_definition
-
-compile_install_release_clang++9:
-    variables:
-        CXX: "clang++-9"
-        CC: "clang-9"
-        BUILD_TYPE: "Release"
-    tags:
-        - clang++-9
-        - cmake
-    <<: *compile_install_definition
-
-compile_release_g++9:
-    variables:
-        CXX: "g++-9"
-        CC: "gcc-9"
-        BUILD_TYPE: "Release"
-        GENERATOR: "Unix Makefiles"
-    tags:
-        - g++-9
-        - cmake
+        - compiler
+        - debian-10-amd64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [7]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
     <<: *compile_definition
 
-test_gcov_release_g++9:
-    variables:
-        GCOV_EXECUTABLE: "gcov-9"
+test_gcov_debian_10_amd64:
     tags:
-        - g++-9
-        - cmake
+        - compiler
+        - debian-10-amd64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [7]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
     needs:
-        - job: compile_release_g++9
+        - job: compile_debian_10_amd64
           artifacts: true
     <<: *test_gcov_definition
 
-compile_debug_g++9:
-    variables:
-        CXX: "g++-9"
-        CC: "gcc-9"
-        BUILD_TYPE: "Debug"
-        GENERATOR: "Unix Makefiles"
+compile_debian_10_arm64:
     tags:
-        - g++-9
-        - cmake
+        - compiler
+        - debian-10-arm64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [7]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
     <<: *compile_definition
 
-test_gcov_debug_g++9:
-    variables:
-        GCOV_EXECUTABLE: "gcov-9"
+test_gcov_debian_10_arm64:
     tags:
-        - g++-9
-        - cmake
+        - compiler
+        - debian-10-arm64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [7]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
     needs:
-        - job: compile_debug_g++9
-          artifacts: true
-    coverage: '/^TOTAL.*\s+(\d+%)$/'
-    <<: *test_gcov_definition
-
-compile_release_g++8:
-    variables:
-        CXX: "g++-8"
-        CC: "gcc-8"
-        BUILD_TYPE: "Release"
-        GENERATOR: "Unix Makefiles"
-    tags:
-        - g++-8
-        - cmake
-    <<: *compile_definition
-
-test_gcov_release_g++8:
-    variables:
-        GCOV_EXECUTABLE: "gcov-8"
-    tags:
-        - g++-8
-        - cmake
-    needs:
-        - job: compile_release_g++8
+        - job: compile_debian_10_arm64
           artifacts: true
     <<: *test_gcov_definition
 
-compile_debug_g++8:
-    variables:
-        CXX: "g++-8"
-        CC: "gcc-8"
-        BUILD_TYPE: "Debug"
-        GENERATOR: "Unix Makefiles"
+compile_debian_10_armhf:
     tags:
-        - g++-8
-        - cmake
+        - compiler
+        - debian-10-armhf
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [7]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
     <<: *compile_definition
 
-test_gcov_debug_g++8:
-    variables:
-        GCOV_EXECUTABLE: "gcov-8"
+test_gcov_debian_10_armhf:
     tags:
-        - g++-8
-        - cmake
+        - compiler
+        - debian-10-armhf
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [7]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
     needs:
-        - job: compile_debug_g++8
-          artifacts: true
-    coverage: '/^TOTAL.*\s+(\d+%)$/'
-    <<: *test_gcov_definition
-
-compile_release_g++7:
-    variables:
-        CXX: "g++-7"
-        CC: "gcc-7"
-        BUILD_TYPE: "Release"
-        GENERATOR: "Unix Makefiles"
-    tags:
-        - g++-7
-        - cmake
-    <<: *compile_definition
-
-test_gcov_release_g++7:
-    variables:
-        GCOV_EXECUTABLE: "gcov-7"
-    tags:
-        - g++-7
-        - cmake
-    needs:
-        - job: compile_release_g++7
+        - job: compile_debian_10_armhf
           artifacts: true
     <<: *test_gcov_definition
 
-compile_debug_g++7:
-    variables:
-        CXX: "g++-7"
-        CC: "gcc-7"
-        BUILD_TYPE: "Debug"
-        GENERATOR: "Unix Makefiles"
+compile_ubuntu_20.04_amd64:
     tags:
-        - g++-7
-        - cmake
+        - compiler
+        - ubuntu-20.04-amd64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [7, 8, 9, 10]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8, 9, 10]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
     <<: *compile_definition
 
-test_gcov_debug_g++7:
-    variables:
-        GCOV_EXECUTABLE: "gcov-7"
+test_gcov_ubuntu_20.04_amd64:
     tags:
-        - g++-7
-        - cmake
+        - compiler
+        - ubuntu-20.04-amd64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [7, 8, 9, 10]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8, 9, 10]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
     needs:
-        - job: compile_debug_g++7
-          artifacts: true
-    coverage: '/^TOTAL.*\s+(\d+%)$/'
-    <<: *test_gcov_definition
-
-compile_release_clang++7:
-    variables:
-        CXX: "clang++-7"
-        CC: "clang-7"
-        BUILD_TYPE: "Release"
-        GENERATOR: "Unix Makefiles"
-    tags:
-        - clang++-7
-        - cmake
-    <<: *compile_definition
-
-test_gcov_release_clang++7:
-    variables:
-        GCOV_EXECUTABLE: "llvm-cov-7 gcov"
-    tags:
-        - clang++-7
-        - cmake
-    needs:
-        - job: compile_release_clang++7
+        - job: compile_ubuntu_20.04_amd64
           artifacts: true
     <<: *test_gcov_definition
 
-compile_debug_clang++7:
-    variables:
-        CXX: "clang++-7"
-        CC: "clang-7"
-        BUILD_TYPE: "Debug"
-        GENERATOR: "Unix Makefiles"
+compile_ubuntu_20.04_arm64:
     tags:
-        - clang++-7
-        - cmake
+        - compiler
+        - ubuntu-20.04-arm64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [7, 8, 9, 10]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8, 9, 10]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
     <<: *compile_definition
 
-test_gcov_debug_clang++7:
-    variables:
-        GCOV_EXECUTABLE: "llvm-cov-7 gcov"
+test_gcov_ubuntu_20.04_arm64:
     tags:
-        - clang++-7
-        - cmake
+        - compiler
+        - ubuntu-20.04-arm64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [7, 8, 9, 10]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8, 9, 10]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
     needs:
-        - job: compile_debug_clang++7
-          artifacts: true
-    coverage: '/^TOTAL.*\s+(\d+%)$/'
-    <<: *test_gcov_definition
-
-compile_release_clang++8:
-    variables:
-        CXX: "clang++-8"
-        CC: "clang-8"
-        BUILD_TYPE: "Release"
-        GENERATOR: "Unix Makefiles"
-    tags:
-        - clang++-8
-        - cmake
-    <<: *compile_definition
-
-test_gcov_release_clang++8:
-    variables:
-        GCOV_EXECUTABLE: "llvm-cov-8 gcov"
-    tags:
-        - clang++-8
-        - cmake
-    needs:
-        - job: compile_release_clang++8
+        - job: compile_ubuntu_20.04_arm64
           artifacts: true
     <<: *test_gcov_definition
 
-compile_debug_clang++8:
-    variables:
-        CXX: "clang++-8"
-        CC: "clang-8"
-        BUILD_TYPE: "Debug"
-        GENERATOR: "Unix Makefiles"
+compile_ubuntu_21.04_amd64:
     tags:
-        - clang++-8
-        - cmake
+        - compiler
+        - ubuntu-21.04-amd64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [11, 12]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [11]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
     <<: *compile_definition
 
-test_gcov_debug_clang++8:
-    variables:
-        GCOV_EXECUTABLE: "llvm-cov-8 gcov"
+test_gcov_ubuntu_21.04_amd64:
     tags:
-        - clang++-8
-        - cmake
+        - compiler
+        - ubuntu-21.04-amd64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [11, 12]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [11]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
     needs:
-        - job: compile_debug_clang++8
-          artifacts: true
-    coverage: '/^TOTAL.*\s+(\d+%)$/'
-    <<: *test_gcov_definition
-
-compile_release_clang++9:
-    variables:
-        CXX: "clang++-9"
-        CC: "clang-9"
-        BUILD_TYPE: "Release"
-        GENERATOR: "Unix Makefiles"
-    tags:
-        - clang++-9
-        - cmake
-    <<: *compile_definition
-
-test_gcov_release_clang++9:
-    variables:
-        GCOV_EXECUTABLE: "llvm-cov-9 gcov"
-    tags:
-        - clang++-9
-        - cmake
-    needs:
-        - job: compile_release_clang++9
+        - job: compile_ubuntu_21.04_amd64
           artifacts: true
     <<: *test_gcov_definition
 
-compile_debug_clang++9:
-    variables:
-        CXX: "clang++-9"
-        CC: "clang-9"
-        BUILD_TYPE: "Debug"
-        GENERATOR: "Unix Makefiles"
+compile_ubuntu_21.04_arm64:
     tags:
-        - clang++-9
-        - cmake
+        - compiler
+        - ubuntu-21.04-arm64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [11, 12]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [11]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
     <<: *compile_definition
 
-test_gcov_debug_clang++9:
-    variables:
-        GCOV_EXECUTABLE: "llvm-cov-9 gcov"
+test_gcov_ubuntu_21.04_arm64:
     tags:
-        - clang++-9
-        - cmake
+        - compiler
+        - ubuntu-21.04-arm64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [11, 12]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [11]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
     needs:
-        - job: compile_debug_clang++9
+        - job: compile_ubuntu_21.04_arm64
           artifacts: true
-    coverage: '/^TOTAL.*\s+(\d+%)$/'
     <<: *test_gcov_definition
 
-compile_debug_clang-tidy-7:
-    variables:
-        CXX: "clang++-7"
-        CC: "clang-7"
-        CLANG_TIDY: "clang-tidy-7"
-        BUILD_TYPE: "Debug"
-        GENERATOR: "Unix Makefiles"
+compile_clang_tidy_ubuntu_20.04_amd64:
     tags:
-        - clang++-7
-        - cmake
+        - compiler
+        - ubuntu-20.04-amd64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [10]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
     <<: *compile_clang_tidy_definition
 
-compile_debug_clang-tidy-8:
-    variables:
-        CXX: "clang++-8"
-        CC: "clang-8"
-        CLANG_TIDY: "clang-tidy-8"
-        BUILD_TYPE: "Debug"
-        GENERATOR: "Unix Makefiles"
+compile_clang_tidy_ubuntu_21.04_amd64:
     tags:
-        - clang++-8
-        - cmake
+        - compiler
+        - ubuntu-21.04-amd64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [11, 12]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
     <<: *compile_clang_tidy_definition
 
-compile_debug_clang-tidy-9:
-    variables:
-        CXX: "clang++-9"
-        CC: "clang-9"
-        CLANG_TIDY: "clang-tidy-9"
-        BUILD_TYPE: "Debug"
-        GENERATOR: "Unix Makefiles"
+compile_install_debian_10_amd64:
     tags:
-        - clang++-9
-        - cmake
-    <<: *compile_clang_tidy_definition
-
-compile_install_debug_ninja_clang++9:
-    variables:
-        CXX: "clang++-9"
-        CC: "clang-9"
-        BUILD_TYPE: "Debug"
-        GENERATOR: "Ninja"
-    tags:
-        - clang++-9
-        - cmake
+        - compiler
+        - debian-10-amd64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [7]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
     <<: *compile_install_definition
 
-compile_install_release_ninja_clang++9:
-    variables:
-        CXX: "clang++-9"
-        CC: "clang-9"
-        BUILD_TYPE: "Release"
-        GENERATOR: "Ninja"
+compile_install_debian_10_arm64:
     tags:
-        - clang++-9
-        - cmake
+        - compiler
+        - debian-10-arm64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [7]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
     <<: *compile_install_definition
 
-compile_release_ninja_g++9:
+compile_install_debian_10_armhf:
+    tags:
+        - compiler
+        - debian-10-armhf
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [7]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+    <<: *compile_install_definition
+
+compile_install_ubuntu_20.04_amd64:
+    tags:
+        - compiler
+        - ubuntu-20.04-amd64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [7, 8, 9, 10]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8, 9, 10]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+    <<: *compile_install_definition
+
+compile_install_ubuntu_20.04_arm64:
+    tags:
+        - compiler
+        - ubuntu-20.04-arm64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [7, 8, 9, 10]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8, 9, 10]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+    <<: *compile_install_definition
+
+compile_install_ubuntu_21.04_amd64:
+    tags:
+        - compiler
+        - ubuntu-21.04-amd64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [11, 12]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [11]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+    <<: *compile_install_definition
+
+compile_install_ubuntu_21.04_arm64:
+    tags:
+        - compiler
+        - ubuntu-21.04-arm64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [11, 12]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [11]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+    <<: *compile_install_definition
+
+compile_release_address_leak_sanitizer_gcc11_amd64:
     variables:
-        CXX: "g++-9"
-        CC: "gcc-9"
+        COMPILER: gcc
+        COMPILER_VERSION: 11
         BUILD_TYPE: "Release"
-        GENERATOR: "Ninja"
+        GENERATOR: "Unix Makefiles"
+        ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_ADDRESS=On -DlibClaPP_ENABLE_SANITIZER_LEAK=On"
     tags:
-        - g++-9
-        - cmake
+        - ubuntu-21.04-amd64
+        - compiler
     <<: *compile_definition
 
-test_gcov_release_ninja_g++9:
+test_release_address_leak_sanitizer_gcc11_amd64:
     variables:
-        GCOV_EXECUTABLE: "gcov-9"
+        COMPILER: gcc
+        COMPILER_VERSION: 11
+        BUILD_TYPE: "Release"
+        GENERATOR: "Unix Makefiles"
     tags:
-        - g++-9
-        - cmake
+        - ubuntu-21.04-amd64
+        - compiler
     needs:
-        - job: compile_release_ninja_g++9
+        - job: compile_release_address_leak_sanitizer_gcc11_amd64
           artifacts: true
-    <<: *test_gcov_definition
+    <<: *test_definition
 
-compile_debug_ninja_g++9:
+compile_debug_address_leak_sanitizer_gcc11_amd64:
     variables:
-        CXX: "g++-9"
-        CC: "gcc-9"
-        BUILD_TYPE: "Debug"
-        GENERATOR: "Ninja"
+        COMPILER: gcc
+        COMPILER_VERSION: 11
+        BUILD_TYPE: "Release"
+        GENERATOR: "Unix Makefiles"
+        ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_ADDRESS=On -DlibClaPP_ENABLE_SANITIZER_LEAK=On"
     tags:
-        - g++-9
-        - cmake
+        - ubuntu-21.04-amd64
+        - compiler
     <<: *compile_definition
 
-test_gcov_debug_ninja_g++9:
+test_debug_address_leak_sanitizer_gcc11_amd64:
     variables:
-        GCOV_EXECUTABLE: "gcov-9"
+        COMPILER: gcc
+        COMPILER_VERSION: 11
+        BUILD_TYPE: "Release"
+        GENERATOR: "Unix Makefiles"
     tags:
-        - g++-9
-        - cmake
+        - ubuntu-21.04-amd64
+        - compiler
     needs:
-        - job: compile_debug_ninja_g++9
+        - job: compile_debug_address_leak_sanitizer_gcc11_amd64
           artifacts: true
-    coverage: '/^TOTAL.*\s+(\d+%)$/'
-    <<: *test_gcov_definition
+    <<: *test_definition
 
-#TODO: address sanitizer currently gives false positives on arm64
-#compile_release_address_sanitizer_g++9:
-#    variables:
-#        CXX: "g++-9"
-#        CC: "gcc-9"
-#        BUILD_TYPE: "Release"
-#        GENERATOR: "Unix Makefiles"
-#        ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_ADDRESS=On"
-#    tags:
-#        - g++-9
-#        - cmake
-#    <<: *compile_definition
-#
-#test_release_address_sanitizer_g++9:
-#    tags:
-#        - g++-9
-#        - cmake
-#    needs:
-#        - job: compile_release_address_sanitizer_g++9
-#          artifacts: true
-#    <<: *test_definition
-#
-#compile_debug_address_sanitizer_g++9:
-#    variables:
-#        CXX: "g++-9"
-#        CC: "gcc-9"
-#        BUILD_TYPE: "Debug"
-#        GENERATOR: "Unix Makefiles"
-#        ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_ADDRESS=On"
-#    tags:
-#        - g++-9
-#        - cmake
-#    <<: *compile_definition
-#
-#test_debug_address_sanitizer_g++9:
-#    tags:
-#        - g++-9
-#        - cmake
-#    needs:
-#        - job: compile_debug_address_sanitizer_g++9
-#          artifacts: true
-#    coverage: '/^TOTAL.*\s+(\d+%)$/'
-#    <<: *test_definition
-
-compile_release_undefined_behavior_sanitizer_g++9:
+compile_release_thread_sanitizer_gcc11_amd64:
     variables:
-        CXX: "g++-9"
-        CC: "gcc-9"
+        COMPILER: gcc
+        COMPILER_VERSION: 11
+        BUILD_TYPE: "Release"
+        GENERATOR: "Unix Makefiles"
+        ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_THREAD=On"
+    tags:
+        - ubuntu-21.04-amd64
+        - compiler
+    <<: *compile_definition
+
+test_release_thread_sanitizer_gcc11_amd64:
+    variables:
+        COMPILER: gcc
+        COMPILER_VERSION: 11
+        BUILD_TYPE: "Release"
+        GENERATOR: "Unix Makefiles"
+    tags:
+        - ubuntu-21.04-amd64
+        - compiler
+    needs:
+        - job: compile_release_thread_sanitizer_gcc11_amd64
+          artifacts: true
+    <<: *test_definition
+
+compile_debug_thread_sanitizer_gcc11_amd64:
+    variables:
+        COMPILER: gcc
+        COMPILER_VERSION: 11
+        BUILD_TYPE: "Release"
+        GENERATOR: "Unix Makefiles"
+        ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_THREAD=On"
+    tags:
+        - ubuntu-21.04-amd64
+        - compiler
+    <<: *compile_definition
+
+test_debug_thread_sanitizer_gcc11_amd64:
+    variables:
+        COMPILER: gcc
+        COMPILER_VERSION: 11
+        BUILD_TYPE: "Release"
+        GENERATOR: "Unix Makefiles"
+    tags:
+        - ubuntu-21.04-amd64
+        - compiler
+    needs:
+        - job: compile_debug_thread_sanitizer_gcc11_amd64
+          artifacts: true
+    <<: *test_definition
+
+compile_release_undefined_behavior_sanitizer_gcc11_amd64:
+    variables:
+        COMPILER: gcc
+        COMPILER_VERSION: 11
         BUILD_TYPE: "Release"
         GENERATOR: "Unix Makefiles"
         ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_UNDEFINED_BEHAVIOR=On"
     tags:
-        - g++-9
-        - cmake
+        - ubuntu-21.04-amd64
+        - compiler
     <<: *compile_definition
 
-test_release_undefined_behavior_sanitizer_g++9:
-    tags:
-        - g++-9
-        - cmake
-    needs:
-        - job: compile_release_undefined_behavior_sanitizer_g++9
-          artifacts: true
-    <<: *test_definition
-
-compile_debug_undefined_behavior_sanitizer_g++9:
+test_release_undefined_behavior_sanitizer_gcc11_amd64:
     variables:
-        CXX: "g++-9"
-        CC: "gcc-9"
-        BUILD_TYPE: "Debug"
-        GENERATOR: "Unix Makefiles"
-        ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_UNDEFINED_BEHAVIOR=On"
-    tags:
-        - g++-9
-        - cmake
-    <<: *compile_definition
-
-test_debug_undefined_behavior_sanitizer_g++9:
-    tags:
-        - g++-9
-        - cmake
-    needs:
-        - job: compile_debug_undefined_behavior_sanitizer_g++9
-          artifacts: true
-    coverage: '/^TOTAL.*\s+(\d+%)$/'
-    <<: *test_definition
-
-compile_release_address_sanitizer_clang++9:
-    variables:
-        CXX: "clang++-9"
-        CC: "clang-9"
+        COMPILER: gcc
+        COMPILER_VERSION: 11
         BUILD_TYPE: "Release"
         GENERATOR: "Unix Makefiles"
-        ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_ADDRESS=On"
     tags:
-        - clang++-9
-        - cmake
-    <<: *compile_definition
-
-test_release_address_sanitizer_clang++9:
-    tags:
-        - clang++-9
-        - cmake
+        - ubuntu-21.04-amd64
+        - compiler
     needs:
-        - job: compile_release_address_sanitizer_clang++9
+        - job: compile_release_undefined_behavior_sanitizer_gcc11_amd64
           artifacts: true
     <<: *test_definition
 
-compile_debug_address_sanitizer_clang++9:
+compile_debug_undefined_behavior_sanitizer_gcc11_amd64:
     variables:
-        CXX: "clang++-9"
-        CC: "clang-9"
-        BUILD_TYPE: "Debug"
-        GENERATOR: "Unix Makefiles"
-        ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_ADDRESS=On"
-    tags:
-        - clang++-9
-        - cmake
-    <<: *compile_definition
-
-test_debug_address_sanitizer_clang++9:
-    tags:
-        - clang++-9
-        - cmake
-    needs:
-        - job: compile_debug_address_sanitizer_clang++9
-          artifacts: true
-    coverage: '/^TOTAL.*\s+(\d+%)$/'
-    <<: *test_definition
-
-compile_release_undefined_behavior_sanitizer_clang++9:
-    variables:
-        CXX: "clang++-9"
-        CC: "clang-9"
+        COMPILER: gcc
+        COMPILER_VERSION: 11
         BUILD_TYPE: "Release"
         GENERATOR: "Unix Makefiles"
         ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_UNDEFINED_BEHAVIOR=On"
     tags:
-        - clang++-9
-        - cmake
+        - ubuntu-21.04-amd64
+        - compiler
     <<: *compile_definition
 
-test_release_undefined_behavior_sanitizer_clang++9:
+test_debug_undefined_behavior_sanitizer_gcc11_amd64:
+    variables:
+        COMPILER: gcc
+        COMPILER_VERSION: 11
+        BUILD_TYPE: "Release"
+        GENERATOR: "Unix Makefiles"
     tags:
-        - clang++-9
-        - cmake
+        - ubuntu-21.04-amd64
+        - compiler
     needs:
-        - job: compile_release_undefined_behavior_sanitizer_clang++9
+        - job: compile_debug_undefined_behavior_sanitizer_gcc11_amd64
           artifacts: true
     <<: *test_definition
 
-compile_debug_undefined_behavior_sanitizer_clang++9:
+compile_release_address_leak_sanitizer_clang12_amd64:
     variables:
-        CXX: "clang++-9"
-        CC: "clang-9"
-        BUILD_TYPE: "Debug"
+        COMPILER: clang
+        COMPILER_VERSION: 12
+        BUILD_TYPE: "Release"
+        GENERATOR: "Unix Makefiles"
+        ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_ADDRESS=On -DlibClaPP_ENABLE_SANITIZER_LEAK=On"
+    tags:
+        - ubuntu-21.04-amd64
+        - compiler
+    <<: *compile_definition
+
+test_release_address_leak_sanitizer_clang12_amd64:
+    variables:
+        COMPILER: clang
+        COMPILER_VERSION: 12
+        BUILD_TYPE: "Release"
+        GENERATOR: "Unix Makefiles"
+    tags:
+        - ubuntu-21.04-amd64
+        - compiler
+    needs:
+        - job: compile_release_address_leak_sanitizer_clang12_amd64
+          artifacts: true
+    <<: *test_definition
+
+compile_debug_address_leak_sanitizer_clang12_amd64:
+    variables:
+        COMPILER: clang
+        COMPILER_VERSION: 12
+        BUILD_TYPE: "Release"
+        GENERATOR: "Unix Makefiles"
+        ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_ADDRESS=On -DlibClaPP_ENABLE_SANITIZER_LEAK=On"
+    tags:
+        - ubuntu-21.04-amd64
+        - compiler
+    <<: *compile_definition
+
+test_debug_address_leak_sanitizer_clang12_amd64:
+    variables:
+        COMPILER: clang
+        COMPILER_VERSION: 12
+        BUILD_TYPE: "Release"
+        GENERATOR: "Unix Makefiles"
+    tags:
+        - ubuntu-21.04-amd64
+        - compiler
+    needs:
+        - job: compile_debug_address_leak_sanitizer_clang12_amd64
+          artifacts: true
+    <<: *test_definition
+
+compile_release_undefined_behavior_sanitizer_clang12_amd64:
+    variables:
+        COMPILER: clang
+        COMPILER_VERSION: 12
+        BUILD_TYPE: "Release"
         GENERATOR: "Unix Makefiles"
         ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_UNDEFINED_BEHAVIOR=On"
     tags:
-        - clang++-9
-        - cmake
+        - ubuntu-21.04-amd64
+        - compiler
     <<: *compile_definition
 
-test_debug_undefined_behavior_sanitizer_clang++9:
+test_release_undefined_behavior_sanitizer_clang12_amd64:
+    variables:
+        COMPILER: clang
+        COMPILER_VERSION: 12
+        BUILD_TYPE: "Release"
+        GENERATOR: "Unix Makefiles"
     tags:
-        - clang++-9
-        - cmake
+        - ubuntu-21.04-amd64
+        - compiler
     needs:
-        - job: compile_debug_undefined_behavior_sanitizer_clang++9
+        - job: compile_release_undefined_behavior_sanitizer_clang12_amd64
           artifacts: true
-    coverage: '/^TOTAL.*\s+(\d+%)$/'
+    <<: *test_definition
+
+compile_debug_undefined_behavior_sanitizer_clang12_amd64:
+    variables:
+        COMPILER: clang
+        COMPILER_VERSION: 12
+        BUILD_TYPE: "Release"
+        GENERATOR: "Unix Makefiles"
+        ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_UNDEFINED_BEHAVIOR=On"
+    tags:
+        - ubuntu-21.04-amd64
+        - compiler
+    <<: *compile_definition
+
+test_debug_undefined_behavior_sanitizer_clang12_amd64:
+    variables:
+        COMPILER: clang
+        COMPILER_VERSION: 12
+        BUILD_TYPE: "Release"
+        GENERATOR: "Unix Makefiles"
+    tags:
+        - ubuntu-21.04-amd64
+        - compiler
+    needs:
+        - job: compile_debug_undefined_behavior_sanitizer_clang12_amd64
+          artifacts: true
+    <<: *test_definition
+
+compile_release_thread_sanitizer_clang12_amd64:
+    variables:
+        COMPILER: clang
+        COMPILER_VERSION: 12
+        BUILD_TYPE: "Release"
+        GENERATOR: "Unix Makefiles"
+        ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_THREAD=On"
+    tags:
+        - ubuntu-21.04-amd64
+        - compiler
+    <<: *compile_definition
+
+test_release_thread_sanitizer_clang12_amd64:
+    variables:
+        COMPILER: clang
+        COMPILER_VERSION: 12
+        BUILD_TYPE: "Release"
+        GENERATOR: "Unix Makefiles"
+    tags:
+        - ubuntu-21.04-amd64
+        - compiler
+    needs:
+        - job: compile_release_thread_sanitizer_clang12_amd64
+          artifacts: true
+    <<: *test_definition
+
+compile_debug_thread_sanitizer_clang12_amd64:
+    variables:
+        COMPILER: clang
+        COMPILER_VERSION: 12
+        BUILD_TYPE: "Release"
+        GENERATOR: "Unix Makefiles"
+        ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_THREAD=On"
+    tags:
+        - ubuntu-21.04-amd64
+        - compiler
+    <<: *compile_definition
+
+test_debug_thread_sanitizer_clang12_amd64:
+    variables:
+        COMPILER: clang
+        COMPILER_VERSION: 12
+        BUILD_TYPE: "Release"
+        GENERATOR: "Unix Makefiles"
+    tags:
+        - ubuntu-21.04-amd64
+        - compiler
+    needs:
+        - job: compile_debug_thread_sanitizer_clang12_amd64
+          artifacts: true
     <<: *test_definition
