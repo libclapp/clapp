@@ -22,6 +22,22 @@
 #include <numeric>
 #include <sstream>
 
+namespace clapp {
+inline namespace option {
+template <typename T>
+basic_param_option_t<T>::~basic_param_option_t() = default;
+
+template <typename T>
+basic_vector_param_option_t<T>::~basic_vector_param_option_t() = default;
+
+template <typename T>
+basic_option_t<T>::~basic_option_t() = default;
+
+template <int EXIT_CODE>
+basic_help_option_t<EXIT_CODE>::~basic_help_option_t() = default;
+}  // namespace option
+}  // namespace clapp
+
 template <typename T>
 inline void clapp::option::gen_opt_conf_process_params([
     [maybe_unused]] opt_params_t<T>& opt_params) {}
@@ -305,9 +321,6 @@ clapp::option::basic_param_option_t<T>::basic_param_option_t(
 }
 
 template <typename T>
-clapp::option::basic_param_option_t<T>::~basic_param_option_t() = default;
-
-template <typename T>
 typename clapp::option::basic_param_option_t<T>::callbacks_t
 clapp::option::basic_param_option_t<T>::create_callbacks(
     basic_param_option_t<T>* inst) {
@@ -375,10 +388,6 @@ clapp::option::basic_vector_param_option_t<T>::basic_vector_param_option_t(
 }
 
 template <typename T>
-clapp::option::basic_vector_param_option_t<T>::~basic_vector_param_option_t() =
-    default;
-
-template <typename T>
 typename clapp::basic_vector_param_option_t<T>::callbacks_t
 clapp::option::basic_vector_param_option_t<T>::create_callbacks(
     basic_vector_param_option_t<T>* inst) {
@@ -439,9 +448,6 @@ clapp::option::basic_option_t<T>::basic_option_t(clapp::basic_parser_t& parser,
 }
 
 template <typename T>
-clapp::option::basic_option_t<T>::~basic_option_t() = default;
-
-template <typename T>
 T clapp::option::basic_option_t<T>::value() const {
     if (_value) {
         return _value.value();
@@ -488,9 +494,6 @@ clapp::option::basic_help_option_t<EXIT_CODE>::gen_func_print_help_and_exit(
     basic_parser_t& parser) {
     return parser.gen_func_print_help_and_exit(EXIT_CODE);
 }
-
-template <int EXIT_CODE>
-clapp::option::basic_help_option_t<EXIT_CODE>::~basic_help_option_t() = default;
 
 template <typename... Params>
 clapp::option::count_option_t::count_option_t(clapp::basic_parser_t& parser,
