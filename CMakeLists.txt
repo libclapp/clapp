@@ -72,7 +72,7 @@ if(libClaPP_CLANG_TIDY)
 
     if(CLANG_TIDY)
         message(STATUS "clang-tidy found: ${CLANG_TIDY}")
-        set(CLANG_TIDY_ARGS "${CLANG_TIDY}" "-header-filter=src/include;-warnings-as-errors=*;-checks=*,-google-runtime-references,-fuchsia-default-arguments,-fuchsia-overloaded-operator,-cert-dcl50-cpp,-clang-diagnostic-unused-command-line-argument,-modernize-use-trailing-return-type,-fuchsia-default-arguments-calls")
+        set(CLANG_TIDY_ARGS "${CLANG_TIDY}" "-header-filter=src/include;-warnings-as-errors=*;-checks=*,-google-runtime-references,-fuchsia-default-arguments,-fuchsia-overloaded-operator,-cert-dcl50-cpp,-clang-diagnostic-unused-command-line-argument,-modernize-use-trailing-return-type,-fuchsia-default-arguments-calls,-llvmlibc-*")
     endif()
 endif()
 
