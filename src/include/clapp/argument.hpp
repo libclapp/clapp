@@ -20,6 +20,14 @@
 #include <clapp/value.h>
 #include <numeric>
 
+namespace clapp {
+inline namespace argument {
+template <typename T>
+basic_argument_t<T>::~basic_argument_t() = default;
+
+}
+}  // namespace clapp
+
 template <typename T>
 inline void clapp::argument::gen_arg_conf_process_params(arg_params_t<T>&) {}
 
@@ -213,9 +221,6 @@ template <typename T>
 constexpr bool clapp::argument::basic_argument_t<T>::given() const noexcept {
     return _given;
 }
-
-template <typename T>
-clapp::argument::basic_argument_t<T>::~basic_argument_t() = default;
 
 template <typename T>
 void clapp::argument::basic_argument_t<T>::found_entry(
