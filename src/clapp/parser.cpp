@@ -40,9 +40,8 @@ typename clapp::parser::basic_parser_t::variant_opt_conf_vec_t::const_iterator
 clapp::parser::basic_parser_t::find_option(const std::string_view opt) const {
     for (variant_opt_conf_vec_t::const_iterator it{options.begin()};
          it != options.end(); it++) {
-        if (std::visit(
-                [opt](auto&& o) -> bool { return o.contains_option(opt); },
-                *it)) {
+        if (std::visit([opt](auto&& o) { return bool{o.contains_option(opt)}; },
+                       *it)) {
             return it;
         }
     }
@@ -53,9 +52,8 @@ typename clapp::parser::basic_parser_t::variant_opt_conf_vec_t::const_iterator
 clapp::parser::basic_parser_t::find_option(const char opt) const {
     for (variant_opt_conf_vec_t::const_iterator it{options.begin()};
          it != options.end(); it++) {
-        if (std::visit(
-                [opt](auto&& o) -> bool { return o.contains_option(opt); },
-                *it)) {
+        if (std::visit([opt](auto&& o) { return bool{o.contains_option(opt)}; },
+                       *it)) {
             return it;
         }
     }
@@ -67,7 +65,7 @@ clapp::parser::basic_parser_t::get_option_help() const {
     typename clapp::parser::basic_parser_t::help_entry_vec_t ret;
     for (auto& option : options) {
         ret.push_back(std::visit(
-            [](auto&& o) -> help_entry_t { return o.get_option_help(); },
+            [](auto&& o) { return help_entry_t{o.get_option_help()}; },
             option));
     }
     return ret;
@@ -78,7 +76,7 @@ clapp::parser::basic_parser_t::get_argument_help() const {
     typename clapp::parser::basic_parser_t::help_entry_vec_t ret;
     for (auto& argument : arguments) {
         ret.push_back(std::visit(
-            [](auto&& a) -> help_entry_t { return a.get_argument_help(); },
+            [](auto&& a) { return help_entry_t{a.get_argument_help()}; },
             argument));
     }
     return ret;
@@ -363,7 +361,7 @@ clapp::parser::basic_parser_t::parse_arg(const std::string_view argument,
     if (num_arguments > 0) {
         if (num_processed_arguments < num_arguments) {
             return std::visit(
-                [this, argument, it](auto&& a) -> parse_result_t {
+                [this, argument, it](auto&& a) {
                     a.argument(argument);
                     num_processed_arguments++;
                     return parse_result_t{it + 1, std::nullopt, std::nullopt};
@@ -374,7 +372,7 @@ clapp::parser::basic_parser_t::parse_arg(const std::string_view argument,
         if (std::holds_alternative<variadic_arg_conf_t>(
                 arguments.at(num_arguments - 1))) {
             return std::visit(
-                [this, argument, it](auto&& a) -> parse_result_t {
+                [this, argument, it](auto&& a) {
                     a.argument(argument);
                     num_processed_arguments++;
                     return parse_result_t{it + 1, std::nullopt, std::nullopt};
@@ -404,7 +402,7 @@ clapp::parser::basic_parser_t::parse_long(const std::string_view option,
         return parse_result_t{it, std::nullopt, std::string{opt}};
     }
     return std::visit(
-        [option, equal_index, &it, opt, end](auto&& o) -> parse_result_t {
+        [option, equal_index, &it, opt, end](auto&& o) {
             using current_option_type_t = std::decay_t<decltype(o)>;
             typename current_option_type_t::long_opt_conf_vec_cit_t opt_it{
                 o.find_option(opt)};
@@ -450,8 +448,7 @@ clapp::parser::basic_parser_t::parse_short(const std::string_view option,
             return parse_result_t{it, option[i], std::nullopt};
         }
         std::optional<parse_result_t> ret{std::visit(
-            [option, i, equal_index, &it,
-             end](auto&& o) -> std::optional<parse_result_t> {
+            [option, i, equal_index, &it, end](auto&& o) {
                 using current_option_type_t = std::decay_t<decltype(o)>;
                 typename current_option_type_t::short_opt_conf_vec_cit_t opt_it{
                     o.find_option(option[i])};
@@ -468,8 +465,8 @@ clapp::parser::basic_parser_t::parse_short(const std::string_view option,
                         opt_it->func(
                             option[i],
                             std::string_view{&(option[equal_index + 1])});
-                        return parse_result_t{it + 1, std::nullopt,
-                                              std::nullopt};
+                        return std::make_optional(
+                            parse_result_t{it + 1, std::nullopt, std::nullopt});
                     }
                 }
                 if (i == option.size() - 1) {
@@ -484,12 +481,12 @@ clapp::parser::basic_parser_t::parse_short(const std::string_view option,
                         }
                         it++;
                         opt_it->func(option[i], std::string_view{*it});
-                        return parse_result_t{it + 1, std::nullopt,
-                                              std::nullopt};
+                        return std::make_optional(
+                            parse_result_t{it + 1, std::nullopt, std::nullopt});
                     } else {
                         opt_it->func(option[i]);
-                        return parse_result_t{it + 1, std::nullopt,
-                                              std::nullopt};
+                        return std::make_optional(
+                            parse_result_t{it + 1, std::nullopt, std::nullopt});
                     }
                 }
                 if constexpr (!std::is_same<current_option_type_t,
@@ -499,7 +496,7 @@ clapp::parser::basic_parser_t::parse_short(const std::string_view option,
                     throw clapp::exception::option_param_exception_t(ss.str());
                 } else {
                     opt_it->func(option[i]);
-                    return std::nullopt;
+                    return std::optional<parse_result_t>{};
                 }
             },
             *found)};
