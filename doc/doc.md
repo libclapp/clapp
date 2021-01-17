@@ -575,13 +575,13 @@ If the previous example listing is executed, you get the following output:
 # Print the help message:
 $ ./libclapp_doc_simple_main_parser -h  # this is the same as with option `--help`
 Usage:
-./libclapp_doc_simple_main_parser <string-arg> [-h|--help]
+./libclapp_doc_simple_main_parser [-h|--help] <string-arg>
 
-  Mandatory Arguments:
-    string-arg String argument
+  Arguments:
+    string-arg String argument (mandatory)
 
-  Optional Options:
-    -h|--help  Show help options.
+  Options:
+    -h|--help  Show help options. (optional)
 
 # Give mandatory argument:
 $ ./libclapp_doc_simple_main_parser my-string
@@ -796,48 +796,47 @@ While giving `false` disables the interitation from the parent parser.
 # Print the overall help message:
 $ ./libclapp_doc_simple_sub_parser --help
 Usage:
-./libclapp_doc_simple_sub_parser [-h|--help] [-i=<arg>] mode1 [-h|--help] [-s=<arg>]
-./libclapp_doc_simple_sub_parser [-h|--help] [-i=<arg>] mode2 <string-arg> [-h|--help]
-./libclapp_doc_simple_sub_parser [-h|--help] [-i=<arg>]
+./libclapp_doc_simple_sub_parser [-h|--help] [-i=<param>] mode1 [-h|--help] [-s=<param>]
+./libclapp_doc_simple_sub_parser [-h|--help] [-i=<param>] mode2 [-h|--help] <string-arg>
+./libclapp_doc_simple_sub_parser [-h|--help] [-i=<param>]
+
+  Options:
+    -h|--help  Show help options. (optional)
+    -i=<param> Int option (optional)
 
   Subparser:
-    mode1          mode1 sub-parser.
-      Optional Options:
-        -h|--help  Show help options.
-        -s=<arg>   String param option.
+    mode1      mode1 sub-parser.
+      Options:
+        -h|--help  Show help options. (optional)
+        -s=<param> String param option. (optional)
 
+    mode2      mode2 sub-parser.
+      Arguments:
+        string-arg String argument (mandatory)
 
-    mode2          mode2 sub-parser.
-      Mandatory Arguments:
-        string-arg String argument
+      Options:
+        -h|--help  Show help options. (optional)
 
-      Optional Options:
-        -h|--help  Show help options.
-
-
-  Optional Options:
-    -h|--help      Show help options.
-    -i=<arg>       Int option
 
 # Print the help message of mode1:
 $ ./libclapp_doc_simple_sub_parser mode1 -h
 Usage:
-./libclapp_doc_simple_sub_parser [-h|--help] [-i=<arg>] mode1 [-h|--help] [-s=<arg>]
+./libclapp_doc_simple_sub_parser [-h|--help] [-i=<param>] mode1 [-h|--help] [-s=<param>]
 
-  Optional Options:
-    -h|--help  Show help options.
-    -s=<arg>   String param option.
+  Options:
+    -h|--help  Show help options. (optional)
+    -s=<param> String param option. (optional)
 
 # Print the help message of mode2:
 $ ./libclapp_doc_simple_sub_parser mode2 --help
 Usage:
-./libclapp_doc_simple_sub_parser [-h|--help] [-i=<arg>] mode2 <string-arg> [-h|--help]
+./libclapp_doc_simple_sub_parser [-h|--help] [-i=<param>] mode2 [-h|--help] <string-arg>
 
-  Mandatory Arguments:
-    string-arg String argument
+  Arguments:
+    string-arg String argument (mandatory)
 
-  Optional Options:
-    -h|--help  Show help options.
+  Options:
+    -h|--help  Show help options. (optional)
 
 # Give no sub-parser:
 $ ./libclapp_doc_simple_sub_parser
