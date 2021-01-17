@@ -901,9 +901,9 @@ TEST(parser, setAndCallPrintAndExitWithString) {
         pae.print_and_exit(text, exit_code);
     });
 
-    const std::string text{"text"};
+    const std::string_view text{"text"};
     const std::optional<int> exit_code;
-    EXPECT_CALL(pae, print_and_exit(std::string_view{text}, exit_code));
+    EXPECT_CALL(pae, print_and_exit(text, exit_code));
     stp.get_print_and_exit_func()(text, exit_code);
 }
 
@@ -915,9 +915,9 @@ TEST(parser, setAndCallPrintAndExitWithStringAndExitCode) {
         pae.print_and_exit(text, exit_code);
     });
 
-    const std::string text{"text-string"};
+    const std::string_view text{"text-string"};
     const std::optional<int> exit_code{10};
-    EXPECT_CALL(pae, print_and_exit(std::string_view{text}, exit_code));
+    EXPECT_CALL(pae, print_and_exit(text, exit_code));
     stp.get_print_and_exit_func()(text, exit_code);
 }
 

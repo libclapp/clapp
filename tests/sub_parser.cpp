@@ -300,8 +300,8 @@ TEST(subParser, constructSubParserSetAndCallPrintAndExitWithStringAndExitCode) {
     const std::string description{"sub parser"};
     simple_sub_parser_t sub{tp, sub_parser, description};
 
-    const std::string text{"text-string"};
+    const std::string_view text{"text-string"};
     const std::optional<int> exit_code{10};
-    EXPECT_CALL(pae, print_and_exit(std::string_view{text}, exit_code));
+    EXPECT_CALL(pae, print_and_exit(text, exit_code));
     sub.get_print_and_exit_func()(text, exit_code);
 }
