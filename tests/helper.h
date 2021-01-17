@@ -5,24 +5,17 @@ template <typename ARG, typename T>
 bool compare_value(const ARG& arg, const T& value,
                    ::testing::MatchResultListener* result_listener) {
     if constexpr (std::is_same<T, double>::value) {
-        ::testing::Matcher<double> matcher{
-            ::testing::DoubleNear(value, 0.0001)};
-        ::testing::StringMatchResultListener smrl;
-        if (!matcher.MatchAndExplain(arg, &smrl)) {
-            *result_listener << "false (" << smrl.str() << ")";
-            return false;
-        }
-        *result_listener << "true (approx)";
-        return true;
+        const double epsilon{0.0001};
+        const bool ret{std::fabs(arg - value) < epsilon};
+        *result_listener << (ret ? "true" : "false") << " (" << arg
+                         << " == " << value << " (approx, " << epsilon << "))";
+        return ret;
     } else if constexpr (std::is_same<T, float>::value) {
-        ::testing::Matcher<float> matcher{::testing::FloatNear(value, 0.01f)};
-        ::testing::StringMatchResultListener smrl;
-        if (!matcher.MatchAndExplain(arg, &smrl)) {
-            *result_listener << "false (" << smrl.str() << ")";
-            return false;
-        }
-        *result_listener << "true (approx)";
-        return true;
+        const float epsilon{0.01f};
+        const bool ret{std::fabs(arg - value) < epsilon};
+        *result_listener << (ret ? "true" : "false") << " (" << arg
+                         << " == " << value << " (approx, " << epsilon << "))";
+        return ret;
     } else {
         *result_listener << (arg == value ? "true" : "false");
         return arg == value;
