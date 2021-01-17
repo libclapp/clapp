@@ -63,9 +63,9 @@ clapp::parser::basic_parser_t::find_option(const char opt) const {
 typename clapp::parser::basic_parser_t::help_entry_vec_t
 clapp::parser::basic_parser_t::get_option_help() const {
     typename clapp::parser::basic_parser_t::help_entry_vec_t ret;
-    for (auto& option : options) {
+    for (const auto& option : options) {
         ret.push_back(std::visit(
-            [](auto&& o) { return help_entry_t{o.get_option_help()}; },
+            [](const auto& o) { return help_entry_t{o.get_option_help()}; },
             option));
     }
     return ret;
@@ -74,9 +74,9 @@ clapp::parser::basic_parser_t::get_option_help() const {
 typename clapp::parser::basic_parser_t::help_entry_vec_t
 clapp::parser::basic_parser_t::get_argument_help() const {
     typename clapp::parser::basic_parser_t::help_entry_vec_t ret;
-    for (auto& argument : arguments) {
+    for (const auto& argument : arguments) {
         ret.push_back(std::visit(
-            [](auto&& a) { return help_entry_t{a.get_argument_help()}; },
+            [](const auto& a) { return help_entry_t{a.get_argument_help()}; },
             argument));
     }
     return ret;
@@ -193,16 +193,17 @@ clapp::parser::basic_parser_t::gen_detailed_help_contents() const {
 std::string clapp::parser::basic_parser_t::gen_short_line() const {
     std::string short_line;
 
-    for (auto& option : options) {
-        short_line +=
-            " " + std::visit([](auto&& o) { return o.create_option_string(); },
-                             option);
-    }
-
-    for (auto& argument : arguments) {
+    for (const auto& option : options) {
         short_line +=
             " " +
-            std::visit([](auto&& a) { return a.create_argument_string(); },
+            std::visit([](const auto& o) { return o.create_option_string(); },
+                       option);
+    }
+
+    for (const auto& argument : arguments) {
+        short_line +=
+            " " +
+            std::visit([](const auto& a) { return a.create_argument_string(); },
                        argument);
     }
 
@@ -340,7 +341,7 @@ clapp::parser::basic_parser_t::parse_result_t clapp::basic_parser_t::parse(
 }
 
 void clapp::parser::basic_parser_t::validate() const {
-    for (auto& validate_func : validate_functions) {
+    for (const auto& validate_func : validate_functions) {
         validate_func();
     }
 }
