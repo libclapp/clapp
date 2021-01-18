@@ -111,4 +111,4 @@ This project uses a clang-format style based on the Google style (`clang-format-
 
 To format the whole project, use the following command:
 
-    clang-format-7 -i examples/*.cpp examples/*.h examples/*.hpp src/clapp/*.cpp src/include/clapp/*.hpp src/include/clapp/*.h tests/*.cpp tests/*.h tests/*.hpp
+    find src tests examples -iname *.h -o -iname *.cpp -o -iname *.c -o -iname *.hpp | xargs clang-format-7 -i
