@@ -395,7 +395,7 @@ clapp::parser::basic_parser_t::parse_arg(const std::string_view argument,
 clapp::parser::basic_parser_t::parse_result_t
 clapp::parser::basic_parser_t::parse_long(const std::string_view option,
                                           arg_iterator it, arg_iterator end) {
-    const std::size_t equal_index{option.find_first_of("=")};
+    const std::size_t equal_index{option.find_first_of('=')};
     const std::string_view opt{option.data(),
                                std::min(equal_index, option.size())};
     variant_opt_conf_vec_t::const_iterator found{find_option(opt)};
@@ -442,7 +442,7 @@ clapp::parser::basic_parser_t::parse_result_t
 clapp::parser::basic_parser_t::parse_short(const std::string_view option,
                                            arg_iterator it, arg_iterator end) {
     Expects(!option.empty());
-    const std::size_t equal_index{option.find_first_of("=")};
+    const std::size_t equal_index{option.find_first_of('=')};
     for (std::size_t i{0}; i < option.size(); i++) {
         variant_opt_conf_vec_t::const_iterator found{find_option(option[i])};
         if (found == options.end()) {
