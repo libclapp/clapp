@@ -36,20 +36,7 @@ if(libClaPP_ENABLE_IPO)
 endif()
 
 if(libClaPP_CLANG_TIDY)
-    if(NOT CLANG_TIDY)
-        find_program(CLANG_TIDY NAMES "clang-tidy" DOC "Path to clang-tidy executable")
-
-        if(NOT CLANG_TIDY)
-            message(STATUS "clang-tidy not found.")
-        else()
-            message(STATUS "found CLANG_TIDY by find_program().")
-        endif()
-    endif()
-
-    if(CLANG_TIDY)
-        message(STATUS "clang-tidy found: ${CLANG_TIDY}")
-        set(CLANG_TIDY_ARGS "${CLANG_TIDY}" "-header-filter=src/include;-warnings-as-errors=*;-checks=*,-google-runtime-references,-fuchsia-default-arguments,-fuchsia-overloaded-operator,-cert-dcl50-cpp,-clang-diagnostic-unused-command-line-argument,-modernize-use-trailing-return-type,-fuchsia-default-arguments-calls,-llvmlibc-*")
-    endif()
+    include(cmake/clang_tidy.cmake)
 endif()
 
 if(libClaPP_CPPCHECK)
