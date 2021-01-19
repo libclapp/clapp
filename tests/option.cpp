@@ -33,7 +33,7 @@ static std::optional<option_test_parser_t::variant_opt_conf_t> contains_option(
     OPTION_T&& option) {
     for (const auto& opt : options) {
         const bool found{std::visit(
-            [&option](auto&& o) -> bool {
+            [&option](auto&& o) {
                 if constexpr (std::is_same<
                                   typename std::decay<decltype(option)>::type,
                                   char>::value) {
@@ -63,7 +63,7 @@ template <typename OPTION_T, typename RESULT_LISTENER_T>
 static std::optional<option_test_parser_t::variant_opt_conf_t> contains_option(
     std::vector<option_test_parser_t::variant_opt_conf_t>& options,
     OPTION_T&& option, RESULT_LISTENER_T&& result_listener) {
-    if (options.size() == 0) {
+    if (options.empty()) {
         *result_listener
             << "Parser-options doesn't contain any options at all.";
         return std::nullopt;
@@ -78,29 +78,29 @@ static std::optional<option_test_parser_t::variant_opt_conf_t> contains_option(
     return ret;
 }
 
-MATCHER(BoolOptionNotGiven, "") {
+MATCHER(BoolOptionNotGiven, "Checks, if bool option not given.") {
     *result_listener << "bool-option: "
                      << (static_cast<bool>(arg) ? "true" : "false")
                      << ", has_value(): "
                      << (arg.has_value() ? "true" : "false")
                      << ", given(): " << (arg.given() ? "true" : "false")
                      << ", value(): " << (arg.value() ? "true" : "false");
-    return static_cast<bool>(arg) == true && arg.has_value() == true &&
-           arg.given() == false && arg.value() == false;
+    return static_cast<bool>(arg) && arg.has_value() && !arg.given() &&
+           !arg.value();
 }
 
-MATCHER(BoolOptionGiven, "") {
+MATCHER(BoolOptionGiven, "Checks, if bool option is given.") {
     *result_listener << "bool-option: "
                      << (static_cast<bool>(arg) ? "true" : "false")
                      << ", has_value(): "
                      << (arg.has_value() ? "true" : "false")
                      << ", given(): " << (arg.given() ? "true" : "false")
                      << ", value(): " << (arg.value() ? "true" : "false");
-    return static_cast<bool>(arg) == true && arg.has_value() == true &&
-           arg.given() == true && arg.value() == true;
+    return static_cast<bool>(arg) && arg.has_value() && arg.given() &&
+           arg.value();
 }
 
-MATCHER_P(NumCountOptionGiven, count, "") {
+MATCHER_P(NumCountOptionGiven, count, "Checks, if num-count option is given.") {
     *result_listener << "count-option: "
                      << (static_cast<bool>(arg) ? "true" : "false")
                      << ", has_value(): "
@@ -108,11 +108,12 @@ MATCHER_P(NumCountOptionGiven, count, "") {
                      << ", given(): " << (arg.given() ? "true" : "false")
                      << ", value(): " << count << "==" << arg.value() << " = "
                      << (arg.value() == count ? "true" : "false");
-    return static_cast<bool>(arg) == true && arg.has_value() == true &&
-           arg.given() == true && arg.value() == count;
+    return static_cast<bool>(arg) && arg.has_value() && arg.given() &&
+           arg.value() == count;
 }
 
-MATCHER_P(NumCountOptionNotGiven, count, "") {
+MATCHER_P(NumCountOptionNotGiven, count,
+          "Checks, if num-count option is not given.") {
     *result_listener << "count-option: "
                      << (static_cast<bool>(arg) ? "true" : "false")
                      << ", has_value(): "
@@ -120,18 +121,17 @@ MATCHER_P(NumCountOptionNotGiven, count, "") {
                      << ", given(): " << (arg.given() ? "true" : "false")
                      << ", value(): " << count << "==" << arg.value() << " = "
                      << (arg.value() == count ? "true" : "false");
-    return static_cast<bool>(arg) == true && arg.has_value() == true &&
-           arg.given() == false && arg.value() == count;
+    return static_cast<bool>(arg) && arg.has_value() && !arg.given() &&
+           arg.value() == count;
 }
 
-MATCHER_P(ParamOptionGiven, value, "") {
+MATCHER_P(ParamOptionGiven, value, "Checks, if param option is given.") {
     *result_listener << "param-option: "
                      << (static_cast<bool>(arg) ? "true" : "false")
                      << ", has_value(): "
                      << (arg.has_value() ? "true" : "false")
                      << ", given(): " << (arg.given() ? "true" : "false");
-    if (!(static_cast<bool>(arg) == true && arg.has_value() == true &&
-          arg.given() == true)) {
+    if (!(static_cast<bool>(arg) && arg.has_value() && arg.given())) {
         return false;
     }
     *result_listener << ", value(): " << clapp::to_string(value)
@@ -139,14 +139,15 @@ MATCHER_P(ParamOptionGiven, value, "") {
     return compare_value(arg.value(), value, result_listener);
 }
 
-MATCHER_P(ParamOptionNotGivenDefaultValue, default_value, "") {
+MATCHER_P(ParamOptionNotGivenDefaultValue, default_value,
+          "Checks, if param option is not given and default value is set "
+          "correctly.") {
     *result_listener << "param-option: "
                      << (static_cast<bool>(arg) ? "true" : "false")
                      << ", has_value(): "
                      << (arg.has_value() ? "true" : "false")
                      << ", given(): " << (arg.given() ? "true" : "false");
-    if (!(static_cast<bool>(arg) == true && arg.has_value() == true &&
-          arg.given() == false)) {
+    if (!(static_cast<bool>(arg) && arg.has_value() && !arg.given())) {
         return false;
     }
     *result_listener << ", value(): " << clapp::to_string(default_value)
@@ -154,7 +155,7 @@ MATCHER_P(ParamOptionNotGivenDefaultValue, default_value, "") {
     return compare_value(arg.value(), default_value, result_listener);
 }
 
-MATCHER(ParamOptionNotGiven, "") {
+MATCHER(ParamOptionNotGiven, "Checks, if param option is not given.") {
     bool caught_value_undefined{false};
     try {
         arg.value();
@@ -168,18 +169,18 @@ MATCHER(ParamOptionNotGiven, "") {
                      << ", given(): " << (arg.given() ? "true" : "false")
                      << ", value() throws value_undefined = "
                      << (caught_value_undefined ? "true" : "false");
-    return static_cast<bool>(arg) == false && arg.has_value() == false &&
-           arg.given() == false && caught_value_undefined;
+    return !static_cast<bool>(arg) && !arg.has_value() && !arg.given() &&
+           caught_value_undefined;
 }
 
-MATCHER_P(VectorParamOptionGiven, value, "") {
+MATCHER_P(VectorParamOptionGiven, value,
+          "Checks, if vector param option is given.") {
     *result_listener << "param-option: "
                      << (static_cast<bool>(arg) ? "true" : "false")
                      << ", has_value(): "
                      << (arg.has_value() ? "true" : "false")
                      << ", given(): " << (arg.given() ? "true" : "false");
-    if (!(static_cast<bool>(arg) == true && arg.has_value() == true &&
-          arg.given() == true)) {
+    if (!(static_cast<bool>(arg) && arg.has_value() && arg.given())) {
         return false;
     }
     const auto& a{arg.value()};
@@ -203,22 +204,22 @@ MATCHER_P(VectorParamOptionGiven, value, "") {
     return compare_value_vector(a, value, result_listener);
 }
 
-MATCHER(VectorParamOptionNotGiven, "") {
+MATCHER(VectorParamOptionNotGiven,
+        "Checks, if vector param option is not given.") {
     *result_listener << "vector-param-option: "
                      << (static_cast<bool>(arg) ? "true" : "false")
                      << ", has_value(): "
                      << (arg.has_value() ? "true" : "false")
                      << ", given(): " << (arg.given() ? "true" : "false");
-    if (!(static_cast<bool>(arg) == false && arg.has_value() == false &&
-          arg.given() == false)) {
+    if (!(!static_cast<bool>(arg) && !arg.has_value() && !arg.given())) {
         return false;
     }
     *result_listener << ", size(): 0==" << clapp::to_string(arg.value().size())
-                     << " = " << (arg.value().size() == 0 ? "true" : "false");
-    return arg.value().size() == 0;
+                     << " = " << (arg.value().empty() ? "true" : "false");
+    return arg.value().empty();
 }
 
-MATCHER_P(ContainsLongOption, option, "") {
+MATCHER_P(ContainsLongOption, option, "Checks, if long option is given.") {
     std::vector<option_test_parser_t::variant_opt_conf_t> options{
         arg.get_options()};
     std::optional<option_test_parser_t::variant_opt_conf_t> found_opt{
@@ -229,11 +230,11 @@ MATCHER_P(ContainsLongOption, option, "") {
     *result_listener << "Found parser-option doesn't contain option '" << option
                      << "'";
     return std::visit(
-        [this](auto&& opt) -> bool { return opt.contains_option(option); },
+        [this](auto&& opt) { return opt.contains_option(option); },
         found_opt.value());
 }
 
-MATCHER_P(ContainsShortOption, option, "") {
+MATCHER_P(ContainsShortOption, option, "Checks, if short option is given.") {
     std::vector<option_test_parser_t::variant_opt_conf_t> options{
         arg.get_options()};
     std::optional<option_test_parser_t::variant_opt_conf_t> found_opt{
@@ -244,8 +245,24 @@ MATCHER_P(ContainsShortOption, option, "") {
     *result_listener << "Found parser-option doesn't contain option '" << option
                      << "'";
     return std::visit(
-        [this](auto&& opt) -> bool { return opt.contains_option(option); },
+        [this](auto&& opt) { return opt.contains_option(option); },
         found_opt.value());
+}
+
+template <typename LONG_OPT_FUNC_T, typename OPT_T>
+LONG_OPT_FUNC_T process_long_option(OPT_T&& option,
+                                    const std::string& long_opt_name) {
+    for (auto& opt : option.long_options) {
+        if (opt.option == long_opt_name) {
+            if constexpr (std::is_same<LONG_OPT_FUNC_T,
+                                       decltype(opt.func)>::value) {
+                return opt.func;
+            } else {
+                throw std::runtime_error("unexpected long_options-func-type");
+            }
+        }
+    }
+    throw std::runtime_error("found long-opt-func, but iterate failed... wtf");
 }
 
 template <typename LONG_OPT_FUNC_T>
@@ -260,22 +277,27 @@ static LONG_OPT_FUNC_T get_long_opt_func(option_test_parser_t& tp,
                                  "' registered.");
     }
     return std::visit(
-        [&long_opt_name](auto&& option) -> LONG_OPT_FUNC_T {
-            for (auto& opt : option.long_options) {
-                if (opt.option == long_opt_name) {
-                    if constexpr (std::is_same<LONG_OPT_FUNC_T,
-                                               decltype(opt.func)>::value) {
-                        return opt.func;
-                    } else {
-                        throw std::runtime_error(
-                            "unexpected long_options-func-type");
-                    }
-                }
-            }
-            throw std::runtime_error(
-                "found long-opt-func, but iterate failed... wtf");
+        [&long_opt_name](auto&& option) {
+            return process_long_option<LONG_OPT_FUNC_T>(
+                std::forward<decltype(option)>(option), long_opt_name);
         },
         found_opt.value());
+}
+
+template <typename SHORT_OPT_FUNC_T, typename OPT_T>
+SHORT_OPT_FUNC_T process_short_option(OPT_T&& option,
+                                      const char short_opt_name) {
+    for (auto& opt : option.short_options) {
+        if (opt.option == short_opt_name) {
+            if constexpr (std::is_same<SHORT_OPT_FUNC_T,
+                                       decltype(opt.func)>::value) {
+                return opt.func;
+            } else {
+                throw std::runtime_error("unexpected short_options-func-type");
+            }
+        }
+    }
+    throw std::runtime_error("found long-opt-func, but iterate failed... wtf");
 }
 
 template <typename SHORT_OPT_FUNC_T>
@@ -290,20 +312,9 @@ static SHORT_OPT_FUNC_T get_short_opt_func(option_test_parser_t& tp,
                                  std::string{short_opt_name} + "' registered.");
     }
     return std::visit(
-        [&short_opt_name](auto&& option) -> SHORT_OPT_FUNC_T {
-            for (auto& opt : option.short_options) {
-                if (opt.option == short_opt_name) {
-                    if constexpr (std::is_same<SHORT_OPT_FUNC_T,
-                                               decltype(opt.func)>::value) {
-                        return opt.func;
-                    } else {
-                        throw std::runtime_error(
-                            "unexpected short_options-func-type");
-                    }
-                }
-            }
-            throw std::runtime_error(
-                "found short-opt-func, but iterate failed... wtf");
+        [&short_opt_name](auto&& option) {
+            return process_short_option<SHORT_OPT_FUNC_T>(
+                std::forward<decltype(option)>(option), short_opt_name);
         },
         found_opt.value());
 }
@@ -379,6 +390,8 @@ class optionT : public ::testing::Test {
     void SetUp() override {}
     void TearDown() override {}
 
+    static bool throw_unexpected_call();
+
     using int32_value_func_t = std::function<std::int32_t(void)>;
     using int32_validate_func_t = std::function<void(
         const std::int32_t&, const std::string& option_string)>;
@@ -411,7 +424,7 @@ class optionT : public ::testing::Test {
     inline static constexpr std::size_t value_size{0xcf};
     inline static constexpr std::ptrdiff_t value_ptrdiff{0x1f};
     inline static const double value_double{1415.1716};
-    inline static const float value_float{1415.1617f};
+    inline static const float value_float{1415.1617F};
     inline static constexpr std::chrono::nanoseconds value_ns{1213};
     inline static constexpr std::chrono::microseconds value_us{121};
     inline static constexpr std::chrono::milliseconds value_ms{12};
@@ -419,6 +432,10 @@ class optionT : public ::testing::Test {
     inline static constexpr std::chrono::minutes value_min{62};
     inline static constexpr std::chrono::hours value_hours{1};
 };
+
+bool optionT::throw_unexpected_call() {
+    throw std::runtime_error{"unexpected call"};
+}
 
 TEST_F(optionT, basicOptionConstructLongAndCallValueThrows) {
     test_option_t opt{tp, long_opt_str, opt_desc_str};
@@ -599,7 +616,9 @@ TEST_F(optionT, boolOptionConstructLongStringCallLongOptFuncCallsFoundFunc) {
         clapp::value::found_func_t{[this]() { found_func_called++; }}};
     get_long_opt_func<option_test_parser_t::long_opt_func_t>(
         tp, long_opt_str)(long_opt_str);
-    ASSERT_THAT(found_func_called, testing::Eq(1));
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
 }
 
 TEST_F(optionT, boolOptionConstructShortOptionalNoValidateFunc) {
@@ -733,14 +752,18 @@ TEST_F(optionT, countOptionConstructLongStringCallLongOptFuncTwice) {
         tp, long_opt_str)(long_opt_str);
     get_long_opt_func<option_test_parser_t::long_opt_func_t>(
         tp, long_opt_str)(long_opt_str);
-    ASSERT_THAT(opt, NumCountOptionGiven(2u));
+
+    constexpr std::uint32_t num_count_options{2U};
+    ASSERT_THAT(opt, NumCountOptionGiven(num_count_options));
 }
 
 TEST_F(optionT, countOptionConstructLongStringCallShortOptFuncOnce) {
     clapp::option::count_option_t opt{tp, short_opt, opt_desc_str};
     get_short_opt_func<option_test_parser_t::short_opt_func_t>(
         tp, short_opt)(short_opt);
-    ASSERT_THAT(opt, NumCountOptionGiven(1u));
+
+    constexpr std::uint32_t num_count_options{1U};
+    ASSERT_THAT(opt, NumCountOptionGiven(num_count_options));
 }
 
 TEST_F(
@@ -752,14 +775,16 @@ TEST_F(
         tp, long_opt_str)(long_opt_str);
     get_short_opt_func<option_test_parser_t::short_opt_func_t>(
         tp, short_opt)(short_opt);
-    ASSERT_THAT(opt, NumCountOptionGiven(2u));
+
+    constexpr std::uint32_t num_count_options{2U};
+    ASSERT_THAT(opt, NumCountOptionGiven(num_count_options));
 }
 
 TEST_F(
     optionT,
     countOptionConstructLongStringVecAndShortWithMinMaxConstraintAndCallLongOptFuncAndShortOptFunc) {
-    constexpr std::uint32_t min_value{0};
-    constexpr std::uint32_t max_value{5};
+    constexpr std::uint32_t min_value{0U};
+    constexpr std::uint32_t max_value{5U};
     clapp::option::count_option_t opt{
         tp, std::vector<std::string>{long_opt_str}, short_opt, opt_desc_str,
         clapp::value::min_max_value_t<std::uint32_t>{min_value, max_value}};
@@ -776,15 +801,21 @@ TEST_F(
         tp, long_opt_str)(long_opt_str);
     get_short_opt_func<option_test_parser_t::short_opt_func_t>(
         tp, short_opt)(short_opt);
-    ASSERT_THAT(opt, NumCountOptionGiven(4u));
+
+    constexpr std::uint32_t num_count_options_first{4U};
+    ASSERT_THAT(opt, NumCountOptionGiven(num_count_options_first));
     ASSERT_NO_THROW((option_validate_func.value()()));
     get_short_opt_func<option_test_parser_t::short_opt_func_t>(
         tp, short_opt)(short_opt);
-    ASSERT_THAT(opt, NumCountOptionGiven(5u));
+
+    constexpr std::uint32_t num_count_options_second{5U};
+    ASSERT_THAT(opt, NumCountOptionGiven(num_count_options_second));
     ASSERT_NO_THROW((option_validate_func.value()()));
     ASSERT_NO_THROW((get_long_opt_func<option_test_parser_t::long_opt_func_t>(
         tp, long_opt_str)(long_opt_str)));
-    ASSERT_THAT(opt, NumCountOptionGiven(6u));
+
+    constexpr std::uint32_t num_count_options_third{6U};
+    ASSERT_THAT(opt, NumCountOptionGiven(num_count_options_third));
     ASSERT_THROW((option_validate_func.value()()),
                  clapp::exception::out_of_range_t);
 }
@@ -792,14 +823,15 @@ TEST_F(
 TEST_F(
     optionT,
     countOptionConstructLongStringAndShortWithDefaultValueAndCallLongOptFunc) {
-    constexpr std::uint32_t default_value{5};
+    constexpr std::uint32_t default_value{5U};
     clapp::option::count_option_t opt{
         tp, long_opt_cstr, short_opt, opt_desc_str,
         clapp::value::default_value_t<std::uint32_t>{default_value}};
     ASSERT_THAT(opt, NumCountOptionNotGiven(default_value));
     ASSERT_NO_THROW((get_long_opt_func<option_test_parser_t::long_opt_func_t>(
         tp, long_opt_cstr)(long_opt_cstr)));
-    ASSERT_THAT(opt, NumCountOptionGiven(6u));
+    constexpr std::uint32_t num_count_options{6U};
+    ASSERT_THAT(opt, NumCountOptionGiven(num_count_options));
 }
 
 TEST_F(optionT, countOptionConstructLongStringCallLongOptFuncCallsFoundFunc) {
@@ -808,7 +840,9 @@ TEST_F(optionT, countOptionConstructLongStringCallLongOptFuncCallsFoundFunc) {
         clapp::value::found_func_t{[this]() { found_func_called++; }}};
     get_long_opt_func<option_test_parser_t::long_opt_func_t>(
         tp, long_opt_str)(long_opt_str);
-    ASSERT_THAT(found_func_called, testing::Eq(1));
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
 }
 
 TEST_F(optionT, countOptionConstructMandatoryLongCallValidateFunc) {
@@ -955,7 +989,9 @@ TEST_F(
     ASSERT_NO_THROW(
         (get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
             tp, short_opt)(short_opt, value_str)));
-    ASSERT_THAT(found_func_called, testing::Eq(1));
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
 }
 
 TEST_F(optionT,
@@ -1117,7 +1153,9 @@ TEST_F(
     ASSERT_NO_THROW(
         (get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
             tp, short_opt)(short_opt, value_str_path)));
-    ASSERT_THAT(found_func_called, testing::Eq(1));
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
 }
 
 TEST_F(optionT,
@@ -1296,7 +1334,9 @@ TEST_F(
     ASSERT_NO_THROW(
         (get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
             tp, short_opt)(short_opt, std::to_string(value_int64))));
-    ASSERT_THAT(found_func_called, testing::Eq(1));
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
 }
 
 TEST_F(
@@ -1763,7 +1803,9 @@ TEST_F(
     ASSERT_NO_THROW(
         (get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
             tp, short_opt)(short_opt, value_str)));
-    ASSERT_THAT(found_func_called, testing::Eq(1));
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
 }
 
 TEST_F(
@@ -1975,7 +2017,9 @@ TEST_F(
     ASSERT_NO_THROW(
         (get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
             tp, short_opt)(short_opt, value_str_path)));
-    ASSERT_THAT(found_func_called, testing::Eq(1));
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
 }
 
 TEST_F(optionT,
@@ -2168,7 +2212,9 @@ TEST_F(
     ASSERT_NO_THROW(
         (get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
             tp, short_opt)(short_opt, std::to_string(value_int32))));
-    ASSERT_THAT(found_func_called, testing::Eq(2));
+
+    constexpr std::uint32_t expected_found_func_called{2U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
 }
 
 TEST_F(
@@ -2509,8 +2555,7 @@ TEST_F(optionT, invalidShortOptionConstruct) {
 TEST_F(optionT, genOptValidateFuncAndCallValidateFuncThrows) {
     std::optional<option_test_parser_t::validate_func_t> validate_func{
         clapp::option::gen_opt_validate_func<std::int32_t, int32_value_func_t>(
-            std::nullopt,
-            []() -> bool { throw std::runtime_error{"unexpected call"}; },
+            std::nullopt, []() { return throw_unexpected_call(); },
             []() { return false; }, std::vector<int32_validate_func_t>{},
             "option string", option_test_parser_t::purpose_t::mandatory)};
     ASSERT_THAT(validate_func.has_value(), testing::Eq(true));
@@ -2520,8 +2565,7 @@ TEST_F(optionT, genOptValidateFuncAndCallValidateFuncThrows) {
 TEST_F(optionT, genOpftValidateFuncAndCallValidateFuncDoesntThrow) {
     std::optional<option_test_parser_t::validate_func_t> validate_func{
         clapp::option::gen_opt_validate_func<std::int32_t, int32_value_func_t>(
-            std::nullopt,
-            []() -> bool { throw std::runtime_error{"unexpected call"}; },
+            std::nullopt, []() { return throw_unexpected_call(); },
             []() { return true; }, std::vector<int32_validate_func_t>{},
             "option string", option_test_parser_t::purpose_t::mandatory)};
     ASSERT_THAT(validate_func.has_value(), testing::Eq(true));
