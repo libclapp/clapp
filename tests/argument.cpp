@@ -31,12 +31,7 @@ contains_argument(
     ARGUMENT_T&& argument) {
     for (const auto& arg : arguments) {
         const bool found{std::visit(
-            [&argument](auto&& a) -> bool {
-                if (argument == a.argument_name) {
-                    return true;
-                }
-                return false;
-            },
+            [&argument](auto&& a) { return argument == a.argument_name; },
             arg)};
         if (found) {
             return arg;
@@ -50,7 +45,7 @@ static std::optional<argument_test_parser_t::variant_arg_conf_t>
 contains_argument(
     std::vector<argument_test_parser_t::variant_arg_conf_t>& arguments,
     ARGUMENT_T&& argument, RESULT_LISTENER_T&& result_listener) {
-    if (arguments.size() == 0) {
+    if (arguments.empty()) {
         *result_listener
             << "Parser-arguments doesn't contain any arguments at all.";
         return std::nullopt;
@@ -65,7 +60,7 @@ contains_argument(
     return ret;
 }
 
-MATCHER_P(ContainsArgument, argument, "") {
+MATCHER_P(ContainsArgument, argument, "Checks, if argument is contained.") {
     std::vector<clapp::parser::basic_parser_t::variant_arg_conf_t> arguments{
         arg.get_arguments()};
     std::optional<clapp::parser::basic_parser_t::variant_arg_conf_t> found_arg{
@@ -76,20 +71,19 @@ MATCHER_P(ContainsArgument, argument, "") {
     *result_listener << "Found parser-argument doesn't contain argument '"
                      << argument << "'";
     return std::visit(
-        [this](auto&& arg_param) -> bool {
+        [this](auto&& arg_param) {
             return arg_param.argument_name == argument;
         },
         found_arg.value());
 }
 
-MATCHER_P(ArgumentGiven, value, "") {
+MATCHER_P(ArgumentGiven, value, "Checks, if argument is given.") {
     *result_listener << "argument: "
                      << (static_cast<bool>(arg) ? "true" : "false")
                      << ", has_value(): "
                      << (arg.has_value() ? "true" : "false")
                      << ", given(): " << (arg.given() ? "true" : "false");
-    if (!(static_cast<bool>(arg) == true && arg.has_value() == true &&
-          arg.given() == true)) {
+    if (!(static_cast<bool>(arg) && arg.has_value() && arg.given())) {
         return false;
     }
     *result_listener << ", value(): " << clapp::to_string(value)
@@ -97,14 +91,13 @@ MATCHER_P(ArgumentGiven, value, "") {
     return compare_value(arg.value(), value, result_listener);
 }
 
-MATCHER_P(ArgumentNotGivenDefaultValue, default_value, "") {
+MATCHER_P(ArgumentNotGivenDefaultValue, default_value, std::string{}) {
     *result_listener << "argument: "
                      << (static_cast<bool>(arg) ? "true" : "false")
                      << ", has_value(): "
                      << (arg.has_value() ? "true" : "false")
                      << ", given(): " << (arg.given() ? "true" : "false");
-    if (!(static_cast<bool>(arg) == true && arg.has_value() == true &&
-          arg.given() == false)) {
+    if (!(static_cast<bool>(arg) && arg.has_value() && !arg.given())) {
         return false;
     }
     *result_listener << ", value(): " << clapp::to_string(default_value)
@@ -112,14 +105,14 @@ MATCHER_P(ArgumentNotGivenDefaultValue, default_value, "") {
     return compare_value(arg.value(), default_value, result_listener);
 }
 
-MATCHER_P(VariadicArgumentGiven, value, "") {
+MATCHER_P(VariadicArgumentGiven, value,
+          "Checks, if variadic argument is given.") {
     *result_listener << "argument: "
                      << (static_cast<bool>(arg) ? "true" : "false")
                      << ", has_value(): "
                      << (arg.has_value() ? "true" : "false")
                      << ", given(): " << (arg.given() ? "true" : "false");
-    if (!(static_cast<bool>(arg) == true && arg.has_value() == true &&
-          arg.given() == true)) {
+    if (!(static_cast<bool>(arg) && arg.has_value() && arg.given())) {
         return false;
     }
     const auto& a{arg.value()};
@@ -143,29 +136,28 @@ MATCHER_P(VariadicArgumentGiven, value, "") {
     return compare_value_vector(a, value, result_listener);
 }
 
-MATCHER(VariadicArgumentNotGiven, "") {
+MATCHER(VariadicArgumentNotGiven,
+        "Checks, if variadic argument is not given.") {
     *result_listener << "vector-param-option: "
                      << (static_cast<bool>(arg) ? "true" : "false")
                      << ", has_value(): "
                      << (arg.has_value() ? "true" : "false")
                      << ", given(): " << (arg.given() ? "true" : "false");
-    if (!(static_cast<bool>(arg) == false && arg.has_value() == false &&
-          arg.given() == false)) {
+    if (!(!static_cast<bool>(arg) && !arg.has_value() && !arg.given())) {
         return false;
     }
     *result_listener << ", size(): 0==" << clapp::to_string(arg.value().size())
-                     << " = " << (arg.value().size() == 0 ? "true" : "false");
-    return arg.value().size() == 0;
+                     << " = " << (arg.value().empty() ? "true" : "false");
+    return arg.value().empty();
 }
 
-MATCHER(ArgumentNotGiven, "") {
+MATCHER(ArgumentNotGiven, "Checks, if argument is not given.") {
     *result_listener << "argument: "
                      << (static_cast<bool>(arg) ? "true" : "false")
                      << ", has_value(): "
                      << (arg.has_value() ? "true" : "false")
                      << ", given(): " << (arg.given() ? "true" : "false");
-    return static_cast<bool>(arg) == false && arg.has_value() == false &&
-           arg.given() == false;
+    return !static_cast<bool>(arg) && !arg.has_value() && !arg.given();
 }
 
 argument_test_parser_t::~argument_test_parser_t() = default;
@@ -182,9 +174,9 @@ static ARG_FUNC_T get_arg_func(argument_test_parser_t& tp,
                                  "' registered.");
     }
     return std::visit(
-        [&argument](auto&& arg) -> ARG_FUNC_T {
+        [&argument](auto&& arg) {
             if (arg.argument_name == argument) {
-                return arg.argument;
+                return ARG_FUNC_T{arg.argument};
             }
             throw std::runtime_error(
                 "found long-opt-func, but iterate failed... wtf");
@@ -306,8 +298,8 @@ class argumentT : public ::testing::Test {
     inline static constexpr std::size_t value_size{0xcf};
     inline static constexpr std::ptrdiff_t value_ptrdiff{0x1f};
     inline static const double value_double{1415.1716};
-    inline static const float value_float{1415.1617f};
-    inline static const float value_float_additional{12.1f};
+    inline static const float value_float{1415.1617F};
+    inline static const float value_float_additional{12.1F};
     inline static constexpr std::chrono::nanoseconds value_ns{1213};
     inline static constexpr std::chrono::microseconds value_us{121};
     inline static constexpr std::chrono::milliseconds value_ms{12};
