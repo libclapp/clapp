@@ -791,6 +791,38 @@ TEST_F(argumentT, int64ArgumentConstructOptionalStrAndCallGetOptionHelp) {
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
+TEST_F(argumentT, int64ArgumentConstructStrWithMinMaxValueAndCallArgFunc) {
+    constexpr std::int64_t min_value{-2};
+    constexpr std::int64_t max_value{0x20};
+    clapp::argument::int64_argument_t arg{
+        tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional,
+        clapp::value::min_max_value_t<std::int64_t>{min_value, max_value}};
+    std::optional<argument_test_parser_t::validate_func_t>
+        argument_validate_func{get_validate_func(tp, arg_str)};
+    ASSERT_THAT(argument_validate_func, testing::Ne(std::nullopt));
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(value_int32));
+    ASSERT_THROW((argument_validate_func.value()()),
+                 clapp::exception::out_of_range_t);
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(value_int8));
+    ASSERT_NO_THROW((argument_validate_func.value()()));
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(max_value));
+    ASSERT_NO_THROW((argument_validate_func.value()()));
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(min_value));
+    ASSERT_NO_THROW((argument_validate_func.value()()));
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(max_value + 1));
+    ASSERT_THROW((argument_validate_func.value()()),
+                 clapp::exception::out_of_range_t);
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(min_value - 1));
+    ASSERT_THROW((argument_validate_func.value()()),
+                 clapp::exception::out_of_range_t);
+}
+
 TEST_F(argumentT,
        variadicInt64ArgumentConstructOptionalStrWithoutValidateFunc) {
     clapp::argument::int64_argument_t arg{
@@ -887,6 +919,31 @@ TEST_F(argumentT, variadicInt64ArgumentCallFoundFunc) {
     ASSERT_THAT(found_func_called, testing::Eq(2));
 }
 
+TEST_F(argumentT,
+       variadicInt64ArgumentConstructStrWithMinMaxValueAndCallArgFunc) {
+    constexpr std::int64_t min_value{-2};
+    constexpr std::int64_t max_value{0x20};
+    clapp::argument::variadic_int64_argument_t arg{
+        tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional,
+        clapp::value::min_max_value_t<std::int64_t>{min_value, max_value}};
+    std::optional<argument_test_parser_t::validate_func_t>
+        argument_validate_func{get_validate_func(tp, arg_str)};
+    ASSERT_THAT(argument_validate_func, testing::Ne(std::nullopt));
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(value_int8));
+    ASSERT_NO_THROW((argument_validate_func.value()()));
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(max_value));
+    ASSERT_NO_THROW((argument_validate_func.value()()));
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(min_value));
+    ASSERT_NO_THROW((argument_validate_func.value()()));
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(value_int32));
+    ASSERT_THROW((argument_validate_func.value()()),
+                 clapp::exception::out_of_range_t);
+}
+
 TEST_F(argumentT, uint64ArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::uint64_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
@@ -965,6 +1022,41 @@ TEST_F(argumentT, uint64ArgumentConstructOptionalStrAndCallGetOptionHelp) {
     ASSERT_THAT(tp.get_argument_help(),
                 testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
+}
+
+TEST_F(argumentT, uint64ArgumentConstructStrWithMinMaxValueAndCallArgFunc) {
+    constexpr std::uint64_t min_value{0x80U};
+    constexpr std::uint64_t max_value{0xdfffU};
+    clapp::argument::uint64_argument_t arg{
+        tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional,
+        clapp::value::min_max_value_t<std::uint64_t>{min_value, max_value}};
+    std::optional<argument_test_parser_t::validate_func_t>
+        argument_validate_func{get_validate_func(tp, arg_str)};
+    ASSERT_THAT(argument_validate_func, testing::Ne(std::nullopt));
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(value_uint32));
+    ASSERT_THROW((argument_validate_func.value()()),
+                 clapp::exception::out_of_range_t);
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(value_uint16));
+    ASSERT_NO_THROW((argument_validate_func.value()()));
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(value_uint8));
+    ASSERT_NO_THROW((argument_validate_func.value()()));
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(max_value));
+    ASSERT_NO_THROW((argument_validate_func.value()()));
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(min_value));
+    ASSERT_NO_THROW((argument_validate_func.value()()));
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(max_value + 1));
+    ASSERT_THROW((argument_validate_func.value()()),
+                 clapp::exception::out_of_range_t);
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(min_value - 1));
+    ASSERT_THROW((argument_validate_func.value()()),
+                 clapp::exception::out_of_range_t);
 }
 
 TEST_F(argumentT,
