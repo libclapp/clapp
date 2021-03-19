@@ -403,8 +403,8 @@ A min/max value is also reflected in the help message, as `(constraint: [<min>,<
 Examples are:
 
 ```c++
-clapp::option::int32_option_t int_opt{ptr_to_parser, "int-option", 'i', "Description for int-option.", clapp::value::min_max_value_t{10, 20}};
-clapp::option::int32_argument_t int_arg{ptr_to_parser, "int-argument", "Description for int-argument.", clapp::value::min_max_value_t{20, 40}};
+clapp::option::int32_option_t int_opt{ptr_to_parser, "int-option", 'i', "Description for int-option.", clapp::value::min_max_value_t<std::int32_t>{10, 20}};
+clapp::option::int32_argument_t int_arg{ptr_to_parser, "int-argument", "Description for int-argument.", clapp::value::min_max_value_t<std::int32_t>{20, 40}};
 ```
 
 ### Not-null value:
