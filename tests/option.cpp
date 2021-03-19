@@ -647,6 +647,20 @@ TEST_F(optionT, boolOptionConstructMandatoryLongCallValidateFunc) {
     ASSERT_NO_THROW(option_validate_func.value()());
 }
 
+TEST_F(optionT, boolOptionalConstructOptionalLongWithNotNullValue) {
+    clapp::option::bool_option_t arg{tp, long_opt_cstr, opt_desc_str,
+                                     option_test_parser_t::purpose_t::optional,
+                                     clapp::value::not_null_value_t<bool>{}};
+
+    std::optional<option_test_parser_t::validate_func_t> option_validate_func{
+        get_validate_func(tp, long_opt_cstr)};
+    ASSERT_THROW((option_validate_func.value()()),
+                 clapp::exception::out_of_range_t);
+    get_long_opt_func<option_test_parser_t::long_opt_func_t>(
+        tp, long_opt_cstr)(long_opt_cstr);
+    ASSERT_NO_THROW((option_validate_func.value()()));
+}
+
 TEST_F(optionT,
        helpOptionConstructLongStringVecAndShortVecAndCallGetOptionHelp) {
     clapp::option::help_option_t opt{
@@ -1422,6 +1436,25 @@ TEST_F(
         (get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
             tp, short_opt)(short_opt, std::to_string(value_int64))));
     ASSERT_THAT(opt, ParamOptionGiven(value_int64));
+}
+
+TEST_F(optionT, int64ParamOptionConstructMandatoryNotNullValue) {
+    clapp::option::int64_param_option_t opt{
+        tp,
+        long_opt_str,
+        short_opt,
+        opt_desc_str,
+        option_test_parser_t::purpose_t::mandatory,
+        clapp::value::not_null_value_t<std::int64_t>{}};
+    std::optional<option_test_parser_t::validate_func_t> option_validate_func{
+        get_validate_func(tp, long_opt_str)};
+    get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+        tp, long_opt_str)(long_opt_str, std::to_string(0));
+    ASSERT_THROW((option_validate_func.value()()),
+                 clapp::exception::out_of_range_t);
+    get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+        tp, long_opt_str)(long_opt_str, std::to_string(value_int64));
+    ASSERT_NO_THROW(option_validate_func.value()());
 }
 
 TEST_F(optionT, int32ParamOptionConstructLongStringAndShortAndCallShortOpt) {
@@ -2256,6 +2289,21 @@ TEST_F(
     ASSERT_THAT(option_validate_func, testing::Ne(std::nullopt));
     get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
         tp, long_opt_str)(long_opt_str, std::to_string(value_int32));
+    ASSERT_THROW((option_validate_func.value()()),
+                 clapp::exception::out_of_range_t);
+}
+
+TEST_F(optionT, vectorInt64ParamOptionConstructNotNullValue) {
+    clapp::option::int64_param_option_t opt{
+        tp, long_opt_str, short_opt, opt_desc_str,
+        clapp::value::not_null_value_t<std::int64_t>{}};
+    std::optional<option_test_parser_t::validate_func_t> option_validate_func{
+        get_validate_func(tp, long_opt_str)};
+    get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+        tp, long_opt_str)(long_opt_str, std::to_string(value_int32));
+    ASSERT_NO_THROW(option_validate_func.value()());
+    get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+        tp, long_opt_str)(long_opt_str, std::to_string(0));
     ASSERT_THROW((option_validate_func.value()()),
                  clapp::exception::out_of_range_t);
 }
