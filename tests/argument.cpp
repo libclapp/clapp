@@ -278,6 +278,7 @@ class argumentT : public ::testing::Test {
     inline static const std::string value_str{"value-str"};
     inline static const std::string purpose_optional_str{"optional"};
     inline static const std::string purpose_mandatory_str{"mandatory"};
+    inline static const std::string not_null_str{"not null"};
     inline static const char* variadic_argument_desc_restriction{
         "variadic argument"};
     inline static constexpr std::int64_t value_int64{0x12345678abcdef0LL};
@@ -436,6 +437,23 @@ TEST_F(argumentT, boolArgumentConstructStrWithDefaultValueAndCallArgFunc) {
     ASSERT_THAT(arg, ArgumentGiven(value_true));
 }
 
+TEST_F(argumentT, boolArgumentConstructOptionalStrWithNotNullValue) {
+    clapp::argument::bool_argument_t arg{
+        tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional,
+        clapp::value::not_null_value_t<bool>{}};
+
+    std::optional<argument_test_parser_t::validate_func_t>
+        argument_validate_func{get_validate_func(tp, arg_str)};
+    ASSERT_THAT(argument_validate_func, testing::Ne(std::nullopt));
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(false));
+    ASSERT_THROW((argument_validate_func.value()()),
+                 clapp::exception::out_of_range_t);
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(true));
+    ASSERT_NO_THROW((argument_validate_func.value()()));
+}
+
 TEST_F(argumentT, boolArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::bool_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
@@ -525,6 +543,24 @@ TEST_F(argumentT,
                 testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ", " +
                                   variadic_argument_desc_restriction + ")"}}));
+}
+
+TEST_F(argumentT, variadicBoolArgumentConstructWithNotNullValue) {
+    clapp::argument::variadic_bool_argument_t arg{
+        tp, arg_str, desc_str, clapp::value::not_null_value_t<bool>{}};
+
+    std::optional<argument_test_parser_t::validate_func_t>
+        argument_validate_func{get_validate_func(tp, arg_str)};
+    ASSERT_THAT(argument_validate_func, testing::Ne(std::nullopt));
+
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(true));
+    ASSERT_NO_THROW((argument_validate_func.value()()));
+
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(false));
+    ASSERT_THROW((argument_validate_func.value()()),
+                 clapp::exception::out_of_range_t);
 }
 
 TEST_F(argumentT, variadicBoolArgumentCallFoundFunc) {
@@ -851,6 +887,22 @@ TEST_F(argumentT, int64ArgumentConstructStrWithMinMaxValueAndCallArgFunc) {
         tp, arg_str)(std::to_string(min_value - 1));
     ASSERT_THROW((argument_validate_func.value()()),
                  clapp::exception::out_of_range_t);
+}
+
+TEST_F(argumentT, int64ArgumentConstructStrWithNotNullValue) {
+    clapp::argument::int64_argument_t arg{
+        tp, arg_str, desc_str, clapp::value::not_null_value_t<std::int64_t>{}};
+
+    std::optional<argument_test_parser_t::validate_func_t>
+        argument_validate_func{get_validate_func(tp, arg_str)};
+    ASSERT_THAT(argument_validate_func, testing::Ne(std::nullopt));
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(0));
+    ASSERT_THROW((argument_validate_func.value()()),
+                 clapp::exception::out_of_range_t);
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(12));
+    ASSERT_NO_THROW((argument_validate_func.value()()));
 }
 
 TEST_F(argumentT,
