@@ -59,6 +59,16 @@ class min_max_value_t {
     T max;
 };
 
+template <typename T>
+class not_null_value_t {
+   public:
+    not_null_value_t();
+
+    std::string append_restriction_text() const;
+
+    void validate(const T &value, const std::string &param_name) const;
+};
+
 class found_func_t {
    public:
     using func_t = std::function<void()>;

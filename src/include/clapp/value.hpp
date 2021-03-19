@@ -95,6 +95,26 @@ void clapp::value::min_max_value_t<T>::validate(
     }
 }
 
+template <typename T>
+clapp::value::not_null_value_t<T>::not_null_value_t() = default;
+
+template <typename T>
+std::string clapp::value::not_null_value_t<T>::append_restriction_text() const {
+    std::stringstream ss;
+    ss << "constraint: not null";
+    return ss.str();
+}
+
+template <typename T>
+void clapp::value::not_null_value_t<T>::validate(
+    const T& value, const std::string& param_name) const {
+    if (value == T{0}) {
+        throw clapp::exception::out_of_range_t{"CLI value for '" + param_name +
+                                               "' must not be null (" +
+                                               to_string(value) + ")"};
+    }
+}
+
 template <>
 std::string clapp::value::convert_value<std::string>(std::string_view param);
 

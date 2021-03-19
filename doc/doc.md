@@ -407,6 +407,20 @@ clapp::option::int32_option_t int_opt{ptr_to_parser, "int-option", 'i', "Descrip
 clapp::option::int32_argument_t int_arg{ptr_to_parser, "int-argument", "Description for int-argument.", clapp::value::min_max_value_t{20, 40}};
 ```
 
+### Not-null value:
+In order to provide a range check for arguments or option parameters, there exists the class `clapp::value::not_null_value_t`.
+If an instance of this class is given to an option parameter constructor, each given value is checked when the parsers `validate()` function is called.
+The same reasoning applies also for arguments.
+
+A not-null value is also reflected in the help message, as `(constraint: not null)` is appended to the argument/option description.
+
+Examples are:
+
+```c++
+clapp::option::int32_option_t int_opt{ptr_to_parser, "int-option", 'i', "Description for int-option.", clapp::value::not_null_value_t<std::int32_t>{}};
+clapp::option::int32_argument_t int_arg{ptr_to_parser, "int-argument", "Description for int-argument.", clapp::value::not_null_value_t<std::int32_t>{}};
+```
+
 ### Path exists:
 In order to provide a check for filesystem-path arguments or option parameters, there exists the class `clapp::value::path_exists_t`.
 If an instance of this class is given to an option parameter constructor, each given path is checked for existence when the parsers `validate()` function is called.

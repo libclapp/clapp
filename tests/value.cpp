@@ -429,6 +429,30 @@ TEST(value, minMaxValueMillisecondsT) {
                  clapp::exception::out_of_range_t);
 }
 
+TEST(value, notNullValueBool) {
+    constexpr bool one{true};
+    constexpr bool zero{false};
+    clapp::value::not_null_value_t<bool> nnv;
+    ASSERT_THAT(nnv.append_restriction_text(),
+                testing::StrEq("constraint: not null"));
+    EXPECT_NO_THROW(nnv.validate(one, "option"));
+    ASSERT_THROW(nnv.validate(zero, "option"),
+                 clapp::exception::out_of_range_t);
+}
+
+TEST(value, notNullValueUint8T) {
+    constexpr std::uint8_t two{2};
+    constexpr std::uint8_t one{1};
+    constexpr std::uint8_t zero{0};
+    clapp::value::not_null_value_t<std::uint8_t> nnv;
+    ASSERT_THAT(nnv.append_restriction_text(),
+                testing::StrEq("constraint: not null"));
+    EXPECT_NO_THROW(nnv.validate(two, "option"));
+    EXPECT_NO_THROW(nnv.validate(one, "option"));
+    ASSERT_THROW(nnv.validate(zero, "option"),
+                 clapp::exception::out_of_range_t);
+}
+
 TEST(value, pathExistsT) {
     clapp::value::path_exists_t pe;
     ASSERT_THAT(pe.append_restriction_text(), testing::StrEq("existing path"));
