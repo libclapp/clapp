@@ -446,13 +446,13 @@ TEST_F(argumentT, boolArgumentConstructOptionalStrAndCallGetOptionHelp) {
 }
 
 TEST_F(argumentT, variadicBoolArgumentConstructOptionalStrWithoutValidateFunc) {
-    clapp::argument::bool_argument_t arg{
+    clapp::argument::variadic_bool_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
 }
 
 TEST_F(argumentT, variadicBoolArgumentConstructMandatoryStrWithValidateFunc) {
-    clapp::argument::bool_argument_t arg{
+    clapp::argument::variadic_bool_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
     ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
                  clapp::exception::argument_exception_t);
