@@ -536,6 +536,30 @@ TEST_F(argumentT, variadicBoolArgumentCallFoundFunc) {
     ASSERT_THAT(found_func_called, testing::Eq(2));
 }
 
+TEST_F(argumentT,
+       variadicBoolArgumentConstructStrWithMinMaxValueAndCallArgFunc) {
+    constexpr bool min_value{false};
+    constexpr bool max_value{true};
+    clapp::argument::variadic_bool_argument_t arg{
+        tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional,
+        clapp::value::min_max_value_t<std::int64_t>{min_value, max_value}};
+    std::optional<argument_test_parser_t::validate_func_t>
+        argument_validate_func{get_validate_func(tp, arg_str)};
+    ASSERT_THAT(argument_validate_func, testing::Ne(std::nullopt));
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(min_value));
+    ASSERT_NO_THROW((argument_validate_func.value()()));
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(max_value));
+    ASSERT_NO_THROW((argument_validate_func.value()()));
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(min_value));
+    ASSERT_NO_THROW((argument_validate_func.value()()));
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(max_value));
+    ASSERT_NO_THROW((argument_validate_func.value()()));
+}
+
 TEST_F(argumentT, stringArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::string_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
