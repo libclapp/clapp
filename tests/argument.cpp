@@ -261,6 +261,8 @@ class argumentT : public ::testing::Test {
     void SetUp() override {}
     void TearDown() override {}
 
+    static bool throw_unexpected_call();
+
     using int32_value_func_t = std::function<std::int32_t(void)>;
     using int32_validate_func_t = std::function<void(
         const std::int32_t&, const std::string& option_string)>;
@@ -308,6 +310,10 @@ class argumentT : public ::testing::Test {
     inline static constexpr std::chrono::hours value_hours{1};
     inline static constexpr std::chrono::hours value_hours_additional{2};
 };
+
+bool argumentT::throw_unexpected_call() {
+    throw std::runtime_error{"unexpected call"};
+}
 
 TEST_F(argumentT, basicArgumentToShortArgumentNameThrows) {
     test_argument_t arg{tp, arg_cstr, desc_cstr};
@@ -966,6 +972,33 @@ TEST_F(argumentT,
         tp, arg_str)(std::to_string(value_int32));
     ASSERT_THROW((argument_validate_func.value()()),
                  clapp::exception::out_of_range_t);
+}
+
+TEST_F(argumentT, variadicInt64ArgumentConstructOptionalWithNotNullValue) {
+    clapp::argument::variadic_int64_argument_t arg{
+        tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional,
+        clapp::value::not_null_value_t<std::int64_t>{}};
+
+    std::optional<argument_test_parser_t::validate_func_t>
+        argument_validate_func{get_validate_func(tp, arg_str)};
+    ASSERT_THAT(argument_validate_func, testing::Ne(std::nullopt));
+
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(true));
+    ASSERT_NO_THROW((argument_validate_func.value()()));
+
+    get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::to_string(false));
+    ASSERT_THROW((argument_validate_func.value()()),
+                 clapp::exception::out_of_range_t);
+}
+
+TEST_F(argumentT,
+       variadicInt64ArgumentConstructStrWithDefaultValueAndCallArgFunc) {
+    ASSERT_THROW((clapp::argument::variadic_int64_argument_t{
+                     tp, arg_str, desc_str,
+                     clapp::value::default_value_t<std::int64_t>{value_int32}}),
+                 clapp::exception::argument_exception_t);
 }
 
 TEST_F(argumentT, uint64ArgumentConstructCStrAndCallValueThrows) {
@@ -4169,3 +4202,90 @@ TEST_F(argumentT, variadicPathArgumentCallFoundFunc) {
 }
 
 #endif
+
+TEST_F(argumentT, genArgValidateFuncAndCallValidateFuncThrows) {
+    std::optional<argument_test_parser_t::validate_func_t> validate_func{
+        clapp::argument::gen_arg_validate_func<std::int32_t,
+                                               int32_value_func_t>(
+            std::nullopt, []() { return throw_unexpected_call(); },
+            []() { return false; }, std::vector<int32_validate_func_t>{},
+            "argument string", argument_test_parser_t::purpose_t::mandatory)};
+    ASSERT_THAT(validate_func.has_value(), testing::Eq(true));
+    ASSERT_THROW((*validate_func)(), clapp::exception::argument_exception_t);
+}
+
+TEST_F(argumentT, genArgValidateFuncAndCallValidateFuncDoesntThrow) {
+    std::optional<argument_test_parser_t::validate_func_t> validate_func{
+        clapp::argument::gen_arg_validate_func<std::int32_t,
+                                               int32_value_func_t>(
+            std::nullopt, []() { return throw_unexpected_call(); },
+            []() { return true; }, std::vector<int32_validate_func_t>{},
+            "argument string", argument_test_parser_t::purpose_t::mandatory)};
+    ASSERT_THAT(validate_func.has_value(), testing::Eq(true));
+    ASSERT_NO_THROW((*validate_func)());
+}
+
+TEST_F(argumentT, genArgValidateFuncWithoutValueFuncAndCallValidateFuncThrows) {
+    constexpr std::int32_t return_value{10};
+    std::optional<argument_test_parser_t::validate_func_t> validate_func{
+        clapp::argument::gen_arg_validate_func<std::int32_t,
+                                               int32_value_func_t>(
+            []() { return return_value; }, []() { return true; },
+            []() { return true; },
+            std::vector<int32_validate_func_t>{
+                [](const std::int32_t& value,
+                   const std::string& argument_string) {
+                    if (argument_string != "argument string") {
+                        throw std::runtime_error{"argument_string invalid"};
+                    }
+                    if (value != return_value) {
+                        throw std::runtime_error{"value invalid"};
+                    }
+                }},
+            "argument string", argument_test_parser_t::purpose_t::mandatory)};
+    ASSERT_THAT(validate_func.has_value(), testing::Eq(true));
+    ASSERT_NO_THROW((*validate_func)());
+}
+
+TEST(argument, genArgValidateFuncAndCallValidateFuncThrows) {
+    using int32_value_func_t = std::function<std::int32_t(void)>;
+    using int32_validate_func_t = std::function<void(
+        const std::int32_t&, const std::string& option_string)>;
+    std::optional<argument_test_parser_t::validate_func_t> validate_func{
+        clapp::argument::gen_arg_validate_func<std::int32_t,
+                                               int32_value_func_t>(
+            std::nullopt, std::nullopt, []() { return true; },
+            std::vector<int32_validate_func_t>{
+                [](const std::int32_t& /*value*/,
+                   const std::string& option_string) {
+                    if (option_string != "option string") {
+                        throw std::runtime_error{"option_string invalid"};
+                    }
+                }},
+            "argument string", argument_test_parser_t::purpose_t::mandatory)};
+    ASSERT_THAT(validate_func.has_value(), testing::Eq(true));
+    ASSERT_THROW((*validate_func)(), clapp::exception::argument_exception_t);
+}
+
+TEST_F(argumentT,
+       genOptValidateFuncWithoutHasValueFuncAndCallValidateFuncDoesntThrow) {
+    constexpr std::int32_t return_value{10};
+    std::optional<argument_test_parser_t::validate_func_t> validate_func{
+        clapp::argument::gen_arg_validate_func<std::int32_t,
+                                               int32_value_func_t>(
+            []() { return return_value; }, []() { return true; },
+            []() { return true; },
+            std::vector<int32_validate_func_t>{
+                [](const std::int32_t& value,
+                   const std::string& argument_string) {
+                    if (argument_string != "argument string") {
+                        throw std::runtime_error{"argument_string invalid"};
+                    }
+                    if (value != return_value) {
+                        throw std::runtime_error{"value invalid"};
+                    }
+                }},
+            "argument string", argument_test_parser_t::purpose_t::mandatory)};
+    ASSERT_THAT(validate_func.has_value(), testing::Eq(true));
+    ASSERT_NO_THROW((*validate_func)());
+}
