@@ -133,8 +133,9 @@ class cli_parser_t : public clapp::basic_main_parser_t {
     clapp::sec_param_option_t seconds{*this, "seconds", "seconds option."};
     clapp::ms_param_option_t milliseconds{*this, "milliseconds",
                                           "milliseconds option."};
-    clapp::us_param_option_t microseconds{*this, "microseconds",
-                                          "microseconds option."};
+    clapp::us_param_option_t microseconds{
+        *this, "microseconds", "microseconds option.",
+        clapp::not_null_value_t<std::chrono::microseconds>{}};
     clapp::ns_param_option_t nanoseconds{*this, "nanoseconds",
                                          "nanoseconds option."};
 
