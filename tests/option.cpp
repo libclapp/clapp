@@ -2562,7 +2562,7 @@ TEST_F(optionT, genOptValidateFuncAndCallValidateFuncThrows) {
     ASSERT_THROW((*validate_func)(), clapp::exception::option_exception_t);
 }
 
-TEST_F(optionT, genOpftValidateFuncAndCallValidateFuncDoesntThrow) {
+TEST_F(optionT, genOptValidateFuncAndCallValidateFuncDoesntThrow) {
     std::optional<option_test_parser_t::validate_func_t> validate_func{
         clapp::option::gen_opt_validate_func<std::int32_t, int32_value_func_t>(
             std::nullopt, []() { return throw_unexpected_call(); },
