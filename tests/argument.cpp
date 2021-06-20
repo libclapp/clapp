@@ -469,6 +469,13 @@ TEST_F(argumentT, boolArgumentConstructOptionalStrAndCallGetOptionHelp) {
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
+TEST_F(argumentT, boolArgumentConstructMandatoryAfterOptionalThrows) {
+    clapp::argument::bool_argument_t arg{
+        tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
+    ASSERT_THROW((clapp::argument::bool_argument_t{tp, arg_cstr, desc_str}),
+                 clapp::exception::argument_exception_t);
+}
+
 TEST_F(argumentT, variadicBoolArgumentConstructOptionalStrWithoutValidateFunc) {
     clapp::argument::variadic_bool_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
