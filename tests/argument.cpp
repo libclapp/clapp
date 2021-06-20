@@ -24,6 +24,15 @@ class argument_test_parser_t : public clapp::parser::basic_parser_t {
     [[nodiscard]] std::string gen_short_line_prefix() const override;
 };
 
+class tiny_sub_parser_t : public clapp::parser::basic_sub_parser_t {
+   public:
+    using clapp::parser::basic_sub_parser_t::basic_sub_parser_t;
+
+    ~tiny_sub_parser_t() override;
+};
+
+tiny_sub_parser_t::~tiny_sub_parser_t() = default;
+
 template <typename ARGUMENT_T>
 static std::optional<argument_test_parser_t::variant_arg_conf_t>
 contains_argument(
@@ -473,6 +482,15 @@ TEST_F(argumentT, boolArgumentConstructMandatoryAfterOptionalThrows) {
     clapp::argument::bool_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THROW((clapp::argument::bool_argument_t{tp, arg_cstr, desc_str}),
+                 clapp::exception::argument_exception_t);
+}
+
+TEST_F(argumentT, boolArgumentConstructOptionalAfterSubParserThrows) {
+    const std::string sub_parser{"sub"};
+    tiny_sub_parser_t sub{tp, sub_parser, desc_str};
+    ASSERT_THROW((clapp::argument::bool_argument_t{
+                     tp, arg_cstr, desc_str,
+                     argument_test_parser_t::purpose_t::optional}),
                  clapp::exception::argument_exception_t);
 }
 
