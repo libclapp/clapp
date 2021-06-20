@@ -301,19 +301,18 @@ clapp::basic_parser_t::process_parse_result(
     const arg_iterator it,
     const clapp::basic_parser_t::parse_result_t& parse_result) {
     if (it == parse_result.it) {
+        Expects(parse_result.long_option || parse_result.short_option);
         if (parse_result.short_option) {
             std::stringstream ss;
             ss << "Invalid (sub-)parser option '-"
                << parse_result.short_option.value() << "'";
             throw clapp::exception::option_exception_t(ss.str());
-        }
-        if (parse_result.long_option) {
+        } else if (parse_result.long_option) {
             std::stringstream ss;
             ss << "Invalid (sub-)parser option '--"
                << parse_result.long_option.value() << "'";
             throw clapp::exception::option_exception_t(ss.str());
         }
-        return it + 1;  // ignore unknonwn arg
     }
     return parse_result.it;
 }
