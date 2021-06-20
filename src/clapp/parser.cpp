@@ -331,8 +331,7 @@ clapp::parser::basic_parser_t::parse_result_t clapp::basic_parser_t::parse(
     if (option.size() >= 3 && option[0] == '-' && option[1] == '-') {
         option.remove_prefix(2);
         return parse_long(option, it, end);
-    }
-    if (option.size() >= 2 && option[0] == '-') {
+    } else if (option.size() >= 2 && option[0] == '-') {
         option.remove_prefix(1);
         return parse_short(option, it, end);
     }
