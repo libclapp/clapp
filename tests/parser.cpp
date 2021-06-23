@@ -227,6 +227,20 @@ TEST_F(optConfT, ConstructOptNoParamConfFindOptionShortOption2) {
                 testing::Eq(onpc.short_options.end()));
 }
 
+TEST_F(optConfT,
+       ConstructOptNoParamConfContainsOptionShortOption1WithoutShortOptions) {
+    const opt_no_param_conf_t onpc{
+        {}, {std::move(np_loc1)}, std::move(valid), description};
+    ASSERT_THAT(onpc.contains_option(short_option1), testing::Eq(false));
+}
+
+TEST_F(optConfT,
+       ConstructOptNoParamConfContainsOptionLongOption1WithoutLongOptions) {
+    const opt_no_param_conf_t onpc{
+        {std::move(np_soc1)}, {}, std::move(valid), description};
+    ASSERT_THAT(onpc.contains_option(long_option1), testing::Eq(false));
+}
+
 TEST_F(optConfT, ConstructOptNoParamConfContainsOptionLongOption1) {
     const opt_no_param_conf_t onpc{{std::move(np_soc1)},
                                    {std::move(np_loc1)},
@@ -378,6 +392,21 @@ TEST_F(optConfT, ConstructOptScalarParamConfFindOptionShortOption2) {
                                        description};
     ASSERT_THAT(ospc.find_option(short_option2),
                 testing::Ne(ospc.short_options.end()));
+}
+
+TEST_F(
+    optConfT,
+    ConstructOptScalarParamConfContainsOptionShortOption1WithoutShortOptions) {
+    const opt_scalar_param_conf_t ospc{
+        {}, {std::move(sp_loc1)}, std::move(valid), description};
+    ASSERT_THAT(ospc.contains_option(short_option1), testing::Eq(false));
+}
+
+TEST_F(optConfT,
+       ConstructOptScalarParamConfContainsOptionLongOption1WithoutLongOptions) {
+    const opt_scalar_param_conf_t ospc{
+        {std::move(sp_soc1)}, {}, std::move(valid), description};
+    ASSERT_THAT(ospc.contains_option(long_option1), testing::Eq(false));
 }
 
 TEST_F(optConfT, ConstructOptScalarParamConfContainsOptionLongOption1) {
@@ -533,6 +562,21 @@ TEST_F(optConfT, ConstructOptVectorParamConfFindOptionShortOption2) {
                                        description};
     ASSERT_THAT(ovpc.find_option(short_option2),
                 testing::Ne(ovpc.short_options.end()));
+}
+
+TEST_F(
+    optConfT,
+    ConstructOptVectorParamConfContainsOptionShortOption1WithoutShortOptions) {
+    const opt_vector_param_conf_t ovpc{
+        {}, {std::move(vp_loc1)}, std::move(valid), description};
+    ASSERT_THAT(ovpc.contains_option(short_option1), testing::Eq(false));
+}
+
+TEST_F(optConfT,
+       ConstructOptVectorParamConfContainsOptionLongOption1WithoutLongOptions) {
+    const opt_vector_param_conf_t ovpc{
+        {std::move(vp_soc1)}, {}, std::move(valid), description};
+    ASSERT_THAT(ovpc.contains_option(long_option1), testing::Eq(false));
 }
 
 TEST_F(optConfT, ConstructOptVectorParamConfContainsOptionLongOption1) {
