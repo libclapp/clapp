@@ -32,8 +32,8 @@ TEST(helpEntry, ConstructAndCompare) {
 
 TEST(purpose, ToCstring) {
     ASSERT_THAT(clapp::parser::basic_parser_t::to_cstring(
-                    clapp::parser::basic_parser_t::purpose_t::optional),
-                testing::StrEq("optional"));
+                    clapp::parser::basic_parser_t::purpose_t::mandatory),
+                testing::StrEq("mandatory"));
     ASSERT_THAT(clapp::parser::basic_parser_t::to_cstring(
                     clapp::parser::basic_parser_t::purpose_t::optional),
                 testing::StrEq("optional"));
