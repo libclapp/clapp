@@ -307,7 +307,8 @@ clapp::basic_parser_t::process_parse_result(
             ss << "Invalid (sub-)parser option '-"
                << parse_result.short_option.value() << "'";
             throw clapp::exception::option_exception_t(ss.str());
-        } else if (parse_result.long_option) {
+        }
+        if (parse_result.long_option) {
             std::stringstream ss;
             ss << "Invalid (sub-)parser option '--"
                << parse_result.long_option.value() << "'";
@@ -331,7 +332,8 @@ clapp::parser::basic_parser_t::parse_result_t clapp::basic_parser_t::parse(
     if (option.size() >= 3 && option[0] == '-' && option[1] == '-') {
         option.remove_prefix(2);
         return parse_long(option, it, end);
-    } else if (option.size() >= 2 && option[0] == '-') {
+    }
+    if (option.size() >= 2 && option[0] == '-') {
         option.remove_prefix(1);
         return parse_short(option, it, end);
     }
