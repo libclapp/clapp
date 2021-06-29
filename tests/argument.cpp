@@ -611,7 +611,7 @@ TEST_F(argumentT,
     constexpr std::int64_t max_value_int64{0};
     clapp::argument::variadic_bool_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional,
-        clapp::value::min_max_value_t<std::int64_t>{min_value, max_value}};
+        clapp::value::min_max_value_t<bool>{min_value, max_value}};
     std::optional<argument_test_parser_t::validate_func_t>
         argument_validate_func{get_validate_func(tp, arg_str)};
     ASSERT_THAT(argument_validate_func, testing::Ne(std::nullopt));
