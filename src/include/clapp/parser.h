@@ -21,6 +21,7 @@
 #include <gsl/gsl_assert>
 #include <gsl/span>
 #include <map>
+#include <optional>
 #include <string>
 #include <variant>
 
