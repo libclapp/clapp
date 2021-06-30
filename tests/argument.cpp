@@ -917,6 +917,7 @@ TEST_F(argumentT, int64ArgumentConstructStrWithMinMaxValueAndCallArgFunc) {
 }
 
 TEST_F(argumentT, int64ArgumentConstructStrWithNotNullValue) {
+    static constexpr std::int64_t not_null_value{12};
     clapp::argument::int64_argument_t arg{
         tp, arg_str, desc_str, clapp::value::not_null_value_t<std::int64_t>{}};
 
@@ -928,7 +929,7 @@ TEST_F(argumentT, int64ArgumentConstructStrWithNotNullValue) {
     ASSERT_THROW((argument_validate_func.value()()),
                  clapp::exception::out_of_range_t);
     get_arg_func<argument_test_parser_t::argument_func_t>(
-        tp, arg_str)(std::to_string(12));
+        tp, arg_str)(std::to_string(not_null_value));
     ASSERT_NO_THROW((argument_validate_func.value()()));
 }
 
