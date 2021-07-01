@@ -22,12 +22,14 @@ clapp::exception::clapp_exception_t::clapp_exception_t(
     : std::runtime_error(message) {}
 clapp::exception::clapp_exception_t::clapp_exception_t(
     const clapp_exception_t&) = default;
-clapp::exception::clapp_exception_t& clapp::exception::clapp_exception_t::
-operator=(const clapp_exception_t&) = default;
+clapp::exception::clapp_exception_t&
+clapp::exception::clapp_exception_t::operator=(const clapp_exception_t&) =
+    default;
 clapp::exception::clapp_exception_t::clapp_exception_t(
     clapp_exception_t&&) noexcept = default;
-clapp::exception::clapp_exception_t& clapp::exception::clapp_exception_t::
-operator=(clapp_exception_t&&) noexcept = default;
+clapp::exception::clapp_exception_t&
+clapp::exception::clapp_exception_t::operator=(clapp_exception_t&&) noexcept =
+    default;
 clapp::exception::clapp_exception_t::~clapp_exception_t() noexcept = default;
 
 clapp::exception::invalid_value_t::invalid_value_t(const char* message)
@@ -51,12 +53,14 @@ clapp::exception::value_undefined_t::value_undefined_t(
     : clapp_exception_t(message) {}
 clapp::exception::value_undefined_t::value_undefined_t(
     const value_undefined_t&) = default;
-clapp::exception::value_undefined_t& clapp::exception::value_undefined_t::
-operator=(const value_undefined_t&) = default;
+clapp::exception::value_undefined_t&
+clapp::exception::value_undefined_t::operator=(const value_undefined_t&) =
+    default;
 clapp::exception::value_undefined_t::value_undefined_t(
     value_undefined_t&&) noexcept = default;
-clapp::exception::value_undefined_t& clapp::exception::value_undefined_t::
-operator=(value_undefined_t&&) noexcept = default;
+clapp::exception::value_undefined_t&
+clapp::exception::value_undefined_t::operator=(value_undefined_t&&) noexcept =
+    default;
 clapp::exception::value_undefined_t::~value_undefined_t() noexcept = default;
 
 clapp::exception::out_of_range_t::out_of_range_t(const char* message)
@@ -99,12 +103,14 @@ clapp::exception::option_exception_t::option_exception_t(
     : clapp_exception_t(message) {}
 clapp::exception::option_exception_t::option_exception_t(
     const option_exception_t&) = default;
-clapp::exception::option_exception_t& clapp::exception::option_exception_t::
-operator=(const option_exception_t&) = default;
+clapp::exception::option_exception_t&
+clapp::exception::option_exception_t::operator=(const option_exception_t&) =
+    default;
 clapp::exception::option_exception_t::option_exception_t(
     option_exception_t&&) noexcept = default;
-clapp::exception::option_exception_t& clapp::exception::option_exception_t::
-operator=(option_exception_t&&) noexcept = default;
+clapp::exception::option_exception_t&
+clapp::exception::option_exception_t::operator=(option_exception_t&&) noexcept =
+    default;
 clapp::exception::option_exception_t::~option_exception_t() noexcept = default;
 
 clapp::exception::option_param_exception_t::option_param_exception_t(
@@ -134,12 +140,14 @@ clapp::exception::argument_exception_t::argument_exception_t(
     : clapp_exception_t(message) {}
 clapp::exception::argument_exception_t::argument_exception_t(
     const argument_exception_t&) = default;
-clapp::exception::argument_exception_t& clapp::exception::argument_exception_t::
-operator=(const argument_exception_t&) = default;
+clapp::exception::argument_exception_t&
+clapp::exception::argument_exception_t::operator=(const argument_exception_t&) =
+    default;
 clapp::exception::argument_exception_t::argument_exception_t(
     argument_exception_t&&) noexcept = default;
-clapp::exception::argument_exception_t& clapp::exception::argument_exception_t::
-operator=(argument_exception_t&&) noexcept = default;
+clapp::exception::argument_exception_t&
+clapp::exception::argument_exception_t::operator=(
+    argument_exception_t&&) noexcept = default;
 clapp::exception::argument_exception_t::~argument_exception_t() noexcept =
     default;
 
@@ -150,12 +158,14 @@ clapp::exception::parser_exception_t::parser_exception_t(
     : clapp_exception_t(message) {}
 clapp::exception::parser_exception_t::parser_exception_t(
     const parser_exception_t&) = default;
-clapp::exception::parser_exception_t& clapp::exception::parser_exception_t::
-operator=(const parser_exception_t&) = default;
+clapp::exception::parser_exception_t&
+clapp::exception::parser_exception_t::operator=(const parser_exception_t&) =
+    default;
 clapp::exception::parser_exception_t::parser_exception_t(
     parser_exception_t&&) noexcept = default;
-clapp::exception::parser_exception_t& clapp::exception::parser_exception_t::
-operator=(parser_exception_t&&) noexcept = default;
+clapp::exception::parser_exception_t&
+clapp::exception::parser_exception_t::operator=(parser_exception_t&&) noexcept =
+    default;
 clapp::exception::parser_exception_t::~parser_exception_t() noexcept = default;
 
 clapp::exception::sub_parser_exception_t::sub_parser_exception_t(

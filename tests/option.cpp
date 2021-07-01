@@ -1,5 +1,6 @@
 #include <clapp/option.h>
 #include <gmock/gmock.h>
+
 #include "helper.h"
 
 class option_test_parser_t : public clapp::parser::basic_parser_t {

@@ -16,8 +16,6 @@
 #ifndef CLAPP_TYPE_TRAITS_H
 #define CLAPP_TYPE_TRAITS_H
 
-#include <type_traits>
-
 #include <chrono>
 #include <iostream>
 #include <type_traits>
@@ -43,8 +41,8 @@ template <typename T>
 class has_append_restriction_text {
    private:
     template <typename C>
-    constexpr static bool test([
-        [maybe_unused]] decltype(&C::append_restriction_text) func) {
+    constexpr static bool test(
+        [[maybe_unused]] decltype(&C::append_restriction_text) func) {
         return true;
     }
     template <typename C>
@@ -76,8 +74,8 @@ template <typename T>
 class has_default_value {
    private:
     template <typename C>
-    constexpr static bool test([
-        [maybe_unused]] decltype(&C::default_value) func) {
+    constexpr static bool test(
+        [[maybe_unused]] decltype(&C::default_value) func) {
         return true;
     }
     template <typename C>

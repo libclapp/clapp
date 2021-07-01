@@ -17,6 +17,7 @@
 #define CLAPP_PARSER_HPP
 
 #include <clapp/parser.h>
+
 #include <numeric>
 #include <sstream>
 

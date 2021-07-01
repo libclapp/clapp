@@ -1,6 +1,7 @@
 #include <clapp/argument.h>
 #include <clapp/sub_parser.h>
 #include <gmock/gmock.h>
+
 #include "helper.h"
 
 class argument_test_parser_t : public clapp::parser::basic_parser_t {

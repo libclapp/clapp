@@ -17,6 +17,7 @@
 #define CLAPP_VALUE_H
 
 #include <clapp/filesystem.h>
+
 #include <functional>
 #include <string>
 #include <string_view>

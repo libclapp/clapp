@@ -19,6 +19,7 @@
 #include <clapp/exception.h>
 #include <clapp/type_traits.h>
 #include <clapp/value.h>
+
 #include <gsl/gsl_assert>
 #include <sstream>
 

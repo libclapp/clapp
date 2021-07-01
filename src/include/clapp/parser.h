@@ -17,6 +17,7 @@
 #define CLAPP_PARSER_H
 
 #include <clapp/value.h>
+
 #include <functional>
 #include <gsl/gsl_assert>
 #include <gsl/span>

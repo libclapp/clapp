@@ -18,6 +18,7 @@
 
 #include <clapp/argument.h>
 #include <clapp/value.h>
+
 #include <numeric>
 
 namespace clapp {
@@ -207,8 +208,8 @@ constexpr clapp::argument::basic_argument_t<T>::operator bool() const noexcept {
 }
 
 template <typename T>
-constexpr bool clapp::argument::basic_argument_t<T>::has_value() const
-    noexcept {
+constexpr bool clapp::argument::basic_argument_t<T>::has_value()
+    const noexcept {
     return _value.has_value();
 }
 
@@ -269,14 +270,14 @@ clapp::argument::basic_variadic_argument_t<T>::basic_variadic_argument_t(
 }
 
 template <typename T>
-inline clapp::argument::basic_variadic_argument_t<T>::operator bool() const
-    noexcept {
+inline clapp::argument::basic_variadic_argument_t<T>::operator bool()
+    const noexcept {
     return !_value.empty();
 }
 
 template <typename T>
-inline bool clapp::argument::basic_variadic_argument_t<T>::has_value() const
-    noexcept {
+inline bool clapp::argument::basic_variadic_argument_t<T>::has_value()
+    const noexcept {
     return !_value.empty();
 }
 
@@ -286,8 +287,8 @@ std::vector<T> clapp::argument::basic_variadic_argument_t<T>::value() const {
 }
 
 template <typename T>
-constexpr bool clapp::argument::basic_variadic_argument_t<T>::given() const
-    noexcept {
+constexpr bool clapp::argument::basic_variadic_argument_t<T>::given()
+    const noexcept {
     return _given;
 }
 

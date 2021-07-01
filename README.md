@@ -102,13 +102,13 @@ Coverage:
 Clang-Tidy:
 -----------
 
-    CXX=clang++-7 CC=clang-7 cmake -DCLANG_TIDY=clang-tidy-7 -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DlibClaPP_BUILD_COVERAGE=On -DCMAKE_BUILD_TYPE=Debug -DlibClaPP_CLANG_TIDY=On ..
+    CXX=clang++-11 CC=clang-11 cmake -DCLANG_TIDY=clang-tidy-11 -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DlibClaPP_BUILD_COVERAGE=On -DCMAKE_BUILD_TYPE=Debug -DlibClaPP_CLANG_TIDY=On ..
 
 Clang-Format:
 -------------
 
-This project uses a clang-format style based on the Google style (`clang-format-7 -style=Google -dump-config`) but modified a bit (see [.clang-format](.clang-format)).
+This project uses a clang-format style based on the Google style (`clang-format-11 -style=Google -dump-config`) but modified a bit (see [.clang-format](.clang-format)).
 
 To format the whole project, use the following command:
 
-    find src tests examples -iname *.h -o -iname *.cpp -o -iname *.c -o -iname *.hpp | xargs clang-format-7 -i
+    find src tests examples -iname *.h -o -iname *.cpp -o -iname *.c -o -iname *.hpp | xargs clang-format-11 -i

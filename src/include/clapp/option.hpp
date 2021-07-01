@@ -19,6 +19,7 @@
 #include <clapp/option.h>
 #include <clapp/type_traits.h>
 #include <clapp/value.h>
+
 #include <numeric>
 #include <sstream>
 
@@ -39,8 +40,8 @@ basic_help_option_t<EXIT_CODE>::~basic_help_option_t() = default;
 }  // namespace clapp
 
 template <typename T>
-inline void clapp::option::gen_opt_conf_process_params([
-    [maybe_unused]] opt_params_t<T>& opt_params) {}
+inline void clapp::option::gen_opt_conf_process_params(
+    [[maybe_unused]] opt_params_t<T>& opt_params) {}
 
 template <typename T, typename Param>
 void clapp::option::gen_opt_conf_process_params(opt_params_t<T>& opt_params,
@@ -350,14 +351,14 @@ void clapp::option::basic_param_option_t<T>::found_entry(
 }
 
 template <typename T>
-constexpr clapp::option::basic_param_option_t<T>::operator bool() const
-    noexcept {
+constexpr clapp::option::basic_param_option_t<T>::operator bool()
+    const noexcept {
     return _value.has_value();
 }
 
 template <typename T>
-constexpr bool clapp::option::basic_param_option_t<T>::has_value() const
-    noexcept {
+constexpr bool clapp::option::basic_param_option_t<T>::has_value()
+    const noexcept {
     return _value.has_value();
 }
 
@@ -419,14 +420,14 @@ void clapp::option::basic_vector_param_option_t<T>::found_entry(
 }
 
 template <typename T>
-inline clapp::option::basic_vector_param_option_t<T>::operator bool() const
-    noexcept {
+inline clapp::option::basic_vector_param_option_t<T>::operator bool()
+    const noexcept {
     return !_value.empty();
 }
 
 template <typename T>
-inline bool clapp::option::basic_vector_param_option_t<T>::has_value() const
-    noexcept {
+inline bool clapp::option::basic_vector_param_option_t<T>::has_value()
+    const noexcept {
     return !_value.empty();
 }
 
@@ -436,8 +437,8 @@ std::vector<T> clapp::option::basic_vector_param_option_t<T>::value() const {
 }
 
 template <typename T>
-constexpr bool clapp::option::basic_vector_param_option_t<T>::given() const
-    noexcept {
+constexpr bool clapp::option::basic_vector_param_option_t<T>::given()
+    const noexcept {
     return _given;
 }
 
