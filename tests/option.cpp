@@ -396,7 +396,7 @@ class optionT : public ::testing::Test {
     using int32_validate_func_t = std::function<void(
         const std::int32_t&, const std::string& option_string)>;
 
-    option_test_parser_t tp;
+    option_test_parser_t tp{};
     std::size_t found_func_called{0};
 
     inline static const char* param_opt_postfix{"=<param>"};

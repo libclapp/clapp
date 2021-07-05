@@ -938,7 +938,7 @@ TEST(parser, callDefaultPrintAndExitWithStringAndExitCode) {
 }
 
 TEST(parser, setAndCallPrintAndExitWithString) {
-    print_and_exit_t pae;
+    print_and_exit_t pae{};
     simple_test_parser_t stp;
     stp.set_print_and_exit_func([&pae](const std::string_view text,
                                        const std::optional<int> exit_code) {
@@ -952,7 +952,7 @@ TEST(parser, setAndCallPrintAndExitWithString) {
 }
 
 TEST(parser, setAndCallPrintAndExitWithStringAndExitCode) {
-    print_and_exit_t pae;
+    print_and_exit_t pae{};
     simple_test_parser_t stp;
     stp.set_print_and_exit_func([&pae](const std::string_view text,
                                        const std::optional<int> exit_code) {

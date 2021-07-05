@@ -276,7 +276,7 @@ class argumentT : public ::testing::Test {
     using int32_validate_func_t = std::function<void(
         const std::int32_t&, const std::string& option_string)>;
 
-    argument_test_parser_t tp;
+    argument_test_parser_t tp{};
     std::size_t found_func_called{0};
 
     inline static const std::string arg_str{"arg-str"};
