@@ -6,6 +6,11 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang
       list(APPEND libClaPP_SANITIZERS "address")
     endif()
 
+    option(libClaPP_ENABLE_SANITIZER_LEAK "Leak sanitizer" FALSE)
+    if(libClaPP_ENABLE_SANITIZER_LEAK)
+      list(APPEND libClaPP_SANITIZERS "leak")
+    endif()
+
     option(libClaPP_ENABLE_SANITIZER_MEMORY "Memory sanitizer" FALSE)
     if(libClaPP_ENABLE_SANITIZER_MEMORY)
       list(APPEND libClaPP_SANITIZERS "memory")
