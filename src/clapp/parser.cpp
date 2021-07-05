@@ -15,6 +15,8 @@
 
 #include <clapp/parser.h>
 #include <clapp/sub_parser.h>
+#include <unistd.h>
+
 #include <iostream>
 #include <sstream>
 #include <utility>
@@ -531,7 +533,7 @@ void clapp::parser::basic_parser_t::default_print_and_exit(
     std::cout << print_msg;
     std::cout.flush();
     if (exit_code) {
-        exit(exit_code.value());
+        _exit(exit_code.value());
     }
 }
 
