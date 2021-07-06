@@ -182,9 +182,9 @@ std::ostream &operator<<(std::ostream &out, const entry_t &e);
 template <>
 entry_t clapp::value::convert_value<entry_t>(std::string_view param);
 
-void process_cmd1(const cli_parser_t::cmd1_parser_t &cmd1);
-
-void process_cmd2(const cli_parser_t::cmd2_parser_t &cmd2);
+static void process_options_and_args(const cli_parser_t &cp);
+static void process_cmd1(const cli_parser_t::cmd1_parser_t &cmd1);
+static void process_cmd2(const cli_parser_t::cmd2_parser_t &cmd2);
 
 cli_parser_t::~cli_parser_t() = default;
 cli_parser_t::cmd1_parser_t::~cmd1_parser_t() = default;
@@ -270,6 +270,88 @@ void process_cmd2(const cli_parser_t::cmd2_parser_t &cmd2) {
     }
 }
 
+void process_options_and_args(const cli_parser_t &cp) {
+    if (cp.string_arg) {
+        std::cout << "string-arg: " << cp.string_arg.value() << "\n";
+    } else {
+        std::cout << "string-arg: not given\n";
+    }
+
+    if (cp.verbose.given()) {
+        std::cout << "verbose: " << cp.verbose.value() << "\n";
+    } else {
+        std::cout << "verbose: not given\n";
+    }
+
+    if (cp.string_param) {
+        std::cout << "string_param: '" << cp.string_param.value() << "'\n";
+    } else {
+        std::cout << "string_param: not given\n";
+    }
+
+    if (cp.string_vector_param) {
+        std::cout << "string_vector_param (size: "
+                  << cp.string_vector_param.value().size() << "): ";
+        for (auto &val : cp.string_vector_param.value()) {
+            std::cout << val << ", ";
+        }
+        std::cout << "\n";
+
+    } else {
+        std::cout << "string_vector_param: not given\n";
+    }
+
+    if (cp.short_bool.given()) {
+        std::cout << "short_bool: given\n";
+    } else {
+        std::cout << "short_bool: not given\n";
+    }
+
+    if (cp.restricted_bool.given()) {
+        std::cout << "restricted_bool: given\n";
+    } else {
+        std::cout << "restricted_bool: not given\n";
+    }
+
+    if (cp.long_bool.given()) {
+        std::cout << "long_bool: " << cp.long_bool.value() << "\n";
+    } else {
+        std::cout << "long_bool: not given\n";
+    }
+
+    if (cp.count.given()) {
+        std::cout << "count: " << cp.count.value() << "\n";
+    } else {
+        std::cout << "count: not given\n";
+    }
+
+#ifdef CLAPP_FS_AVAIL
+    if (cp.test_file) {
+        std::cout << "test-file: " << cp.test_file.value() << "\n";
+    } else {
+        std::cout << "test-file: not given\n";
+    }
+#else
+    std::cout << "without fs\n";
+#endif
+
+    if (cp.constrained_int) {
+        std::cout << "constrained_int: " << cp.constrained_int.value() << "\n";
+    } else {
+        std::cout << "constrained_int: not given\n";
+    }
+    std::cout << "mandatory_bool: " << cp.mandatory_bool.value() << "\n";
+
+    std::cout << "mandatory_int: " << cp.mandatory_int.value() << "\n";
+    std::cout << "default_int: " << cp.default_int.value() << "\n";
+
+    if (cp.optional_int) {
+        std::cout << "optional_int: " << cp.optional_int.value() << "\n";
+    }
+
+    std::cout << "entry_param: '" << cp.entry_param.value() << "'\n";
+}
+
 int main(int argc, char *argv[]) {
     try {
         std::cout << clapp::build_info::build_info_string << std::endl;
@@ -292,86 +374,7 @@ int main(int argc, char *argv[]) {
 
         cp.validate();
 
-        if (cp.string_arg) {
-            std::cout << "string-arg: " << cp.string_arg.value() << "\n";
-        } else {
-            std::cout << "string-arg: not given\n";
-        }
-
-        if (cp.verbose.given()) {
-            std::cout << "verbose: " << cp.verbose.value() << "\n";
-        } else {
-            std::cout << "verbose: not given\n";
-        }
-
-        if (cp.string_param) {
-            std::cout << "string_param: '" << cp.string_param.value() << "'\n";
-        } else {
-            std::cout << "string_param: not given\n";
-        }
-
-        if (cp.string_vector_param) {
-            std::cout << "string_vector_param (size: "
-                      << cp.string_vector_param.value().size() << "): ";
-            for (auto &val : cp.string_vector_param.value()) {
-                std::cout << val << ", ";
-            }
-            std::cout << "\n";
-
-        } else {
-            std::cout << "string_vector_param: not given\n";
-        }
-
-        if (cp.short_bool.given()) {
-            std::cout << "short_bool: given\n";
-        } else {
-            std::cout << "short_bool: not given\n";
-        }
-
-        if (cp.restricted_bool.given()) {
-            std::cout << "restricted_bool: given\n";
-        } else {
-            std::cout << "restricted_bool: not given\n";
-        }
-
-        if (cp.long_bool.given()) {
-            std::cout << "long_bool: " << cp.long_bool.value() << "\n";
-        } else {
-            std::cout << "long_bool: not given\n";
-        }
-
-        if (cp.count.given()) {
-            std::cout << "count: " << cp.count.value() << "\n";
-        } else {
-            std::cout << "count: not given\n";
-        }
-
-#ifdef CLAPP_FS_AVAIL
-        if (cp.test_file) {
-            std::cout << "test-file: " << cp.test_file.value() << "\n";
-        } else {
-            std::cout << "test-file: not given\n";
-        }
-#else
-        std::cout << "without fs\n";
-#endif
-
-        if (cp.constrained_int) {
-            std::cout << "constrained_int: " << cp.constrained_int.value()
-                      << "\n";
-        } else {
-            std::cout << "constrained_int: not given\n";
-        }
-        std::cout << "mandatory_bool: " << cp.mandatory_bool.value() << "\n";
-
-        std::cout << "mandatory_int: " << cp.mandatory_int.value() << "\n";
-        std::cout << "default_int: " << cp.default_int.value() << "\n";
-
-        if (cp.optional_int) {
-            std::cout << "optional_int: " << cp.optional_int.value() << "\n";
-        }
-
-        std::cout << "entry_param: '" << cp.entry_param.value() << "'\n";
+        process_options_and_args(cp);
 
         if (cp.cmd1) {
             std::cout << "cmd1 given" << std::endl;
