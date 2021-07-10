@@ -94,6 +94,7 @@ struct opt_conf_container_t {
 template <typename T>
 class basic_param_option_t {
    public:
+    using value_t = T;
     using callbacks_t = option_param_callbacks_t<T>;
     using opt_conf_t = basic_parser_t::opt_scalar_param_conf_t;
 
@@ -123,6 +124,7 @@ class basic_param_option_t {
 template <typename T>
 class basic_vector_param_option_t {
    public:
+    using value_t = T;
     using callbacks_t = option_vector_param_callbacks_t<T>;
     using opt_conf_t = basic_parser_t::opt_vector_param_conf_t;
 
@@ -157,6 +159,7 @@ class basic_vector_param_option_t {
 template <typename T, T default_value_param>
 class basic_option_t {
    public:
+    using value_t = T;
     using callbacks_t = option_callbacks_t<T>;
     using opt_conf_t = basic_parser_t::opt_no_param_conf_t;
 

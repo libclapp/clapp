@@ -103,6 +103,7 @@ arg_conf_container_t<T, ARG_CONF> gen_arg_conf(CALLBACKS&& callbacks,
 template <typename T>
 class basic_argument_t {
    public:
+    using value_t = T;
     using callbacks_t = argument_callbacks_t<T>;
     using arg_conf_t = basic_parser_t::single_arg_conf_t;
 
@@ -129,6 +130,7 @@ class basic_argument_t {
 template <typename T>
 class basic_variadic_argument_t {
    public:
+    using value_t = T;
     using callbacks_t = variadic_argument_callbacks_t<T>;
     using arg_conf_t = basic_parser_t::variadic_arg_conf_t;
 
