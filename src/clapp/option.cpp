@@ -77,7 +77,7 @@ clapp::option::count_option_t::create_callbacks(count_option_t* inst) {
 
 void clapp::option::count_option_t::found_entry() {
     _given = true;
-    _value = _value.value() + 1;
+    _value = _value + 1;
     for (auto& found_func : _found) {
         found_func.found();
     }

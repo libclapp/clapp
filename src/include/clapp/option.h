@@ -154,7 +154,7 @@ class basic_vector_param_option_t {
     bool _given{false};
 };
 
-template <typename T>
+template <typename T, T default_value_param>
 class basic_option_t {
    public:
     using callbacks_t = option_callbacks_t<T>;
@@ -175,13 +175,15 @@ class basic_option_t {
     T value() const;
     bool given() const;
 
+    static constexpr T default_value = default_value_param;
+
    protected:
     std::vector<clapp::value::found_func_t> _found{};
-    std::optional<T> _value{};
+    T _value{default_value};
     bool _given{false};
 };
 
-class bool_option_t : public basic_option_t<bool> {
+class bool_option_t : public basic_option_t<bool, false> {
    public:
     template <typename... Params>
     explicit bool_option_t(basic_parser_t& parser, Params... parameters);
@@ -213,7 +215,7 @@ class basic_help_option_t : public bool_option_t {
         basic_parser_t& parser);
 };
 
-class count_option_t : public basic_option_t<std::uint32_t> {
+class count_option_t : public basic_option_t<std::uint32_t, 0U> {
    public:
     template <typename... Params>
     explicit count_option_t(basic_parser_t& parser, Params... parameters);

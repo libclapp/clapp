@@ -86,7 +86,7 @@ MATCHER(BoolOptionNotGiven, "Checks, if bool option not given.") {
                      << (arg.has_value() ? "true" : "false")
                      << ", given(): " << (arg.given() ? "true" : "false")
                      << ", value(): " << (arg.value() ? "true" : "false");
-    return static_cast<bool>(arg) && arg.has_value() && !arg.given() &&
+    return !static_cast<bool>(arg) && arg.has_value() && !arg.given() &&
            !arg.value();
 }
 
@@ -343,7 +343,7 @@ std::string option_test_parser_t::gen_short_line_prefix() const {
     return "opt-test-parser" + gen_short_line();
 }
 
-class test_option_t : public clapp::option::basic_option_t<std::int32_t> {
+class test_option_t : public clapp::option::basic_option_t<std::int32_t, 0> {
    public:
     template <typename... Params>
     explicit test_option_t(clapp::parser::basic_parser_t& parser,
@@ -360,19 +360,19 @@ class test_option_t : public clapp::option::basic_option_t<std::int32_t> {
 template <typename... Params>
 test_option_t::test_option_t(clapp::basic_parser_t& parser,
                              Params... parameters)
-    : clapp::basic_option_t<std::int32_t>{parser, create_callbacks(this),
-                                          std::forward<Params>(parameters)...} {
-}
+    : clapp::basic_option_t<std::int32_t, 0>{
+          parser, create_callbacks(this),
+          std::forward<Params>(parameters)...} {}
 
 void test_option_t::found_entry() {
     _given = true;
-    _value = _value.value() + 1;
+    _value++;
     for (auto& found_func : _found) {
         found_func.found();
     }
 }
 
-inline test_option_t::operator bool() const { return _value.value() != 0; }
+inline test_option_t::operator bool() const { return _value != 0; }
 
 test_option_t::~test_option_t() = default;
 
@@ -438,14 +438,14 @@ bool optionT::throw_unexpected_call() {
     throw std::runtime_error{"unexpected call"};
 }
 
-TEST_F(optionT, basicOptionConstructLongAndCallValueThrows) {
+TEST_F(optionT, basicOptionConstructLongAndCallValueReturnsDefaultValue) {
     test_option_t opt{tp, long_opt_str, opt_desc_str};
-    ASSERT_THROW(opt.value(), clapp::exception::value_undefined_t);
+    ASSERT_THAT(opt.value(), test_option_t::default_value);
 }
 
-TEST_F(optionT, basicOptionConstructShortAndCallValueThrows) {
+TEST_F(optionT, basicOptionConstructShortAndCallValueReturnsDefaultValue) {
     test_option_t opt{tp, short_opt, opt_desc_str};
-    ASSERT_THROW(opt.value(), clapp::exception::value_undefined_t);
+    ASSERT_THAT(opt.value(), test_option_t::default_value);
 }
 
 TEST_F(optionT, boolOptionConstructShort) {
@@ -655,8 +655,7 @@ TEST_F(optionT, boolOptionalConstructOptionalLongWithNotNullValue) {
 
     std::optional<option_test_parser_t::validate_func_t> option_validate_func{
         get_validate_func(tp, long_opt_cstr)};
-    ASSERT_THROW((option_validate_func.value()()),
-                 clapp::exception::out_of_range_t);
+    ASSERT_NO_THROW((option_validate_func.value()()));
     get_long_opt_func<option_test_parser_t::long_opt_func_t>(
         tp, long_opt_cstr)(long_opt_cstr);
     ASSERT_NO_THROW((option_validate_func.value()()));

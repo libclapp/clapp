@@ -163,7 +163,7 @@ TEST(subParser, constructSimpleSubParserAndParseSubOption) {
     ASSERT_THAT(static_cast<bool>(sub), testing::Eq(false));
     ASSERT_THAT(sub.get_sub_parser_name(), testing::StrEq(sub_parser));
 
-    ASSERT_THAT(static_cast<bool>(sub.bool_option), testing::Eq(true));
+    ASSERT_THAT(static_cast<bool>(sub.bool_option), testing::Eq(false));
     ASSERT_THAT(sub.bool_option.has_value(), testing::Eq(true));
     ASSERT_THAT(sub.bool_option.value(), testing::Eq(false));
     tp.parse(arg.begin(), arg.end());

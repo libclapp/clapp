@@ -1221,7 +1221,7 @@ TEST(parser, constructSimpleTestParserParseArgumentAndValidateRecursive) {
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t ebp;
     ASSERT_NO_THROW(ebp.parse(arg.begin(), arg.end()));
-    ASSERT_THAT(static_cast<bool>(ebp.bool_option), testing::Eq(true));
+    ASSERT_THAT(static_cast<bool>(ebp.bool_option), testing::Eq(false));
     ASSERT_THAT(ebp.bool_option.has_value(), testing::Eq(true));
     ASSERT_THAT(ebp.bool_option.value(), testing::Eq(false));
     ASSERT_THAT(static_cast<bool>(ebp.int_option), testing::Eq(false));
@@ -1256,7 +1256,7 @@ TEST(parser,
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t ebp;
     ASSERT_NO_THROW(ebp.parse(arg.begin(), arg.end()));
-    ASSERT_THAT(static_cast<bool>(ebp.bool_option), testing::Eq(true));
+    ASSERT_THAT(static_cast<bool>(ebp.bool_option), testing::Eq(false));
     ASSERT_THAT(ebp.bool_option.has_value(), testing::Eq(true));
     ASSERT_THAT(ebp.bool_option.value(), testing::Eq(false));
     ASSERT_THAT(static_cast<bool>(ebp.int_option), testing::Eq(true));
@@ -1276,7 +1276,7 @@ TEST(
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t ebp;
     ASSERT_NO_THROW(ebp.parse(arg.begin(), arg.end()));
-    ASSERT_THAT(static_cast<bool>(ebp.bool_option), testing::Eq(true));
+    ASSERT_THAT(static_cast<bool>(ebp.bool_option), testing::Eq(false));
     ASSERT_THAT(ebp.bool_option.has_value(), testing::Eq(true));
     ASSERT_THAT(ebp.bool_option.value(), testing::Eq(false));
     ASSERT_THAT(static_cast<bool>(ebp.int_option), testing::Eq(true));
@@ -1320,7 +1320,7 @@ TEST(parser, constructSimpleTestParser2ParseWithoutMandatoryOptionThrows) {
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser2_t ebp;
     ASSERT_NO_THROW(ebp.parse(arg.begin(), arg.end()));
-    ASSERT_THAT(static_cast<bool>(ebp.count_option), testing::Eq(true));
+    ASSERT_THAT(static_cast<bool>(ebp.count_option), testing::Eq(false));
     ASSERT_THAT(ebp.count_option.has_value(), testing::Eq(true));
     ASSERT_THAT(ebp.count_option.value(), testing::Eq(0));
     ASSERT_THROW(ebp.validate(), clapp::option_param_exception_t);
@@ -1359,10 +1359,10 @@ TEST(parser, constructSubParserContainerParseSubparserAndValidate) {
     ASSERT_NO_THROW(spc.parse(arg.begin(), arg.end()));
     ASSERT_THAT(static_cast<bool>(spc.string_arg), testing::Eq(true));
     ASSERT_THAT(spc.string_arg.value(), testing::StrEq("string-arg"));
-    ASSERT_THAT(static_cast<bool>(spc.bool_option), testing::Eq(true));
+    ASSERT_THAT(static_cast<bool>(spc.bool_option), testing::Eq(false));
     ASSERT_THAT(spc.bool_option.has_value(), testing::Eq(true));
     ASSERT_THAT(spc.bool_option.value(), testing::Eq(false));
-    ASSERT_THAT(static_cast<bool>(spc.bool_option2), testing::Eq(true));
+    ASSERT_THAT(static_cast<bool>(spc.bool_option2), testing::Eq(false));
     ASSERT_THAT(spc.bool_option2.has_value(), testing::Eq(true));
     ASSERT_THAT(spc.bool_option2.value(), testing::Eq(false));
     ASSERT_THAT(static_cast<bool>(spc.sub_parser.bool_option),
@@ -1391,7 +1391,7 @@ TEST(parser, constructSubParserContainerParseSubparserAndValidate2) {
     ASSERT_THAT(spc.bool_option2.has_value(), testing::Eq(true));
     ASSERT_THAT(spc.bool_option2.value(), testing::Eq(true));
     ASSERT_THAT(static_cast<bool>(spc.sub_parser.bool_option),
-                testing::Eq(true));
+                testing::Eq(false));
     ASSERT_THAT(spc.sub_parser.bool_option.has_value(), testing::Eq(true));
     ASSERT_THAT(spc.sub_parser.bool_option.value(), testing::Eq(false));
     ASSERT_THAT(static_cast<bool>(spc.sub_parser.string_option),

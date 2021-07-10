@@ -31,8 +31,8 @@ basic_param_option_t<T>::~basic_param_option_t() = default;
 template <typename T>
 basic_vector_param_option_t<T>::~basic_vector_param_option_t() = default;
 
-template <typename T>
-basic_option_t<T>::~basic_option_t() = default;
+template <typename T, T default_value>
+basic_option_t<T, default_value>::~basic_option_t() = default;
 
 template <int EXIT_CODE>
 basic_help_option_t<EXIT_CODE>::~basic_help_option_t() = default;
@@ -442,48 +442,47 @@ constexpr bool clapp::option::basic_vector_param_option_t<T>::given()
     return _given;
 }
 
-template <typename T>
+template <typename T, T default_value>
 template <typename... Params>
-clapp::option::basic_option_t<T>::basic_option_t(clapp::basic_parser_t& parser,
-                                                 callbacks_t&& callbacks,
-                                                 Params&&... parameters) {
+clapp::option::basic_option_t<T, default_value>::basic_option_t(
+    clapp::basic_parser_t& parser, callbacks_t&& callbacks,
+    Params&&... parameters) {
     opt_conf_container_t<T, opt_conf_t> conf{gen_opt_conf<T, opt_conf_t>(
         callbacks, std::forward<Params>(parameters)...)};
     parser.reg(std::move(conf.opt_conf));
-    _value = conf.default_value;
+    if (conf.default_value) {
+        _value = conf.default_value.value();
+    }
     _found = std::move(conf.found);
 }
 
-template <typename T>
-T clapp::option::basic_option_t<T>::value() const {
-    if (!_value) {
-        throw clapp::exception::value_undefined_t{
-            "Requested option value is not defined."};
-    }
-    const T ret{_value.value()};
-    return ret;
+template <typename T, T default_value>
+T clapp::option::basic_option_t<T, default_value>::value() const {
+    return _value;
 }
 
-template <typename T>
-bool clapp::option::basic_option_t<T>::given() const {
+template <typename T, T default_value>
+bool clapp::option::basic_option_t<T, default_value>::given() const {
     return _given;
 }
 
-template <typename T>
-constexpr clapp::option::basic_option_t<T>::operator bool() const noexcept {
-    return _value.has_value();
+template <typename T, T default_value>
+constexpr clapp::option::basic_option_t<T, default_value>::operator bool()
+    const noexcept {
+    return _value != default_value;
 }
 
-template <typename T>
-constexpr bool clapp::option::basic_option_t<T>::has_value() const noexcept {
-    return _value.has_value();
+template <typename T, T default_value>
+constexpr bool clapp::option::basic_option_t<T, default_value>::has_value()
+    const noexcept {
+    return true;
 }
 
 template <typename... Params>
 clapp::option::bool_option_t::bool_option_t(clapp::basic_parser_t& parser,
                                             Params... parameters)
-    : clapp::basic_option_t<bool>{parser, create_callbacks(this),
-                                  std::forward<Params>(parameters)...} {
+    : clapp::basic_option_t<bool, false>{parser, create_callbacks(this),
+                                         std::forward<Params>(parameters)...} {
     if (!_value) {
         _value = false;
     }
@@ -506,7 +505,7 @@ clapp::option::basic_help_option_t<EXIT_CODE>::gen_func_print_help_and_exit(
 template <typename... Params>
 clapp::option::count_option_t::count_option_t(clapp::basic_parser_t& parser,
                                               Params... parameters)
-    : clapp::basic_option_t<std::uint32_t>{
+    : clapp::basic_option_t<std::uint32_t, 0U>{
           parser, create_callbacks(this), std::forward<Params>(parameters)...} {
     if (!_value) {
         _value = 0;
