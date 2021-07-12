@@ -882,6 +882,24 @@ sub_parser_container_t::~sub_parser_container_t() = default;
     return "sub_parser_container" + gen_short_line();
 }
 
+class help_parser_t : public clapp::basic_parser_t {
+   public:
+    using clapp::basic_parser_t::basic_parser_t;
+    ~help_parser_t() override;
+
+    clapp::option::help_option_t help_option{
+        *this, std::vector<std::string>{"h", "help"},
+        std::vector<char>{'h', '?'}, "Print help and exit."};
+
+    [[nodiscard]] std::string gen_short_line_prefix() const override;
+};
+
+help_parser_t::~help_parser_t() = default;
+
+[[nodiscard]] std::string help_parser_t::gen_short_line_prefix() const {
+    return "help-parser" + gen_short_line();
+}
+
 TEST(parser, constructEmptyBasicParser) { empty_basic_parser_t ebp; }
 
 TEST(parser, constructEmptyBasicParserAndParseEmptyArguments) {
@@ -935,6 +953,65 @@ TEST(parser, callDefaultPrintAndExitWithStringAndExitCode) {
                 ::testing::ExitedWithCode(exit_code), "");
     const std::string output{testing::internal::GetCapturedStdout()};
     ASSERT_THAT(output, testing::StrEq(text));
+}
+
+static constexpr const char help_str[] =
+    "Usage:\nhelp-parser [-h|-?|--h|--help]\n\n  Options:\n    "
+    "-h|-?|--h|--help Print help and exit. (optional)\n";
+
+TEST(parser, constructHelpParserAndParseEmptyArguments) {
+    constexpr const char* const argv[]{nullptr};
+    const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
+    help_parser_t hp;
+    ASSERT_NO_THROW(hp.parse(arg.begin(), arg.end()));
+}
+
+TEST(parser, constructHelpParserAndParseHelpOptionLong1) {
+    constexpr const char* const argv[]{"--help", nullptr};
+    const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
+    help_parser_t hp;
+    static constexpr int exit_code{EXIT_SUCCESS};
+    testing::internal::CaptureStdout();
+    ASSERT_EXIT(hp.parse(arg.begin(), arg.end()),
+                ::testing::ExitedWithCode(exit_code), "");
+    std::string output = testing::internal::GetCapturedStdout();
+    ASSERT_THAT(output, testing::StrEq(help_str));
+}
+
+TEST(parser, constructHelpParserAndParseHelpOptionLong2) {
+    constexpr const char* const argv[]{"--h", nullptr};
+    const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
+    help_parser_t hp;
+    static constexpr int exit_code{EXIT_SUCCESS};
+    testing::internal::CaptureStdout();
+    ASSERT_EXIT(hp.parse(arg.begin(), arg.end()),
+                ::testing::ExitedWithCode(exit_code), "");
+    std::string output = testing::internal::GetCapturedStdout();
+    ASSERT_THAT(output, testing::StrEq(help_str));
+}
+
+TEST(parser, constructHelpParserAndParseHelpOptionShort1) {
+    constexpr const char* const argv[]{"-h", nullptr};
+    const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
+    help_parser_t hp;
+    static constexpr int exit_code{EXIT_SUCCESS};
+    testing::internal::CaptureStdout();
+    ASSERT_EXIT(hp.parse(arg.begin(), arg.end()),
+                ::testing::ExitedWithCode(exit_code), "");
+    std::string output = testing::internal::GetCapturedStdout();
+    ASSERT_THAT(output, testing::StrEq(help_str));
+}
+
+TEST(parser, constructHelpParserAndParseHelpOptionShort2) {
+    constexpr const char* const argv[]{"-?", nullptr};
+    const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
+    help_parser_t hp;
+    static constexpr int exit_code{EXIT_SUCCESS};
+    testing::internal::CaptureStdout();
+    ASSERT_EXIT(hp.parse(arg.begin(), arg.end()),
+                ::testing::ExitedWithCode(exit_code), "");
+    std::string output = testing::internal::GetCapturedStdout();
+    ASSERT_THAT(output, testing::StrEq(help_str));
 }
 
 TEST(parser, setAndCallPrintAndExitWithString) {
