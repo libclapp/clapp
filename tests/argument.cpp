@@ -12,7 +12,6 @@ class argument_test_parser_t : public clapp::parser::basic_parser_t {
     using clapp::parser::basic_parser_t::argument_descriptions_vec_t;
     using clapp::parser::basic_parser_t::argument_func_t;
     using clapp::parser::basic_parser_t::argument_type_t;
-    using clapp::parser::basic_parser_t::arguments_vector_t;
     using clapp::parser::basic_parser_t::validate_func_vec_t;
 
     using clapp::parser::basic_parser_t::get_argument_help;

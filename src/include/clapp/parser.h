@@ -92,12 +92,6 @@ class basic_parser_t {
         long_option_func_t func;
     };
 
-    struct arg_conf_t {
-        std::string argument;
-        argument_func_t func;
-        argument_type_t argument_type;
-    };
-
     template <typename short_option_func_t, typename long_option_func_t,
               option_type_t option_type>
     struct basic_reg_option_conf_t {
@@ -180,8 +174,6 @@ class basic_parser_t {
 
     using sub_parsers_map_t =
         std::map<std::string, basic_sub_parser_t&, std::less<>>;
-    using arguments_vector_t = std::vector<arg_conf_t>;
-    using optional_argument_t = std::optional<arg_conf_t>;
     using validate_func_vec_t = std::vector<validate_func_t>;
     using variant_opt_conf_vec_t = std::vector<variant_opt_conf_t>;
     using variant_arg_conf_vec_t = std::vector<variant_arg_conf_t>;
@@ -295,8 +287,6 @@ class basic_parser_t {
                                arg_iterator end);
 
     sub_parsers_map_t sub_parsers{};
-    arguments_vector_t mandatory_arguments{};
-    optional_argument_t optional_argument{};
     validate_func_vec_t validate_functions{};
     sub_parser_descriptions_vec_t sub_parser_descriptions{};
     argument_descriptions_vec_t mandatory_argument_descriptions{};
