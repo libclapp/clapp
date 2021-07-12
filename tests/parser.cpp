@@ -824,7 +824,7 @@ class simple_test_parser3_t : public clapp::basic_parser_t {
         clapp::basic_parser_t::purpose_t::mandatory};
 
     clapp::option::vector_string_param_option_t string_option{
-        *this, "str", 's', "String option.",
+        *this, "str", std::vector<char>{'s', 'o'}, "String option.",
         clapp::basic_parser_t::purpose_t::optional};
 
     clapp::argument::variadic_string_argument_t variadic_string_arg{
@@ -1003,12 +1003,12 @@ TEST(parser, constructSimpleTestParser3AndGenHelpMessage) {
     ASSERT_THAT(
         stp.gen_help_msg(255),
         testing::StrEq(
-            "simple-test-parser3 -i|--int=<param>... [-s|--str=<param>...] "
+            "simple-test-parser3 -i|--int=<param>... [-s|-o|--str=<param>...] "
             "<variadic-arg-name>...\n\n  Arguments:\n    "
-            "variadic-arg-name Variadic arg desc (mandatory, variadic "
-            "argument)\n\n  Options:\n    -i|--int=<param>  Int option. "
+            "variadic-arg-name   Variadic arg desc (mandatory, variadic "
+            "argument)\n\n  Options:\n    -i|--int=<param>    Int option. "
             "(mandatory, vector option, constraint: [10,200])\n  "
-            "  -s|--str=<param>  String "
+            "  -s|-o|--str=<param> String "
             "option. (optional, vector option)\n"));
 }
 
