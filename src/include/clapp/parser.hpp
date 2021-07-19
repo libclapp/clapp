@@ -335,4 +335,9 @@ inline const char* clapp::parser::basic_parser_t::to_cstring(
     Expects(false);
 }
 
+constexpr std::string_view
+clapp::parser::basic_parser_t::gen_usage_prefix() noexcept {
+    return "Usage:\n";
+}
+
 #endif

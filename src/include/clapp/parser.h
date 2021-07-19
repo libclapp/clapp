@@ -244,7 +244,7 @@ class basic_parser_t {
     std::string gen_short_line() const;
     std::string gen_short_lines(std::size_t rec_depth) const;
     virtual std::string gen_short_line_prefix() const = 0;
-    static std::string gen_usage_prefix();
+    static constexpr std::string_view gen_usage_prefix() noexcept;
     virtual help_contents_t gen_detailed_help_contents() const;
     std::string gen_opt_arg_lines(const help_contents_t& help_contents,
                                   const std::size_t num_spaces) const;

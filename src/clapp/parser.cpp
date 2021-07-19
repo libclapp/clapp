@@ -149,10 +149,6 @@ void clapp::parser::basic_parser_t::reg(reg_sub_parser_conf_t&& config) {
     get_sub_parsers().emplace(std::move(config.sub_parser_name), config.parser);
 }
 
-std::string clapp::parser::basic_parser_t::gen_usage_prefix() {
-    return "Usage:\n";
-}
-
 clapp::parser::basic_parser_t::help_contents_t
 clapp::parser::basic_parser_t::gen_detailed_help_contents() const {
     help_contents_t ret;
@@ -513,8 +509,9 @@ clapp::parser::basic_parser_t::gen_func_print_help_and_exit(
     const int exit_code) const {
     return found_func_t{[this, exit_code]() {
         static constexpr std::size_t max_rec_depth{65535U};
-        print_and_exit_func(gen_usage_prefix() + gen_help_msg(max_rec_depth),
-                            exit_code);
+        print_and_exit_func(
+            std::string{gen_usage_prefix()} + gen_help_msg(max_rec_depth),
+            exit_code);
     }};
 }
 
