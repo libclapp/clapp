@@ -10,7 +10,7 @@
 
 [[noreturn]] void print_version_and_exit() {
     std::cout << clapp::build_info::build_info_string << std::endl;
-    _exit(EXIT_SUCCESS);
+    clapp::basic_main_parser_t::exit(EXIT_SUCCESS);
 }
 
 class cli_parser_t : public clapp::basic_main_parser_t {
