@@ -40,6 +40,9 @@ TEST(mainParser, constructMainParserAndGenHelpPrefix) {
     constexpr const char* const argv[]{"main", nullptr};
     empty_main_parser_t emp;
 
+    ASSERT_THROW(emp.gen_short_line_prefix(),
+                 clapp::exception::no_executable_exception_t);
+
     emp.parse(1, static_cast<const char* const*>(argv));
     ASSERT_THAT(emp.gen_short_line_prefix(), testing::StrEq("main"));
 }
