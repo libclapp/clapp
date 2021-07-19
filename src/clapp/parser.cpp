@@ -530,8 +530,12 @@ void clapp::parser::basic_parser_t::default_print_and_exit(
     std::cout << print_msg;
     std::cout.flush();
     if (exit_code) {
-        _exit(exit_code.value());
+        exit(exit_code.value());
     }
+}
+
+[[noreturn]] void clapp::parser::basic_parser_t::exit(int exit_code) {
+    _exit(exit_code);
 }
 
 void clapp::parser::basic_parser_t::set_print_and_exit_func(

@@ -264,6 +264,8 @@ class basic_parser_t {
     void set_print_and_exit_func(print_and_exit_func_t&& func);
     print_and_exit_func_t& get_print_and_exit_func();
 
+    [[noreturn]] static void exit(int exit_code);
+
    protected:
     sub_parsers_map_t& get_sub_parsers();
     help_entry_vec_t get_option_help() const;
