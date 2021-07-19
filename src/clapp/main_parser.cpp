@@ -25,10 +25,12 @@ clapp::parser::basic_main_parser_t::operator bool() const {
 }
 
 std::string clapp::parser::basic_main_parser_t::get_executable() const {
-    if (executable.has_value()) {
-        return executable.value();
+    if (!executable.has_value()) {
+        throw no_executable_exception_t{
+            "The parser does not know the executable."};
     }
-    throw no_executable_exception_t{"The parser does not know the executable."};
+    std::string ret{executable.value()};
+    return ret;
 }
 
 void clapp::parser::basic_main_parser_t::parse(int argc,
@@ -50,5 +52,7 @@ void clapp::parser::basic_main_parser_t::parse_and_validate(
 }
 
 std::string clapp::parser::basic_main_parser_t::gen_short_line_prefix() const {
-    return get_executable() + gen_short_line();
+    const std::string exec{get_executable()};
+    const std::string short_line{gen_short_line()};
+    return exec + short_line;
 }
