@@ -947,7 +947,7 @@ TEST(parser, callDefaultPrintAndExitWithString) {
 
 TEST(parser, callDefaultPrintAndExitWithStringAndExitCode) {
     const std::string text{"text"};
-    const int exit_code{2};
+    static constexpr int exit_code{2};
     testing::internal::CaptureStdout();
     ASSERT_EXIT(empty_basic_parser_t::default_print_and_exit(text, exit_code),
                 ::testing::ExitedWithCode(exit_code), "");
