@@ -450,11 +450,11 @@ clapp::option::basic_option_t<T>::basic_option_t(clapp::basic_parser_t& parser,
 
 template <typename T>
 T clapp::option::basic_option_t<T>::value() const {
-    if (_value) {
-        return _value.value();
+    if (!_value) {
+        throw clapp::exception::value_undefined_t{
+            "Requested option value is not defined."};
     }
-    throw clapp::exception::value_undefined_t{
-        "Requested option value is not defined."};
+    return _value.value();
 }
 
 template <typename T>
