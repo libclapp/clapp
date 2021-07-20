@@ -174,10 +174,6 @@ clapp::fs::path clapp::value::convert_value<clapp::fs::path>(
     return {param};
 }
 
-std::string clapp::path_exists_t::append_restriction_text() {
-    return "existing path";
-}
-
 void clapp::path_exists_t::validate(const clapp::fs::path& path,
                                     const std::string& param_name) {
     if (!clapp::fs::exists(path)) {

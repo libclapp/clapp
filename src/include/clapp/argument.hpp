@@ -36,7 +36,8 @@ void clapp::argument::gen_arg_conf_process_params(arg_params_t<T>& arg_params,
                                                   Param&& param) {
     if constexpr (has_append_restriction_text<
                       typename std::decay<Param>::type>::value) {
-        arg_params.restrictions.push_back(param.append_restriction_text());
+        arg_params.restrictions.push_back(
+            std::string{param.append_restriction_text()});
     }
     if constexpr (has_default_value<typename std::decay<Param>::type>::value) {
         arg_params.default_value = param.default_value();

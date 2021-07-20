@@ -64,7 +64,7 @@ class not_null_value_t {
    public:
     not_null_value_t();
 
-    std::string append_restriction_text() const;
+    static constexpr std::string_view append_restriction_text() noexcept;
 
     void validate(const T &value, const std::string &param_name) const;
 };
@@ -83,7 +83,7 @@ class found_func_t {
 #ifdef CLAPP_FS_AVAIL
 class path_exists_t {
    public:
-    static std::string append_restriction_text();
+    static constexpr std::string_view append_restriction_text() noexcept;
 
     static void validate(const fs::path &path, const std::string &param_name);
 };

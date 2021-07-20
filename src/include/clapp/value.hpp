@@ -75,9 +75,7 @@ clapp::value::min_max_value_t<T>::min_max_value_t(T _min, T _max)
 
 template <typename T>
 std::string clapp::value::min_max_value_t<T>::append_restriction_text() const {
-    std::stringstream ss;
-    ss << "constraint: [" << to_string(min) << "," << to_string(max) << "]";
-    return ss.str();
+    return "constraint: [" + to_string(min) + "," + to_string(max) + "]";
 }
 
 template <typename T>
@@ -99,10 +97,9 @@ template <typename T>
 clapp::value::not_null_value_t<T>::not_null_value_t() = default;
 
 template <typename T>
-std::string clapp::value::not_null_value_t<T>::append_restriction_text() const {
-    std::stringstream ss;
-    ss << "constraint: not null";
-    return ss.str();
+constexpr std::string_view
+clapp::value::not_null_value_t<T>::append_restriction_text() noexcept {
+    return "constraint: not null";
 }
 
 template <typename T>
@@ -114,6 +111,13 @@ void clapp::value::not_null_value_t<T>::validate(
                                                to_string(value) + ")"};
     }
 }
+
+#ifdef CLAPP_FS_AVAIL
+constexpr std::string_view
+clapp::path_exists_t::append_restriction_text() noexcept {
+    return "existing path";
+}
+#endif
 
 template <>
 std::string clapp::value::convert_value<std::string>(std::string_view param);
