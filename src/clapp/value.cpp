@@ -30,7 +30,8 @@ void clapp::value::found_func_t::found() { func(); }
 template <>
 std::string clapp::value::convert_value<std::string>(
     const std::string_view param) {
-    return std::string{param};
+    std::string ret{param};
+    return ret;
 }
 
 template <>
