@@ -59,7 +59,8 @@ std::string clapp::value::to_string(const T& value) {
 
 template <typename T>
 std::string clapp::value::default_value_t<T>::append_restriction_text() const {
-    return "default-value: " + to_string(value);
+    const std::string val_str{to_string(value)};
+    return "default-value: " + val_str;
 }
 
 template <typename T>
@@ -75,7 +76,9 @@ clapp::value::min_max_value_t<T>::min_max_value_t(T _min, T _max)
 
 template <typename T>
 std::string clapp::value::min_max_value_t<T>::append_restriction_text() const {
-    return "constraint: [" + to_string(min) + "," + to_string(max) + "]";
+    const std::string min_str{to_string(min)};
+    const std::string max_str{to_string(max)};
+    return "constraint: [" + min_str + "," + max_str + "]";
 }
 
 template <typename T>
