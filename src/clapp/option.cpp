@@ -45,12 +45,13 @@ void clapp::option::check_short_option(const char option) {
 
 clapp::option::bool_option_t::callbacks_t
 clapp::option::bool_option_t::create_callbacks(bool_option_t* inst) {
-    return callbacks_t{
+    callbacks_t callbacks{
         [inst](const std::string_view /*option*/) { inst->found_entry(); },
         [inst](const char /*option*/) { inst->found_entry(); },
         [inst]() { return inst->given(); },
         [inst]() { return static_cast<bool>(*inst); },
         [inst]() { return inst->value(); }};
+    return callbacks;
 }
 
 void clapp::option::bool_option_t::found_entry() {
@@ -65,12 +66,13 @@ clapp::option::bool_option_t::~bool_option_t() = default;
 
 clapp::option::count_option_t::callbacks_t
 clapp::option::count_option_t::create_callbacks(count_option_t* inst) {
-    return callbacks_t{
+    callbacks_t callbacks{
         [inst](const std::string_view /*option*/) { inst->found_entry(); },
         [inst](const char /*option*/) { inst->found_entry(); },
         [inst]() { return inst->given(); },
         [inst]() { return static_cast<bool>(*inst); },
         [inst]() { return inst->value(); }};
+    return callbacks;
 }
 
 void clapp::option::count_option_t::found_entry() {
