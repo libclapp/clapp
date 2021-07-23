@@ -149,7 +149,8 @@ template <typename short_option_func_t, typename long_option_func_t,
 std::string clapp::parser::basic_parser_t::basic_reg_option_conf_t<
     short_option_func_t, long_option_func_t,
     option_type>::create_option_string(const std::string& long_option) {
-    return std::string{"--"} + long_option;
+    const std::string prefix{"--"};
+    return prefix + long_option;
 }
 
 template <typename short_option_func_t, typename long_option_func_t,
@@ -157,7 +158,8 @@ template <typename short_option_func_t, typename long_option_func_t,
 std::string clapp::parser::basic_parser_t::basic_reg_option_conf_t<
     short_option_func_t, long_option_func_t,
     option_type>::create_option_string(const char short_option) {
-    return std::string{"-"} + short_option;
+    const std::string prefix{"-"};
+    return prefix + short_option;
 }
 
 template <typename short_option_func_t, typename long_option_func_t,
@@ -172,16 +174,18 @@ std::string clapp::parser::basic_parser_t::basic_reg_option_conf_t<
         option_string = std::accumulate(
             short_option.begin(), short_option.end(), std::string(),
             [](const std::string& a, const char b) -> std::string {
-                std::string opt_str{create_option_string(b)};
-                return a + (a.length() > 0 ? "|" : "") + opt_str;
+                const std::string opt_str{create_option_string(b)};
+                const std::string sep{(a.length() > 0 ? "|" : "")};
+                return a + sep + opt_str;
             });
     }
     if (!long_option.empty()) {
         option_string = std::accumulate(
             long_option.begin(), long_option.end(), option_string,
             [](const std::string& a, const std::string& b) -> std::string {
-                std::string opt_str{create_option_string(b)};
-                return a + (a.length() > 0 ? "|" : "") + opt_str;
+                const std::string opt_str{create_option_string(b)};
+                const std::string sep{(a.length() > 0 ? "|" : "")};
+                return a + sep + opt_str;
             });
     }
     return option_string;
@@ -199,8 +203,9 @@ std::string clapp::parser::basic_parser_t::basic_reg_option_conf_t<
             [](const std::string& a,
                const basic_short_opt_conf_t<short_option_func_t>& b)
                 -> std::string {
-                std::string opt_str{std::string{"-"} + b.option};
-                return a + (a.length() > 0 ? "|" : "") + opt_str;
+                const std::string opt_str{std::string{"-"} + b.option};
+                const std::string sep{(a.length() > 0 ? "|" : "")};
+                return a + sep + opt_str;
             });
     }
     if (!long_options.empty()) {
@@ -209,8 +214,9 @@ std::string clapp::parser::basic_parser_t::basic_reg_option_conf_t<
             [](const std::string& a,
                const basic_long_opt_conf_t<long_option_func_t>& b)
                 -> std::string {
-                std::string opt_str{std::string{"--"} + b.option};
-                return a + (a.length() > 0 ? "|" : "") + opt_str;
+                const std::string opt_str{std::string{"--"} + b.option};
+                const std::string sep{(a.length() > 0 ? "|" : "")};
+                return a + sep + opt_str;
             });
     }
     if constexpr (is_param_opt<short_option_func_t, long_option_func_t>()) {
@@ -241,7 +247,8 @@ clapp::parser::basic_parser_t::help_entry_t
 clapp::parser::basic_parser_t::basic_reg_option_conf_t<
     short_option_func_t, long_option_func_t, option_type>::get_option_help()
     const {
-    return help_entry_t{create_basic_option_string(), description};
+    const help_entry_t ret{create_basic_option_string(), description};
+    return ret;
 }
 
 template <typename short_option_func_t, typename long_option_func_t,
@@ -317,7 +324,8 @@ std::string clapp::parser::basic_parser_t::basic_reg_argument_conf_t<
 template <clapp::parser::basic_parser_t::argument_type_t argument_type>
 clapp::parser::basic_parser_t::help_entry_t clapp::parser::basic_parser_t::
     basic_reg_argument_conf_t<argument_type>::get_argument_help() const {
-    return help_entry_t{create_basic_argument_string(), description};
+    const help_entry_t ret{create_basic_argument_string(), description};
+    return ret;
 }
 
 inline bool clapp::parser::basic_parser_t::is_active() const noexcept {
