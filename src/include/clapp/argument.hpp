@@ -159,7 +159,9 @@ clapp::argument::gen_arg_conf(CALLBACKS&& callbacks,
     std::string restriction{std::accumulate(
         arg_params.restrictions.begin(), arg_params.restrictions.end(), purpose,
         [](const std::string& a, const std::string& b) -> std::string {
-            return a + (a.length() > 0 && b.length() > 0 ? ", " : "") + b;
+            const std::string separator{a.length() > 0 && b.length() > 0 ? ", "
+                                                                         : ""};
+            return a + separator + b;
         })};
     if (restriction.size() > 0) {
         restriction = " (" + restriction + ")";
@@ -177,12 +179,13 @@ template <typename T>
 typename clapp::argument::basic_argument_t<T>::callbacks_t
 clapp::argument::basic_argument_t<T>::create_callbacks(
     basic_argument_t<T>* inst) {
-    return callbacks_t{[inst](const std::string_view argument) {
-                           inst->found_entry(argument);
-                       },
-                       [inst]() { return inst->given(); },
-                       [inst]() { return static_cast<bool>(*inst); },
-                       [inst]() { return inst->value(); }};
+    const callbacks_t callbacks{[inst](const std::string_view argument) {
+                                    inst->found_entry(argument);
+                                },
+                                [inst]() { return inst->given(); },
+                                [inst]() { return static_cast<bool>(*inst); },
+                                [inst]() { return inst->value(); }};
+    return callbacks;
 }
 
 template <typename T>
@@ -211,11 +214,12 @@ constexpr bool clapp::argument::basic_argument_t<T>::has_value() const
 
 template <typename T>
 T clapp::argument::basic_argument_t<T>::value() const {
-    if (_value) {
-        return _value.value();
+    if (!_value) {
+        throw clapp::exception::value_undefined_t{
+            "Requested argument value is not defined."};
     }
-    throw clapp::exception::value_undefined_t{
-        "Requested argument value is not defined."};
+    const T ret{_value.value()};
+    return ret;
 }
 
 template <typename T>
@@ -237,12 +241,13 @@ template <typename T>
 typename clapp::argument::basic_variadic_argument_t<T>::callbacks_t
 clapp::argument::basic_variadic_argument_t<T>::create_callbacks(
     basic_variadic_argument_t<T>* inst) {
-    return callbacks_t{[inst](const std::string_view argument) {
-                           inst->found_entry(argument);
-                       },
-                       [inst]() { return inst->given(); },
-                       [inst]() { return static_cast<bool>(*inst); },
-                       [inst]() { return inst->value(); }};
+    const callbacks_t callbacks{[inst](const std::string_view argument) {
+                                    inst->found_entry(argument);
+                                },
+                                [inst]() { return inst->given(); },
+                                [inst]() { return static_cast<bool>(*inst); },
+                                [inst]() { return inst->value(); }};
+    return callbacks;
 }
 
 template <typename T>
@@ -299,7 +304,8 @@ void clapp::argument::basic_variadic_argument_t<T>::found_entry(
 template <typename T>
 std::string clapp::argument::basic_variadic_argument_t<
     T>::variadic_argument_restrictions() {
-    return "variadic argument";
+    const std::string ret{"variadic argument"};
+    return ret;
 }
 
 #endif
