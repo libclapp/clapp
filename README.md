@@ -21,10 +21,11 @@ Build:
 ------
 
 ### Dependencies:
-libClaPP only depends on the [GSL](https://github.com/microsoft/GSL), but this library is shipped as git-submodule dependency within this git repository.
+Besides the dependency to CMake, the library `libClaPP` only depends on the [GSL](https://github.com/microsoft/GSL). Note: this repository ships with an appropriate version of GSL as git-submodule.
 
-If the unit tests of this libray should be built, also [google test](https://github.com/google/googletest) is required (is also shipped as git-submodule dependency).
-If the listings in the [doc/](doc/)-folder should be extracted and build too, a Raku-(Perl 6)-interpreter is required. A very common Raku interpreter is [Rakudo](https://rakudo.org/), which can be installed on Debian/Ubuntu by executing `apt install rakudo`.
+If the unit tests of this libray should be built too (can be selected by the CMake option `-DlibClaPP_BUILD_TESTS=On`), also [google test](https://github.com/google/googletest) is required (is also shipped as git-submodule dependency).
+
+If the listings in the [doc/](doc/)-folder should be extracted and build too, a Raku-(Perl 6)-interpreter is required. A very common Raku interpreter is [Rakudo](https://rakudo.org/), which can be installed on Debian/Ubuntu by executing `apt install rakudo`. Just give the CMake option `-DlibClaPP_BUILD_DOC_CODE=On` to build the code in the documentation.
 
 ### Build the library:
 Since all build dependencies are already included in this repository as submodules, you may prefer to use the shipped dependencies via the CMake option `libClaPP_SUBMODULE_DEPENDENCIES` enabled:
@@ -45,6 +46,7 @@ But if all dependencies are installed on your system, the following steps are su
     cmake --build .
 
 #### Build the library in debug mode with submodules, unitests and check code coverage:
+Set `GCOV_EXECUTABLE` accordingly (i.e. `llvm-cov-11 gcov`, `gcov-10`)
 
     git clone --recurse-submodules https://git.libclapp.org/libclapp/clapp.git
     mkdir build
@@ -52,9 +54,11 @@ But if all dependencies are installed on your system, the following steps are su
     cmake -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Debug ..
     cmake --build .
     ctest -V -R libclapp_tests
-    gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/
+    gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/ -e doc/ -e ../doc/ --gcov-executable="${GCOV_EXECUTABLE}"
 
 #### Build the library in debug mode with submodules, unitests, examples and check code coverage:
+
+Set `GCOV_EXECUTABLE` accordingly (i.e. `llvm-cov-11 gcov`, `gcov-10`)
 
     git clone --recurse-submodules https://git.libclapp.org/libclapp/clapp.git
     mkdir build
@@ -62,21 +66,22 @@ But if all dependencies are installed on your system, the following steps are su
     cmake -DlibClaPP_BUILD_TESTS=On -DlibClaPP_BUILD_EXAMPLES=On -DlibClaPP_BUILD_COVERAGE=On -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DCMAKE_BUILD_TYPE=Debug ..
     cmake --build .
     ctest -V -R libclapp_tests
-    gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/
+    gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/ -e doc/ -e ../doc/ --gcov-executable="${GCOV_EXECUTABLE}"
     ctest -V -E libclapp_tests
 
 #### Build with gcc/clang sanitizers:
-LibClaPP can be built with the following sanitizers: Address sanitizer, memory sanitizer, undefined behavior sanitizer or a thread sanitizer.
-To enable these sanitizers, one of the following options must be set: `libClaPP_ENABLE_SANITIZER_ADDRESS`, `libClaPP_ENABLE_SANITIZER_MEMORY`,
-`libClaPP_ENABLE_SANITIZER_UNDEFINED_BEHAVIOR`, `libClaPP_ENABLE_SANITIZER_THREAD`.
+LibClaPP can be built with the following GCC/Clang-sanitizers: Address sanitizer, memory sanitizer, undefined behavior sanitizer or a thread sanitizer.
+To enable these sanitizers, one of the following CMake-options must be enabled (Note: depending on the actual compiler, it may or may not possible to combine different sanitizers): 
+- `libClaPP_ENABLE_SANITIZER_ADDRESS`
+- `libClaPP_ENABLE_SANITIZER_MEMORY`
+- `libClaPP_ENABLE_SANITIZER_UNDEFINED_BEHAVIOR`
+- `libClaPP_ENABLE_SANITIZER_THREAD`
 
 For easy switching between different sanitizers, the tool `ccmake` may be used instead of pure `cmake`.
 
 ### Install the library
 
-To install the library on your system, type the following command.
-
-    make install
+To install the library on your system, add `--target install` to the `cmake --build` command above (i.e. `cmake --build . --target install`).
 
 To uninstall the library, remove all files that were installed:
 
@@ -92,12 +97,6 @@ Some examples can be found in the [examples](examples) folder.
 Additionally, [doc/doc.md](doc/doc.md) also contains a few examples.
 
 For a quick start take a look at [examples/short_example.cpp](examples/short_example.cpp).
-
-Coverage:
----------
-
-    cmake -DlibClaPP_BUILD_COVERAGE=On -DCMAKE_BUILD_TYPE=Debug -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DlibClaPP_BUILD_TESTS=On ..
-    gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/
 
 Clang-Tidy:
 -----------
