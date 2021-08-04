@@ -1,7 +1,9 @@
 Introduction:
 =============
 
-In libClaPP the following Terminology is used:
+Table of Contents:
+------------------
+[[_TOC_]]
 
 Terminology:
 -------------
@@ -14,8 +16,8 @@ In this project the following terms are used:
 * Argument: An argument is the short form for positional argument.
     Thus, arguments higly depend on the position where they occur.
     Unlinke to options that may occur anywhere else.
-* Sub-Parser: A subparser is always implicitly the last argument of a the current parser.
-    Once this argument is given, a completely new parsing instance is started.
+* Sub-Parser: A subparser can be triggered by a particular argument name. Once the current parser detects an argument name of a sub-parser, the current parser hands over the parsing-task to the corresponding sub-parser.
+Thus, this sup-parser argument is always implicitly the last argument handled by the current parser. (e.g. the commands `git commit -f` or `git log` can be implemented by sub-parsers, where the sub-parser for `commit` must at least be capable of the option  `-f` and the sub-parser for `log` does not get any further options or arguments at all)
 
 Outlook:
 --------
@@ -25,7 +27,7 @@ The first section starts with the individual value types (for options and argume
 This includes an introduction to the supported CLI-options and CLI-arguments.
 Also, a complete collection of shipped types is given. Including a description, how
 custom types can be used.
-Finally, additional options for options, arguments or their parameters are described (conaining
+Finally, additional options for options, arguments or their parameters are described (containing
 constraints or additional help information).
 
 The next section concludes with the different parser types: main-parser and sub-parser.
@@ -57,8 +59,8 @@ ABSTRACT_OPTION(basic_parser_t& parser, SHORT_OPTION short_option, const std::st
 ```
 
 where `LONG_OPTION`, `SHORT_OPTION` and `ADDITIONAL_PARAMS` are placeholders for the following types:
-* `LONG_OPTION` can either be a std::string, a c-string or a std::vector<std::string>.
-* `SHORT_OPTION` can either be a char or a std::vector<char>.
+* `LONG_OPTION` can either be a `std::string`, a C-style string or a `std::vector<std::string>`.
+* `SHORT_OPTION` can either be a `char` or a `std::vector<char>`.
 * `ADDITIONAL_PARAMS` are the variadic types that involve additional parameters for the option (For a complete collection of additional parameters see [Additional parameters for arguments or options](#additional-parameters-for-arguments-or-options)).
 
 Currently, there exist different types of options:
@@ -357,6 +359,7 @@ This restrictions can be given to the argument or option parameter types in an a
 All options can be either mandatory or optional:
 * Mandatory options must always be given. This is also reflected in the help message: `-o|--option` or `-p|--option-with-param=<arg>`.
 * Optional options are optional and thus are not required. This is also reflected in the help message: `[-o|--option]` or `[-p|--option-with-param=<arg>]`.
+
 As a default (i.e. no mandatory is given), each option is optional! 
 
 Some example options are: 
@@ -369,6 +372,7 @@ clapp::option::bool_option_t int_opt{ptr_to_parser, "yes", 'y', "Description for
 Arguments can also be mandatory or optional:
 * Mandatory arguments must always be given. This is also reflected in the help message: `<argument>`.
 * Optional arguments are not necessarily required. This is also reflected in the help message: `[<argument>]`.
+
 As a default (i.e. no optional is given), each argument is mandatory! 
 
 Some example arguments are: 
@@ -382,7 +386,7 @@ clapp::argument::bool_option_t int_opt{ptr_to_parser, "argument", "Description f
 In order to provide a default value for arguments or option parameters, there exists the class `clapp::value::default_value_t`.
 If an instance of this class is given to an optional option parameter constructor, this default value would be used, if the option value was not given.
 The same reasoning applies also for arguments.
-Note: Even if it is possible for mandatory arguments or option parameters to define a default value, this may be unnecessary.
+Note: Even if it is possible for mandatory arguments or mandatory option parameters to define a default value, this is unnecessary, as the parser requires the user to give a value!
 
 A default value is also reflected in the help message, as `(default-value: <value>)` is appended to the argument/option description.
 
@@ -630,7 +634,7 @@ The default mode is active, if none of the additional modes was activated. Both 
 
 Note: if sup-parsers are used, these sub-parsers always take the role of the last argument.
 Thus, if at least one sub-parser is registered, no variadic or optional arguments can be used.
-Furthermore, if a sub-parser is registered before an argument, the arument position will always be before registered sub-parsers.
+Furthermore, if a sub-parser is registered before an argument, the argument position will always be before registered sub-parsers.
 
 Note: sub-parsers can be stacked. I.e. a sub-parser can itself contain other sub-parsers which iself can contain additional sub-parsers.
 
@@ -667,7 +671,7 @@ const basic_parser_t& get_active_parser() const;
 #### The `validate()` method:
 The `validate()` method is similar to `basic_main_parser::validate()` and thus can be used to check the requirements of the parsed result.
 Thus, it checks if all mandatory arguments or options were given and ensures that all constraints are met.
-Note: this method only validates all arguments or options of the current parser instance. Thus, if further subparsers are used, the `validate()` method ignores all subparsers. If you want to validate this sub-parser and all furhter sub-parsers, use `validate_recursive()`.
+Note: this method only validates all arguments or options of the current parser instance. Thus, if further subparsers are used, the `validate()` method ignores all subparsers. If you want to validate this sub-parser and all its sub-parsers, use `validate_recursive()`.
 If the validation fails, it throws an exception of type `clapp::clapp_exception_t` (or a derived type of this type).
 
 #### The `validate_recursive()` method:
@@ -798,11 +802,8 @@ int main(int argc, char *argv[]) {
 }
 ```
 [//]:#end_cpp_listing_simple_sub_parser
-The mode1-subparser is configured to inherit all options and arguments from the main-parser,
-while the mode2-subparser doesn't inherit anything from the main-parser.
-This behavior can be controlled by the fourth (optional) bool argument that is given to the
-subparser-constructors: Giving `true` or no argument enables this feature.
-While giving `false` disables the interitation from the parent parser.
+
+The mode1-subparser and the mode2-subparser support both different options and arguments. In the following section, you can see the output of this example when invoked with different CLI-arguments.
 
 ### Example cli-outputs when using the sub-parser listing:
 [//]:#begin_calls_simple_sub_parser
