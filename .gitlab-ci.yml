@@ -361,11 +361,11 @@ compile_install_debian_10_amd64:
         - debian-10-amd64
     parallel:
         matrix:
-            - BUILD_TYPE: [Debug, Release]
+            - BUILD_TYPE: ["Debug", "Release", ""]
               COMPILER: clang
               COMPILER_VERSION: [7]
               GENERATOR: ["Unix Makefiles", "Ninja"]
-            - BUILD_TYPE: [Debug, Release]
+            - BUILD_TYPE: ["Debug", "Release", ""]
               COMPILER: gcc
               COMPILER_VERSION: [7, 8]
               GENERATOR: ["Unix Makefiles", "Ninja"]
@@ -377,11 +377,11 @@ compile_install_debian_10_arm64:
         - debian-10-arm64
     parallel:
         matrix:
-            - BUILD_TYPE: [Debug, Release]
+            - BUILD_TYPE: ["Debug", "Release", ""]
               COMPILER: clang
               COMPILER_VERSION: [7]
               GENERATOR: ["Unix Makefiles", "Ninja"]
-            - BUILD_TYPE: [Debug, Release]
+            - BUILD_TYPE: ["Debug", "Release", ""]
               COMPILER: gcc
               COMPILER_VERSION: [7, 8]
               GENERATOR: ["Unix Makefiles", "Ninja"]
@@ -393,11 +393,11 @@ compile_install_debian_10_armhf:
         - debian-10-armhf
     parallel:
         matrix:
-            - BUILD_TYPE: [Debug, Release]
+            - BUILD_TYPE: ["Debug", "Release", ""]
               COMPILER: clang
               COMPILER_VERSION: [7]
               GENERATOR: ["Unix Makefiles", "Ninja"]
-            - BUILD_TYPE: [Debug, Release]
+            - BUILD_TYPE: ["Debug", "Release", ""]
               COMPILER: gcc
               COMPILER_VERSION: [7, 8]
               GENERATOR: ["Unix Makefiles", "Ninja"]
