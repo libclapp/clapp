@@ -45,10 +45,26 @@ class cli_parser_t : public clapp::basic_main_parser_t {
                                   clapp::min_max_value_t<std::size_t>{0, 7},
                                   clapp::default_value_t<std::size_t>{2}};
 
-    // first subparser declaration
-    class first_parser_t : public clapp::basic_sub_parser_t {
-       public:
+    // create a subparser with a registered help option
+    class sub_parser_t : public clapp::basic_sub_parser_t {
+       protected:
         using clapp::basic_sub_parser_t::basic_sub_parser_t;
+
+       public:
+        explicit sub_parser_t(const sub_parser_t &) = delete;
+        explicit sub_parser_t(sub_parser_t &&) noexcept = delete;
+        sub_parser_t &operator=(const sub_parser_t &) = delete;
+        sub_parser_t &operator=(sub_parser_t &&) noexcept = delete;
+
+        ~sub_parser_t() override;
+
+        clapp::help_option_t help{*this, "help", 'h', "Show help options."};
+    };
+
+    // first subparser declaration (inherits help from sub_parser_t)
+    class first_parser_t : public sub_parser_t {
+       public:
+        using sub_parser_t::sub_parser_t;
 
         explicit first_parser_t(const first_parser_t &) = delete;
         explicit first_parser_t(first_parser_t &&) noexcept = delete;
@@ -56,8 +72,6 @@ class cli_parser_t : public clapp::basic_main_parser_t {
         first_parser_t &operator=(first_parser_t &&) noexcept = delete;
 
         ~first_parser_t() override;
-
-        clapp::help_option_t help{*this, "help", 'h', "Show help options."};
 
         clapp::bool_option_t short_bool{*this, 'b', "Short bool option.",
                                         purpose_t::mandatory};
@@ -73,10 +87,10 @@ class cli_parser_t : public clapp::basic_main_parser_t {
             clapp::default_value_t<std::string>{"abaa"}};
     };
 
-    // second subparser declaration
-    class second_parser_t : public clapp::basic_sub_parser_t {
+    // second subparser declaration (inherits help from sub_parser_t)
+    class second_parser_t : public sub_parser_t {
        public:
-        using clapp::basic_sub_parser_t::basic_sub_parser_t;
+        using sub_parser_t::sub_parser_t;
 
         explicit second_parser_t(const second_parser_t &) = delete;
         explicit second_parser_t(second_parser_t &&) noexcept = delete;
@@ -84,8 +98,6 @@ class cli_parser_t : public clapp::basic_main_parser_t {
         second_parser_t &operator=(second_parser_t &&) noexcept = delete;
 
         ~second_parser_t() override;
-
-        clapp::help_option_t help{*this, "help", 'h', "Show help options."};
 
         clapp::int32_argument_t int_arg{
             *this, "int-arg", "Int argument",
@@ -109,6 +121,7 @@ class cli_parser_t : public clapp::basic_main_parser_t {
 };
 
 cli_parser_t::~cli_parser_t() = default;
+cli_parser_t::sub_parser_t::~sub_parser_t() = default;
 cli_parser_t::first_parser_t::~first_parser_t() = default;
 cli_parser_t::second_parser_t::~second_parser_t() = default;
 
