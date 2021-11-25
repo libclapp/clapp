@@ -2,6 +2,7 @@
 #include <clapp/build_info.h>
 #include <clapp/main_parser.h>
 #include <clapp/option.h>
+#include <clapp/parser_container.h>
 #include <clapp/sub_parser.h>
 #include <unistd.h>
 
@@ -185,31 +186,33 @@ void process_second(const cli_parser_t::second_parser_t &second) {
     }
 }
 
+using parser_t = clapp::parser::basic_parser_container_t<cli_parser_t>;
+
 int main(int argc, char *argv[]) {
     try {
-        cli_parser_t cp;
+        parser_t cp;
         const std::optional<clapp::value::exit_t> exit{
             cp.parse_and_validate(argc, argv)};
         if (exit) {
             return exit.value().get_exit_code();
         }
 
-        if (cp.verbose) {  // if the optional verbose option is given
-            std::cout << "verbose: " << cp.verbose.value() << "\n";
+        if (cp->verbose) {  // if the optional verbose option is given
+            std::cout << "verbose: " << cp->verbose.value() << "\n";
         } else {
             std::cout << "verbose: not given\n";
         }
 
-        if (cp.first) {  // if the first sub-parser is selected
+        if (cp->first) {  // if the first sub-parser is selected
             std::cout << "first parser active" << std::endl;
-            process_first(cp.first);
+            process_first(cp->first);
         } else {
             std::cout << "first parser not active" << std::endl;
         }
 
-        if (cp.second) {  // if the first sub-parser is selected
+        if (cp->second) {  // if the first sub-parser is selected
             std::cout << "second parser active" << std::endl;
-            process_second(cp.second);
+            process_second(cp->second);
         } else {
             std::cout << "second parser not active" << std::endl;
         }

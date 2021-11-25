@@ -441,9 +441,30 @@ clapp::option::path_param_option_t file_opt{ptr_to_parser, "filename-option", 'f
 clapp::option::path_argument_t file_arg{ptr_to_parser, "filenem-argument", "Description for filename argument.", clapp::value::path_exists_t{}};
 ```
 
+### Found callback:
+In order to provide a callback-function for arguments or options which gets invoked at the time when the parser detects the option or argument, there exists the class `clapp::value::found_func_t`.
+This class expects a callable object (or function pointer) which matches the following signature: `std::function<clapp::value::found_func_t::ret_t(const std::string&)>`.
+If an instance of this class is given to an option- or argument-constructor, the parser will invoke the callable object inside this instance once it detects it (and even before it parses anything).
+Since the return-value is a `std::optional`, the callable object may return `std::nullopt` (if the parser should proceed parsing) or the exit reason `clapp::value::exit_t` (if the parser should immediately stop parsing).
+In the latter case, the parser stops parsing immediately and propagates the exit reason instance `clapp::value::exit_t` down to the caller of the `parse()`- and `parse_and_validate()`-methods.
+
+In order to create an exit reason, `clapp::value::stop_t::exit(<EXIT-CODE>)` must be called:
+
+Examples for creating an exit reason are the following calls:
+```c++
+clapp::value::stop_t::exit(EXIT_FAILURE);
+clapp::value::stop_t::exit(EXIT_SUCCESS);
+```
+
+Note: when parsing was stopped by an exit reason, using any properties/methods of options or arguments of this parser lead to undefined behavior (as parsing was interrupted). Therefore, the parser should use a `clapp::parser::basic_parser_container_t` for encapsulation. It ensures that the parser is always used in a valid state.
+
+One example of a found callback is the help-option `--help`.
+If the user gives `--help`, any further parsing may not be adequate (either, because it )
+Therefore, the `help_option_t` returns an exit reason (`EXIT_SUCCESS`) and the caller gets informed about this, as the `parse()`- or `parse_and_validate()`-methods return this exit reason.
+
 ### Custom restrictions:
 Of course, it is possible to create own restriction classes. 
-This classes must contain at least one of these methods:
+These classes must contain at least one of these methods:
 * `template<typename T> T default_value() const;`
     This method can be used to define a default value, if the argument or parameter option is optional.
 * `std::string append_restriction_text() const;`
@@ -478,9 +499,9 @@ Since the main-parser base class `clapp::parser::basic_main_parser_t` is itself 
 for a complete collection of derived methods.
 
 ```c++
-void parse(int argc, const char* const* argv);
-void parse(const arg_t& arg);
-void parse_and_validate(int argc, const char* const* argv);
+std::optional<clapp::value::stop_t> parse(int argc, const char* const* argv);
+std::optional<clapp::value::stop_t> parse(const arg_t& arg);
+std::optional<clapp::value::stop_t> parse_and_validate(int argc, const char* const* argv);
 void validate() const;
 void validate_recursive() const;
 explicit operator bool() const;
@@ -495,6 +516,7 @@ These functions may throw exceptions of type `clapp::clapp_exception_t` (or a de
 For example, if invalid or unknown options are given, or given values could not be converted to the required type.
 But these functions only try to parse the values.
 Thus, in order to check if all mandatory options and arguments are given, the methods `validate()`, `validate_recursive()` or `parse_and_validate()` may be used.
+Note: if an exit reason (from a `found_func_t`-callback) is returned, this exit reason is returned from the `parse()` methods.
 
 #### The `validate()` method:
 The `validate()` method can be used to check the requirements of the parsed result.
@@ -511,6 +533,7 @@ Thus, it validates the current parser and subparsers that were selected by the c
 #### The `parse_and_validate()` method:
 This method is a combination of the `parse()`- and `validate_recursive()`-methods.
 Thus, it first parses the cli-arguments and if the parsing succeeds, it validates the parsed results.
+Note: if an exit reason (from a `found_func_t`-callback) is returned, this exit reason is returned from the `parse()` methods.
 
 #### The `operator bool()` method:
 For main-parsers, this method always returns `true`, if an executable is set.
@@ -615,6 +638,147 @@ Caught Exception: Mandatory argument 'string-arg' not given.
 ```
 [//]:#end_calls_simple_main_parser
 
+Parser-Container:
+-----------------
+In particular, if the `parse()` function received an exit reason (from a `found_func_t`-callback)
+the parser aborts parsing immediately.
+However, this leaves the parser-object (and its options or arguments) in an an unspecified
+(but valid) state, as the `found_func_t`-callback is called directly when the parser reaches
+the particular option or argument.
+Thus, the parser state after an exit reason is amongst others dependent on the order of the
+cli-arguments and parsing may not be finished at the timepoint when the exit reason was received.
+
+To prevent the users from accessing members in an unspecified state, the parser-container
+`basic_parser_container_t` was introduced.
+It is a wrapper well suited for a main parser (similar to a `std::unique_ptr` for a raw-pointer).
+
+### Parser container construction:
+Since the parser container is a template, it requires the typename of the main parser which
+should be wrapped.
+Its constructor forwards all its arguments to the wrapped main parser constructor.
+
+### Parser container usage:
+The parser container base class `clapp::parser::basic_parse_container_t` ships only with
+`parse()` and `parse_and_validate()` methods.
+To get access to the underlying (main) parser, the operators `->` and `*` were also overloaded.
+These operators can be used to get access to the members or methods of the underlying (main) parser.
+
+Most of them are listed here, but for a complete collection take a look at
+[src/include/clapp/main_parser.h](src/include/clapp/main_parser.h).
+Since the main-parser base class `clapp::parser::basic_main_parser_t` is itself derived from
+`clapp::parser::basic_parser_t`, you may also look at
+[src/include/clapp/parser.h](src/include/clapp/parser.h)
+for a complete collection of derived methods.
+
+```c++
+template <typename... ARGS_T>
+std::optional<clapp::value::stop_t> parse(ARGS_T&&...);
+template <typename... ARGS_T>
+std::optional<clapp::value::stop_t> parse_and_validate(ARGS_T&&...);
+
+parser_t* operator->();
+parser_t& operator*();
+```
+#### The `parse()` methods:
+The `parse()` method forwards all arguments to the corresponding `parse()` methods of the
+underlying (main) parser.
+Furthermore, it forwards possible exit reasons from the `parse()` method of the main parser.
+
+#### The `parse_and_validate()` method:
+The `parse_and_validate()` method forwards all arguments to the `parse_and_validate()` method
+of the underlying (main) parser.
+Furthermore, it forwards possible exit reasons from the `parse()` method of the main parser.
+
+#### The `operator->()` method:
+This operator provides access to the members or methods of the underlying (main) parser.
+
+#### The `operator*()` method:
+This operator provides access to the members or methods of the underlying (main) parser.
+
+### Example code listing for a parser container:
+The following code-listing illustrates the same example as before but it makes use of a
+parser container:
+
+[//]:#begin_cpp_listing_parser_container
+```c++
+#include <clapp/argument.h>
+#include <clapp/main_parser.h>
+#include <clapp/option.h>
+#include <clapp/parser_container.h>
+
+#include <optional>
+
+class cli_parser_t : public clapp::basic_main_parser_t {
+   public:
+    cli_parser_t() = default;
+
+    ~cli_parser_t() override;
+
+    clapp::help_option_t help{*this, "help", 'h', "Show help options."};
+
+    clapp::string_argument_t string_arg{*this, "string-arg", "String argument"};
+
+    // delete copy/mv-ctors and assignmet operators (CppCoreGuideline C.21):
+    explicit cli_parser_t(const cli_parser_t &) = delete;
+    explicit cli_parser_t(cli_parser_t &&) noexcept = delete;
+    cli_parser_t &operator=(const cli_parser_t &) = delete;
+    cli_parser_t &operator=(cli_parser_t &&) noexcept = delete;
+};
+
+cli_parser_t::~cli_parser_t() = default;
+
+using parser_t = clapp::parser::basic_parser_container_t<cli_parser_t>;
+
+int main(int argc, char *argv[]) {
+    try {
+        parser_t cp;  // create parser instance
+        const std::optional<clapp::value::exit_t> exit{cp.parse_and_validate(
+            argc, argv)};  // parses and validates cli-arguments
+        if (exit) {
+            return exit.value().get_exit_code();
+        }
+        Ensures(
+            cp->string_arg);  // parser ensures mandatory arguments are given
+        std::cout << "string-arg: " << cp->string_arg.value() << std::endl;
+    } catch (std::exception &e) {
+        std::cout << "Caught Exception: " << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
+}
+```
+[//]:#end_cpp_listing_parser_container
+
+Note: The previous listing explicitly deletes the copy/move assignment operators and the copy/move constructors.
+Depending on your code style, this may not be necessary, as `clapp::basic_main_parser_t` already deletes the copy/move assignment operators and the copy/move constructors.
+But if you want to be conformant to [CppCoreGuideline C.21](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#c21-if-you-define-or-delete-any-default-operation-define-or-delete-them-all), you should declare them.
+
+### Example cli-outputs when using the previous listing:
+If the previous example listing is executed, you get the following output:
+[//]:#begin_calls_parser_container
+```bash
+# Print the help message:
+$ ./libclapp_doc_parser_container -h  # this is the same as with option `--help`
+Usage:
+./libclapp_doc_parser_container [-h|--help] <string-arg>
+
+  Arguments:
+    string-arg String argument (mandatory)
+
+  Options:
+    -h|--help  Show help options. (optional)
+
+# Give mandatory argument:
+$ ./libclapp_doc_parser_container my-string
+string-arg: my-string
+
+# Give no mandatory argument throws:
+$ ./libclapp_doc_parser_container
+Caught Exception: Mandatory argument 'string-arg' not given.
+
+```
+[//]:#end_calls_parser_container
+
 Sub Parser:
 -----------
 The sub-parser is another key element of the libClaPP CLI parsing library.
@@ -710,6 +874,7 @@ this sub-parser.
 #include <clapp/argument.h>
 #include <clapp/main_parser.h>
 #include <clapp/option.h>
+#include <clapp/parser_container.h>
 #include <clapp/sub_parser.h>
 #include <optional>
 
@@ -771,32 +936,36 @@ cli_parser_t::~cli_parser_t() = default;
 cli_parser_t::mode1_parser_t::~mode1_parser_t() = default;
 cli_parser_t::mode2_parser_t::~mode2_parser_t() = default;
 
+using parser_t = clapp::parser::basic_parser_container_t<cli_parser_t>;
+
 int main(int argc, char *argv[]) {
     try {
-        cli_parser_t cp;  // create parser instance
+        parser_t cp;  // create parser instance
         const std::optional<clapp::value::exit_t> exit{cp.parse_and_validate(
             argc, argv)};  // parses and validates cli-arguments
         if (exit) {
             return exit.value().get_exit_code();
         }
 
-        if(cp.mode1) {
+        if (cp->mode1) {
             std::cout << "mode1: ";
-            if(cp.mode1.string) {
-                std::cout << "string: '" << cp.mode1.string.value() << "' ";
+            if (cp->mode1.string) {
+                std::cout << "string: '" << cp->mode1.string.value() << "' ";
             }
-            if(cp.int_opt){
-                std::cout << "int-opt: '" << cp.int_opt.value() << "' ";
+            if (cp->int_opt) {
+                std::cout << "int-opt: '" << cp->int_opt.value() << "' ";
             }
             std::cout << std::endl;
-        } else if(cp.mode2) {
+        } else if (cp->mode2) {
             std::cout << "mode2: ";
-            Ensures(cp.mode2.string_arg);  // parser ensures mandatory arguments are given
-            std::cout << "string_arg: '" << cp.mode2.string_arg.value() << "'" << std::endl;
+            // parser ensures mandatory arguments are given
+            Ensures(cp->mode2.string_arg);
+            std::cout << "string_arg: '" << cp->mode2.string_arg.value() << "'"
+                      << std::endl;
         } else {
             std::cout << "default mode: ";
-            if(cp.int_opt){
-                std::cout << "int-opt: '" << cp.int_opt.value() << "'";
+            if (cp->int_opt) {
+                std::cout << "int-opt: '" << cp->int_opt.value() << "'";
             }
             std::cout << std::endl;
         }

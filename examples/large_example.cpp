@@ -2,6 +2,7 @@
 #include <clapp/build_info.h>
 #include <clapp/main_parser.h>
 #include <clapp/option.h>
+#include <clapp/parser_container.h>
 #include <clapp/sub_parser.h>
 #include <clapp/value.h>
 
@@ -349,41 +350,43 @@ void process_options_and_args(const cli_parser_t &cp) {
     std::cout << "entry_param: '" << cp.entry_param.value() << "'\n";
 }
 
+using parser_t = clapp::parser::basic_parser_container_t<cli_parser_t>;
+
 int main(int argc, char *argv[]) {
     try {
         std::cout << clapp::build_info::build_info_string << std::endl;
-        cli_parser_t cp;
+        parser_t cp;
         const std::optional<clapp::value::exit_t> exit{
             cp.parse_and_validate(argc, argv)};
         if (exit) {
             return exit.value().get_exit_code();
         }
 
-        if (!cp) {
+        if (!*cp) {
             std::cout << "Parsing failed!" << std::endl;
             return EXIT_FAILURE;
         }
 
-        if (cp.help.value()) {
+        if (cp->help.value()) {
             std::cout << "Usage: \n"
-                      << cp.get_executable() << ' ' << cp.gen_help_msg(0);
+                      << cp->get_executable() << ' ' << cp->gen_help_msg(0);
             return EXIT_SUCCESS;
         }
 
-        cp.validate();
+        cp->validate();
 
-        process_options_and_args(cp);
+        process_options_and_args(*cp);
 
-        if (cp.cmd1) {
+        if (cp->cmd1) {
             std::cout << "cmd1 given" << std::endl;
-            process_cmd1(cp.cmd1);
+            process_cmd1(cp->cmd1);
         } else {
             std::cout << "cmd1 not given" << std::endl;
         }
 
-        if (cp.cmd2) {
+        if (cp->cmd2) {
             std::cout << "cmd2 given" << std::endl;
-            process_cmd2(cp.cmd2);
+            process_cmd2(cp->cmd2);
         } else {
             std::cout << "cmd2 not given" << std::endl;
         }
