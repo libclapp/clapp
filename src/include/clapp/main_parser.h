@@ -27,10 +27,12 @@ class basic_main_parser_t : public basic_parser_t {
     ~basic_main_parser_t() override;
 
     using basic_parser_t::parse;
-    void parse(int argc, const char* const* argv);
-    void parse(const arg_t& arg);
+    [[nodiscard]] std::optional<clapp::value::exit_t> parse(
+        int argc, const char* const* argv);
+    [[nodiscard]] std::optional<clapp::value::exit_t> parse(const arg_t& arg);
 
-    void parse_and_validate(int argc, const char* const* argv);
+    [[nodiscard]] std::optional<clapp::value::exit_t> parse_and_validate(
+        int argc, const char* const* argv);
 
     explicit operator bool() const;
     std::string get_executable() const;

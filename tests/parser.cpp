@@ -70,38 +70,56 @@ class optConfT : public ::testing::Test {
     static inline const std::string long_option2{"long-option"};
     static inline const std::string option_string{"opt-str"};
     static inline const std::string description{"desc"};
-    opt_no_param_short_opt_conf_t np_soc1{short_option1,
-                                          [](const char /*opt*/) {}};
-    opt_no_param_short_opt_conf_t np_soc2{short_option2,
-                                          [](const char /*opt*/) {}};
-    opt_no_param_long_opt_conf_t np_loc1{long_option1,
-                                         [](const std::string_view /*opt*/) {}};
-    opt_no_param_long_opt_conf_t np_loc2{long_option2,
-                                         [](const std::string_view /*opt*/) {}};
-    opt_scalar_param_short_opt_conf_t sp_soc1{
+    opt_no_param_short_opt_conf_t np_soc1{
         short_option1,
-        [](const char /*opt*/, const std::string_view /*val*/) {}};
-    opt_scalar_param_short_opt_conf_t sp_soc2{
+        [](const char /*opt*/) { return clapp::value::found_func_t::ret_t{}; }};
+    opt_no_param_short_opt_conf_t np_soc2{
         short_option2,
-        [](const char /*opt*/, const std::string_view /*val*/) {}};
+        [](const char /*opt*/) { return clapp::value::found_func_t::ret_t{}; }};
+    opt_no_param_long_opt_conf_t np_loc1{
+        long_option1, [](const std::string_view /*opt*/) {
+            return clapp::value::found_func_t::ret_t{};
+        }};
+    opt_no_param_long_opt_conf_t np_loc2{
+        long_option2, [](const std::string_view /*opt*/) {
+            return clapp::value::found_func_t::ret_t{};
+        }};
+    opt_scalar_param_short_opt_conf_t sp_soc1{
+        short_option1, [](const char /*opt*/, const std::string_view /*val*/) {
+            return clapp::value::found_func_t::ret_t{};
+        }};
+    opt_scalar_param_short_opt_conf_t sp_soc2{
+        short_option2, [](const char /*opt*/, const std::string_view /*val*/) {
+            return clapp::value::found_func_t::ret_t{};
+        }};
     opt_scalar_param_long_opt_conf_t sp_loc1{
         long_option1,
-        [](const std::string_view /*opt*/, const std::string_view /*val*/) {}};
+        [](const std::string_view /*opt*/, const std::string_view /*val*/) {
+            return clapp::value::found_func_t::ret_t{};
+        }};
     opt_scalar_param_long_opt_conf_t sp_loc2{
         long_option2,
-        [](const std::string_view /*opt*/, const std::string_view /*val*/) {}};
+        [](const std::string_view /*opt*/, const std::string_view /*val*/) {
+            return clapp::value::found_func_t::ret_t{};
+        }};
     opt_scalar_param_short_opt_conf_t vp_soc1{
-        short_option1,
-        [](const char /*opt*/, const std::string_view /*val*/) {}};
+        short_option1, [](const char /*opt*/, const std::string_view /*val*/) {
+            return clapp::value::found_func_t::ret_t{};
+        }};
     opt_scalar_param_short_opt_conf_t vp_soc2{
-        short_option2,
-        [](const char /*opt*/, const std::string_view /*val*/) {}};
+        short_option2, [](const char /*opt*/, const std::string_view /*val*/) {
+            return clapp::value::found_func_t::ret_t{};
+        }};
     opt_scalar_param_long_opt_conf_t vp_loc1{
         long_option1,
-        [](const std::string_view /*opt*/, const std::string_view /*val*/) {}};
+        [](const std::string_view /*opt*/, const std::string_view /*val*/) {
+            return clapp::value::found_func_t::ret_t{};
+        }};
     opt_scalar_param_long_opt_conf_t vp_loc2{
         long_option2,
-        [](const std::string_view /*opt*/, const std::string_view /*val*/) {}};
+        [](const std::string_view /*opt*/, const std::string_view /*val*/) {
+            return clapp::value::found_func_t::ret_t{};
+        }};
     validate_func_t valid{[]() {}};
     purpose_t purpose_mandatory{purpose_t::mandatory};
     purpose_t purpose_optional{purpose_t::optional};
@@ -628,7 +646,9 @@ class argConfT : public ::testing::Test {
     static inline const std::string arg_1{"arg"};
     static inline const std::string arg_2{"argument"};
     static inline const std::string description{"desc"};
-    argument_func_t arg_func{[](const std::string_view /*arg*/) {}};
+    argument_func_t arg_func{[](const std::string_view /*arg*/) {
+        return clapp::value::found_func_t::ret_t{};
+    }};
     validate_func_t valid{[]() {}};
     purpose_t purpose_mandatory{purpose_t::mandatory};
     purpose_t purpose_optional{purpose_t::optional};
@@ -732,8 +752,9 @@ TEST_F(argConfT, ConstructVariadicArgConfTGetArgumentHelp) {
 
 class print_and_exit_t {
    public:
-    MOCK_METHOD2(print_and_exit, void(const std::string_view print_msg,
-                                      std::optional<int> exit_code));
+    MOCK_METHOD2(print_and_exit,
+                 clapp::value::exit_t(const std::string_view print_msg,
+                                      int exit_code));
 };
 
 template <class T, size_t N>
@@ -840,6 +861,86 @@ simple_test_parser3_t::~simple_test_parser3_t() = default;
     return "simple-test-parser3" + gen_short_line();
 }
 
+class simple_test_parser4_t : public clapp::basic_parser_t {
+   public:
+    using clapp::basic_parser_t::basic_parser_t;
+    ~simple_test_parser4_t() override;
+
+    static constexpr std::int32_t min_int{10};
+    static constexpr std::int32_t max_int{200};
+
+    static clapp::value::found_func_t::ret_t found_cb(
+        const std::string_view option) {
+        std::cout << "found cb: " << option << std::endl;
+        return clapp::value::exit_t::exit(EXIT_SUCCESS);
+    }
+
+    clapp::option::bool_option_t bool_opt{
+        *this,
+        "bo",
+        'b',
+        "Arg desc",
+        clapp::basic_parser_t::purpose_t::optional,
+        clapp::value::found_func_t{found_cb}};
+
+    clapp::option::string_param_option_t string_opt{
+        *this,
+        "opt",
+        'o',
+        "Arg desc",
+        clapp::basic_parser_t::purpose_t::optional,
+        clapp::value::found_func_t{found_cb}};
+
+    clapp::argument::string_argument_t string_arg{
+        *this, "arg-name", "Arg desc",
+        clapp::basic_parser_t::purpose_t::optional,
+        clapp::value::found_func_t{found_cb}};
+
+    [[nodiscard]] std::string gen_short_line_prefix() const override;
+};
+
+simple_test_parser4_t::~simple_test_parser4_t() = default;
+
+[[nodiscard]] std::string simple_test_parser4_t::gen_short_line_prefix() const {
+    return "simple-test-parser4" + gen_short_line();
+}
+
+class simple_test_parser5_t : public clapp::basic_parser_t {
+   public:
+    using clapp::basic_parser_t::basic_parser_t;
+    ~simple_test_parser5_t() override;
+
+    static constexpr std::int32_t min_int{10};
+    static constexpr std::int32_t max_int{200};
+
+    static clapp::value::found_func_t::ret_t found_cb(
+        const std::string_view option) {
+        static std::size_t i{0U};
+        std::cout << "found cb: " << option << std::endl;
+        i++;
+        if (i == 1U) {
+            return clapp::value::found_func_t::ret_t{};
+        }
+        return clapp::value::exit_t::exit(EXIT_FAILURE);
+    }
+
+    clapp::argument::string_argument_t string_arg{*this, "arg-name",
+                                                  "Arg desc"};
+
+    clapp::argument::variadic_string_argument_t var_string_arg{
+        *this, "var-arg-name", "Var arg desc",
+        clapp::basic_parser_t::purpose_t::optional,
+        clapp::value::found_func_t{found_cb}};
+
+    [[nodiscard]] std::string gen_short_line_prefix() const override;
+};
+
+simple_test_parser5_t::~simple_test_parser5_t() = default;
+
+[[nodiscard]] std::string simple_test_parser5_t::gen_short_line_prefix() const {
+    return "simple-test-parser5" + gen_short_line();
+}
+
 class sub_parser_container_t : public clapp::basic_parser_t {
    public:
     using clapp::basic_parser_t::basic_parser_t;
@@ -906,14 +1007,16 @@ TEST(parser, constructEmptyBasicParserAndParseEmptyArguments) {
     constexpr const char* const argv[]{nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     empty_basic_parser_t ebp;
-    ASSERT_NO_THROW(ebp.parse(arg.begin(), arg.end()));
+    ASSERT_THAT(ebp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
 }
 
 TEST(parser, constructEmptyBasicParserAndParseAndValidateEmptyArguments) {
     constexpr const char* const argv[]{nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     empty_basic_parser_t ebp;
-    ASSERT_NO_THROW(ebp.parse(arg.begin(), arg.end()));
+    ASSERT_THAT(ebp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
     ASSERT_NO_THROW(ebp.validate());
 }
 
@@ -937,22 +1040,15 @@ TEST(parser, constructEmptyBasicParserGetActiveReturnsThisRef) {
     ASSERT_THAT(&ebp.get_active_parser(), testing::Eq(&ebp));
 }
 
-TEST(parser, callDefaultPrintAndExitWithString) {
-    const std::string text{"text-to-print"};
-    testing::internal::CaptureStdout();
-    empty_basic_parser_t::default_print_and_exit(text, std::nullopt);
-    const std::string output{testing::internal::GetCapturedStdout()};
-    ASSERT_THAT(output, testing::StrEq(text));
-}
-
 TEST(parser, callDefaultPrintAndExitWithStringAndExitCode) {
     const std::string text{"text"};
     static constexpr int exit_code{2};
     testing::internal::CaptureStdout();
-    ASSERT_EXIT(empty_basic_parser_t::default_print_and_exit(text, exit_code),
-                ::testing::ExitedWithCode(exit_code), "");
+    const clapp::value::exit_t ret{
+        empty_basic_parser_t::default_print_and_exit(text, exit_code)};
     const std::string output{testing::internal::GetCapturedStdout()};
     ASSERT_THAT(output, testing::StrEq(text));
+    ASSERT_THAT(ret.get_exit_code(), ::testing::Eq(exit_code));
 }
 
 static constexpr const char help_str[] =
@@ -963,7 +1059,8 @@ TEST(parser, constructHelpParserAndParseEmptyArguments) {
     constexpr const char* const argv[]{nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     help_parser_t hp;
-    ASSERT_NO_THROW(hp.parse(arg.begin(), arg.end()));
+    ASSERT_THAT(hp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
 }
 
 TEST(parser, constructHelpParserAndParseHelpOptionLong1) {
@@ -972,10 +1069,12 @@ TEST(parser, constructHelpParserAndParseHelpOptionLong1) {
     help_parser_t hp;
     static constexpr int exit_code{EXIT_SUCCESS};
     testing::internal::CaptureStdout();
-    ASSERT_EXIT(hp.parse(arg.begin(), arg.end()),
-                ::testing::ExitedWithCode(exit_code), "");
+    const clapp::value::found_func_t::ret_t ret{
+        hp.parse(arg.begin(), arg.end())};
     std::string output = testing::internal::GetCapturedStdout();
     ASSERT_THAT(output, testing::StrEq(help_str));
+    ASSERT_THAT(ret.has_value(), testing::Eq(true));
+    ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(exit_code));
 }
 
 TEST(parser, constructHelpParserAndParseHelpOptionLong2) {
@@ -984,10 +1083,12 @@ TEST(parser, constructHelpParserAndParseHelpOptionLong2) {
     help_parser_t hp;
     static constexpr int exit_code{EXIT_SUCCESS};
     testing::internal::CaptureStdout();
-    ASSERT_EXIT(hp.parse(arg.begin(), arg.end()),
-                ::testing::ExitedWithCode(exit_code), "");
+    const clapp::value::found_func_t::ret_t ret{
+        hp.parse(arg.begin(), arg.end())};
     std::string output = testing::internal::GetCapturedStdout();
     ASSERT_THAT(output, testing::StrEq(help_str));
+    ASSERT_THAT(ret.has_value(), testing::Eq(true));
+    ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(exit_code));
 }
 
 TEST(parser, constructHelpParserAndParseHelpOptionShort1) {
@@ -996,10 +1097,12 @@ TEST(parser, constructHelpParserAndParseHelpOptionShort1) {
     help_parser_t hp;
     static constexpr int exit_code{EXIT_SUCCESS};
     testing::internal::CaptureStdout();
-    ASSERT_EXIT(hp.parse(arg.begin(), arg.end()),
-                ::testing::ExitedWithCode(exit_code), "");
+    const clapp::value::found_func_t::ret_t ret{
+        hp.parse(arg.begin(), arg.end())};
     std::string output = testing::internal::GetCapturedStdout();
     ASSERT_THAT(output, testing::StrEq(help_str));
+    ASSERT_THAT(ret.has_value(), testing::Eq(true));
+    ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(exit_code));
 }
 
 TEST(parser, constructHelpParserAndParseHelpOptionShort2) {
@@ -1008,46 +1111,115 @@ TEST(parser, constructHelpParserAndParseHelpOptionShort2) {
     help_parser_t hp;
     static constexpr int exit_code{EXIT_SUCCESS};
     testing::internal::CaptureStdout();
-    ASSERT_EXIT(hp.parse(arg.begin(), arg.end()),
-                ::testing::ExitedWithCode(exit_code), "");
+    const clapp::value::found_func_t::ret_t ret{
+        hp.parse(arg.begin(), arg.end())};
     std::string output = testing::internal::GetCapturedStdout();
     ASSERT_THAT(output, testing::StrEq(help_str));
+    ASSERT_THAT(ret.has_value(), testing::Eq(true));
+    ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(exit_code));
 }
 
-TEST(parser, setAndCallPrintAndExitWithString) {
-    print_and_exit_t pae{};
-    simple_test_parser_t stp;
-    stp.set_print_and_exit_func([&pae](const std::string_view text,
-                                       const std::optional<int> exit_code) {
-        pae.print_and_exit(text, exit_code);
-    });
+TEST(parser, constructSimpleTestParser4AndParseArgument) {
+    constexpr const char* const argv[]{"myarg", nullptr};
+    const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
+    simple_test_parser4_t stp;
+    static constexpr int exit_code{EXIT_SUCCESS};
+    testing::internal::CaptureStdout();
+    const clapp::value::found_func_t::ret_t ret{
+        stp.parse(arg.begin(), arg.end())};
+    std::string output{testing::internal::GetCapturedStdout()};
+    ASSERT_THAT(output, testing::StrEq("found cb: arg-name\n"));
+    ASSERT_THAT(ret.has_value(), testing::Eq(true));
+    ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(exit_code));
+}
 
-    const std::string_view text{"text"};
-    const std::optional<int> exit_code;
-    EXPECT_CALL(pae, print_and_exit(text, exit_code));
-    stp.get_print_and_exit_func()(text, exit_code);
+TEST(parser, constructSimpleTestParser4AndParseLongOpt) {
+    constexpr const char* const argv[]{"--opt", "string", nullptr};
+    const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
+    simple_test_parser4_t stp;
+    static constexpr int exit_code{EXIT_SUCCESS};
+    testing::internal::CaptureStdout();
+    const clapp::value::found_func_t::ret_t ret{
+        stp.parse(arg.begin(), arg.end())};
+    std::string output{testing::internal::GetCapturedStdout()};
+    ASSERT_THAT(output, testing::StrEq("found cb: --opt\n"));
+    ASSERT_THAT(ret.has_value(), testing::Eq(true));
+    ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(exit_code));
+}
+
+TEST(parser, constructSimpleTestParser4AndParseShortOpt) {
+    constexpr const char* const argv[]{"-o", "string", nullptr};
+    const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
+    simple_test_parser4_t stp;
+    static constexpr int exit_code{EXIT_SUCCESS};
+    testing::internal::CaptureStdout();
+    const clapp::value::found_func_t::ret_t ret{
+        stp.parse(arg.begin(), arg.end())};
+    std::string output{testing::internal::GetCapturedStdout()};
+    ASSERT_THAT(output, testing::StrEq("found cb: -o\n"));
+    ASSERT_THAT(ret.has_value(), testing::Eq(true));
+    ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(exit_code));
+}
+
+TEST(parser, constructSimpleTestParser4AndParseShortOpt2) {
+    constexpr const char* const argv[]{"-bo", "string", nullptr};
+    const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
+    simple_test_parser4_t stp;
+    static constexpr int exit_code{EXIT_SUCCESS};
+    testing::internal::CaptureStdout();
+    const clapp::value::found_func_t::ret_t ret{
+        stp.parse(arg.begin(), arg.end())};
+    std::string output{testing::internal::GetCapturedStdout()};
+    ASSERT_THAT(output, testing::StrEq("found cb: -b\n"));
+    ASSERT_THAT(ret.has_value(), testing::Eq(true));
+    ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(exit_code));
+}
+
+TEST(parser, constructSimpleTestParser5AndParseArgument) {
+    constexpr const char* const argv[]{"myarg", "myarg2", "myarg3", nullptr};
+    const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
+    simple_test_parser5_t stp;
+    static constexpr int exit_code{EXIT_FAILURE};
+    testing::internal::CaptureStdout();
+    const clapp::value::found_func_t::ret_t ret{
+        stp.parse(arg.begin(), arg.end())};
+    std::string output{testing::internal::GetCapturedStdout()};
+    ASSERT_THAT(
+        output,
+        testing::StrEq("found cb: var-arg-name\nfound cb: var-arg-name\n"));
+    ASSERT_THAT(ret.has_value(), testing::Eq(true));
+    ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(exit_code));
 }
 
 TEST(parser, setAndCallPrintAndExitWithStringAndExitCode) {
     print_and_exit_t pae{};
     simple_test_parser_t stp;
-    stp.set_print_and_exit_func([&pae](const std::string_view text,
-                                       const std::optional<int> exit_code) {
-        pae.print_and_exit(text, exit_code);
-    });
+    stp.set_print_and_exit_func(
+        [&pae](const std::string_view text, const int exit_code) {
+            return pae.print_and_exit(text, exit_code);
+        });
 
-    const std::string_view text{"text-string"};
-    const std::optional<int> exit_code{10};
-    EXPECT_CALL(pae, print_and_exit(text, exit_code));
-    stp.get_print_and_exit_func()(text, exit_code);
+    static constexpr std::string_view text{"text-string"};
+    static constexpr int exit_code{10};
+    static constexpr clapp::value::exit_t stop{
+        clapp::value::exit_t::exit(exit_code)};
+    EXPECT_CALL(pae, print_and_exit(text, exit_code))
+        .Times(1)
+        .WillOnce(testing::Return(stop));
+    const clapp::value::exit_t ret{
+        stp.get_print_and_exit_func()(text, exit_code)};
+    ASSERT_THAT(ret.get_exit_code(), testing::Eq(exit_code));
 }
 
 TEST(parser, genFuncPrintHelpAndExit) {
     empty_basic_parser_t ebp;
+    static constexpr int ret_val{EXIT_SUCCESS};
     clapp::value::found_func_t ff{
-        ebp.gen_func_print_help_and_exit(EXIT_SUCCESS)};
+        ebp.gen_func_print_help_and_req_exit(ret_val)};
     testing::internal::CaptureStdout();
-    ASSERT_EXIT(ff.found(), ::testing::ExitedWithCode(0), "");
+    const clapp::value::found_func_t::ret_t ret{ff.found("name")};
+    ASSERT_THAT(ret.has_value(), testing::Eq(true));
+    ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(ret_val));
     std::string output{testing::internal::GetCapturedStdout()};
     ASSERT_THAT(output, testing::StrEq("Usage:\narg-test-parser\n"));
 }
@@ -1089,6 +1261,27 @@ TEST(parser, constructSimpleTestParser3AndGenHelpMessage) {
             "option. (optional, vector option)\n"));
 }
 
+TEST(parser, constructSimpleTestParser4AndGenHelpMessage) {
+    simple_test_parser4_t stp;
+    ASSERT_THAT(
+        stp.gen_help_msg(255),
+        testing::StrEq(
+            "simple-test-parser4 [-b|--bo] [-o|--opt=<param>] [<arg-name>]\n\n "
+            " Arguments:\n    arg-name         Arg desc (optional)\n\n  "
+            "Options:\n    -b|--bo          Arg desc (optional)\n    "
+            "-o|--opt=<param> Arg desc (optional)\n"));
+}
+
+TEST(parser, constructSimpleTestParser5AndGenHelpMessage) {
+    simple_test_parser5_t stp;
+    ASSERT_THAT(
+        stp.gen_help_msg(255),
+        testing::StrEq(
+            "simple-test-parser5 <arg-name> [<var-arg-name>...]\n\n  "
+            "Arguments:\n    arg-name     Arg desc (mandatory)\n    "
+            "var-arg-name Var arg desc (optional, variadic argument)\n"));
+}
+
 TEST(parser, constructSubParserContainerAndGenHelpMessage) {
     sub_parser_container_t spc;
     ASSERT_THAT(
@@ -1127,7 +1320,7 @@ TEST(parser, constructEmptyBasicParserAndParseUnknownArgumentsThrows) {
     constexpr const char* const argv[]{"unknown-argument", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     empty_basic_parser_t ebp;
-    ASSERT_THROW(ebp.parse(arg.begin(), arg.end()),
+    ASSERT_THROW(static_cast<void>(ebp.parse(arg.begin(), arg.end())),
                  clapp::exception::clapp_exception_t);
 }
 
@@ -1135,7 +1328,7 @@ TEST(parser, constructEmptyBasicParserAndParseUnknownLongOptionThrows) {
     constexpr const char* const argv[]{"--long-option", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     empty_basic_parser_t ebp;
-    ASSERT_THROW(ebp.parse(arg.begin(), arg.end()),
+    ASSERT_THROW(static_cast<void>(ebp.parse(arg.begin(), arg.end())),
                  clapp::exception::option_exception_t);
 }
 
@@ -1143,7 +1336,7 @@ TEST(parser, constructEmptyBasicParserAndParseUnknownShortOptionThrows) {
     constexpr const char* const argv[]{"-s", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     empty_basic_parser_t ebp;
-    ASSERT_THROW(ebp.parse(arg.begin(), arg.end()),
+    ASSERT_THROW(static_cast<void>(ebp.parse(arg.begin(), arg.end())),
                  clapp::exception::option_exception_t);
 }
 
@@ -1151,7 +1344,7 @@ TEST(parser, constructSimpleTestParserAndParseUnknownLongOptionThrows) {
     constexpr const char* const argv[]{"--long-option", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t ebp;
-    ASSERT_THROW(ebp.parse(arg.begin(), arg.end()),
+    ASSERT_THROW(static_cast<void>(ebp.parse(arg.begin(), arg.end())),
                  clapp::exception::option_exception_t);
 }
 
@@ -1159,7 +1352,7 @@ TEST(parser, constructSimpleTestParserAndParseUnknownShortOptionThrows) {
     constexpr const char* const argv[]{"-s", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t ebp;
-    ASSERT_THROW(ebp.parse(arg.begin(), arg.end()),
+    ASSERT_THROW(static_cast<void>(ebp.parse(arg.begin(), arg.end())),
                  clapp::exception::option_exception_t);
 }
 
@@ -1167,7 +1360,7 @@ TEST(parser, constructSimpleTestParserAndParseLongBoolOptionWithParamThrows) {
     constexpr const char* const argv[]{"--bool=param", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t ebp;
-    ASSERT_THROW(ebp.parse(arg.begin(), arg.end()),
+    ASSERT_THROW(static_cast<void>(ebp.parse(arg.begin(), arg.end())),
                  clapp::exception::option_param_exception_t);
 }
 
@@ -1175,7 +1368,7 @@ TEST(parser, constructSimpleTestParserAndParseShortOptionWithParamThrows) {
     constexpr const char* const argv[]{"-b=param", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t ebp;
-    ASSERT_THROW(ebp.parse(arg.begin(), arg.end()),
+    ASSERT_THROW(static_cast<void>(ebp.parse(arg.begin(), arg.end())),
                  clapp::exception::option_param_exception_t);
 }
 
@@ -1183,7 +1376,7 @@ TEST(parser, constructSimpleTestParserAndParseLongIntOptionWithoutParamThrows) {
     constexpr const char* const argv[]{"--int", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t ebp;
-    ASSERT_THROW(ebp.parse(arg.begin(), arg.end()),
+    ASSERT_THROW(static_cast<void>(ebp.parse(arg.begin(), arg.end())),
                  clapp::exception::option_param_exception_t);
 }
 
@@ -1192,7 +1385,7 @@ TEST(parser,
     constexpr const char* const argv[]{"-i", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t ebp;
-    ASSERT_THROW(ebp.parse(arg.begin(), arg.end()),
+    ASSERT_THROW(static_cast<void>(ebp.parse(arg.begin(), arg.end())),
                  clapp::exception::option_param_exception_t);
 }
 
@@ -1201,7 +1394,7 @@ TEST(parser,
     constexpr const char* const argv[]{"-ib", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t ebp;
-    ASSERT_THROW(ebp.parse(arg.begin(), arg.end()),
+    ASSERT_THROW(static_cast<void>(ebp.parse(arg.begin(), arg.end())),
                  clapp::exception::option_param_exception_t);
 }
 
@@ -1210,7 +1403,8 @@ TEST(parser,
     constexpr const char* const argv[]{nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t ebp;
-    ASSERT_NO_THROW(ebp.parse(arg.begin(), arg.end()));
+    ASSERT_THAT(ebp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
     ASSERT_THAT(ebp.get_num_processed_arguments(), testing::Eq(0));
     ASSERT_THROW(ebp.validate_recursive(),
                  clapp::exception::argument_exception_t);
@@ -1220,7 +1414,8 @@ TEST(parser, constructSimpleTestParserParseArgumentAndValidateRecursive) {
     constexpr const char* const argv[]{"argument", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t ebp;
-    ASSERT_NO_THROW(ebp.parse(arg.begin(), arg.end()));
+    ASSERT_THAT(ebp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
     ASSERT_THAT(static_cast<bool>(ebp.bool_option), testing::Eq(false));
     ASSERT_THAT(ebp.bool_option.has_value(), testing::Eq(true));
     ASSERT_THAT(ebp.bool_option.value(), testing::Eq(false));
@@ -1238,7 +1433,8 @@ TEST(
     constexpr const char* const argv[]{"-b", "arg", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t ebp;
-    ASSERT_NO_THROW(ebp.parse(arg.begin(), arg.end()));
+    ASSERT_THAT(ebp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
     ASSERT_THAT(static_cast<bool>(ebp.bool_option), testing::Eq(true));
     ASSERT_THAT(ebp.bool_option.has_value(), testing::Eq(true));
     ASSERT_THAT(ebp.bool_option.value(), testing::Eq(true));
@@ -1255,7 +1451,8 @@ TEST(parser,
     constexpr const char* const argv[]{"--int", "123", "arg", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t ebp;
-    ASSERT_NO_THROW(ebp.parse(arg.begin(), arg.end()));
+    ASSERT_THAT(ebp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
     ASSERT_THAT(static_cast<bool>(ebp.bool_option), testing::Eq(false));
     ASSERT_THAT(ebp.bool_option.has_value(), testing::Eq(true));
     ASSERT_THAT(ebp.bool_option.value(), testing::Eq(false));
@@ -1275,7 +1472,8 @@ TEST(
                                        nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t ebp;
-    ASSERT_NO_THROW(ebp.parse(arg.begin(), arg.end()));
+    ASSERT_THAT(ebp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
     ASSERT_THAT(static_cast<bool>(ebp.bool_option), testing::Eq(false));
     ASSERT_THAT(ebp.bool_option.has_value(), testing::Eq(true));
     ASSERT_THAT(ebp.bool_option.value(), testing::Eq(false));
@@ -1295,7 +1493,8 @@ TEST(parser, constructSimpleTestParserParseArgumentAndShortOptionsAndValidate) {
     constexpr const char* const argv[]{"-bi=123", "arg", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t ebp;
-    ASSERT_NO_THROW(ebp.parse(arg.begin(), arg.end()));
+    ASSERT_THAT(ebp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
     ASSERT_THAT(static_cast<bool>(ebp.bool_option), testing::Eq(true));
     ASSERT_THAT(ebp.bool_option.has_value(), testing::Eq(true));
     ASSERT_THAT(ebp.bool_option.value(), testing::Eq(true));
@@ -1311,7 +1510,7 @@ TEST(parser, constructSimpleTestParser2AndParseLongCountOptionWithParamThrows) {
     constexpr const char* const argv[]{"--count=param", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser2_t ebp;
-    ASSERT_THROW(ebp.parse(arg.begin(), arg.end()),
+    ASSERT_THROW(static_cast<void>(ebp.parse(arg.begin(), arg.end())),
                  clapp::option_param_exception_t);
 }
 
@@ -1319,7 +1518,8 @@ TEST(parser, constructSimpleTestParser2ParseWithoutMandatoryOptionThrows) {
     constexpr const char* const argv[]{nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser2_t ebp;
-    ASSERT_NO_THROW(ebp.parse(arg.begin(), arg.end()));
+    ASSERT_THAT(ebp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
     ASSERT_THAT(static_cast<bool>(ebp.count_option), testing::Eq(false));
     ASSERT_THAT(ebp.count_option.has_value(), testing::Eq(true));
     ASSERT_THAT(ebp.count_option.value(), testing::Eq(0));
@@ -1330,7 +1530,8 @@ TEST(parser, constructSimpleTestParser2ParseOptionWithoutParamAndValidate) {
     constexpr const char* const argv[]{"-c", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser2_t ebp;
-    ASSERT_NO_THROW(ebp.parse(arg.begin(), arg.end()));
+    ASSERT_THAT(ebp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
     ASSERT_THAT(static_cast<bool>(ebp.count_option), testing::Eq(true));
     ASSERT_THAT(ebp.count_option.has_value(), testing::Eq(true));
     ASSERT_THAT(ebp.count_option.value(), testing::Eq(1));
@@ -1343,7 +1544,8 @@ TEST(
     constexpr const char* const argv[]{"-c", "opt-arg", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser2_t ebp;
-    ASSERT_NO_THROW(ebp.parse(arg.begin(), arg.end()));
+    ASSERT_THAT(ebp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
     ASSERT_THAT(static_cast<bool>(ebp.count_option), testing::Eq(true));
     ASSERT_THAT(ebp.count_option.value(), testing::Eq(1));
     ASSERT_THAT(static_cast<bool>(ebp.string_arg), testing::Eq(true));
@@ -1356,7 +1558,8 @@ TEST(parser, constructSubParserContainerParseSubparserAndValidate) {
                                        nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     sub_parser_container_t spc;
-    ASSERT_NO_THROW(spc.parse(arg.begin(), arg.end()));
+    ASSERT_THAT(spc.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
     ASSERT_THAT(static_cast<bool>(spc.string_arg), testing::Eq(true));
     ASSERT_THAT(spc.string_arg.value(), testing::StrEq("string-arg"));
     ASSERT_THAT(static_cast<bool>(spc.bool_option), testing::Eq(false));
@@ -1381,7 +1584,8 @@ TEST(parser, constructSubParserContainerParseSubparserAndValidate2) {
         "string-arg", "-b", "-2", "sub-parser", "-s", "param", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
     sub_parser_container_t spc;
-    ASSERT_NO_THROW(spc.parse(arg.begin(), arg.end()));
+    ASSERT_THAT(spc.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
     ASSERT_THAT(static_cast<bool>(spc.string_arg), testing::Eq(true));
     ASSERT_THAT(spc.string_arg.value(), testing::StrEq("string-arg"));
     ASSERT_THAT(static_cast<bool>(spc.bool_option), testing::Eq(true));

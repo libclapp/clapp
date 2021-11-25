@@ -26,7 +26,10 @@ static T convert_int(std::string_view param);
 clapp::value::found_func_t::found_func_t(func_t&& func_arg)
     : func{std::move(func_arg)} {}
 
-void clapp::value::found_func_t::found() { func(); }
+clapp::value::found_func_t::ret_t clapp::value::found_func_t::found(
+    const std::string& name) {
+    return func(name);
+}
 
 template <>
 std::string clapp::value::convert_value<std::string>(

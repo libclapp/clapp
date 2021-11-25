@@ -7,8 +7,9 @@
 
 class print_and_exit_t {
    public:
-    MOCK_METHOD2(print_and_exit, void(const std::string_view print_msg,
-                                      std::optional<int> exit_code));
+    MOCK_METHOD2(print_and_exit,
+                 clapp::value::exit_t(const std::string_view print_msg,
+                                      int exit_code));
 };
 
 template <class T, size_t N>
@@ -138,7 +139,8 @@ TEST(subParser, constructEmptySubParserAndParseEmptyArguments) {
     ASSERT_THAT(static_cast<bool>(sub), testing::Eq(false));
     ASSERT_THAT(sub.get_sub_parser_name(), testing::StrEq(sub_parser));
 
-    tp.parse(arg.begin(), arg.end());
+    ASSERT_THAT(tp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
 }
 
 TEST(subParser, constructSimpleSubParserAndParseSubOption) {
@@ -166,7 +168,9 @@ TEST(subParser, constructSimpleSubParserAndParseSubOption) {
     ASSERT_THAT(static_cast<bool>(sub.bool_option), testing::Eq(false));
     ASSERT_THAT(sub.bool_option.has_value(), testing::Eq(true));
     ASSERT_THAT(sub.bool_option.value(), testing::Eq(false));
-    tp.parse(arg.begin(), arg.end());
+
+    ASSERT_THAT(tp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
     ASSERT_THAT(static_cast<bool>(sub.bool_option), testing::Eq(true));
 }
 
@@ -193,7 +197,8 @@ TEST(subParser, constructSimpleSubParserAndParseBaseOption) {
     ASSERT_THAT(sub.get_sub_parser_name(), testing::StrEq(sub_parser));
 
     ASSERT_THAT(tp.count_option.value(), testing::Eq(0));
-    tp.parse(arg.begin(), arg.end());
+    ASSERT_THAT(tp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
     ASSERT_THAT(tp.count_option.value(), testing::Eq(1));
 }
 
@@ -257,7 +262,8 @@ TEST(subParser, constructSubParserAfterParsingSubBecomesActive) {
     ASSERT_THAT(&tp.get_active_parser(), testing::Eq(&tp));
     ASSERT_THAT(sub.is_active(), testing::Eq(false));
 
-    tp.parse(arg.begin(), arg.end());
+    ASSERT_THAT(tp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
     ASSERT_THAT(sub.is_active(), testing::Eq(true));
     ASSERT_THAT(&tp.get_active_parser(), testing::Eq(&sub));
 }
@@ -271,7 +277,8 @@ TEST(subParser, constructSubParserAndValidateRecursiveDoNotThrow) {
     empty_test_parser_t tp;
     simple_sub_parser_t sub{tp, sub_parser, description};
 
-    tp.parse(arg.begin(), arg.end());
+    ASSERT_THAT(tp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
     ASSERT_NO_THROW(tp.validate_recursive());
 }
 
@@ -283,24 +290,51 @@ TEST(subParser, constructSubParserAndValidateRecursiveDoThrow) {
 
     empty_test_parser_t tp;
     simple_sub_parser_t sub{tp, sub_parser, description};
-    tp.parse(arg.begin(), arg.end());
+
+    ASSERT_THAT(tp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
     ASSERT_THROW(tp.validate_recursive(), clapp::clapp_exception_t);
 }
 
-TEST(subParser, constructSubParserSetAndCallPrintAndExitWithStringAndExitCode) {
+TEST(subParser, constructSubParserAndCallDefaultExitWithStringAndExitCode) {
     print_and_exit_t pae{};
     empty_test_parser_t tp;
-    tp.set_print_and_exit_func([&pae](const std::string_view text,
-                                      const std::optional<int> exit_code) {
-        pae.print_and_exit(text, exit_code);
-    });
 
     const std::string sub_parser{"sub"};
     const std::string description{"sub parser"};
     simple_sub_parser_t sub{tp, sub_parser, description};
 
     static constexpr std::string_view text{"text-string"};
-    static constexpr std::optional<int> exit_code{10};
-    EXPECT_CALL(pae, print_and_exit(text, exit_code));
-    sub.get_print_and_exit_func()(text, exit_code);
+    static constexpr int exit_code{10};
+    testing::internal::CaptureStdout();
+    const clapp::value::exit_t ret{
+        sub.get_print_and_exit_func()(text, exit_code)};
+    ASSERT_THAT(testing::internal::GetCapturedStdout(),
+                testing::HasSubstr(std::string{text}));
+    ASSERT_THAT(ret.get_exit_code(), testing::Eq(exit_code));
+}
+
+TEST(subParser, constructSubParserSetAndCallPrintAndExitWithStringAndExitCode) {
+    print_and_exit_t pae{};
+    empty_test_parser_t tp;
+
+    const std::string sub_parser{"sub"};
+    const std::string description{"sub parser"};
+    simple_sub_parser_t sub{tp, sub_parser, description};
+
+    sub.set_print_and_exit_func(
+        [&pae](const std::string_view text, const int exit_code) {
+            return pae.print_and_exit(text, exit_code);
+        });
+
+    static constexpr std::string_view text{"text-string"};
+    static constexpr int exit_code{10};
+    static constexpr clapp::value::exit_t exit{
+        clapp::value::exit_t::exit(exit_code)};
+    EXPECT_CALL(pae, print_and_exit(text, exit_code))
+        .Times(1)
+        .WillOnce(testing::Return(exit));
+    const clapp::value::exit_t ret{
+        sub.get_print_and_exit_func()(text, exit_code)};
+    ASSERT_THAT(ret.get_exit_code(), testing::Eq(exit_code));
 }

@@ -329,10 +329,11 @@ typename clapp::option::basic_param_option_t<T>::callbacks_t
 clapp::option::basic_param_option_t<T>::create_callbacks(
     basic_param_option_t<T>* inst) {
     const callbacks_t callbacks{
-        [inst](const std::string_view /*option*/,
-               const std::string_view param) { inst->found_entry(param); },
-        [inst](const char /*option*/, const std::string_view param) {
-            inst->found_entry(param);
+        [inst](const std::string_view option, const std::string_view param) {
+            return inst->found_entry("--" + std::string{option}, param);
+        },
+        [inst](const char option, const std::string_view param) {
+            return inst->found_entry("-" + std::string{option}, param);
         },
         [inst]() { return inst->given(); },
         [inst]() { return static_cast<bool>(*inst); },
@@ -341,13 +342,18 @@ clapp::option::basic_param_option_t<T>::create_callbacks(
 }
 
 template <typename T>
-void clapp::option::basic_param_option_t<T>::found_entry(
-    const std::string_view param) {
+clapp::value::found_func_t::ret_t
+clapp::option::basic_param_option_t<T>::found_entry(
+    const std::string& option, const std::string_view param) {
+    for (auto& found_func : _found) {
+        const clapp::value::found_func_t::ret_t ret{found_func.found(option)};
+        if (ret) {
+            return ret;
+        }
+    }
     _given = true;
     _value = convert_value<T>(param);
-    for (auto& found_func : _found) {
-        found_func.found();
-    }
+    return {};
 }
 
 template <typename T>
@@ -398,10 +404,11 @@ typename clapp::basic_vector_param_option_t<T>::callbacks_t
 clapp::option::basic_vector_param_option_t<T>::create_callbacks(
     basic_vector_param_option_t<T>* inst) {
     const callbacks_t callbacks{
-        [inst](const std::string_view /*option*/,
-               const std::string_view param) { inst->found_entry(param); },
-        [inst](const char /*option*/, const std::string_view param) {
-            inst->found_entry(param);
+        [inst](const std::string_view option, const std::string_view param) {
+            return inst->found_entry("--" + std::string{option}, param);
+        },
+        [inst](const char option, const std::string_view param) {
+            return inst->found_entry("-" + std::string{option}, param);
         },
         [inst]() { return inst->given(); },
         [inst]() { return static_cast<bool>(*inst); },
@@ -410,13 +417,18 @@ clapp::option::basic_vector_param_option_t<T>::create_callbacks(
 }
 
 template <typename T>
-void clapp::option::basic_vector_param_option_t<T>::found_entry(
-    const std::string_view param) {
+clapp::value::found_func_t::ret_t
+clapp::option::basic_vector_param_option_t<T>::found_entry(
+    const std::string& option, const std::string_view param) {
+    for (auto& found_func : _found) {
+        const clapp::value::found_func_t::ret_t ret{found_func.found(option)};
+        if (ret) {
+            return ret;
+        }
+    }
     _given = true;
     _value.push_back(convert_value<T>(param));
-    for (auto& found_func : _found) {
-        found_func.found();
-    }
+    return {};
 }
 
 template <typename T>
@@ -493,13 +505,13 @@ template <typename... Params>
 clapp::option::basic_help_option_t<EXIT_CODE>::basic_help_option_t(
     basic_parser_t& parser, Params... parameters)
     : bool_option_t{parser, std::forward<Params>(parameters)...,
-                    gen_func_print_help_and_exit(parser)} {}
+                    gen_func_print_help_and_req_exit(parser)} {}
 
 template <int EXIT_CODE>
 clapp::value::found_func_t
-clapp::option::basic_help_option_t<EXIT_CODE>::gen_func_print_help_and_exit(
+clapp::option::basic_help_option_t<EXIT_CODE>::gen_func_print_help_and_req_exit(
     basic_parser_t& parser) {
-    return parser.gen_func_print_help_and_exit(EXIT_CODE);
+    return parser.gen_func_print_help_and_req_exit(EXIT_CODE);
 }
 
 template <typename... Params>

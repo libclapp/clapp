@@ -7,21 +7,16 @@
 
 #include <iostream>
 
-[[noreturn]] void print_version_and_exit();
+clapp::value::found_func_t::ret_t print_version_and_exit(
+    const std::string &option);
 
-[[noreturn]] void print_version_and_exit() {
-    std::cout << clapp::build_info::build_info_string << std::endl;
-    clapp::basic_main_parser_t::exit(EXIT_SUCCESS);
-}
+clapp::value::found_func_t::ret_t print_not_implemented_and_exit(
+    const std::string &option);
 
 class cli_parser_t : public clapp::basic_main_parser_t {
    public:
     using clapp::basic_main_parser_t::basic_main_parser_t;
     cli_parser_t() = default;
-
-    cli_parser_t(int argc, const char *const *argv) : cli_parser_t{} {
-        parse_and_validate(argc, argv);
-    }
 
     explicit cli_parser_t(const cli_parser_t &) = delete;
     explicit cli_parser_t(cli_parser_t &&) noexcept = delete;
@@ -44,6 +39,10 @@ class cli_parser_t : public clapp::basic_main_parser_t {
                                   "Verbose option.",
                                   clapp::min_max_value_t<std::size_t>{0, 7},
                                   clapp::default_value_t<std::size_t>{2}};
+
+    clapp::bool_option_t debug{
+        *this, "debug", 'd', "debug option.",
+        clapp::value::found_func_t{print_not_implemented_and_exit}};
 
     // create a subparser with a registered help option
     class sub_parser_t : public clapp::basic_sub_parser_t {
@@ -120,6 +119,19 @@ class cli_parser_t : public clapp::basic_main_parser_t {
     second_parser_t second{*this, "second", "Second parser."};
 };
 
+clapp::value::found_func_t::ret_t print_version_and_exit(
+    const std::string & /*option*/) {
+    std::cout << clapp::build_info::build_info_string << std::endl;
+    return clapp::value::exit_t::exit(EXIT_SUCCESS);
+}
+
+clapp::value::found_func_t::ret_t print_not_implemented_and_exit(
+    const std::string &option) {
+    std::cout << "Option '" << option
+              << "' currently not implemented: don't use it!" << std::endl;
+    return clapp::value::exit_t::exit(EXIT_FAILURE);
+}
+
 cli_parser_t::~cli_parser_t() = default;
 cli_parser_t::sub_parser_t::~sub_parser_t() = default;
 cli_parser_t::first_parser_t::~first_parser_t() = default;
@@ -175,7 +187,12 @@ void process_second(const cli_parser_t::second_parser_t &second) {
 
 int main(int argc, char *argv[]) {
     try {
-        cli_parser_t cp{argc, argv};
+        cli_parser_t cp;
+        const std::optional<clapp::value::exit_t> exit{
+            cp.parse_and_validate(argc, argv)};
+        if (exit) {
+            return exit.value().get_exit_code();
+        }
 
         if (cp.verbose) {  // if the optional verbose option is given
             std::cout << "verbose: " << cp.verbose.value() << "\n";

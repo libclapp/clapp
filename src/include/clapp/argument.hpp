@@ -181,7 +181,7 @@ typename clapp::argument::basic_argument_t<T>::callbacks_t
 clapp::argument::basic_argument_t<T>::create_callbacks(
     basic_argument_t<T>* inst) {
     const callbacks_t callbacks{[inst](const std::string_view argument) {
-                                    inst->found_entry(argument);
+                                    return inst->found_entry(argument);
                                 },
                                 [inst]() { return inst->given(); },
                                 [inst]() { return static_cast<bool>(*inst); },
@@ -193,7 +193,8 @@ template <typename T>
 template <typename... Params>
 clapp::argument::basic_argument_t<T>::basic_argument_t(
     clapp::basic_parser_t& parser, const std::string& argument_name,
-    const std::string& description, Params&&... parameters) {
+    const std::string& description, Params&&... parameters)
+    : _argument_name{argument_name} {
     arg_conf_container_t<T, arg_conf_t> conf{gen_arg_conf<T, arg_conf_t>(
         create_callbacks(this), argument_name, description,
         std::forward<Params>(parameters)...)};
@@ -229,13 +230,15 @@ constexpr bool clapp::argument::basic_argument_t<T>::given() const noexcept {
 }
 
 template <typename T>
-void clapp::argument::basic_argument_t<T>::found_entry(
+clapp::value::found_func_t::ret_t
+clapp::argument::basic_argument_t<T>::found_entry(
     const std::string_view argument) {
+    for (auto& found_func : _found) {
+        return found_func.found(_argument_name);
+    }
     _given = true;
     _value = clapp::value::convert_value<T>(argument);
-    for (auto& found_func : _found) {
-        found_func.found();
-    }
+    return {};
 }
 
 template <typename T>
@@ -243,7 +246,7 @@ typename clapp::argument::basic_variadic_argument_t<T>::callbacks_t
 clapp::argument::basic_variadic_argument_t<T>::create_callbacks(
     basic_variadic_argument_t<T>* inst) {
     const callbacks_t callbacks{[inst](const std::string_view argument) {
-                                    inst->found_entry(argument);
+                                    return inst->found_entry(argument);
                                 },
                                 [inst]() { return inst->given(); },
                                 [inst]() { return static_cast<bool>(*inst); },
@@ -255,7 +258,8 @@ template <typename T>
 template <typename... Params>
 clapp::argument::basic_variadic_argument_t<T>::basic_variadic_argument_t(
     clapp::basic_parser_t& parser, const std::string& argument_name,
-    const std::string& description, Params&&... parameters) {
+    const std::string& description, Params&&... parameters)
+    : _argument_name{argument_name} {
     arg_conf_container_t<T, arg_conf_t> conf{gen_arg_conf<T, arg_conf_t>(
         create_callbacks(this), argument_name, description,
         std::forward<Params>(parameters)...)};
@@ -293,13 +297,15 @@ constexpr bool clapp::argument::basic_variadic_argument_t<T>::given()
 }
 
 template <typename T>
-void clapp::argument::basic_variadic_argument_t<T>::found_entry(
+clapp::value::found_func_t::ret_t
+clapp::argument::basic_variadic_argument_t<T>::found_entry(
     const std::string_view argument) {
+    for (auto& found_func : _found) {
+        return found_func.found(_argument_name);
+    }
     _given = true;
     _value.push_back(clapp::value::convert_value<T>(argument));
-    for (auto& found_func : _found) {
-        found_func.found();
-    }
+    return {};
 }
 
 template <typename T>

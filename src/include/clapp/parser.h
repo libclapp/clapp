@@ -41,17 +41,21 @@ class basic_sub_parser_t;
 class basic_parser_t {
    public:
     using arg_iterator = arg_t::iterator;
-    using long_opt_func_t = std::function<void(const std::string_view option)>;
-    using long_opt_param_func_t = std::function<void(
-        const std::string_view option, const std::string_view param)>;
-    using short_opt_func_t = std::function<void(const char option)>;
+    using long_opt_func_t = std::function<clapp::value::found_func_t::ret_t(
+        const std::string_view option)>;
+    using long_opt_param_func_t =
+        std::function<clapp::value::found_func_t::ret_t(
+            const std::string_view option, const std::string_view param)>;
+    using short_opt_func_t =
+        std::function<clapp::value::found_func_t::ret_t(const char option)>;
     using short_opt_param_func_t =
-        std::function<void(const char option, const std::string_view param)>;
-    using argument_func_t =
-        std::function<void(const std::string_view argument)>;
+        std::function<clapp::value::found_func_t::ret_t(
+            const char option, const std::string_view param)>;
+    using argument_func_t = std::function<clapp::value::found_func_t::ret_t(
+        const std::string_view argument)>;
     using validate_func_t = std::function<void(void)>;
-    using print_and_exit_func_t = std::function<void(
-        const std::string_view print_msg, std::optional<int> exit_code)>;
+    using print_and_exit_func_t = std::function<clapp::value::exit_t(
+        const std::string_view print_msg, int exit_code)>;
 
     enum class argument_type_t { single, variadic };
     enum class option_type_t { scalar, vector };
@@ -230,13 +234,15 @@ class basic_parser_t {
         arg_iterator it;
         std::optional<char> short_option;
         std::optional<std::string> long_option;
+        std::optional<clapp::value::exit_t> exit;
     };
 
     static arg_iterator process_parse_result(
         arg_iterator it, const parse_result_t& parse_result);
-    void parse(arg_iterator begin, arg_iterator end);
-    parse_result_t parse(std::string_view option, arg_iterator it,
-                         arg_iterator end);
+    [[nodiscard]] std::optional<clapp::value::exit_t> parse(arg_iterator begin,
+                                                            arg_iterator end);
+    [[nodiscard]] parse_result_t parse(std::string_view option, arg_iterator it,
+                                       arg_iterator end);
 
     void validate() const;
 
@@ -253,15 +259,15 @@ class basic_parser_t {
     std::string gen_help_desc(std::size_t num_spaces,
                               std::size_t rec_depth) const;
     std::string gen_help_msg(std::size_t rec_depth) const;
-    value::found_func_t gen_func_print_help_and_exit(int exit_code) const;
+    value::found_func_t gen_func_print_help_and_req_exit(int exit_code) const;
 
     std::size_t get_num_processed_arguments() const;
 
     inline virtual bool is_active() const noexcept;
     const basic_parser_t& get_active_parser() const;
 
-    static void default_print_and_exit(const std::string_view print_msg,
-                                       std::optional<int> exit_code);
+    static exit_t default_print_and_exit(const std::string_view print_msg,
+                                         int exit_code);
     void set_print_and_exit_func(print_and_exit_func_t&& func);
     print_and_exit_func_t& get_print_and_exit_func();
 

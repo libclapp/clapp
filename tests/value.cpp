@@ -469,9 +469,26 @@ TEST(value, exitTExit) {
     ASSERT_THAT(e.get_exit_code(), testing::Eq(exit_code));
 }
 
-TEST(value, foundFuncT) {
+TEST(value, foundFuncTReturnsNothing) {
     std::stringstream ss;
-    clapp::value::found_func_t ff{[&ss]() { ss << "called func"; }};
-    ff.found();
-    ASSERT_THAT(ss.str(), testing::StrEq("called func"));
+    clapp::value::found_func_t ff{[&ss](const std::string& name) {
+        ss << "called func '" << name << "'";
+        return clapp::value::found_func_t::ret_t{};
+    }};
+    ASSERT_THAT(ff.found("name").has_value(), testing::Eq(false));
+    ASSERT_THAT(ss.str(), testing::StrEq("called func 'name'"));
+}
+
+TEST(value, foundFuncTReturnsExit) {
+    static constexpr int exit_code{77};
+    std::stringstream ss;
+    clapp::value::found_func_t ff{[&ss](const std::string& name) {
+        ss << "called func-" << name;
+        return clapp::value::found_func_t::ret_t{
+            clapp::value::exit_t::exit(exit_code)};
+    }};
+    const clapp::value::found_func_t::ret_t ret{ff.found("name2")};
+    ASSERT_THAT(ret.has_value(), testing::Eq(true));
+    ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(exit_code));
+    ASSERT_THAT(ss.str(), testing::StrEq("called func-name2"));
 }

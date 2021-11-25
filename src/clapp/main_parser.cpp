@@ -33,22 +33,28 @@ std::string clapp::parser::basic_main_parser_t::get_executable() const {
     return ret;
 }
 
-void clapp::parser::basic_main_parser_t::parse(int argc,
-                                               const char* const* argv) {
+std::optional<clapp::value::exit_t> clapp::parser::basic_main_parser_t::parse(
+    int argc, const char* const* argv) {
     arg_t arg{argv, argc};
-    parse(arg);
+    return parse(arg);
 }
 
-void clapp::parser::basic_main_parser_t::parse(const arg_t& arg) {
+std::optional<clapp::value::exit_t> clapp::parser::basic_main_parser_t::parse(
+    const arg_t& arg) {
     arg_iterator it{arg.begin()};
     executable = *it;
-    parse(it + 1, arg.end());
+    return parse(it + 1, arg.end());
 }
 
-void clapp::parser::basic_main_parser_t::parse_and_validate(
+std::optional<clapp::value::exit_t>
+clapp::parser::basic_main_parser_t::parse_and_validate(
     int argc, const char* const* argv) {
-    parse(argc, argv);
+    const std::optional<clapp::value::exit_t> ret{parse(argc, argv)};
+    if (ret) {
+        return ret;
+    }
     validate_recursive();
+    return {};
 }
 
 std::string clapp::parser::basic_main_parser_t::gen_short_line_prefix() const {

@@ -119,9 +119,11 @@ class basic_argument_t {
 
    protected:
     void validate() const;
-    void found_entry(const std::string_view argument);
+    [[nodiscard]] clapp::value::found_func_t::ret_t found_entry(
+        const std::string_view argument);
     static callbacks_t create_callbacks(basic_argument_t<T>* inst);
 
+    const std::string _argument_name;
     std::vector<clapp::value::found_func_t> _found{};
     std::optional<T> _value{};
     bool _given{false};
@@ -148,9 +150,11 @@ class basic_variadic_argument_t {
 
    protected:
     void validate() const;
-    void found_entry(const std::string_view argument);
+    [[nodiscard]] clapp::value::found_func_t::ret_t found_entry(
+        const std::string_view argument);
     static callbacks_t create_callbacks(basic_variadic_argument_t<T>* inst);
 
+    const std::string _argument_name;
     std::vector<clapp::value::found_func_t> _found{};
     std::vector<T> _value{};
     bool _given{false};

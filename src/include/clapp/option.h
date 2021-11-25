@@ -113,7 +113,8 @@ class basic_param_option_t {
     virtual ~basic_param_option_t();
 
    protected:
-    void found_entry(std::string_view param);
+    [[nodiscard]] clapp::value::found_func_t::ret_t found_entry(
+        const std::string& option, std::string_view param);
     static callbacks_t create_callbacks(basic_param_option_t<T>* inst);
 
     std::vector<clapp::value::found_func_t> _found{};
@@ -148,7 +149,8 @@ class basic_vector_param_option_t {
     virtual ~basic_vector_param_option_t();
 
    protected:
-    void found_entry(std::string_view param);
+    [[nodiscard]] clapp::value::found_func_t::ret_t found_entry(
+        const std::string& option, std::string_view param);
     static callbacks_t create_callbacks(basic_vector_param_option_t<T>* inst);
 
     std::vector<clapp::value::found_func_t> _found{};
@@ -198,7 +200,8 @@ class bool_option_t : public basic_option_t<bool, false> {
     ~bool_option_t() override;
 
    private:
-    void found_entry();
+    [[nodiscard]] clapp::value::found_func_t::ret_t found_entry(
+        const std::string& option);
     static callbacks_t create_callbacks(bool_option_t* inst);
 };
 
@@ -214,7 +217,7 @@ class basic_help_option_t : public bool_option_t {
 
     ~basic_help_option_t() override;
 
-    static value::found_func_t gen_func_print_help_and_exit(
+    static value::found_func_t gen_func_print_help_and_req_exit(
         basic_parser_t& parser);
 };
 
@@ -230,7 +233,8 @@ class count_option_t : public basic_option_t<std::uint32_t, 0U> {
     ~count_option_t() override;
 
    private:
-    void found_entry();
+    [[nodiscard]] clapp::value::found_func_t::ret_t found_entry(
+        const std::string& option);
     static callbacks_t create_callbacks(count_option_t* inst);
 };
 

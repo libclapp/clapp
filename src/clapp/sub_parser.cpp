@@ -33,10 +33,10 @@ clapp::parser::basic_sub_parser_t::basic_sub_parser_t(
     : parent_parser{parser},
       sub_parser_name{std::move(sub_parser_name_arg)},
       description{std::move(description_arg)} {
-    set_print_and_exit_func(
-        [this](const std::string_view print_msg, std::optional<int> exit_code) {
-            parent_parser.get_print_and_exit_func()(print_msg, exit_code);
-        });
+    set_print_and_exit_func([this](const std::string_view print_msg,
+                                   const int exit_code) {
+        return parent_parser.get_print_and_exit_func()(print_msg, exit_code);
+    });
     parser.reg(reg_sub_parser_conf_t{*this, sub_parser_name, description});
 }
 

@@ -46,20 +46,33 @@ void clapp::option::check_short_option(const char option) {
 clapp::option::bool_option_t::callbacks_t
 clapp::option::bool_option_t::create_callbacks(bool_option_t* inst) {
     callbacks_t callbacks{
-        [inst](const std::string_view /*option*/) { inst->found_entry(); },
-        [inst](const char /*option*/) { inst->found_entry(); },
+        [inst](const std::string_view option) {
+            const clapp::value::found_func_t::ret_t ret{
+                inst->found_entry("--" + std::string{option})};
+            return ret;
+        },
+        [inst](const char option) {
+            const clapp::value::found_func_t::ret_t ret{
+                inst->found_entry("-" + std::string{option})};
+            return ret;
+        },
         [inst]() { return inst->given(); },
         [inst]() { return static_cast<bool>(*inst); },
         [inst]() { return inst->value(); }};
     return callbacks;
 }
 
-void clapp::option::bool_option_t::found_entry() {
+clapp::value::found_func_t::ret_t clapp::option::bool_option_t::found_entry(
+    const std::string& option) {
+    for (auto& found_func : _found) {
+        const clapp::value::found_func_t::ret_t ret{found_func.found(option)};
+        if (ret) {
+            return ret;
+        }
+    }
     _given = true;
     _value = true;
-    for (auto& found_func : _found) {
-        found_func.found();
-    }
+    return {};
 }
 
 clapp::option::bool_option_t::~bool_option_t() = default;
@@ -67,20 +80,33 @@ clapp::option::bool_option_t::~bool_option_t() = default;
 clapp::option::count_option_t::callbacks_t
 clapp::option::count_option_t::create_callbacks(count_option_t* inst) {
     callbacks_t callbacks{
-        [inst](const std::string_view /*option*/) { inst->found_entry(); },
-        [inst](const char /*option*/) { inst->found_entry(); },
+        [inst](const std::string_view option) {
+            const clapp::value::found_func_t::ret_t ret{
+                inst->found_entry("--" + std::string{option})};
+            return ret;
+        },
+        [inst](const char option) {
+            const clapp::value::found_func_t::ret_t ret{
+                inst->found_entry("-" + std::string{option})};
+            return ret;
+        },
         [inst]() { return inst->given(); },
         [inst]() { return static_cast<bool>(*inst); },
         [inst]() { return inst->value(); }};
     return callbacks;
 }
 
-void clapp::option::count_option_t::found_entry() {
+clapp::value::found_func_t::ret_t clapp::option::count_option_t::found_entry(
+    const std::string& option) {
+    for (auto& found_func : _found) {
+        const clapp::value::found_func_t::ret_t ret{found_func.found(option)};
+        if (ret) {
+            return ret;
+        }
+    }
     _given = true;
     _value = _value + 1;
-    for (auto& found_func : _found) {
-        found_func.found();
-    }
+    return {};
 }
 
 clapp::option::count_option_t::~count_option_t() = default;

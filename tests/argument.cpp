@@ -234,7 +234,8 @@ class test_argument_t : public clapp::argument::basic_argument_t<std::int32_t> {
     inline explicit operator bool() const;
 
    private:
-    void found_entry();
+    [[nodiscard]] clapp::value::found_func_t::ret_t found_entry(
+        std::string_view argument);
     static callbacks_t create_callbacks(test_argument_t* inst);
 };
 
@@ -244,12 +245,18 @@ test_argument_t::test_argument_t(clapp::basic_parser_t& parser,
     : clapp::basic_argument_t<std::int32_t>{
           parser, std::forward<Params>(parameters)...} {}
 
-void test_argument_t::found_entry() {
+clapp::value::found_func_t::ret_t test_argument_t::found_entry(
+    const std::string_view argument) {
+    for (auto& found_func : _found) {
+        const clapp::value::found_func_t::ret_t ret{
+            found_func.found(std::string{argument})};
+        if (ret) {
+            return ret;
+        }
+    }
     _given = true;
     _value = _value.value() + 1;
-    for (auto& found_func : _found) {
-        found_func.found();
-    }
+    return {};
 }
 
 inline test_argument_t::operator bool() const { return _value.value() != 0; }
@@ -258,11 +265,12 @@ test_argument_t::~test_argument_t() = default;
 
 test_argument_t::callbacks_t test_argument_t::create_callbacks(
     test_argument_t* inst) {
-    return callbacks_t{
-        [inst](const std::string_view /*option*/) { inst->found_entry(); },
-        [inst]() { return inst->given(); },
-        [inst]() { return static_cast<bool>(*inst); },
-        [inst]() { return inst->value(); }};
+    return callbacks_t{[inst](const std::string_view argument) {
+                           return inst->found_entry(argument);
+                       },
+                       [inst]() { return inst->given(); },
+                       [inst]() { return static_cast<bool>(*inst); },
+                       [inst]() { return inst->value(); }};
 }
 
 class argumentT : public ::testing::Test {
@@ -278,6 +286,7 @@ class argumentT : public ::testing::Test {
 
     argument_test_parser_t tp{};
     std::size_t found_func_called{0};
+    std::optional<std::string> found_func_arg{};
 
     inline static const std::string arg_str{"arg-str"};
     inline static constexpr const char* arg_cstr{"arg-cstr"};
@@ -374,11 +383,16 @@ TEST_F(argumentT, basicArgumentConstructStrWithDefaultValueAndCallArgFunc) {
 TEST_F(argumentT, basicArgumentCallFoundFunc) {
     test_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(value_uint16))));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, boolArgumentConstructCStrAndCallValueThrows) {
@@ -417,11 +431,16 @@ TEST_F(argumentT, boolArgumentConstructMandatoryStrWithValidateFunc) {
 TEST_F(argumentT, boolArgumentCallFoundFunc) {
     clapp::argument::bool_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, boolArgumentConstructWithEmpyArgumentNameThrows) {
@@ -591,16 +610,22 @@ TEST_F(argumentT, variadicBoolArgumentConstructWithNotNullValue) {
 TEST_F(argumentT, variadicBoolArgumentCallFoundFunc) {
     clapp::argument::variadic_bool_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("true")));
     ASSERT_THAT(found_func_called, testing::Eq(2));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT,
@@ -665,11 +690,16 @@ TEST_F(argumentT, stringArgumentConstructMandatoryStrWithValidateFunc) {
 TEST_F(argumentT, stringArgumentCallFoundFunc) {
     clapp::argument::string_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, stringArgumentConstructWithEmpyArgumentNameThrows) {
@@ -792,16 +822,22 @@ TEST_F(argumentT, variadicStringArgumentConstructStrAndCallGetOptionHelp) {
 TEST_F(argumentT, variadicStringArgumentCallFoundFunc) {
     clapp::argument::variadic_string_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("11")));
     ASSERT_THAT(found_func_called, testing::Eq(2));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, int64ArgumentConstructCStrAndCallValueThrows) {
@@ -840,11 +876,16 @@ TEST_F(argumentT, int64ArgumentConstructMandatoryStrWithValidateFunc) {
 TEST_F(argumentT, int64ArgumentCallFoundFunc) {
     clapp::argument::int64_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, int64ArgumentConstructWithEmpyArgumentNameThrows) {
@@ -1017,16 +1058,22 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicInt64ArgumentCallFoundFunc) {
     clapp::argument::variadic_int64_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("11")));
     ASSERT_THAT(found_func_called, testing::Eq(2));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT,
@@ -1117,11 +1164,16 @@ TEST_F(argumentT, uint64ArgumentConstructMandatoryStrWithValidateFunc) {
 TEST_F(argumentT, uint64ArgumentCallFoundFunc) {
     clapp::argument::uint64_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, uint64ArgumentConstructWithEmpyArgumentNameThrows) {
@@ -1280,16 +1332,22 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicUint64ArgumentCallFoundFunc) {
     clapp::argument::variadic_uint64_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("11")));
     ASSERT_THAT(found_func_called, testing::Eq(2));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, int32ArgumentConstructCStrAndCallValueThrows) {
@@ -1328,11 +1386,16 @@ TEST_F(argumentT, int32ArgumentConstructMandatoryStrWithValidateFunc) {
 TEST_F(argumentT, int32ArgumentCallFoundFunc) {
     clapp::argument::int32_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, int32ArgumentConstructWithEmpyArgumentNameThrows) {
@@ -1456,16 +1519,22 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicInt32ArgumentCallFoundFunc) {
     clapp::argument::variadic_int32_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("11")));
     ASSERT_THAT(found_func_called, testing::Eq(2));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, uint32ArgumentConstructCStrAndCallValueThrows) {
@@ -1504,11 +1573,16 @@ TEST_F(argumentT, uint32ArgumentConstructMandatoryStrWithValidateFunc) {
 TEST_F(argumentT, uint32ArgumentCallFoundFunc) {
     clapp::argument::uint32_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, uint32ArgumentConstructWithEmpyArgumentNameThrows) {
@@ -1632,16 +1706,22 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicUint32ArgumentCallFoundFunc) {
     clapp::argument::variadic_uint32_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("11")));
     ASSERT_THAT(found_func_called, testing::Eq(2));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, int16ArgumentConstructCStrAndCallValueThrows) {
@@ -1680,11 +1760,16 @@ TEST_F(argumentT, int16ArgumentConstructMandatoryStrWithValidateFunc) {
 TEST_F(argumentT, int16ArgumentCallFoundFunc) {
     clapp::argument::int16_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, int16ArgumentConstructWithEmpyArgumentNameThrows) {
@@ -1808,16 +1893,22 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicInt16ArgumentCallFoundFunc) {
     clapp::argument::variadic_int16_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("11")));
     ASSERT_THAT(found_func_called, testing::Eq(2));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, uint16ArgumentConstructCStrAndCallValueThrows) {
@@ -1856,11 +1947,16 @@ TEST_F(argumentT, uint16ArgumentConstructMandatoryStrWithValidateFunc) {
 TEST_F(argumentT, uint16ArgumentCallFoundFunc) {
     clapp::argument::uint16_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, uint16ArgumentConstructWithEmpyArgumentNameThrows) {
@@ -1984,16 +2080,22 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicUint16ArgumentCallFoundFunc) {
     clapp::argument::variadic_uint16_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("11")));
     ASSERT_THAT(found_func_called, testing::Eq(2));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, int8ArgumentConstructCStrAndCallValueThrows) {
@@ -2032,11 +2134,16 @@ TEST_F(argumentT, int8ArgumentConstructMandatoryStrWithValidateFunc) {
 TEST_F(argumentT, int8ArgumentCallFoundFunc) {
     clapp::argument::int8_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, int8ArgumentConstructWithEmpyArgumentNameThrows) {
@@ -2156,16 +2263,22 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicInt8ArgumentCallFoundFunc) {
     clapp::argument::variadic_int8_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("11")));
     ASSERT_THAT(found_func_called, testing::Eq(2));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, uint8ArgumentConstructCStrAndCallValueThrows) {
@@ -2204,11 +2317,16 @@ TEST_F(argumentT, uint8ArgumentConstructMandatoryStrWithValidateFunc) {
 TEST_F(argumentT, uint8ArgumentCallFoundFunc) {
     clapp::argument::uint8_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, uint8ArgumentConstructWithEmpyArgumentNameThrows) {
@@ -2332,16 +2450,22 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicUint8ArgumentCallFoundFunc) {
     clapp::argument::variadic_uint8_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("11")));
     ASSERT_THAT(found_func_called, testing::Eq(2));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, ptrdiffArgumentConstructCStrAndCallValueThrows) {
@@ -2380,11 +2504,16 @@ TEST_F(argumentT, ptrdiffArgumentConstructMandatoryStrWithValidateFunc) {
 TEST_F(argumentT, ptrdiffArgumentCallFoundFunc) {
     clapp::argument::ptrdiff_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, ptrdiffArgumentConstructWithEmpyArgumentNameThrows) {
@@ -2509,16 +2638,22 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicPtrdiffArgumentCallFoundFunc) {
     clapp::argument::variadic_ptrdiff_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("11")));
     ASSERT_THAT(found_func_called, testing::Eq(2));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, sizeArgumentConstructCStrAndCallValueThrows) {
@@ -2557,11 +2692,16 @@ TEST_F(argumentT, sizeArgumentConstructMandatoryStrWithValidateFunc) {
 TEST_F(argumentT, sizeArgumentCallFoundFunc) {
     clapp::argument::size_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, sizeArgumentConstructWithEmpyArgumentNameThrows) {
@@ -2681,16 +2821,22 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicSizeArgumentCallFoundFunc) {
     clapp::argument::variadic_size_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("11")));
     ASSERT_THAT(found_func_called, testing::Eq(2));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, floatArgumentConstructCStrAndCallValueThrows) {
@@ -2729,11 +2875,16 @@ TEST_F(argumentT, floatArgumentConstructMandatoryStrWithValidateFunc) {
 TEST_F(argumentT, floatArgumentCallFoundFunc) {
     clapp::argument::float_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, floatArgumentConstructWithEmpyArgumentNameThrows) {
@@ -2857,16 +3008,22 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicFloatArgumentCallFoundFunc) {
     clapp::argument::variadic_float_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("11")));
     ASSERT_THAT(found_func_called, testing::Eq(2));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, doubleArgumentConstructCStrAndCallValueThrows) {
@@ -2905,11 +3062,16 @@ TEST_F(argumentT, doubleArgumentConstructMandatoryStrWithValidateFunc) {
 TEST_F(argumentT, doubleArgumentCallFoundFunc) {
     clapp::argument::double_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, doubleArgumentConstructWithEmpyArgumentNameThrows) {
@@ -3037,16 +3199,22 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicDoubleArgumentCallFoundFunc) {
     clapp::argument::variadic_double_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("11")));
     ASSERT_THAT(found_func_called, testing::Eq(2));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, nsArgumentConstructCStrAndCallValueThrows) {
@@ -3085,11 +3253,16 @@ TEST_F(argumentT, nsArgumentConstructMandatoryStrWithValidateFunc) {
 TEST_F(argumentT, nsArgumentCallFoundFunc) {
     clapp::argument::ns_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, nsArgumentConstructWithEmpyArgumentNameThrows) {
@@ -3213,16 +3386,22 @@ TEST_F(argumentT, variadicNsArgumentConstructMandatoryStrAndCallGetOptionHelp) {
 TEST_F(argumentT, variadicNsArgumentCallFoundFunc) {
     clapp::argument::variadic_ns_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("11")));
     ASSERT_THAT(found_func_called, testing::Eq(2));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, usArgumentConstructCStrAndCallValueThrows) {
@@ -3261,11 +3440,16 @@ TEST_F(argumentT, usArgumentConstructMandatoryStrWithValidateFunc) {
 TEST_F(argumentT, usArgumentCallFoundFunc) {
     clapp::argument::us_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, usArgumentConstructWithEmpyArgumentNameThrows) {
@@ -3389,16 +3573,22 @@ TEST_F(argumentT, variadicUsArgumentConstructMandatoryStrAndCallGetOptionHelp) {
 TEST_F(argumentT, variadicUsArgumentCallFoundFunc) {
     clapp::argument::variadic_us_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("11")));
     ASSERT_THAT(found_func_called, testing::Eq(2));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, msArgumentConstructCStrAndCallValueThrows) {
@@ -3437,11 +3627,16 @@ TEST_F(argumentT, msArgumentConstructMandatoryStrWithValidateFunc) {
 TEST_F(argumentT, msArgumentCallFoundFunc) {
     clapp::argument::ms_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, msArgumentConstructWithEmpyArgumentNameThrows) {
@@ -3566,16 +3761,22 @@ TEST_F(argumentT, variadicMsArgumentConstructMandatoryStrAndCallGetOptionHelp) {
 TEST_F(argumentT, variadicMsArgumentCallFoundFunc) {
     clapp::argument::variadic_ms_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("11")));
     ASSERT_THAT(found_func_called, testing::Eq(2));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, secArgumentConstructCStrAndCallValueThrows) {
@@ -3614,11 +3815,16 @@ TEST_F(argumentT, secArgumentConstructMandatoryStrWithValidateFunc) {
 TEST_F(argumentT, secArgumentCallFoundFunc) {
     clapp::argument::sec_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, secArgumentConstructWithEmpyArgumentNameThrows) {
@@ -3741,16 +3947,22 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicSecArgumentCallFoundFunc) {
     clapp::argument::variadic_sec_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("11")));
     ASSERT_THAT(found_func_called, testing::Eq(2));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, minArgumentConstructCStrAndCallValueThrows) {
@@ -3789,11 +4001,16 @@ TEST_F(argumentT, minArgumentConstructMandatoryStrWithValidateFunc) {
 TEST_F(argumentT, minArgumentCallFoundFunc) {
     clapp::argument::min_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, minArgumentConstructWithEmpyArgumentNameThrows) {
@@ -3915,16 +4132,22 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicMinArgumentCallFoundFunc) {
     clapp::argument::variadic_min_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("11")));
     ASSERT_THAT(found_func_called, testing::Eq(2));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, hoursArgumentConstructCStrAndCallValueThrows) {
@@ -3963,11 +4186,16 @@ TEST_F(argumentT, hoursArgumentConstructMandatoryStrWithValidateFunc) {
 TEST_F(argumentT, hoursArgumentCallFoundFunc) {
     clapp::argument::hours_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, hoursArgumentConstructWithEmpyArgumentNameThrows) {
@@ -4094,16 +4322,22 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicHoursArgumentCallFoundFunc) {
     clapp::argument::variadic_hours_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("1")));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)("11")));
     ASSERT_THAT(found_func_called, testing::Eq(2));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 #ifdef CLAPP_FS_AVAIL
@@ -4144,11 +4378,16 @@ TEST_F(argumentT, pathArgumentConstructMandatoryStrWithValidateFunc) {
 TEST_F(argumentT, pathArgumentCallFoundFunc) {
     clapp::argument::path_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(value_path.string())));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 TEST_F(argumentT, pathArgumentConstructWithEmpyArgumentNameThrows) {
@@ -4269,16 +4508,22 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicPathArgumentCallFoundFunc) {
     clapp::argument::variadic_path_argument_t arg{
         tp, arg_str, desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& argument) {
+            found_func_arg = argument;
+            found_func_called++;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
 
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(value_path.string())));
     ASSERT_THAT(found_func_called, testing::Eq(1));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(value_path_additional.string())));
     ASSERT_THAT(found_func_called, testing::Eq(2));
+    ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
 #endif

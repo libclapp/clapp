@@ -44,10 +44,6 @@ class cli_parser_t : public clapp::basic_main_parser_t {
    public:
     cli_parser_t() = default;
 
-    cli_parser_t(int argc, const char *const *argv) : cli_parser_t{} {
-        parse(argc, argv);
-    }
-
     explicit cli_parser_t(const cli_parser_t &) = delete;
     explicit cli_parser_t(cli_parser_t &&) noexcept = delete;
     cli_parser_t &operator=(const cli_parser_t &) = delete;
@@ -356,11 +352,12 @@ void process_options_and_args(const cli_parser_t &cp) {
 int main(int argc, char *argv[]) {
     try {
         std::cout << clapp::build_info::build_info_string << std::endl;
-        // create parser and parse the args
-        // cli_parser_t cp;
-        // cp.parse(argc, argv);
-        // or do it all in one.
-        cli_parser_t cp{argc, argv};
+        cli_parser_t cp;
+        const std::optional<clapp::value::exit_t> exit{
+            cp.parse_and_validate(argc, argv)};
+        if (exit) {
+            return exit.value().get_exit_code();
+        }
 
         if (!cp) {
             std::cout << "Parsing failed!" << std::endl;

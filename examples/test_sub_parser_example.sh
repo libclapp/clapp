@@ -37,6 +37,18 @@ CLAPP_EXCEPTION_REGEX='^Caught\ ClaPP-Exception:.*$'
     [ "${lines[2]}" = "second parser not active" ]
 }
 
+@test "sub-parser-example: show not implemented with short option -d" {
+    run ./libclapp_example_sub_parser -d
+    [ "$status" -eq 1 ]
+    [ "${lines[0]}" = "Option '-d' currently not implemented: don't use it!" ]
+}
+
+@test "sub-parser-example: show not implemented with short option --debug" {
+    run ./libclapp_example_sub_parser --debug
+    [ "$status" -eq 1 ]
+    [ "${lines[0]}" = "Option '--debug' currently not implemented: don't use it!" ]
+}
+
 @test "sub-parser-example: first: give only mandatory short option -b" {
     run ./libclapp_example_sub_parser first -b
     [ "$status" -eq 0 ]

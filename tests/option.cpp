@@ -353,7 +353,8 @@ class test_option_t : public clapp::option::basic_option_t<std::int32_t, 0> {
     inline explicit operator bool() const;
 
    private:
-    void found_entry();
+    [[nodiscard]] clapp::value::found_func_t::ret_t found_entry(
+        std::string_view option);
     static callbacks_t create_callbacks(test_option_t* inst);
 };
 
@@ -364,12 +365,18 @@ test_option_t::test_option_t(clapp::basic_parser_t& parser,
           parser, create_callbacks(this),
           std::forward<Params>(parameters)...} {}
 
-void test_option_t::found_entry() {
+clapp::value::found_func_t::ret_t test_option_t::found_entry(
+    const std::string_view option) {
+    for (auto& found_func : _found) {
+        const clapp::value::found_func_t::ret_t ret{
+            found_func.found(std::string{option})};
+        if (ret) {
+            return ret;
+        }
+    }
     _given = true;
     _value++;
-    for (auto& found_func : _found) {
-        found_func.found();
-    }
+    return {};
 }
 
 inline test_option_t::operator bool() const { return _value != 0; }
@@ -378,12 +385,15 @@ test_option_t::~test_option_t() = default;
 
 test_option_t::callbacks_t test_option_t::create_callbacks(
     test_option_t* inst) {
-    return callbacks_t{
-        [inst](const std::string_view /*option*/) { inst->found_entry(); },
-        [inst](const char /*option*/) { inst->found_entry(); },
-        [inst]() { return inst->given(); },
-        [inst]() { return static_cast<bool>(*inst); },
-        [inst]() { return inst->value(); }};
+    return callbacks_t{[inst](const std::string_view option) {
+                           return inst->found_entry("--" + std::string{option});
+                       },
+                       [inst](const char option) {
+                           return inst->found_entry("-" + std::string{option});
+                       },
+                       [inst]() { return inst->given(); },
+                       [inst]() { return static_cast<bool>(*inst); },
+                       [inst]() { return inst->value(); }};
 }
 
 class optionT : public ::testing::Test {
@@ -399,6 +409,7 @@ class optionT : public ::testing::Test {
 
     option_test_parser_t tp{};
     std::size_t found_func_called{0};
+    std::optional<std::string> found_func_opt{};
 
     inline static const char* param_opt_postfix{"=<param>"};
     inline static const char* vector_opt_desc_restriction{"vector option"};
@@ -611,15 +622,129 @@ TEST_F(optionT, twoBoolOptionsConstructAndCallShortOptAndLongOptFunc) {
     ASSERT_THAT(opt2, BoolOptionGiven());
 }
 
-TEST_F(optionT, boolOptionConstructLongStringCallLongOptFuncCallsFoundFunc) {
+TEST_F(optionT,
+       boolOptionConstructLongStringCallLongOptFuncCallsFoundFuncWithExit) {
     clapp::option::bool_option_t opt{
         tp, long_opt_str, opt_desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
-    get_long_opt_func<option_test_parser_t::long_opt_func_t>(
-        tp, long_opt_str)(long_opt_str);
+        clapp::value::found_func_t{[this](const std::string& option) {
+            found_func_called++;
+            found_func_opt = option;
+            return clapp::value::found_func_t::ret_t{
+                clapp::value::exit_t::exit(EXIT_FAILURE)};
+        }}};
+    const clapp::value::found_func_t::ret_t ret{
+        get_long_opt_func<option_test_parser_t::long_opt_func_t>(
+            tp, long_opt_str)(long_opt_str)};
+    ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(EXIT_FAILURE));
 
     constexpr std::uint32_t expected_found_func_called{1U};
     ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("--" + std::string{long_opt_str}));
+}
+
+TEST_F(optionT,
+       boolOptionConstructLongStringCallLongOptFuncCallsFoundFuncWithoutExit) {
+    clapp::option::bool_option_t opt{
+        tp, long_opt_str, opt_desc_str,
+        clapp::value::found_func_t{[this](const std::string& option) {
+            found_func_called++;
+            found_func_opt = option;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
+    const clapp::value::found_func_t::ret_t ret{
+        get_long_opt_func<option_test_parser_t::long_opt_func_t>(
+            tp, long_opt_str)(long_opt_str)};
+    ASSERT_THAT(ret.has_value(), testing::Eq(false));
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("--" + std::string{long_opt_str}));
+}
+
+TEST_F(optionT,
+       boolOptionConstructLongStringCallLongOptFuncCallsFoundFuncThrows) {
+    clapp::option::bool_option_t opt{
+        tp, long_opt_str, opt_desc_str,
+        clapp::value::found_func_t{[this](const std::string& option)
+                                       -> clapp::value::found_func_t::ret_t {
+            found_func_called++;
+            found_func_opt = option;
+            throw std::runtime_error{"test-exception"};
+        }}};
+    ASSERT_THROW(static_cast<void>(
+                     get_long_opt_func<option_test_parser_t::long_opt_func_t>(
+                         tp, long_opt_str)(long_opt_str)),
+                 std::runtime_error);
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("--" + std::string{long_opt_str}));
+}
+
+TEST_F(optionT,
+       boolOptionConstructShortStringCallShortOptFuncCallsFoundFuncWithExit) {
+    clapp::option::bool_option_t opt{
+        tp, short_opt, opt_desc_str,
+        clapp::value::found_func_t{[this](const std::string& option) {
+            found_func_called++;
+            found_func_opt = option;
+            return clapp::value::found_func_t::ret_t{
+                clapp::value::exit_t::exit(EXIT_SUCCESS)};
+        }}};
+    const clapp::value::found_func_t::ret_t ret{
+        get_short_opt_func<option_test_parser_t::short_opt_func_t>(
+            tp, short_opt)(short_opt)};
+    ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(EXIT_SUCCESS));
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("-" + std::string{short_opt}));
+}
+
+TEST_F(
+    optionT,
+    boolOptionConstructShortStringCallShortOptFuncCallsFoundFuncWithoutExit) {
+    clapp::option::bool_option_t opt{
+        tp, short_opt, opt_desc_str,
+        clapp::value::found_func_t{[this](const std::string& option) {
+            found_func_called++;
+            found_func_opt = option;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
+    const clapp::value::found_func_t::ret_t ret{
+        get_short_opt_func<option_test_parser_t::short_opt_func_t>(
+            tp, short_opt)(short_opt)};
+    ASSERT_THAT(ret.has_value(), testing::Eq(false));
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("-" + std::string{short_opt}));
+}
+
+TEST_F(optionT,
+       boolOptionConstructShortStringCallShortOptFuncCallsFoundFuncThrows) {
+    clapp::option::bool_option_t opt{
+        tp, short_opt, opt_desc_str,
+        clapp::value::found_func_t{[this](const std::string& option)
+                                       -> clapp::value::found_func_t::ret_t {
+            found_func_called++;
+            found_func_opt = option;
+            throw std::runtime_error{"test-exception"};
+        }}};
+    ASSERT_THROW(static_cast<void>(
+                     get_short_opt_func<option_test_parser_t::short_opt_func_t>(
+                         tp, short_opt)(short_opt)),
+                 std::runtime_error);
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("-" + std::string{short_opt}));
 }
 
 TEST_F(optionT, boolOptionConstructShortOptionalNoValidateFunc) {
@@ -695,9 +820,8 @@ TEST_F(optionT, helpOptionConstructLongCStringAndShortAndCallGetOptionHelp) {
 TEST_F(optionT, helpOptionConstructLongStringCallLongOptFunc) {
     clapp::option::help_option_t opt{tp, long_opt_str, opt_desc_str};
     testing::internal::CaptureStdout();
-    ASSERT_EXIT((get_long_opt_func<option_test_parser_t::long_opt_func_t>(
-                    tp, long_opt_str)(long_opt_str)),
-                ::testing::ExitedWithCode(0), "");
+    ASSERT_NO_THROW(get_long_opt_func<option_test_parser_t::long_opt_func_t>(
+        tp, long_opt_str)(long_opt_str));
     ASSERT_THAT(testing::internal::GetCapturedStdout(),
                 testing::HasSubstr("Usage:\n"));
 }
@@ -705,9 +829,8 @@ TEST_F(optionT, helpOptionConstructLongStringCallLongOptFunc) {
 TEST_F(optionT, helpOptionConstructLongStringCallShortOptFunc) {
     clapp::option::help_option_t opt{tp, short_opt, opt_desc_str};
     testing::internal::CaptureStdout();
-    ASSERT_EXIT((get_short_opt_func<option_test_parser_t::short_opt_func_t>(
-                    tp, short_opt)(short_opt)),
-                ::testing::ExitedWithCode(0), "");
+    ASSERT_NO_THROW(get_short_opt_func<option_test_parser_t::short_opt_func_t>(
+        tp, short_opt)(short_opt));
     ASSERT_THAT(testing::internal::GetCapturedStdout(),
                 testing::HasSubstr("Usage:\n"));
 }
@@ -716,15 +839,13 @@ TEST_F(optionT, helpOptionConstructAndCallShortOptAndLongOptFunc) {
     clapp::option::help_option_t opt{
         tp, std::vector<std::string>{long_opt_cstr}, short_opt, opt_desc_str};
     testing::internal::CaptureStdout();
-    ASSERT_EXIT((get_short_opt_func<option_test_parser_t::short_opt_func_t>(
-                    tp, short_opt)(short_opt)),
-                ::testing::ExitedWithCode(0), "");
+    ASSERT_NO_THROW(get_short_opt_func<option_test_parser_t::short_opt_func_t>(
+        tp, short_opt)(short_opt));
     ASSERT_THAT(testing::internal::GetCapturedStdout(),
                 testing::HasSubstr("Usage:\n"));
     testing::internal::CaptureStdout();
-    ASSERT_EXIT((get_long_opt_func<option_test_parser_t::long_opt_func_t>(
-                    tp, long_opt_cstr)(long_opt_cstr)),
-                ::testing::ExitedWithCode(0), "");
+    ASSERT_NO_THROW(get_long_opt_func<option_test_parser_t::long_opt_func_t>(
+        tp, long_opt_cstr)(long_opt_cstr));
     ASSERT_THAT(testing::internal::GetCapturedStdout(),
                 testing::HasSubstr("Usage:\n"));
 }
@@ -848,15 +969,129 @@ TEST_F(
     ASSERT_THAT(opt, NumCountOptionGiven(num_count_options));
 }
 
-TEST_F(optionT, countOptionConstructLongStringCallLongOptFuncCallsFoundFunc) {
+TEST_F(optionT,
+       countOptionConstructLongStringCallLongOptFuncCallsFoundFuncWithExit) {
     clapp::option::count_option_t opt{
         tp, long_opt_str, opt_desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
-    get_long_opt_func<option_test_parser_t::long_opt_func_t>(
-        tp, long_opt_str)(long_opt_str);
+        clapp::value::found_func_t{[this](const std::string& option) {
+            found_func_called++;
+            found_func_opt = option;
+            return clapp::value::found_func_t::ret_t{
+                clapp::value::exit_t::exit(EXIT_FAILURE)};
+        }}};
+    const clapp::value::found_func_t::ret_t ret{
+        get_long_opt_func<option_test_parser_t::long_opt_func_t>(
+            tp, long_opt_str)(long_opt_str)};
+    ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(EXIT_FAILURE));
 
     constexpr std::uint32_t expected_found_func_called{1U};
     ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("--" + std::string{long_opt_str}));
+}
+
+TEST_F(optionT,
+       countOptionConstructLongStringCallLongOptFuncCallsFoundFuncWithoutExit) {
+    clapp::option::count_option_t opt{
+        tp, long_opt_str, opt_desc_str,
+        clapp::value::found_func_t{[this](const std::string& option) {
+            found_func_called++;
+            found_func_opt = option;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
+    const clapp::value::found_func_t::ret_t ret{
+        get_long_opt_func<option_test_parser_t::long_opt_func_t>(
+            tp, long_opt_str)(long_opt_str)};
+    ASSERT_THAT(ret.has_value(), testing::Eq(false));
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("--" + std::string{long_opt_str}));
+}
+
+TEST_F(optionT,
+       countOptionConstructLongStringCallLongOptFuncCallsFoundFuncThrows) {
+    clapp::option::count_option_t opt{
+        tp, long_opt_str, opt_desc_str,
+        clapp::value::found_func_t{[this](const std::string& option)
+                                       -> clapp::value::found_func_t::ret_t {
+            found_func_called++;
+            found_func_opt = option;
+            throw std::runtime_error{"test-exception"};
+        }}};
+    ASSERT_THROW(static_cast<void>(
+                     get_long_opt_func<option_test_parser_t::long_opt_func_t>(
+                         tp, long_opt_str)(long_opt_str)),
+                 std::runtime_error);
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("--" + std::string{long_opt_str}));
+}
+
+TEST_F(optionT,
+       countOptionConstructShortStringCallShortOptFuncCallsFoundFuncWithExit) {
+    clapp::option::count_option_t opt{
+        tp, short_opt, opt_desc_str,
+        clapp::value::found_func_t{[this](const std::string& option) {
+            found_func_called++;
+            found_func_opt = option;
+            return clapp::value::found_func_t::ret_t{
+                clapp::value::exit_t::exit(EXIT_SUCCESS)};
+        }}};
+    const clapp::value::found_func_t::ret_t ret{
+        get_short_opt_func<option_test_parser_t::short_opt_func_t>(
+            tp, short_opt)(short_opt)};
+    ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(EXIT_SUCCESS));
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("-" + std::string{short_opt}));
+}
+
+TEST_F(
+    optionT,
+    countOptionConstructShortStringCallShortOptFuncCallsFoundFuncWithoutExit) {
+    clapp::option::count_option_t opt{
+        tp, short_opt, opt_desc_str,
+        clapp::value::found_func_t{[this](const std::string& option) {
+            found_func_called++;
+            found_func_opt = option;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
+    const clapp::value::found_func_t::ret_t ret{
+        get_short_opt_func<option_test_parser_t::short_opt_func_t>(
+            tp, short_opt)(short_opt)};
+    ASSERT_THAT(ret.has_value(), testing::Eq(false));
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("-" + std::string{short_opt}));
+}
+
+TEST_F(optionT,
+       countOptionConstructShortStringCallShortOptFuncCallsFoundFuncThrows) {
+    clapp::option::count_option_t opt{
+        tp, short_opt, opt_desc_str,
+        clapp::value::found_func_t{[this](const std::string& option)
+                                       -> clapp::value::found_func_t::ret_t {
+            found_func_called++;
+            found_func_opt = option;
+            throw std::runtime_error{"test-exception"};
+        }}};
+    ASSERT_THROW(static_cast<void>(
+                     get_short_opt_func<option_test_parser_t::short_opt_func_t>(
+                         tp, short_opt)(short_opt)),
+                 std::runtime_error);
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("-" + std::string{short_opt}));
 }
 
 TEST_F(optionT, countOptionConstructMandatoryLongCallValidateFunc) {
@@ -996,16 +1231,134 @@ TEST_F(optionT, stringParamOptionConstructShortAndCallShortOpt) {
 
 TEST_F(
     optionT,
-    stringParamOptionConstructLongStringAndShortAndCallShortOptCallsFoundFunc) {
+    stringParamOptionConstructLongStringCallLongOptFuncCallsFoundFuncWithExit) {
     clapp::option::string_param_option_t opt{
-        tp, long_opt_str, short_opt, opt_desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
-    ASSERT_NO_THROW(
-        (get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
-            tp, short_opt)(short_opt, value_str)));
+        tp, long_opt_str, opt_desc_str,
+        clapp::value::found_func_t{[this](const std::string& option) {
+            found_func_called++;
+            found_func_opt = option;
+            return clapp::value::found_func_t::ret_t{
+                clapp::value::exit_t::exit(EXIT_FAILURE)};
+        }}};
+    const clapp::value::found_func_t::ret_t ret{
+        get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+            tp, long_opt_str)(long_opt_str, value_str)};
+    ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(EXIT_FAILURE));
 
     constexpr std::uint32_t expected_found_func_called{1U};
     ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("--" + std::string{long_opt_str}));
+}
+
+TEST_F(
+    optionT,
+    stringParamOptionConstructLongStringCallLongOptFuncCallsFoundFuncWithoutExit) {
+    clapp::option::string_param_option_t opt{
+        tp, long_opt_str, opt_desc_str,
+        clapp::value::found_func_t{[this](const std::string& option) {
+            found_func_called++;
+            found_func_opt = option;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
+    const clapp::value::found_func_t::ret_t ret{
+        get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+            tp, long_opt_str)(long_opt_str, value_str)};
+    ASSERT_THAT(ret.has_value(), testing::Eq(false));
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("--" + std::string{long_opt_str}));
+}
+
+TEST_F(
+    optionT,
+    stringParamOptionConstructLongStringCallLongOptFuncCallsFoundFuncThrows) {
+    clapp::option::string_param_option_t opt{
+        tp, long_opt_str, opt_desc_str,
+        clapp::value::found_func_t{[this](const std::string& option)
+                                       -> clapp::value::found_func_t::ret_t {
+            found_func_called++;
+            found_func_opt = option;
+            throw std::runtime_error{"test-exception"};
+        }}};
+    ASSERT_THROW(
+        static_cast<void>(
+            get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+                tp, long_opt_str)(long_opt_str, value_str)),
+        std::runtime_error);
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("--" + std::string{long_opt_str}));
+}
+
+TEST_F(
+    optionT,
+    stringParamOptionConstructShortStringCallShortOptFuncCallsFoundFuncWithExit) {
+    clapp::option::string_param_option_t opt{
+        tp, short_opt, opt_desc_str,
+        clapp::value::found_func_t{[this](const std::string& option) {
+            found_func_called++;
+            found_func_opt = option;
+            return clapp::value::found_func_t::ret_t{
+                clapp::value::exit_t::exit(EXIT_SUCCESS)};
+        }}};
+    const clapp::value::found_func_t::ret_t ret{
+        get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
+            tp, short_opt)(short_opt, value_str)};
+    ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(EXIT_SUCCESS));
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("-" + std::string{short_opt}));
+}
+
+TEST_F(
+    optionT,
+    stringParamOptionConstructShortStringCallShortOptFuncCallsFoundFuncWithoutExit) {
+    clapp::option::string_param_option_t opt{
+        tp, short_opt, opt_desc_str,
+        clapp::value::found_func_t{[this](const std::string& option) {
+            found_func_called++;
+            found_func_opt = option;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
+    const clapp::value::found_func_t::ret_t ret{
+        get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
+            tp, short_opt)(short_opt, value_str)};
+    ASSERT_THAT(ret.has_value(), testing::Eq(false));
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("-" + std::string{short_opt}));
+}
+
+TEST_F(
+    optionT,
+    stringParamOptionConstructShortStringCallShortOptFuncCallsFoundFuncThrows) {
+    clapp::option::string_param_option_t opt{
+        tp, short_opt, opt_desc_str,
+        clapp::value::found_func_t{[this](const std::string& option)
+                                       -> clapp::value::found_func_t::ret_t {
+            found_func_called++;
+            found_func_opt = option;
+            throw std::runtime_error{"test-exception"};
+        }}};
+    ASSERT_THROW(
+        static_cast<void>(
+            get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
+                tp, short_opt)(short_opt, value_str)),
+        std::runtime_error);
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("-" + std::string{short_opt}));
 }
 
 TEST_F(optionT,
@@ -1163,13 +1516,19 @@ TEST_F(
     pathParamOptionConstructLongStringAndShortAndCallShortOptCallsFoundFunc) {
     clapp::option::path_param_option_t opt{
         tp, long_opt_str, short_opt, opt_desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& option) {
+            found_func_called++;
+            found_func_opt = option;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_NO_THROW(
         (get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
             tp, short_opt)(short_opt, value_str_path)));
 
     constexpr std::uint32_t expected_found_func_called{1U};
     ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("-" + std::string{short_opt}));
 }
 
 TEST_F(optionT,
@@ -1344,13 +1703,19 @@ TEST_F(
     int64ParamOptionConstructLongStringAndShortAndCallShortOptCallsFoundFunc) {
     clapp::option::int64_param_option_t opt{
         tp, long_opt_str, short_opt, opt_desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& option) {
+            found_func_called++;
+            found_func_opt = option;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_NO_THROW(
         (get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
             tp, short_opt)(short_opt, std::to_string(value_int64))));
 
     constexpr std::uint32_t expected_found_func_called{1U};
     ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("-" + std::string{short_opt}));
 }
 
 TEST_F(
@@ -1829,16 +2194,134 @@ TEST_F(
 
 TEST_F(
     optionT,
-    vectorStringParamOptionConstructLongStringAndShortAndCallShortOptCallsFoundFunc) {
+    vectorStringParamOptionConstructLongStringCallLongOptFuncCallsFoundFuncWithExit) {
     clapp::option::vector_string_param_option_t opt{
-        tp, long_opt_str, short_opt, opt_desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
-    ASSERT_NO_THROW(
-        (get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
-            tp, short_opt)(short_opt, value_str)));
+        tp, long_opt_str, opt_desc_str,
+        clapp::value::found_func_t{[this](const std::string& option) {
+            found_func_called++;
+            found_func_opt = option;
+            return clapp::value::found_func_t::ret_t{
+                clapp::value::exit_t::exit(EXIT_FAILURE)};
+        }}};
+    const clapp::value::found_func_t::ret_t ret{
+        get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+            tp, long_opt_str)(long_opt_str, value_str)};
+    ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(EXIT_FAILURE));
 
     constexpr std::uint32_t expected_found_func_called{1U};
     ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("--" + std::string{long_opt_str}));
+}
+
+TEST_F(
+    optionT,
+    vectorStringParamOptionConstructLongStringCallLongOptFuncCallsFoundFuncWithoutExit) {
+    clapp::option::vector_string_param_option_t opt{
+        tp, long_opt_str, opt_desc_str,
+        clapp::value::found_func_t{[this](const std::string& option) {
+            found_func_called++;
+            found_func_opt = option;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
+    const clapp::value::found_func_t::ret_t ret{
+        get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+            tp, long_opt_str)(long_opt_str, value_str)};
+    ASSERT_THAT(ret.has_value(), testing::Eq(false));
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("--" + std::string{long_opt_str}));
+}
+
+TEST_F(
+    optionT,
+    vectorStringParamOptionConstructLongStringCallLongOptFuncCallsFoundFuncThrows) {
+    clapp::option::vector_string_param_option_t opt{
+        tp, long_opt_str, opt_desc_str,
+        clapp::value::found_func_t{[this](const std::string& option)
+                                       -> clapp::value::found_func_t::ret_t {
+            found_func_called++;
+            found_func_opt = option;
+            throw std::runtime_error{"test-exception"};
+        }}};
+    ASSERT_THROW(
+        static_cast<void>(
+            get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+                tp, long_opt_str)(long_opt_str, value_str)),
+        std::runtime_error);
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("--" + std::string{long_opt_str}));
+}
+
+TEST_F(
+    optionT,
+    vectorStringParamOptionConstructShortStringCallShortOptFuncCallsFoundFuncWithExit) {
+    clapp::option::vector_string_param_option_t opt{
+        tp, short_opt, opt_desc_str,
+        clapp::value::found_func_t{[this](const std::string& option) {
+            found_func_called++;
+            found_func_opt = option;
+            return clapp::value::found_func_t::ret_t{
+                clapp::value::exit_t::exit(EXIT_SUCCESS)};
+        }}};
+    const clapp::value::found_func_t::ret_t ret{
+        get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
+            tp, short_opt)(short_opt, value_str)};
+    ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(EXIT_SUCCESS));
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("-" + std::string{short_opt}));
+}
+
+TEST_F(
+    optionT,
+    vectorStringParamOptionConstructShortStringCallShortOptFuncCallsFoundFuncWithoutExit) {
+    clapp::option::vector_string_param_option_t opt{
+        tp, short_opt, opt_desc_str,
+        clapp::value::found_func_t{[this](const std::string& option) {
+            found_func_called++;
+            found_func_opt = option;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
+    const clapp::value::found_func_t::ret_t ret{
+        get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
+            tp, short_opt)(short_opt, value_str)};
+    ASSERT_THAT(ret.has_value(), testing::Eq(false));
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("-" + std::string{short_opt}));
+}
+
+TEST_F(
+    optionT,
+    vectorStringParamOptionConstructShortStringCallShortOptFuncCallsFoundFuncThrows) {
+    clapp::option::vector_string_param_option_t opt{
+        tp, short_opt, opt_desc_str,
+        clapp::value::found_func_t{[this](const std::string& option)
+                                       -> clapp::value::found_func_t::ret_t {
+            found_func_called++;
+            found_func_opt = option;
+            throw std::runtime_error{"test-exception"};
+        }}};
+    ASSERT_THROW(
+        static_cast<void>(
+            get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
+                tp, short_opt)(short_opt, value_str)),
+        std::runtime_error);
+
+    constexpr std::uint32_t expected_found_func_called{1U};
+    ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("-" + std::string{short_opt}));
 }
 
 TEST_F(
@@ -2046,13 +2529,19 @@ TEST_F(
     vectorPathParamOptionConstructLongStringAndShortAndCallShortOptCallsFoundFunc) {
     clapp::option::vector_path_param_option_t opt{
         tp, long_opt_str, short_opt, opt_desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& option) {
+            found_func_called++;
+            found_func_opt = option;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
     ASSERT_NO_THROW(
         (get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
             tp, short_opt)(short_opt, value_str_path)));
 
     constexpr std::uint32_t expected_found_func_called{1U};
     ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("-" + std::string{short_opt}));
 }
 
 TEST_F(optionT,
@@ -2237,7 +2726,11 @@ TEST_F(
     vectorInt64ParamOptionConstructLongStringAndShortAndCallShortOptCallsFoundFunc) {
     clapp::option::vector_int64_param_option_t opt{
         tp, long_opt_str, short_opt, opt_desc_str,
-        clapp::value::found_func_t{[this]() { found_func_called++; }}};
+        clapp::value::found_func_t{[this](const std::string& option) {
+            found_func_called++;
+            found_func_opt = option;
+            return clapp::value::found_func_t::ret_t{};
+        }}};
 
     ASSERT_NO_THROW(
         (get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
@@ -2248,6 +2741,8 @@ TEST_F(
 
     constexpr std::uint32_t expected_found_func_called{2U};
     ASSERT_THAT(found_func_called, testing::Eq(expected_found_func_called));
+    ASSERT_THAT(found_func_opt.value(),
+                testing::StrEq("-" + std::string{short_opt}));
 }
 
 TEST_F(

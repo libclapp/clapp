@@ -21,6 +21,14 @@
 #include <sstream>
 #include <utility>
 
+template <typename IT_T>
+static clapp::parser::basic_parser_t::parse_result_t handle_parse_ret(
+    clapp::value::found_func_t::ret_t ret, IT_T it);
+
+template <typename IT_T>
+static std::optional<clapp::parser::basic_parser_t::parse_result_t>
+handle_parse_ret_or_nullopt(clapp::value::found_func_t::ret_t ret, IT_T it);
+
 clapp::parser::basic_parser_t::basic_parser_t() = default;
 
 bool clapp::parser::basic_parser_t::help_entry_t::operator==(
@@ -315,13 +323,17 @@ clapp::basic_parser_t::process_parse_result(
     return parse_result.it;
 }
 
-void clapp::parser::basic_parser_t::parse(arg_iterator begin,
-                                          arg_iterator end) {
+std::optional<clapp::value::exit_t> clapp::parser::basic_parser_t::parse(
+    arg_iterator begin, arg_iterator end) {
     for (arg_iterator it = begin; it != end;) {
         clapp::basic_parser_t::parse_result_t parse_result{
             parse(std::string_view{*it}, it, end)};
+        if (parse_result.exit) {
+            return parse_result.exit;
+        }
         it = process_parse_result(it, parse_result);
     }
+    return {};
 }
 
 clapp::parser::basic_parser_t::parse_result_t clapp::basic_parser_t::parse(
@@ -334,7 +346,9 @@ clapp::parser::basic_parser_t::parse_result_t clapp::basic_parser_t::parse(
         option.remove_prefix(1);
         return parse_short(option, it, end);
     }
-    return parse_arg(option, it, end);
+    clapp::parser::basic_parser_t::parse_result_t ret{
+        parse_arg(option, it, end)};
+    return ret;
 }
 
 void clapp::parser::basic_parser_t::validate() const {
@@ -352,6 +366,28 @@ void clapp::parser::basic_parser_t::validate_recursive() const {
     }
 }
 
+template <typename IT_T>
+static clapp::parser::basic_parser_t::parse_result_t handle_parse_ret(
+    const clapp::value::found_func_t::ret_t ret, const IT_T it) {
+    if (ret) {
+        return clapp::parser::basic_parser_t::parse_result_t{it, std::nullopt,
+                                                             std::nullopt, ret};
+    }
+    return clapp::parser::basic_parser_t::parse_result_t{
+        it + 1, std::nullopt, std::nullopt, std::nullopt};
+}
+
+template <typename IT_T>
+static std::optional<clapp::parser::basic_parser_t::parse_result_t>
+handle_parse_ret_or_nullopt(const clapp::value::found_func_t::ret_t ret,
+                            const IT_T it) {
+    if (ret) {
+        return std::make_optional(clapp::parser::basic_parser_t::parse_result_t{
+            it, std::nullopt, std::nullopt, ret});
+    }
+    return {};
+}
+
 clapp::parser::basic_parser_t::parse_result_t
 clapp::parser::basic_parser_t::parse_arg(const std::string_view argument,
                                          arg_iterator it, arg_iterator end) {
@@ -360,10 +396,15 @@ clapp::parser::basic_parser_t::parse_arg(const std::string_view argument,
         if (num_processed_arguments < num_arguments) {
             return std::visit(
                 [this, argument, it](auto&& a) {
-                    a.argument(argument);
+                    const clapp::value::found_func_t::ret_t ret{
+                        a.argument(argument)};
+                    if (ret) {
+                        return clapp::parser::basic_parser_t::parse_result_t{
+                            it, std::nullopt, std::nullopt, ret};
+                    }
                     num_processed_arguments++;
-                    parse_result_t ret{it + 1, std::nullopt, std::nullopt};
-                    return ret;
+                    return parse_result_t{it + 1, std::nullopt, std::nullopt,
+                                          std::nullopt};
                 },
                 arguments.at(num_processed_arguments));
         }
@@ -372,10 +413,15 @@ clapp::parser::basic_parser_t::parse_arg(const std::string_view argument,
                 arguments.at(num_arguments - 1))) {
             return std::visit(
                 [this, argument, it](auto&& a) {
-                    a.argument(argument);
+                    const clapp::value::found_func_t::ret_t ret{
+                        a.argument(argument)};
+                    if (ret) {
+                        return clapp::parser::basic_parser_t::parse_result_t{
+                            it, std::nullopt, std::nullopt, ret};
+                    }
                     num_processed_arguments++;
-                    parse_result_t ret{it + 1, std::nullopt, std::nullopt};
-                    return ret;
+                    return parse_result_t{it + 1, std::nullopt, std::nullopt,
+                                          std::nullopt};
                 },
                 arg);
         }
@@ -388,7 +434,7 @@ clapp::parser::basic_parser_t::parse_arg(const std::string_view argument,
         throw clapp::exception::clapp_exception_t(ss.str());
     }
     found_sub_parser->second.sub_parse(it + 1, end);
-    return parse_result_t{end, std::nullopt, std::nullopt};
+    return parse_result_t{end, std::nullopt, std::nullopt, std::nullopt};
 }
 
 clapp::parser::basic_parser_t::parse_result_t
@@ -399,7 +445,7 @@ clapp::parser::basic_parser_t::parse_long(const std::string_view option,
                                std::min(equal_index, option.size())};
     variant_opt_conf_vec_t::const_iterator found{find_option(opt)};
     if (found == options.end()) {
-        return parse_result_t{it, std::nullopt, std::string{opt}};
+        return parse_result_t{it, std::nullopt, std::string{opt}, std::nullopt};
     }
     return std::visit(
         [option, equal_index, &it, opt, end](auto&& o) {
@@ -414,10 +460,10 @@ clapp::parser::basic_parser_t::parse_long(const std::string_view option,
                     ss << "No param allowed for option '--" << opt << "'";
                     throw clapp::exception::option_param_exception_t(ss.str());
                 } else {
-                    opt_it->func(opt,
-                                 std::string_view{&(option[equal_index + 1])});
-                    parse_result_t ret{it + 1, std::nullopt, std::nullopt};
-                    return ret;
+                    return handle_parse_ret(
+                        opt_it->func(
+                            opt, std::string_view{&(option[equal_index + 1])}),
+                        it);
                 }
             }
             if constexpr (!std::is_same<current_option_type_t,
@@ -428,14 +474,10 @@ clapp::parser::basic_parser_t::parse_long(const std::string_view option,
                     throw clapp::exception::option_param_exception_t(ss.str());
                 }
                 it++;
-                opt_it->func(opt, std::string_view{*it});
-                parse_result_t ret{it + 1, std::nullopt, std::nullopt};
-                return ret;
-
+                return handle_parse_ret(
+                    opt_it->func(opt, std::string_view{*it}), it);
             } else {
-                opt_it->func(opt);
-                parse_result_t ret{it + 1, std::nullopt, std::nullopt};
-                return ret;
+                return handle_parse_ret(opt_it->func(opt), it);
             }
         },
         *found);
@@ -449,7 +491,7 @@ clapp::parser::basic_parser_t::parse_short(const std::string_view option,
     const char opt{option[0U]};
     variant_opt_conf_vec_t::const_iterator found{find_option(opt)};
     if (found == options.end()) {
-        return parse_result_t{it, opt, std::nullopt};
+        return parse_result_t{it, opt, std::nullopt, std::nullopt};
     }
 
     std::optional<parse_result_t> ret{std::visit(
@@ -465,10 +507,10 @@ clapp::parser::basic_parser_t::parse_short(const std::string_view option,
                     ss << "No param allowed for option '-" << opt << "'";
                     throw clapp::exception::option_param_exception_t(ss.str());
                 } else {
-                    opt_it->func(opt,
-                                 std::string_view{&(option[equal_index + 1])});
-                    return std::make_optional(
-                        parse_result_t{it + 1, std::nullopt, std::nullopt});
+                    return std::make_optional(handle_parse_ret(
+                        opt_it->func(
+                            opt, std::string_view{&(option[equal_index + 1])}),
+                        it));
                 }
             }
             if (option.size() == 1U) {
@@ -481,13 +523,11 @@ clapp::parser::basic_parser_t::parse_short(const std::string_view option,
                             ss.str());
                     }
                     it++;
-                    opt_it->func(opt, std::string_view{*it});
-                    return std::make_optional(
-                        parse_result_t{it + 1, std::nullopt, std::nullopt});
+                    return std::make_optional(handle_parse_ret(
+                        opt_it->func(opt, std::string_view{*it}), it));
                 } else {
-                    opt_it->func(opt);
                     return std::make_optional(
-                        parse_result_t{it + 1, std::nullopt, std::nullopt});
+                        handle_parse_ret(opt_it->func(opt), it));
                 }
             }
             if constexpr (!std::is_same<current_option_type_t,
@@ -496,8 +536,7 @@ clapp::parser::basic_parser_t::parse_short(const std::string_view option,
                 ss << "No param given for option '-" << opt << "'";
                 throw clapp::exception::option_param_exception_t(ss.str());
             } else {
-                opt_it->func(opt);
-                return std::optional<parse_result_t>{};
+                return handle_parse_ret_or_nullopt(opt_it->func(opt), it);
             }
         },
         *found)};
@@ -510,14 +549,15 @@ clapp::parser::basic_parser_t::parse_short(const std::string_view option,
 }
 
 clapp::value::found_func_t
-clapp::parser::basic_parser_t::gen_func_print_help_and_exit(
+clapp::parser::basic_parser_t::gen_func_print_help_and_req_exit(
     const int exit_code) const {
-    found_func_t found_func{[this, exit_code]() {
-        static constexpr std::size_t max_rec_depth{65535U};
-        const std::string usage_prefix{gen_usage_prefix()};
-        const std::string msg{usage_prefix + gen_help_msg(max_rec_depth)};
-        print_and_exit_func(msg, exit_code);
-    }};
+    found_func_t found_func{
+        [this, exit_code](const std::string& /*name*/) -> found_func_t::ret_t {
+            static constexpr std::size_t max_rec_depth{65535U};
+            const std::string usage_prefix{gen_usage_prefix()};
+            const std::string msg{usage_prefix + gen_help_msg(max_rec_depth)};
+            return print_and_exit_func(msg, exit_code);
+        }};
     return found_func;
 }
 
@@ -531,13 +571,11 @@ clapp::parser::basic_parser_t::get_active_parser() const {
     return *this;
 }
 
-void clapp::parser::basic_parser_t::default_print_and_exit(
-    const std::string_view print_msg, const std::optional<int> exit_code) {
+clapp::value::exit_t clapp::parser::basic_parser_t::default_print_and_exit(
+    const std::string_view print_msg, const int exit_code) {
     std::cout << print_msg;
     std::cout.flush();
-    if (exit_code) {
-        exit(exit_code.value());
-    }
+    return exit_t::exit(exit_code);
 }
 
 [[noreturn]] void clapp::parser::basic_parser_t::exit(const int exit_code) {

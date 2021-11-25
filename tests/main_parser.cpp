@@ -10,48 +10,87 @@ class empty_main_parser_t : public clapp::parser::basic_main_parser_t {
 
 empty_main_parser_t::~empty_main_parser_t() = default;
 
-TEST(mainParser, constructMainParser) {
+class bo_main_parser_t : public clapp::parser::basic_main_parser_t {
+   public:
+    clapp::bool_option_t bo{
+        *this, std::vector<char>{'b'}, "Exits if given.",
+        clapp::value::found_func_t{[](const std::string_view /*name*/) {
+            return clapp::value::exit_t::exit(EXIT_SUCCESS);
+        }}};
+
+    ~bo_main_parser_t() override;
+};
+
+bo_main_parser_t::~bo_main_parser_t() = default;
+
+TEST(mainParser, constructEmptyMainParserAndParse) {
     constexpr const char* const argv[]{"main", nullptr};
     empty_main_parser_t emp;
 
-    emp.parse(1, static_cast<const char* const*>(argv));
+    ASSERT_THAT(emp.parse(1, static_cast<const char* const*>(argv)).has_value(),
+                testing::Eq(false));
 }
 
-TEST(mainParser, constructMainParserBoolOperator) {
+TEST(mainParser, constructEmptyMainParserBoolOperator) {
     constexpr const char* const argv[]{"main-exec", nullptr};
     empty_main_parser_t emp;
     ASSERT_THAT(static_cast<bool>(emp), testing::Eq(false));
 
-    emp.parse(1, static_cast<const char* const*>(argv));
+    ASSERT_THAT(emp.parse(1, static_cast<const char* const*>(argv)).has_value(),
+                testing::Eq(false));
     ASSERT_THAT(static_cast<bool>(emp), testing::Eq(true));
 }
 
-TEST(mainParser, constructMainParserGetExecutable) {
+TEST(mainParser, constructEmptyMainParserGetExecutable) {
     constexpr const char* const argv[]{"main-exec", nullptr};
     empty_main_parser_t emp;
     ASSERT_THROW(emp.get_executable(),
                  clapp::exception::no_executable_exception_t);
 
-    emp.parse(1, static_cast<const char* const*>(argv));
+    ASSERT_THAT(emp.parse(1, static_cast<const char* const*>(argv)).has_value(),
+                testing::Eq(false));
     ASSERT_THAT(emp.get_executable(), testing::StrEq("main-exec"));
 }
 
-TEST(mainParser, constructMainParserAndGenHelpPrefix) {
+TEST(mainParser, constructEmptyMainParserAndGenHelpPrefix) {
     constexpr const char* const argv[]{"main", nullptr};
     empty_main_parser_t emp;
 
     ASSERT_THROW(emp.gen_short_line_prefix(),
                  clapp::exception::no_executable_exception_t);
 
-    emp.parse(1, static_cast<const char* const*>(argv));
+    ASSERT_THAT(emp.parse(1, static_cast<const char* const*>(argv)).has_value(),
+                testing::Eq(false));
     ASSERT_THAT(emp.gen_short_line_prefix(), testing::StrEq("main"));
 }
 
-TEST(mainParser, constructMainParserParseAndValidate) {
+TEST(mainParser, constructEmptyMainParserAndParseAndValidate) {
     constexpr const char* const argv[]{"main", nullptr};
     empty_main_parser_t emp;
 
-    emp.parse_and_validate(1, static_cast<const char* const*>(argv));
+    ASSERT_THAT(emp.parse_and_validate(1, static_cast<const char* const*>(argv))
+                    .has_value(),
+                testing::Eq(false));
+}
+
+TEST(mainParser, constructHelpMainParserAndParse) {
+    constexpr const char* const argv[]{"main", "-b", nullptr};
+    bo_main_parser_t bmp;
+
+    const std::optional<clapp::value::exit_t> exit{
+        bmp.parse(2, static_cast<const char* const*>(argv))};
+    ASSERT_THAT(exit.has_value(), testing::Eq(true));
+    ASSERT_THAT(exit.value().get_exit_code(), testing::Eq(EXIT_SUCCESS));
+}
+
+TEST(mainParser, constructHelpMainParserAndParseAndValidate) {
+    constexpr const char* const argv[]{"main", "-b", nullptr};
+    bo_main_parser_t bmp;
+
+    const std::optional<clapp::value::exit_t> exit{
+        bmp.parse_and_validate(2, static_cast<const char* const*>(argv))};
+    ASSERT_THAT(exit.has_value(), testing::Eq(true));
+    ASSERT_THAT(exit.value().get_exit_code(), testing::Eq(EXIT_SUCCESS));
 }
 
 TEST(mainParser, constructMainParserIsActiveIsTrue) {

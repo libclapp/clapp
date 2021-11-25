@@ -6,18 +6,12 @@
 
 #include <iostream>
 
-[[noreturn]] void print_version_and_exit();
-
-[[noreturn]] void print_version_and_exit() {
-    std::cout << clapp::build_info::build_info_string << std::endl;
-    clapp::basic_main_parser_t::exit(EXIT_SUCCESS);
-}
+clapp::value::found_func_t::ret_t print_version_and_exit(
+    const std::string &option);
 
 class cli_parser_t : public clapp::basic_main_parser_t {
    public:
-    cli_parser_t(int argc, const char *const *argv) {
-        parse_and_validate(argc, argv);
-    }
+    cli_parser_t() = default;
 
     explicit cli_parser_t(const cli_parser_t &) = delete;
     explicit cli_parser_t(cli_parser_t &&) noexcept = delete;
@@ -60,11 +54,22 @@ class cli_parser_t : public clapp::basic_main_parser_t {
         *this, "string-vector", "String vector param."};
 };
 
+clapp::value::found_func_t::ret_t print_version_and_exit(
+    const std::string & /*option*/) {
+    std::cout << clapp::build_info::build_info_string << std::endl;
+    return clapp::value::exit_t::exit(EXIT_SUCCESS);
+}
+
 cli_parser_t::~cli_parser_t() = default;
 
 int main(int argc, char *argv[]) {
     try {
-        cli_parser_t cp{argc, argv};  // parses and validates cli-arguments
+        cli_parser_t cp;
+        const std::optional<clapp::value::exit_t> exit{
+            cp.parse_and_validate(argc, argv)};
+        if (exit) {
+            return exit.value().get_exit_code();
+        }
 
         Expects(cp.string_arg);  // parser ensures mandatory arguments are given
         std::cout << "string-arg: " << cp.string_arg.value() << std::endl;

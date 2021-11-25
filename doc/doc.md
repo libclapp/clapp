@@ -549,9 +549,7 @@ string argument:
 
 class cli_parser_t : public clapp::basic_main_parser_t {
    public:
-    cli_parser_t(int argc, const char *const *argv) {
-        parse_and_validate(argc, argv);
-    }
+    cli_parser_t() = default;
 
     ~cli_parser_t() override;
 
@@ -559,7 +557,7 @@ class cli_parser_t : public clapp::basic_main_parser_t {
 
     clapp::string_argument_t string_arg{*this, "string-arg", "String argument"};
 
-    //delete copy/move-ctors and assignmet operators (CppCoreGuideline C.21):
+    // delete copy/mv-ctors and assignmet operators (CppCoreGuideline C.21):
     explicit cli_parser_t(const cli_parser_t &) = delete;
     explicit cli_parser_t(cli_parser_t &&) noexcept = delete;
     cli_parser_t &operator=(const cli_parser_t &) = delete;
@@ -570,7 +568,12 @@ cli_parser_t::~cli_parser_t() = default;
 
 int main(int argc, char *argv[]) {
     try {
-        cli_parser_t cp{argc, argv};  // parses and validates cli-arguments
+        cli_parser_t cp;  // create parser instance
+        const std::optional<clapp::value::exit_t> exit{cp.parse_and_validate(
+            argc, argv)};  // parses and validates cli-arguments
+        if (exit) {
+            return exit.value().get_exit_code();
+        }
         Ensures(cp.string_arg);  // parser ensures mandatory arguments are given
         std::cout << "string-arg: " << cp.string_arg.value() << std::endl;
     } catch (std::exception &e) {
@@ -700,7 +703,7 @@ If no sub-parser-member was selected by the cli-arguments, this method returns a
 to this sub-parser instance. If a sub-parser was selected it would return a reference to
 this sub-parser.
 
-### Example code listing for sub-parsers:
+### Example code listing using sub-parsers and parser containers:
 
 [//]:#begin_cpp_listing_simple_sub_parser
 ```c++
@@ -708,13 +711,11 @@ this sub-parser.
 #include <clapp/main_parser.h>
 #include <clapp/option.h>
 #include <clapp/sub_parser.h>
+#include <optional>
 
 class cli_parser_t : public clapp::basic_main_parser_t {
    public:
-    cli_parser_t(int argc, const char *const *argv) {
-        parse_and_validate(argc, argv);
-    }
-
+    cli_parser_t() = default;
     ~cli_parser_t() override;
 
     clapp::help_option_t help{*this, "help", 'h', "Show help options."};
@@ -731,7 +732,7 @@ class cli_parser_t : public clapp::basic_main_parser_t {
 
         clapp::string_param_option_t string{*this, 's', "String param option."};
 
-        //delete copy/move-ctors and assignmet operators (CppCoreGuideline C.21):
+        // delete copy/mv-ctors and assignmet operators (CppCoreGuideline C.21):
         explicit mode1_parser_t(const mode1_parser_t &) = delete;
         explicit mode1_parser_t(mode1_parser_t &&) noexcept = delete;
         mode1_parser_t &operator=(const mode1_parser_t &) = delete;
@@ -746,10 +747,10 @@ class cli_parser_t : public clapp::basic_main_parser_t {
 
         clapp::help_option_t help{*this, "help", 'h', "Show help options."};
 
-        clapp::string_argument_t string_arg{
-            *this, "string-arg", "String argument"};
+        clapp::string_argument_t string_arg{*this, "string-arg",
+                                            "String argument"};
 
-        //delete copy/move-ctors and assignmet operators (CppCoreGuideline C.21):
+        // delete copy/mv-ctors and assignmet operators (CppCoreGuideline C.21):
         explicit mode2_parser_t(const mode2_parser_t &) = delete;
         explicit mode2_parser_t(mode2_parser_t &&) noexcept = delete;
         mode2_parser_t &operator=(const mode2_parser_t &) = delete;
@@ -759,7 +760,7 @@ class cli_parser_t : public clapp::basic_main_parser_t {
     mode1_parser_t mode1{*this, "mode1", "mode1 sub-parser."};
     mode2_parser_t mode2{*this, "mode2", "mode2 sub-parser."};
 
-    //delete copy/move-ctors and assignmet operators (CppCoreGuideline C.21):
+    // delete copy/mv-ctors and assignmet operators (CppCoreGuideline C.21):
     explicit cli_parser_t(const cli_parser_t &) = delete;
     explicit cli_parser_t(cli_parser_t &&) noexcept = delete;
     cli_parser_t &operator=(const cli_parser_t &) = delete;
@@ -772,7 +773,12 @@ cli_parser_t::mode2_parser_t::~mode2_parser_t() = default;
 
 int main(int argc, char *argv[]) {
     try {
-        cli_parser_t cp{argc, argv};  // parses and validates cli-arguments
+        cli_parser_t cp;  // create parser instance
+        const std::optional<clapp::value::exit_t> exit{cp.parse_and_validate(
+            argc, argv)};  // parses and validates cli-arguments
+        if (exit) {
+            return exit.value().get_exit_code();
+        }
 
         if(cp.mode1) {
             std::cout << "mode1: ";

@@ -85,10 +85,11 @@ class exit_t {
 
 class found_func_t {
    public:
-    using func_t = std::function<void()>;
+    using ret_t = std::optional<exit_t>;
+    using func_t = std::function<ret_t(const std::string &)>;
     explicit found_func_t(func_t &&func_arg);
 
-    void found();
+    [[nodiscard]] ret_t found(const std::string &name);
 
    private:
     func_t func;
