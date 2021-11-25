@@ -286,3 +286,90 @@ TEST(exception, noExecutableExceptionT) {
     ASSERT_THAT(ce3.what(), testing::StrEq(msg2));
     ASSERT_THAT(ce4.what(), testing::StrEq(msg));
 }
+
+TEST(exception, parserContainerExceptionT) {
+    static_assert(
+        std::is_base_of<std::runtime_error,
+                        clapp::exception::parser_container_exception_t>::value);
+    static_assert(
+        std::is_base_of<clapp::exception::clapp_exception_t,
+                        clapp::exception::parser_container_exception_t>::value);
+    static_assert(
+        std::is_base_of<clapp::exception::parser_exception_t,
+                        clapp::exception::parser_container_exception_t>::value);
+
+    const std::string msg{"message"};
+    const std::string msg2{"message2"};
+
+    clapp::exception::parser_container_exception_t ce1{msg.c_str()};
+    clapp::exception::parser_container_exception_t ce2{msg2};
+
+    clapp::exception::parser_container_exception_t ce3{ce1};
+    clapp::exception::parser_container_exception_t ce4{std::move(ce1)};
+
+    ce4 = ce3;
+    ce3 = std::move(ce2);
+
+    ASSERT_THAT(ce3.what(), testing::StrEq(msg2));
+    ASSERT_THAT(ce4.what(), testing::StrEq(msg));
+}
+
+TEST(exception, notFullyParsedExceptionT) {
+    static_assert(
+        std::is_base_of<std::runtime_error,
+                        clapp::exception::not_fully_parsed_exception_t>::value);
+    static_assert(
+        std::is_base_of<clapp::exception::clapp_exception_t,
+                        clapp::exception::not_fully_parsed_exception_t>::value);
+    static_assert(
+        std::is_base_of<clapp::exception::parser_exception_t,
+                        clapp::exception::not_fully_parsed_exception_t>::value);
+    static_assert(
+        std::is_base_of<clapp::exception::parser_container_exception_t,
+                        clapp::exception::not_fully_parsed_exception_t>::value);
+
+    const std::string msg{"message"};
+    const std::string msg2{"message2"};
+
+    clapp::exception::not_fully_parsed_exception_t ce1{msg.c_str()};
+    clapp::exception::not_fully_parsed_exception_t ce2{msg2};
+
+    clapp::exception::not_fully_parsed_exception_t ce3{ce1};
+    clapp::exception::not_fully_parsed_exception_t ce4{std::move(ce1)};
+
+    ce4 = ce3;
+    ce3 = std::move(ce2);
+
+    ASSERT_THAT(ce3.what(), testing::StrEq(msg2));
+    ASSERT_THAT(ce4.what(), testing::StrEq(msg));
+}
+
+TEST(exception, invalidParserStateExceptionT) {
+    static_assert(std::is_base_of<
+                  std::runtime_error,
+                  clapp::exception::invalid_parser_state_exception_t>::value);
+    static_assert(std::is_base_of<
+                  clapp::exception::clapp_exception_t,
+                  clapp::exception::invalid_parser_state_exception_t>::value);
+    static_assert(std::is_base_of<
+                  clapp::exception::parser_exception_t,
+                  clapp::exception::invalid_parser_state_exception_t>::value);
+    static_assert(std::is_base_of<
+                  clapp::exception::parser_container_exception_t,
+                  clapp::exception::invalid_parser_state_exception_t>::value);
+
+    const std::string msg{"message"};
+    const std::string msg2{"message2"};
+
+    clapp::exception::invalid_parser_state_exception_t ce1{msg.c_str()};
+    clapp::exception::invalid_parser_state_exception_t ce2{msg2};
+
+    clapp::exception::invalid_parser_state_exception_t ce3{ce1};
+    clapp::exception::invalid_parser_state_exception_t ce4{std::move(ce1)};
+
+    ce4 = ce3;
+    ce3 = std::move(ce2);
+
+    ASSERT_THAT(ce3.what(), testing::StrEq(msg2));
+    ASSERT_THAT(ce4.what(), testing::StrEq(msg));
+}

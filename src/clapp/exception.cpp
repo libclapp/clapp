@@ -224,3 +224,62 @@ clapp::exception::no_executable_exception_t::operator=(
     no_executable_exception_t&&) noexcept = default;
 clapp::exception::no_executable_exception_t::
     ~no_executable_exception_t() noexcept = default;
+
+clapp::exception::parser_container_exception_t::parser_container_exception_t(
+    const char* message)
+    : parser_exception_t(message) {}
+clapp::exception::parser_container_exception_t::parser_container_exception_t(
+    const std::string& message)
+    : parser_exception_t(message) {}
+clapp::exception::parser_container_exception_t::parser_container_exception_t(
+    const parser_container_exception_t&) = default;
+clapp::exception::parser_container_exception_t&
+clapp::exception::parser_container_exception_t::operator=(
+    const parser_container_exception_t&) = default;
+clapp::exception::parser_container_exception_t::parser_container_exception_t(
+    parser_container_exception_t&&) noexcept = default;
+clapp::exception::parser_container_exception_t&
+clapp::exception::parser_container_exception_t::operator=(
+    parser_container_exception_t&&) noexcept = default;
+clapp::exception::parser_container_exception_t::
+    ~parser_container_exception_t() noexcept = default;
+
+clapp::exception::not_fully_parsed_exception_t::not_fully_parsed_exception_t(
+    const char* message)
+    : parser_container_exception_t(message) {}
+clapp::exception::not_fully_parsed_exception_t::not_fully_parsed_exception_t(
+    const std::string& message)
+    : parser_container_exception_t(message) {}
+clapp::exception::not_fully_parsed_exception_t::not_fully_parsed_exception_t(
+    const not_fully_parsed_exception_t&) = default;
+clapp::exception::not_fully_parsed_exception_t&
+clapp::exception::not_fully_parsed_exception_t::operator=(
+    const not_fully_parsed_exception_t&) = default;
+clapp::exception::not_fully_parsed_exception_t::not_fully_parsed_exception_t(
+    not_fully_parsed_exception_t&&) noexcept = default;
+clapp::exception::not_fully_parsed_exception_t&
+clapp::exception::not_fully_parsed_exception_t::operator=(
+    not_fully_parsed_exception_t&&) noexcept = default;
+clapp::exception::not_fully_parsed_exception_t::
+    ~not_fully_parsed_exception_t() noexcept = default;
+
+clapp::exception::invalid_parser_state_exception_t::
+    invalid_parser_state_exception_t(const char* message)
+    : parser_container_exception_t(message) {}
+clapp::exception::invalid_parser_state_exception_t::
+    invalid_parser_state_exception_t(const std::string& message)
+    : parser_container_exception_t(message) {}
+clapp::exception::invalid_parser_state_exception_t::
+    invalid_parser_state_exception_t(const invalid_parser_state_exception_t&) =
+        default;
+clapp::exception::invalid_parser_state_exception_t&
+clapp::exception::invalid_parser_state_exception_t::operator=(
+    const invalid_parser_state_exception_t&) = default;
+clapp::exception::invalid_parser_state_exception_t::
+    invalid_parser_state_exception_t(
+        invalid_parser_state_exception_t&&) noexcept = default;
+clapp::exception::invalid_parser_state_exception_t&
+clapp::exception::invalid_parser_state_exception_t::operator=(
+    invalid_parser_state_exception_t&&) noexcept = default;
+clapp::exception::invalid_parser_state_exception_t::
+    ~invalid_parser_state_exception_t() noexcept = default;

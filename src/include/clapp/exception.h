@@ -152,6 +152,46 @@ class no_executable_exception_t : public main_parser_exception_t {
     ~no_executable_exception_t() noexcept override;
 };
 
+class parser_container_exception_t : public parser_exception_t {
+   public:
+    explicit parser_container_exception_t(const char* message);
+    explicit parser_container_exception_t(const std::string& message);
+    parser_container_exception_t(const parser_container_exception_t&);
+    parser_container_exception_t& operator=(
+        const parser_container_exception_t&);
+    parser_container_exception_t(parser_container_exception_t&&) noexcept;
+    parser_container_exception_t& operator=(
+        parser_container_exception_t&&) noexcept;
+    ~parser_container_exception_t() noexcept override;
+};
+
+class not_fully_parsed_exception_t : public parser_container_exception_t {
+   public:
+    explicit not_fully_parsed_exception_t(const char* message);
+    explicit not_fully_parsed_exception_t(const std::string& message);
+    not_fully_parsed_exception_t(const not_fully_parsed_exception_t&);
+    not_fully_parsed_exception_t& operator=(
+        const not_fully_parsed_exception_t&);
+    not_fully_parsed_exception_t(not_fully_parsed_exception_t&&) noexcept;
+    not_fully_parsed_exception_t& operator=(
+        not_fully_parsed_exception_t&&) noexcept;
+    ~not_fully_parsed_exception_t() noexcept override;
+};
+
+class invalid_parser_state_exception_t : public parser_container_exception_t {
+   public:
+    explicit invalid_parser_state_exception_t(const char* message);
+    explicit invalid_parser_state_exception_t(const std::string& message);
+    invalid_parser_state_exception_t(const invalid_parser_state_exception_t&);
+    invalid_parser_state_exception_t& operator=(
+        const invalid_parser_state_exception_t&);
+    invalid_parser_state_exception_t(
+        invalid_parser_state_exception_t&&) noexcept;
+    invalid_parser_state_exception_t& operator=(
+        invalid_parser_state_exception_t&&) noexcept;
+    ~invalid_parser_state_exception_t() noexcept override;
+};
+
 }  // namespace exception
 }  // namespace clapp
 
