@@ -19,6 +19,7 @@
 #include <clapp/filesystem.h>
 
 #include <functional>
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -68,6 +69,18 @@ class not_null_value_t {
     static constexpr std::string_view append_restriction_text() noexcept;
 
     void validate(const T &value, const std::string &param_name) const;
+};
+
+class exit_t {
+   public:
+    [[nodiscard]] static constexpr exit_t exit(int exit_code) noexcept;
+
+    [[nodiscard]] constexpr int get_exit_code() const noexcept;
+
+   private:
+    constexpr exit_t(int exit_code_param) noexcept;
+
+    int exit_code;
 };
 
 class found_func_t {

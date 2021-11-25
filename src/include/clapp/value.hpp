@@ -116,6 +116,18 @@ void clapp::value::not_null_value_t<T>::validate(
     }
 }
 
+constexpr clapp::value::exit_t::exit_t(const int exit_code_param) noexcept
+    : exit_code{exit_code_param} {}
+
+constexpr clapp::value::exit_t clapp::value::exit_t::exit(
+    const int exit_code_param) noexcept {
+    return exit_t{exit_code_param};
+}
+
+constexpr int clapp::value::exit_t::get_exit_code() const noexcept {
+    return exit_code;
+}
+
 #ifdef CLAPP_FS_AVAIL
 constexpr std::string_view
 clapp::path_exists_t::append_restriction_text() noexcept {

@@ -462,6 +462,13 @@ TEST(value, pathExistsT) {
         clapp::exception::path_does_not_exist_t);
 }
 
+TEST(value, exitTExit) {
+    static constexpr int exit_code{0x58};
+    static constexpr clapp::value::exit_t e{
+        clapp::value::exit_t::exit(exit_code)};
+    ASSERT_THAT(e.get_exit_code(), testing::Eq(exit_code));
+}
+
 TEST(value, foundFuncT) {
     std::stringstream ss;
     clapp::value::found_func_t ff{[&ss]() { ss << "called func"; }};
