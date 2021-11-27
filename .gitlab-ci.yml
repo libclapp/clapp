@@ -84,7 +84,7 @@ clang_format:
         - git diff-index --quiet HEAD --
     tags:
         - compiler
-        - ubuntu-21.04-amd64
+        - ubuntu-20.04-amd64
 
 compile_debian_10_amd64:
     tags:
@@ -366,15 +366,15 @@ test_gcov_ubuntu_20.04_arm64:
           artifacts: true
     <<: *test_gcov_definition
 
-compile_ubuntu_21.04_amd64:
+compile_ubuntu_22.04_amd64:
     tags:
         - compiler
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
     parallel:
         matrix:
             - BUILD_TYPE: [Debug, Release]
               COMPILER: clang
-              COMPILER_VERSION: [11, 12]
+              COMPILER_VERSION: [12, 13]
               GENERATOR: ["Unix Makefiles", "Ninja"]
             - BUILD_TYPE: [Debug, Release]
               COMPILER: gcc
@@ -382,34 +382,34 @@ compile_ubuntu_21.04_amd64:
               GENERATOR: ["Unix Makefiles", "Ninja"]
     <<: *compile_definition
 
-test_gcov_ubuntu_21.04_amd64:
+test_gcov_ubuntu_22.04_amd64:
     tags:
         - compiler
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
     parallel:
         matrix:
             - BUILD_TYPE: [Debug, Release]
               COMPILER: clang
-              COMPILER_VERSION: [11, 12]
+              COMPILER_VERSION: [12, 13]
               GENERATOR: ["Unix Makefiles", "Ninja"]
             - BUILD_TYPE: [Debug, Release]
               COMPILER: gcc
               COMPILER_VERSION: [11]
               GENERATOR: ["Unix Makefiles", "Ninja"]
     needs:
-        - job: compile_ubuntu_21.04_amd64
+        - job: compile_ubuntu_22.04_amd64
           artifacts: true
     <<: *test_gcov_definition
 
-compile_ubuntu_21.04_arm64:
+compile_ubuntu_22.04_arm64:
     tags:
         - compiler
-        - ubuntu-21.04-arm64
+        - ubuntu-22.04-arm64
     parallel:
         matrix:
             - BUILD_TYPE: [Debug, Release]
               COMPILER: clang
-              COMPILER_VERSION: [11, 12]
+              COMPILER_VERSION: [12, 13]
               GENERATOR: ["Unix Makefiles", "Ninja"]
             - BUILD_TYPE: [Debug, Release]
               COMPILER: gcc
@@ -417,22 +417,22 @@ compile_ubuntu_21.04_arm64:
               GENERATOR: ["Unix Makefiles", "Ninja"]
     <<: *compile_definition
 
-test_gcov_ubuntu_21.04_arm64:
+test_gcov_ubuntu_22.04_arm64:
     tags:
         - compiler
-        - ubuntu-21.04-arm64
+        - ubuntu-22.04-arm64
     parallel:
         matrix:
             - BUILD_TYPE: [Debug, Release]
               COMPILER: clang
-              COMPILER_VERSION: [11, 12]
+              COMPILER_VERSION: [12, 13]
               GENERATOR: ["Unix Makefiles", "Ninja"]
             - BUILD_TYPE: [Debug, Release]
               COMPILER: gcc
               COMPILER_VERSION: [11]
               GENERATOR: ["Unix Makefiles", "Ninja"]
     needs:
-        - job: compile_ubuntu_21.04_arm64
+        - job: compile_ubuntu_22.04_arm64
           artifacts: true
     <<: *test_gcov_definition
 
@@ -448,15 +448,15 @@ compile_clang_tidy_ubuntu_20.04_amd64:
               GENERATOR: ["Unix Makefiles", "Ninja"]
     <<: *compile_clang_tidy_definition
 
-compile_clang_tidy_ubuntu_21.04_amd64:
+compile_clang_tidy_ubuntu_22.04_amd64:
     tags:
         - compiler
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
     parallel:
         matrix:
             - BUILD_TYPE: [Debug, Release]
               COMPILER: clang
-              COMPILER_VERSION: [11, 12]
+              COMPILER_VERSION: [12, 13]
               GENERATOR: ["Unix Makefiles", "Ninja"]
     <<: *compile_clang_tidy_definition
 
@@ -540,15 +540,15 @@ compile_install_ubuntu_20.04_arm64:
               GENERATOR: ["Unix Makefiles", "Ninja"]
     <<: *compile_install_definition
 
-compile_install_ubuntu_21.04_amd64:
+compile_install_ubuntu_22.04_amd64:
     tags:
         - compiler
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
     parallel:
         matrix:
             - BUILD_TYPE: [Debug, Release]
               COMPILER: clang
-              COMPILER_VERSION: [11, 12]
+              COMPILER_VERSION: [12, 13]
               GENERATOR: ["Unix Makefiles", "Ninja"]
             - BUILD_TYPE: [Debug, Release]
               COMPILER: gcc
@@ -556,15 +556,15 @@ compile_install_ubuntu_21.04_amd64:
               GENERATOR: ["Unix Makefiles", "Ninja"]
     <<: *compile_install_definition
 
-compile_install_ubuntu_21.04_arm64:
+compile_install_ubuntu_22.04_arm64:
     tags:
         - compiler
-        - ubuntu-21.04-arm64
+        - ubuntu-22.04-arm64
     parallel:
         matrix:
             - BUILD_TYPE: [Debug, Release]
               COMPILER: clang
-              COMPILER_VERSION: [11, 12]
+              COMPILER_VERSION: [12, 13]
               GENERATOR: ["Unix Makefiles", "Ninja"]
             - BUILD_TYPE: [Debug, Release]
               COMPILER: gcc
@@ -580,7 +580,7 @@ compile_release_address_leak_sanitizer_gcc11_amd64:
         GENERATOR: "Unix Makefiles"
         ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_ADDRESS=On -DlibClaPP_ENABLE_SANITIZER_LEAK=On"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     <<: *compile_definition
 
@@ -591,7 +591,7 @@ test_release_address_leak_sanitizer_gcc11_amd64:
         BUILD_TYPE: "Release"
         GENERATOR: "Unix Makefiles"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     needs:
         - job: compile_release_address_leak_sanitizer_gcc11_amd64
@@ -606,7 +606,7 @@ compile_debug_address_leak_sanitizer_gcc11_amd64:
         GENERATOR: "Unix Makefiles"
         ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_ADDRESS=On -DlibClaPP_ENABLE_SANITIZER_LEAK=On"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     <<: *compile_definition
 
@@ -617,7 +617,7 @@ test_debug_address_leak_sanitizer_gcc11_amd64:
         BUILD_TYPE: "Release"
         GENERATOR: "Unix Makefiles"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     needs:
         - job: compile_debug_address_leak_sanitizer_gcc11_amd64
@@ -632,7 +632,7 @@ compile_release_thread_sanitizer_gcc11_amd64:
         GENERATOR: "Unix Makefiles"
         ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_THREAD=On"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     <<: *compile_definition
 
@@ -643,7 +643,7 @@ test_release_thread_sanitizer_gcc11_amd64:
         BUILD_TYPE: "Release"
         GENERATOR: "Unix Makefiles"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     needs:
         - job: compile_release_thread_sanitizer_gcc11_amd64
@@ -658,7 +658,7 @@ compile_debug_thread_sanitizer_gcc11_amd64:
         GENERATOR: "Unix Makefiles"
         ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_THREAD=On"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     <<: *compile_definition
 
@@ -669,7 +669,7 @@ test_debug_thread_sanitizer_gcc11_amd64:
         BUILD_TYPE: "Release"
         GENERATOR: "Unix Makefiles"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     needs:
         - job: compile_debug_thread_sanitizer_gcc11_amd64
@@ -684,7 +684,7 @@ compile_release_undefined_behavior_sanitizer_gcc11_amd64:
         GENERATOR: "Unix Makefiles"
         ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_UNDEFINED_BEHAVIOR=On"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     <<: *compile_definition
 
@@ -695,7 +695,7 @@ test_release_undefined_behavior_sanitizer_gcc11_amd64:
         BUILD_TYPE: "Release"
         GENERATOR: "Unix Makefiles"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     needs:
         - job: compile_release_undefined_behavior_sanitizer_gcc11_amd64
@@ -710,7 +710,7 @@ compile_debug_undefined_behavior_sanitizer_gcc11_amd64:
         GENERATOR: "Unix Makefiles"
         ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_UNDEFINED_BEHAVIOR=On"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     <<: *compile_definition
 
@@ -721,165 +721,165 @@ test_debug_undefined_behavior_sanitizer_gcc11_amd64:
         BUILD_TYPE: "Release"
         GENERATOR: "Unix Makefiles"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     needs:
         - job: compile_debug_undefined_behavior_sanitizer_gcc11_amd64
           artifacts: true
     <<: *test_definition
 
-compile_release_address_leak_sanitizer_clang12_amd64:
+compile_release_address_leak_sanitizer_clang13_amd64:
     variables:
         COMPILER: clang
-        COMPILER_VERSION: 12
+        COMPILER_VERSION: 13
         BUILD_TYPE: "Release"
         GENERATOR: "Unix Makefiles"
         ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_ADDRESS=On -DlibClaPP_ENABLE_SANITIZER_LEAK=On"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     <<: *compile_definition
 
-test_release_address_leak_sanitizer_clang12_amd64:
+test_release_address_leak_sanitizer_clang13_amd64:
     variables:
         COMPILER: clang
-        COMPILER_VERSION: 12
+        COMPILER_VERSION: 13
         BUILD_TYPE: "Release"
         GENERATOR: "Unix Makefiles"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     needs:
-        - job: compile_release_address_leak_sanitizer_clang12_amd64
+        - job: compile_release_address_leak_sanitizer_clang13_amd64
           artifacts: true
     <<: *test_definition
 
-compile_debug_address_leak_sanitizer_clang12_amd64:
+compile_debug_address_leak_sanitizer_clang13_amd64:
     variables:
         COMPILER: clang
-        COMPILER_VERSION: 12
+        COMPILER_VERSION: 13
         BUILD_TYPE: "Release"
         GENERATOR: "Unix Makefiles"
         ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_ADDRESS=On -DlibClaPP_ENABLE_SANITIZER_LEAK=On"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     <<: *compile_definition
 
-test_debug_address_leak_sanitizer_clang12_amd64:
+test_debug_address_leak_sanitizer_clang13_amd64:
     variables:
         COMPILER: clang
-        COMPILER_VERSION: 12
+        COMPILER_VERSION: 13
         BUILD_TYPE: "Release"
         GENERATOR: "Unix Makefiles"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     needs:
-        - job: compile_debug_address_leak_sanitizer_clang12_amd64
+        - job: compile_debug_address_leak_sanitizer_clang13_amd64
           artifacts: true
     <<: *test_definition
 
-compile_release_undefined_behavior_sanitizer_clang12_amd64:
+compile_release_undefined_behavior_sanitizer_clang13_amd64:
     variables:
         COMPILER: clang
-        COMPILER_VERSION: 12
+        COMPILER_VERSION: 13
         BUILD_TYPE: "Release"
         GENERATOR: "Unix Makefiles"
         ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_UNDEFINED_BEHAVIOR=On"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     <<: *compile_definition
 
-test_release_undefined_behavior_sanitizer_clang12_amd64:
+test_release_undefined_behavior_sanitizer_clang13_amd64:
     variables:
         COMPILER: clang
-        COMPILER_VERSION: 12
+        COMPILER_VERSION: 13
         BUILD_TYPE: "Release"
         GENERATOR: "Unix Makefiles"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     needs:
-        - job: compile_release_undefined_behavior_sanitizer_clang12_amd64
+        - job: compile_release_undefined_behavior_sanitizer_clang13_amd64
           artifacts: true
     <<: *test_definition
 
-compile_debug_undefined_behavior_sanitizer_clang12_amd64:
+compile_debug_undefined_behavior_sanitizer_clang13_amd64:
     variables:
         COMPILER: clang
-        COMPILER_VERSION: 12
+        COMPILER_VERSION: 13
         BUILD_TYPE: "Release"
         GENERATOR: "Unix Makefiles"
         ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_UNDEFINED_BEHAVIOR=On"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     <<: *compile_definition
 
-test_debug_undefined_behavior_sanitizer_clang12_amd64:
+test_debug_undefined_behavior_sanitizer_clang13_amd64:
     variables:
         COMPILER: clang
-        COMPILER_VERSION: 12
+        COMPILER_VERSION: 13
         BUILD_TYPE: "Release"
         GENERATOR: "Unix Makefiles"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     needs:
-        - job: compile_debug_undefined_behavior_sanitizer_clang12_amd64
+        - job: compile_debug_undefined_behavior_sanitizer_clang13_amd64
           artifacts: true
     <<: *test_definition
 
-compile_release_thread_sanitizer_clang12_amd64:
+compile_release_thread_sanitizer_clang13_amd64:
     variables:
         COMPILER: clang
-        COMPILER_VERSION: 12
+        COMPILER_VERSION: 13
         BUILD_TYPE: "Release"
         GENERATOR: "Unix Makefiles"
         ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_THREAD=On"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     <<: *compile_definition
 
-test_release_thread_sanitizer_clang12_amd64:
+test_release_thread_sanitizer_clang13_amd64:
     variables:
         COMPILER: clang
-        COMPILER_VERSION: 12
+        COMPILER_VERSION: 13
         BUILD_TYPE: "Release"
         GENERATOR: "Unix Makefiles"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     needs:
-        - job: compile_release_thread_sanitizer_clang12_amd64
+        - job: compile_release_thread_sanitizer_clang13_amd64
           artifacts: true
     <<: *test_definition
 
-compile_debug_thread_sanitizer_clang12_amd64:
+compile_debug_thread_sanitizer_clang13_amd64:
     variables:
         COMPILER: clang
-        COMPILER_VERSION: 12
+        COMPILER_VERSION: 13
         BUILD_TYPE: "Release"
         GENERATOR: "Unix Makefiles"
         ADDITIONAL_OPTION: "-DlibClaPP_ENABLE_SANITIZER_THREAD=On"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     <<: *compile_definition
 
-test_debug_thread_sanitizer_clang12_amd64:
+test_debug_thread_sanitizer_clang13_amd64:
     variables:
         COMPILER: clang
-        COMPILER_VERSION: 12
+        COMPILER_VERSION: 13
         BUILD_TYPE: "Release"
         GENERATOR: "Unix Makefiles"
     tags:
-        - ubuntu-21.04-amd64
+        - ubuntu-22.04-amd64
         - compiler
     needs:
-        - job: compile_debug_thread_sanitizer_clang12_amd64
+        - job: compile_debug_thread_sanitizer_clang13_amd64
           artifacts: true
     <<: *test_definition
