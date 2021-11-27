@@ -199,7 +199,7 @@ compile_ubuntu_20.04_amd64:
         matrix:
             - BUILD_TYPE: [Debug, Release]
               COMPILER: clang
-              COMPILER_VERSION: [7, 8, 9, 10]
+              COMPILER_VERSION: [7, 8, 9, 10, 11, 12]
               GENERATOR: ["Unix Makefiles", "Ninja"]
             - BUILD_TYPE: [Debug, Release]
               COMPILER: gcc
@@ -215,7 +215,7 @@ test_gcov_ubuntu_20.04_amd64:
         matrix:
             - BUILD_TYPE: [Debug, Release]
               COMPILER: clang
-              COMPILER_VERSION: [7, 8, 9, 10]
+              COMPILER_VERSION: [7, 8, 9, 10, 11, 12]
               GENERATOR: ["Unix Makefiles", "Ninja"]
             - BUILD_TYPE: [Debug, Release]
               COMPILER: gcc
@@ -234,7 +234,7 @@ compile_ubuntu_20.04_arm64:
         matrix:
             - BUILD_TYPE: [Debug, Release]
               COMPILER: clang
-              COMPILER_VERSION: [7, 8, 9, 10]
+              COMPILER_VERSION: [7, 8, 9, 10, 11, 12]
               GENERATOR: ["Unix Makefiles", "Ninja"]
             - BUILD_TYPE: [Debug, Release]
               COMPILER: gcc
@@ -250,7 +250,7 @@ test_gcov_ubuntu_20.04_arm64:
         matrix:
             - BUILD_TYPE: [Debug, Release]
               COMPILER: clang
-              COMPILER_VERSION: [7, 8, 9, 10]
+              COMPILER_VERSION: [7, 8, 9, 10, 11, 12]
               GENERATOR: ["Unix Makefiles", "Ninja"]
             - BUILD_TYPE: [Debug, Release]
               COMPILER: gcc
