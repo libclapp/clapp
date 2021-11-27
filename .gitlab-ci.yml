@@ -191,6 +191,111 @@ test_gcov_debian_10_armhf:
           artifacts: true
     <<: *test_gcov_definition
 
+compile_debian_11_amd64:
+    tags:
+        - compiler
+        - debian-11-amd64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [9, 11]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [9, 10]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+    <<: *compile_definition
+
+test_gcov_debian_11_amd64:
+    tags:
+        - compiler
+        - debian-11-amd64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [9, 11]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [9, 10]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+    needs:
+        - job: compile_debian_11_amd64
+          artifacts: true
+    <<: *test_gcov_definition
+
+compile_debian_11_arm64:
+    tags:
+        - compiler
+        - debian-11-arm64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [9, 11]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [9, 10]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+    <<: *compile_definition
+
+test_gcov_debian_11_arm64:
+    tags:
+        - compiler
+        - debian-11-arm64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [9, 11]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [9, 10]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+    needs:
+        - job: compile_debian_11_arm64
+          artifacts: true
+    <<: *test_gcov_definition
+
+compile_debian_11_armhf:
+    tags:
+        - compiler
+        - debian-11-armhf
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [9, 11]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [9, 10]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+    <<: *compile_definition
+
+test_gcov_debian_11_armhf:
+    tags:
+        - compiler
+        - debian-11-armhf
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [9, 11]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [9, 10]
+              GENERATOR: ["Unix Makefiles", "Ninja"]
+    needs:
+        - job: compile_debian_11_armhf
+          artifacts: true
+    <<: *test_gcov_definition
+
 compile_ubuntu_20.04_amd64:
     tags:
         - compiler
