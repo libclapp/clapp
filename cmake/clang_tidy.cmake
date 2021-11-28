@@ -26,6 +26,7 @@ if(libClaPP_CLANG_TIDY_BIN)
 
     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "13.0.0")
         list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -altera-unroll-loops)
+        list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -altera-id-dependent-backward-branch)
     endif()
 
     set(libClaPP_CLANG_TIDY_CHECKS ${libClaPP_CLANG_TIDY_CHECKS_LIST})
