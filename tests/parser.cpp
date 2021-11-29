@@ -1603,9 +1603,3 @@ TEST(parser, constructSubParserContainerParseSubparserAndValidate2) {
     ASSERT_THAT(spc.sub_parser.string_option.value(), testing::StrEq("param"));
     ASSERT_NO_THROW(spc.validate());
 }
-
-TEST(parser, callExit) {
-    static constexpr int exit_code{2};
-    ASSERT_EXIT(empty_basic_parser_t::exit(exit_code),
-                ::testing::ExitedWithCode(exit_code), "");
-}

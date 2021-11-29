@@ -578,10 +578,6 @@ clapp::value::exit_t clapp::parser::basic_parser_t::default_print_and_exit(
     return exit_t::exit(exit_code);
 }
 
-[[noreturn]] void clapp::parser::basic_parser_t::exit(const int exit_code) {
-    _exit(exit_code);
-}
-
 void clapp::parser::basic_parser_t::set_print_and_exit_func(
     print_and_exit_func_t&& func) {
     print_and_exit_func = std::move(func);
