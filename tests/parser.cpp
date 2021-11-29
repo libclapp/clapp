@@ -30,17 +30,21 @@ TEST(helpEntry, ConstructAndCompare) {
                 testing::Ne(he));
 }
 
-TEST(purpose, ToCstring) {
-    ASSERT_THAT(clapp::parser::basic_parser_t::to_cstring(
-                    clapp::parser::basic_parser_t::purpose_t::mandatory),
-                testing::StrEq("mandatory"));
-    ASSERT_THAT(clapp::parser::basic_parser_t::to_cstring(
-                    clapp::parser::basic_parser_t::purpose_t::optional),
-                testing::StrEq("optional"));
-    ASSERT_DEATH(
-        clapp::parser::basic_parser_t::to_cstring(
-            static_cast<clapp::parser::basic_parser_t::purpose_t>(128)),
-        "");
+TEST(purpose, ToStringView) {
+    ASSERT_THAT(
+        std::string{clapp::parser::basic_parser_t::to_string_view(
+                        clapp::parser::basic_parser_t::purpose_t::mandatory)
+                        .value()},
+        testing::StrEq("mandatory"));
+    ASSERT_THAT(
+        std::string{clapp::parser::basic_parser_t::to_string_view(
+                        clapp::parser::basic_parser_t::purpose_t::optional)
+                        .value()},
+        testing::StrEq("optional"));
+    ASSERT_THAT(clapp::parser::basic_parser_t::to_string_view(
+                    static_cast<clapp::parser::basic_parser_t::purpose_t>(128))
+                    .has_value(),
+                false);
 }
 
 class optConfT : public ::testing::Test {

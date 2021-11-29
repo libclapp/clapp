@@ -333,15 +333,17 @@ inline bool clapp::parser::basic_parser_t::is_active() const noexcept {
     return true;
 }
 
-inline const char* clapp::parser::basic_parser_t::to_cstring(
+constexpr std::optional<std::string_view>
+clapp::parser::basic_parser_t::to_string_view(
     const purpose_t purpose) noexcept {
+    using namespace std::literals;
     switch (purpose) {
         case purpose_t::optional:
-            return "optional";
+            return "optional"sv;
         case purpose_t::mandatory:
-            return "mandatory";
+            return "mandatory"sv;
     }
-    Expects(false);
+    return std::nullopt;
 }
 
 constexpr std::string_view

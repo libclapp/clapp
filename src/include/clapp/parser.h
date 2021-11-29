@@ -24,6 +24,7 @@
 #include <map>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <variant>
 
 namespace clapp {
@@ -169,7 +170,8 @@ class basic_parser_t {
         std::string description;
     };
 
-    static inline const char* to_cstring(const purpose_t purpose) noexcept;
+    static constexpr std::optional<std::string_view> to_string_view(
+        const purpose_t purpose) noexcept;
 
    protected:
     using long_opt_variant_t =

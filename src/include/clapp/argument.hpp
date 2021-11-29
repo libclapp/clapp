@@ -155,7 +155,8 @@ clapp::argument::gen_arg_conf(CALLBACKS&& callbacks,
     gen_arg_conf_process_params(arg_params,
                                 std::forward<Params>(parameters)...);
 
-    const std::string purpose{basic_parser_t::to_cstring(arg_params.purpose)};
+    const std::string purpose{
+        basic_parser_t::to_string_view(arg_params.purpose).value()};
 
     std::string restriction{std::accumulate(
         arg_params.restrictions.begin(), arg_params.restrictions.end(), purpose,

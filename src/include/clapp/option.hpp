@@ -260,7 +260,8 @@ clapp::option::opt_conf_container_t<T, OPT_CONF> clapp::option::gen_opt_conf1(
     gen_opt_conf_process_params(opt_params,
                                 std::forward<Params>(parameters)...);
 
-    const std::string purpose{basic_parser_t::to_cstring(opt_params.purpose)};
+    const std::string purpose{
+        basic_parser_t::to_string_view(opt_params.purpose).value()};
 
     std::string restriction{std::accumulate(
         opt_params.restrictions.begin(), opt_params.restrictions.end(), purpose,
