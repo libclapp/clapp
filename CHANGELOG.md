@@ -1,3 +1,22 @@
+0.4.0 - 2021-12-05
+==================
+This release contains a major interface-change (at least compared to the 0.3.x- or 0.2.x-series):
+The interface of the `clapp::value::found_func_t::func_t`-callback was changed from `std::function<void()>` to `std::function<std::optional<exit_t>(const std::string &)>`.
+Thus, it supports an optional exit-value which is propagated down to the `parse()`- and `parse_and_validate()`-functions and can be used to determine if the program should exit or not.
+Note: also `basic_help_option_t` uses this mechanism and does not call `::exit()` or `::_exit()` anymore!
+Note: if a found-callback-func returns a value, the parsing-process gets interrupted. Thus, accessing members of the parser after the parsing was interrupted can lead to undefined behavior (you may use a parser-container like `basic_parser_container_t` to prevent this).
+
+Release 0.4.0 contains the following changes:
+---------------------------------------------
+- Sub-parser example ([examples/sub_parser_example.cpp](examples/sub_parser_example.cpp)) uses a new intermediate parser.
+- Introduced new type `clapp::value::exit_t`.
+- Updated `clapp::value::found_func_t::func_t` to use `clapp::value::exit_t` and the name of the option/argument as parameter (`std::function<std::optional<exit_t>(const std::string &)>`).
+- Introduced parser-container `clapp::parser::basic_parser_container_t`: It can be used as a wrapper for a main-parser and ensures that the parser is not used if the parsing-process was interrupted by an exit-request of a found-function.
+- Any calls to `::exit()` or `::_exit()` were removed (not required anymore due to the new found-callback-interface).
+- Replaced internal implementation of `purpose_t`-stringification from `to_cstring()` to `to_string_view()`.
+- Added support for clang-tidy-13.
+- Several changes in gitlab-CI: (updated ubuntu 21.04 to 22.04, added debian 11 pipelines, added clang-11 and clang-12 to ubuntu 20.04)
+
 0.3.1 - 2021-08-17
 ==================
 This release uses the same interfaces (as in 0.3.0).
