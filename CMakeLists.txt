@@ -52,9 +52,6 @@ if(libClaPP_CPPCHECK)
   endif()
 endif()
 
-add_library(ClaPP_OPTIONS INTERFACE)
-target_compile_features(ClaPP_OPTIONS INTERFACE cxx_std_17)
-
 include(cmake/sanitizer.cmake)
 
 add_library(libClaPP_GSL INTERFACE)

@@ -3,7 +3,7 @@ set(libClaPP_INCLUDE_DIRS $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../inclu
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../include>)
 target_include_directories(clapp PRIVATE ${libClaPP_INCLUDE_DIRS}
   SYSTEM INTERFACE ${libClaPP_INCLUDE_DIRS} $<INSTALL_INTERFACE:../include>)
-target_link_libraries(clapp PUBLIC libClaPP_SANITIZER ClaPP_OPTIONS libClaPP_GSL ${libClaPP_CXX_FS_LINKER_FLAG})
+target_link_libraries(clapp PUBLIC libClaPP_SANITIZER libClaPP_GSL ${libClaPP_CXX_FS_LINKER_FLAG})
 target_link_libraries(clapp PRIVATE libClaPP_CXX_COMPILE_OPTIONS)
 set_target_properties(clapp PROPERTIES VERSION "${libClaPP_VERSION}" POSITION_INDEPENDENT_CODE ON)
 if(libClaPP_CLANG_TIDY_ARGS)
