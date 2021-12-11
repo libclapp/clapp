@@ -30,12 +30,13 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang
     string(REPLACE ";" "," libClaPP_LIST_OF_SANITIZERS "${libClaPP_LIST_OF_SANITIZERS}")
 endif()
 
+add_library(libClaPP_SANITIZER INTERFACE)
 if(libClaPP_LIST_OF_SANITIZERS)
     message(STATUS "Using the following sanitizers: ${libClaPP_LIST_OF_SANITIZERS}")
     if(NOT "${libClaPP_LIST_OF_SANITIZERS}" STREQUAL "")
-        target_compile_options(ClaPP_OPTIONS
+        target_compile_options(libClaPP_SANITIZER
                                INTERFACE -fsanitize=${libClaPP_LIST_OF_SANITIZERS})
-        target_link_libraries(ClaPP_OPTIONS
+        target_link_libraries(libClaPP_SANITIZER
                               INTERFACE -fsanitize=${libClaPP_LIST_OF_SANITIZERS})
     endif()
 else()
