@@ -6,20 +6,79 @@ variables:
     GIT_STRATEGY: clone
     GIT_SUBMODULE_STRATEGY: recursive
 
-.compile_install_template: &compile_install_definition
+.usage_cmake_subdir_template: &usage_cmake_subdir_definition
     stage: build
     script:
         - if [ "${COMPILER}" == "gcc" ]; then export CC="gcc-${COMPILER_VERSION}"; export CXX="g++-${COMPILER_VERSION}"; fi
         - if [ "${COMPILER}" == "clang" ]; then export CC="clang-${COMPILER_VERSION}"; export CXX="clang++-${COMPILER_VERSION}"; fi
-        - export GENERATOR_WO_SPACES=$(echo $GENERATOR | tr -s ' ' '_')
-        - export BUILD_DIR="build_${COMPILER}_${COMPILER_VERSION}_${GENERATOR_WO_SPACES}_${BUILD_TYPE}"
-        - echo "Using ${CXX} and ${CC} with ${GENERATOR} to build ${BUILD_TYPE}, build dir ${BUILD_DIR}"
-        - SRC_DIR=`pwd`
-        - mkdir "${BUILD_DIR}"
-        - cd "${BUILD_DIR}"
-        - cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DlibClaPP_SUBMODULE_DEPENDENCIES=On -DlibClaPP_PEDANTIC_COMPILER_FLAGS=On -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -G "${GENERATOR}" ${SRC_DIR}
+        - export BUILD_DIR="build_${COMPILER}_${COMPILER_VERSION}_${BUILD_TYPE}"
+        - echo "Using ${CXX} and ${CC} to build ${BUILD_TYPE}, build dir ${BUILD_DIR}"
+        - mkdir "usage/cmake_subdir/${BUILD_DIR}"
+        - cd "usage/cmake_subdir/${BUILD_DIR}"
+        - cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
+        - cmake --build .
+        - LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib" ./usage_cmake_subdir --help
+
+.usage_cmake_import_template: &usage_cmake_import_definition
+    stage: build
+    script:
+        - if [ "${COMPILER}" == "gcc" ]; then export CC="gcc-${COMPILER_VERSION}"; export CXX="g++-${COMPILER_VERSION}"; fi
+        - if [ "${COMPILER}" == "clang" ]; then export CC="clang-${COMPILER_VERSION}"; export CXX="clang++-${COMPILER_VERSION}"; fi
+        - export BUILD_DIR="build_${COMPILER}_${COMPILER_VERSION}_${BUILD_TYPE}"
+        - echo "Using ${CXX} and ${CC} to build ${BUILD_TYPE}, build dir ${BUILD_DIR}"
+        - mkdir "third_party/GSL/${BUILD_DIR}"
+        - cd "third_party/GSL/${BUILD_DIR}"
+        - cmake -DGSL_CXX_STANDARD="17" -DGSL_TEST=Off -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
         - cmake --build . --target install
-        - echo -e '#include<clapp/main_parser.h>\n#include<clapp/build_info.h>\n#include<iostream>\nint main (int argc, char *argv[]) {\nstd::cout << clapp::build_info::project_name << " v" << clapp::build_info::version << std::endl;\n}' | ${CXX} `pkg-config --libs --cflags libclapp` -I${SRC_DIR}/third_party/GSL/include/ --std=c++17 -o out -x c++ -
+        - mkdir "../../../${BUILD_DIR}"
+        - cd "../../../${BUILD_DIR}"
+        - cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DlibClaPP_PEDANTIC_COMPILER_FLAGS=On -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
+        - cmake --build . --target install
+        - mkdir "../usage/cmake_import/${BUILD_DIR}"
+        - cd "../usage/cmake_import/${BUILD_DIR}"
+        - cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
+        - cmake --build .
+        - LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib" ./usage_cmake_import --help
+
+.usage_cmake_pkgconfig_template: &usage_cmake_pkgconfig_definition
+    stage: build
+    script:
+        - if [ "${COMPILER}" == "gcc" ]; then export CC="gcc-${COMPILER_VERSION}"; export CXX="g++-${COMPILER_VERSION}"; fi
+        - if [ "${COMPILER}" == "clang" ]; then export CC="clang-${COMPILER_VERSION}"; export CXX="clang++-${COMPILER_VERSION}"; fi
+        - export BUILD_DIR="build_${COMPILER}_${COMPILER_VERSION}_${BUILD_TYPE}"
+        - echo "Using ${CXX} and ${CC} to build ${BUILD_TYPE}, build dir ${BUILD_DIR}"
+        - mkdir "third_party/GSL/${BUILD_DIR}"
+        - cd "third_party/GSL/${BUILD_DIR}"
+        - cmake -DGSL_CXX_STANDARD="17" -DGSL_TEST=Off -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
+        - cmake --build . --target install
+        - mkdir "../../../${BUILD_DIR}"
+        - cd "../../../${BUILD_DIR}"
+        - cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DlibClaPP_PEDANTIC_COMPILER_FLAGS=On -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
+        - cmake --build . --target install
+        - mkdir "../usage/cmake_pkgconfig/${BUILD_DIR}"
+        - cd "../usage/cmake_pkgconfig/${BUILD_DIR}"
+        - cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
+        - cmake --build .
+        - LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib" ./usage_cmake_pkgconfig --help
+
+.usage_make_pkgconfig_template: &usage_make_pkgconfig_definition
+    stage: build
+    script:
+        - if [ "${COMPILER}" == "gcc" ]; then export CC="gcc-${COMPILER_VERSION}"; export CXX="g++-${COMPILER_VERSION}"; fi
+        - if [ "${COMPILER}" == "clang" ]; then export CC="clang-${COMPILER_VERSION}"; export CXX="clang++-${COMPILER_VERSION}"; fi
+        - export BUILD_DIR="build_${COMPILER}_${COMPILER_VERSION}_${BUILD_TYPE}"
+        - echo "Using ${CXX} and ${CC} to build ${BUILD_TYPE}, build dir ${BUILD_DIR}"
+        - mkdir "third_party/GSL/${BUILD_DIR}"
+        - cd "third_party/GSL/${BUILD_DIR}"
+        - cmake -DGSL_CXX_STANDARD="17" -DGSL_TEST=Off -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
+        - cmake --build . --target install
+        - mkdir "../../../${BUILD_DIR}"
+        - cd "../../../${BUILD_DIR}"
+        - cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DlibClaPP_PEDANTIC_COMPILER_FLAGS=On -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
+        - cmake --build . --target install
+        - cd ../usage/make_pkgconfig
+        - make
+        - LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib" ./usage_make_pkgconfig --help
 
 .compile_template: &compile_definition
     stage: build
@@ -63,7 +122,7 @@ variables:
         - find -type d -name 'build_*' | grep -v "${BUILD_DIR}" | xargs rm -rf
         - cd "${BUILD_DIR}"
         - ctest -V -R libclapp_tests
-        - gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/ -e doc/ -e ../doc/ --gcov-executable="${GCOV_EXECUTABLE}"
+        - gcovr -r ../ -e ../third_party/ -e ../tests/ -e ../examples/ -e ../usage/ -e doc/ -e ../doc/ --gcov-executable="${GCOV_EXECUTABLE}"
         - ctest -V -E libclapp_tests
     coverage: '/^TOTAL.*\s+(\d+%)$/'
 
@@ -79,7 +138,7 @@ variables:
 clang_format:
     stage: build
     script:
-        - find src tests examples -iname *.h -o -iname *.cpp -o -iname *.c -o -iname *.hpp | xargs clang-format-11 -i
+        - find src tests examples usage -iname *.h -o -iname *.cpp -o -iname *.c -o -iname *.hpp | xargs clang-format-11 -i
         - git diff HEAD
         - git diff-index --quiet HEAD --
     tags:
@@ -460,7 +519,7 @@ compile_clang_tidy_ubuntu_22.04_amd64:
               GENERATOR: ["Unix Makefiles", "Ninja"]
     <<: *compile_clang_tidy_definition
 
-compile_install_debian_10_amd64:
+usage_cmake_subdir_debian_10_amd64:
     tags:
         - compiler
         - debian-10-amd64
@@ -469,14 +528,54 @@ compile_install_debian_10_amd64:
             - BUILD_TYPE: ["Debug", "Release", ""]
               COMPILER: clang
               COMPILER_VERSION: [7]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
             - BUILD_TYPE: ["Debug", "Release", ""]
               COMPILER: gcc
               COMPILER_VERSION: [7, 8]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
-    <<: *compile_install_definition
+    <<: *usage_cmake_subdir_definition
 
-compile_install_debian_10_arm64:
+usage_cmake_import_debian_10_amd64:
+    tags:
+        - compiler
+        - debian-10-amd64
+    parallel:
+        matrix:
+            - BUILD_TYPE: ["Debug", "Release", ""]
+              COMPILER: clang
+              COMPILER_VERSION: [7]
+            - BUILD_TYPE: ["Debug", "Release", ""]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8]
+    <<: *usage_cmake_import_definition
+
+usage_cmake_pkgconfig_debian_10_amd64:
+    tags:
+        - compiler
+        - debian-10-amd64
+    parallel:
+        matrix:
+            - BUILD_TYPE: ["Debug", "Release", ""]
+              COMPILER: clang
+              COMPILER_VERSION: [7]
+            - BUILD_TYPE: ["Debug", "Release", ""]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8]
+    <<: *usage_cmake_pkgconfig_definition
+
+usage_make_pkgconfig_debian_10_amd64:
+    tags:
+        - compiler
+        - debian-10-amd64
+    parallel:
+        matrix:
+            - BUILD_TYPE: ["Debug", "Release", ""]
+              COMPILER: clang
+              COMPILER_VERSION: [7]
+            - BUILD_TYPE: ["Debug", "Release", ""]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8]
+    <<: *usage_make_pkgconfig_definition
+
+usage_cmake_subdir_debian_10_arm64:
     tags:
         - compiler
         - debian-10-arm64
@@ -485,14 +584,54 @@ compile_install_debian_10_arm64:
             - BUILD_TYPE: ["Debug", "Release", ""]
               COMPILER: clang
               COMPILER_VERSION: [7]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
             - BUILD_TYPE: ["Debug", "Release", ""]
               COMPILER: gcc
               COMPILER_VERSION: [7, 8]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
-    <<: *compile_install_definition
+    <<: *usage_cmake_subdir_definition
 
-compile_install_debian_10_armhf:
+usage_cmake_import_debian_10_arm64:
+    tags:
+        - compiler
+        - debian-10-arm64
+    parallel:
+        matrix:
+            - BUILD_TYPE: ["Debug", "Release", ""]
+              COMPILER: clang
+              COMPILER_VERSION: [7]
+            - BUILD_TYPE: ["Debug", "Release", ""]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8]
+    <<: *usage_cmake_import_definition
+
+usage_cmake_pkgconfig_debian_10_arm64:
+    tags:
+        - compiler
+        - debian-10-arm64
+    parallel:
+        matrix:
+            - BUILD_TYPE: ["Debug", "Release", ""]
+              COMPILER: clang
+              COMPILER_VERSION: [7]
+            - BUILD_TYPE: ["Debug", "Release", ""]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8]
+    <<: *usage_cmake_pkgconfig_definition
+
+usage_make_pkgconfig_debian_10_arm64:
+    tags:
+        - compiler
+        - debian-10-arm64
+    parallel:
+        matrix:
+            - BUILD_TYPE: ["Debug", "Release", ""]
+              COMPILER: clang
+              COMPILER_VERSION: [7]
+            - BUILD_TYPE: ["Debug", "Release", ""]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8]
+    <<: *usage_make_pkgconfig_definition
+
+usage_cmake_subdir_debian_10_armhf:
     tags:
         - compiler
         - debian-10-armhf
@@ -501,14 +640,54 @@ compile_install_debian_10_armhf:
             - BUILD_TYPE: ["Debug", "Release", ""]
               COMPILER: clang
               COMPILER_VERSION: [7]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
             - BUILD_TYPE: ["Debug", "Release", ""]
               COMPILER: gcc
               COMPILER_VERSION: [7, 8]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
-    <<: *compile_install_definition
+    <<: *usage_cmake_subdir_definition
 
-compile_install_ubuntu_20.04_amd64:
+usage_cmake_import_debian_10_armhf:
+    tags:
+        - compiler
+        - debian-10-armhf
+    parallel:
+        matrix:
+            - BUILD_TYPE: ["Debug", "Release", ""]
+              COMPILER: clang
+              COMPILER_VERSION: [7]
+            - BUILD_TYPE: ["Debug", "Release", ""]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8]
+    <<: *usage_cmake_import_definition
+
+usage_cmake_pkgconfig_debian_10_armhf:
+    tags:
+        - compiler
+        - debian-10-armhf
+    parallel:
+        matrix:
+            - BUILD_TYPE: ["Debug", "Release", ""]
+              COMPILER: clang
+              COMPILER_VERSION: [7]
+            - BUILD_TYPE: ["Debug", "Release", ""]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8]
+    <<: *usage_cmake_pkgconfig_definition
+
+usage_make_pkgconfig_debian_10_armhf:
+    tags:
+        - compiler
+        - debian-10-armhf
+    parallel:
+        matrix:
+            - BUILD_TYPE: ["Debug", "Release", ""]
+              COMPILER: clang
+              COMPILER_VERSION: [7]
+            - BUILD_TYPE: ["Debug", "Release", ""]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8]
+    <<: *usage_make_pkgconfig_definition
+
+usage_cmake_subdir_ubuntu_20.04_amd64:
     tags:
         - compiler
         - ubuntu-20.04-amd64
@@ -517,14 +696,54 @@ compile_install_ubuntu_20.04_amd64:
             - BUILD_TYPE: [Debug, Release]
               COMPILER: clang
               COMPILER_VERSION: [7, 8, 9, 10]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
             - BUILD_TYPE: [Debug, Release]
               COMPILER: gcc
               COMPILER_VERSION: [7, 8, 9, 10]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
-    <<: *compile_install_definition
+    <<: *usage_cmake_subdir_definition
 
-compile_install_ubuntu_20.04_arm64:
+usage_cmake_import_ubuntu_20.04_amd64:
+    tags:
+        - compiler
+        - ubuntu-20.04-amd64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [7, 8, 9, 10]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8, 9, 10]
+    <<: *usage_cmake_import_definition
+
+usage_cmake_pkgconfig_ubuntu_20.04_amd64:
+    tags:
+        - compiler
+        - ubuntu-20.04-amd64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [7, 8, 9, 10]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8, 9, 10]
+    <<: *usage_cmake_pkgconfig_definition
+
+usage_make_pkgconfig_ubuntu_20.04_amd64:
+    tags:
+        - compiler
+        - ubuntu-20.04-amd64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [7, 8, 9, 10]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8, 9, 10]
+    <<: *usage_make_pkgconfig_definition
+
+usage_cmake_subdir_ubuntu_20.04_arm64:
     tags:
         - compiler
         - ubuntu-20.04-arm64
@@ -533,14 +752,54 @@ compile_install_ubuntu_20.04_arm64:
             - BUILD_TYPE: [Debug, Release]
               COMPILER: clang
               COMPILER_VERSION: [7, 8, 9, 10]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
             - BUILD_TYPE: [Debug, Release]
               COMPILER: gcc
               COMPILER_VERSION: [7, 8, 9, 10]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
-    <<: *compile_install_definition
+    <<: *usage_cmake_subdir_definition
 
-compile_install_ubuntu_22.04_amd64:
+usage_cmake_import_ubuntu_20.04_arm64:
+    tags:
+        - compiler
+        - ubuntu-20.04-arm64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [7, 8, 9, 10]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8, 9, 10]
+    <<: *usage_cmake_import_definition
+
+usage_cmake_pkgconfig_ubuntu_20.04_arm64:
+    tags:
+        - compiler
+        - ubuntu-20.04-arm64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [7, 8, 9, 10]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8, 9, 10]
+    <<: *usage_cmake_pkgconfig_definition
+
+usage_make_pkgconfig_ubuntu_20.04_arm64:
+    tags:
+        - compiler
+        - ubuntu-20.04-arm64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [7, 8, 9, 10]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [7, 8, 9, 10]
+    <<: *usage_make_pkgconfig_definition
+
+usage_cmake_subdir_ubuntu_22.04_amd64:
     tags:
         - compiler
         - ubuntu-22.04-amd64
@@ -549,14 +808,54 @@ compile_install_ubuntu_22.04_amd64:
             - BUILD_TYPE: [Debug, Release]
               COMPILER: clang
               COMPILER_VERSION: [12, 13]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
             - BUILD_TYPE: [Debug, Release]
               COMPILER: gcc
               COMPILER_VERSION: [11]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
-    <<: *compile_install_definition
+    <<: *usage_cmake_subdir_definition
 
-compile_install_ubuntu_22.04_arm64:
+usage_cmake_import_ubuntu_22.04_amd64:
+    tags:
+        - compiler
+        - ubuntu-22.04-amd64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [12, 13]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [11]
+    <<: *usage_cmake_import_definition
+
+usage_cmake_pkgconfig_ubuntu_22.04_amd64:
+    tags:
+        - compiler
+        - ubuntu-22.04-amd64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [12, 13]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [11]
+    <<: *usage_cmake_pkgconfig_definition
+
+usage_make_pkgconfig_ubuntu_22.04_amd64:
+    tags:
+        - compiler
+        - ubuntu-22.04-amd64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [12, 13]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [11]
+    <<: *usage_make_pkgconfig_definition
+
+usage_cmake_subdir_ubuntu_22.04_arm64:
     tags:
         - compiler
         - ubuntu-22.04-arm64
@@ -565,12 +864,52 @@ compile_install_ubuntu_22.04_arm64:
             - BUILD_TYPE: [Debug, Release]
               COMPILER: clang
               COMPILER_VERSION: [12, 13]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
             - BUILD_TYPE: [Debug, Release]
               COMPILER: gcc
               COMPILER_VERSION: [11]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
-    <<: *compile_install_definition
+    <<: *usage_cmake_subdir_definition
+
+usage_cmake_import_ubuntu_22.04_arm64:
+    tags:
+        - compiler
+        - ubuntu-22.04-arm64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [12, 13]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [11]
+    <<: *usage_cmake_import_definition
+
+usage_cmake_pkgconfig_ubuntu_22.04_arm64:
+    tags:
+        - compiler
+        - ubuntu-22.04-arm64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [12, 13]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [11]
+    <<: *usage_cmake_pkgconfig_definition
+
+usage_make_pkgconfig_ubuntu_22.04_arm64:
+    tags:
+        - compiler
+        - ubuntu-22.04-arm64
+    parallel:
+        matrix:
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: clang
+              COMPILER_VERSION: [12, 13]
+            - BUILD_TYPE: [Debug, Release]
+              COMPILER: gcc
+              COMPILER_VERSION: [11]
+    <<: *usage_make_pkgconfig_definition
 
 compile_release_address_leak_sanitizer_gcc11_amd64:
     variables:

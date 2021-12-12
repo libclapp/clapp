@@ -1,7 +1,7 @@
 add_library(libClaPP_gmock_main INTERFACE)
 if(libClaPP_BUILD_TESTS)
     if(libClaPP_SUBMODULE_DEPENDENCIES)
-        if(NOT TARGET gmock_main)
+        if(NOT TARGET GTest::gmock_main)
             add_subdirectory("${THIRD_PARTY_DIR}/googletest" EXCLUDE_FROM_ALL)
             target_compile_features(gtest PUBLIC cxx_std_17)    #changing gtest (and its further libs gmock and gmock_main) to be C++17, otherwise we will get linker error.
         endif()

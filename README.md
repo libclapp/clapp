@@ -91,12 +91,16 @@ Documentation:
 --------------
 A short documentation of libClaPP is available in [doc/doc.md](doc/doc.md).
 
-Example:
---------
+Examples:
+---------
 Some examples can be found in the [examples](examples) folder.
 Additionally, [doc/doc.md](doc/doc.md) also contains a few examples.
 
 For a quick start take a look at [examples/short_example.cpp](examples/short_example.cpp).
+
+Usage:
+------
+Some examples how libClaPP can be used (CMake-subdir, CMake-package, CMake with `pkgconfig`, `make` with `pkgconfig`) can be found in the [usage](usage) folder.
 
 Clang-Tidy:
 -----------
@@ -110,4 +114,4 @@ This project uses a clang-format style based on the Google style (`clang-format-
 
 To format the whole project, use the following command:
 
-    find src tests examples -iname *.h -o -iname *.cpp -o -iname *.c -o -iname *.hpp | xargs clang-format-11 -i
+    find src tests examples usage -iname *.h -o -iname *.cpp -o -iname *.c -o -iname *.hpp | xargs clang-format-11 -i
