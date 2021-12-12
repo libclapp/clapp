@@ -11,6 +11,7 @@ if(libClaPP_CLANG_TIDY_ARGS)
 endif()
 
 install(TARGETS clapp LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+add_library(libClaPP::clapp ALIAS clapp)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     target_compile_options(clapp PRIVATE -Wnull-dereference -Wuseless-cast)
