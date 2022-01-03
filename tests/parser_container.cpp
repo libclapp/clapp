@@ -13,7 +13,7 @@ class example_main_parser2_t : public clapp::parser::basic_main_parser_t {
    public:
     clapp::option::bool_option_t count_option{
         *this, "count", 'c', "Count option.",
-        clapp::basic_parser_t::purpose_t::mandatory};
+        clapp::parser::types::purpose_t::mandatory};
 
     clapp::bool_option_t bo{
         *this, std::vector<std::string>{"bo"}, "Exits if given.",

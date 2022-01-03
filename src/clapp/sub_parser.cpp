@@ -17,10 +17,10 @@
 
 clapp::parser::basic_sub_parser_t::~basic_sub_parser_t() = default;
 
-void clapp::parser::basic_sub_parser_t::sub_parse(arg_iterator begin,
-                                                  arg_iterator end) {
+void clapp::parser::basic_sub_parser_t::sub_parse(types::arg_iterator_t begin,
+                                                  types::arg_iterator_t end) {
     active = true;
-    for (arg_iterator it = begin; it != end;) {
+    for (types::arg_iterator_t it = begin; it != end;) {
         std::string_view option{*it};
         parse_result_t parse_result{parse(option, it, end)};
         it = process_parse_result(it, parse_result);

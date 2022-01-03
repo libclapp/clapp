@@ -13,8 +13,9 @@ class print_and_exit_t {
 };
 
 template <class T, size_t N>
-inline clapp::parser::arg_t sub_parser_make_arg_t(T (&arg)[N]) {
-    return clapp::parser::arg_t{static_cast<const char* const*>(arg), N - 1};
+inline clapp::parser::types::arg_t sub_parser_make_arg_t(T (&arg)[N]) {
+    return clapp::parser::types::arg_t{static_cast<const char* const*>(arg),
+                                       N - 1};
 }
 
 class empty_test_parser_t : public clapp::parser::basic_parser_t {
@@ -73,7 +74,7 @@ class simple_sub_parser_t : public clapp::parser::basic_sub_parser_t {
     using clapp::parser::basic_sub_parser_t::basic_sub_parser_t;
     clapp::option::bool_option_t bool_option{
         *this, "bool", 'b', "Bool option.",
-        basic_parser_t::purpose_t::mandatory};
+        clapp::parser::types::purpose_t::mandatory};
 
     ~simple_sub_parser_t() override;
 };
@@ -103,7 +104,7 @@ class optional_argument_test_sub_parser_t
     : public clapp::parser::basic_parser_t {
    public:
     clapp::argument::string_argument_t string_argument{
-        *this, "arg", "Arg", clapp::basic_parser_t::purpose_t::optional};
+        *this, "arg", "Arg", clapp::parser::types::purpose_t::optional};
 
     ~optional_argument_test_sub_parser_t() override;
 
@@ -123,7 +124,7 @@ TEST(subParser, constructEmptySubParserAndParseEmptyArguments) {
     const std::string description{"sub parser"};
 
     constexpr const char* const argv[]{"sub", nullptr};
-    const clapp::parser::arg_t arg{sub_parser_make_arg_t(argv)};
+    const clapp::parser::types::arg_t arg{sub_parser_make_arg_t(argv)};
 
     empty_test_parser_t etp;
     empty_sub_parser_t sub{etp, sub_parser, description};
@@ -148,7 +149,7 @@ TEST(subParser, constructSimpleSubParserAndParseSubOption) {
     const std::string description{"subbb parser"};
 
     constexpr const char* const argv[]{"subbb", "--bool", nullptr};
-    const clapp::parser::arg_t arg{sub_parser_make_arg_t(argv)};
+    const clapp::parser::types::arg_t arg{sub_parser_make_arg_t(argv)};
 
     simple_test_sub_parser_t stsp;
     simple_sub_parser_t sub{stsp, sub_parser, description};
@@ -179,7 +180,7 @@ TEST(subParser, constructSimpleSubParserAndParseBaseOption) {
     const std::string description{"subbb parser"};
 
     constexpr const char* const argv[]{"--count", "subbb", "-b", nullptr};
-    const clapp::parser::arg_t arg{sub_parser_make_arg_t(argv)};
+    const clapp::parser::types::arg_t arg{sub_parser_make_arg_t(argv)};
 
     simple_test_sub_parser_t stsp;
     simple_sub_parser_t sub{stsp, sub_parser, description};
@@ -254,7 +255,7 @@ TEST(subParser, constructSubParserAfterParsingSubBecomesActive) {
     const std::string sub_parser{"sub"};
     const std::string description{"sub parser"};
     constexpr const char* const argv[]{"sub", nullptr};
-    const clapp::parser::arg_t arg{sub_parser_make_arg_t(argv)};
+    const clapp::parser::types::arg_t arg{sub_parser_make_arg_t(argv)};
 
     empty_test_parser_t etp;
     empty_sub_parser_t sub{etp, sub_parser, description};
@@ -272,7 +273,7 @@ TEST(subParser, constructSubParserAndValidateRecursiveDoNotThrow) {
     const std::string sub_parser{"sub"};
     const std::string description{"sub parser"};
     constexpr const char* const argv[]{"sub", "-b", nullptr};
-    const clapp::parser::arg_t arg{sub_parser_make_arg_t(argv)};
+    const clapp::parser::types::arg_t arg{sub_parser_make_arg_t(argv)};
 
     empty_test_parser_t etp;
     simple_sub_parser_t sub{etp, sub_parser, description};
@@ -286,7 +287,7 @@ TEST(subParser, constructSubParserAndValidateRecursiveDoThrow) {
     const std::string sub_parser{"sub"};
     const std::string description{"sub parser"};
     constexpr const char* const argv[]{"sub", nullptr};
-    const clapp::parser::arg_t arg{sub_parser_make_arg_t(argv)};
+    const clapp::parser::types::arg_t arg{sub_parser_make_arg_t(argv)};
 
     empty_test_parser_t etp;
     simple_sub_parser_t sub{etp, sub_parser, description};

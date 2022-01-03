@@ -36,7 +36,8 @@ class basic_main_parser_t : public basic_parser_t {
     using basic_parser_t::parse;
     [[nodiscard]] std::optional<clapp::value::exit_t> parse(
         int argc, const char* const* argv);
-    [[nodiscard]] std::optional<clapp::value::exit_t> parse(const arg_t& arg);
+    [[nodiscard]] std::optional<clapp::value::exit_t> parse(
+        const types::arg_t& arg);
 
     [[nodiscard]] std::optional<clapp::value::exit_t> parse_and_validate(
         int argc, const char* const* argv);

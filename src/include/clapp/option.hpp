@@ -64,7 +64,7 @@ void clapp::option::gen_opt_conf_process_params(opt_params_t<T>& opt_params,
         opt_params.found.push_back(param);
     }
     if constexpr (std::is_same<typename std::decay<Param>::type,
-                               basic_parser_t::purpose_t>::value) {
+                               parser::types::purpose_t>::value) {
         opt_params.purpose = param;
     }
 }
@@ -79,48 +79,43 @@ void clapp::option::gen_opt_conf_process_params(opt_params_t<T>& opt_params,
 }
 
 template <typename short_option_func_t>
-std::vector<clapp::basic_parser_t::basic_short_opt_conf_t<short_option_func_t>>
+std::vector<clapp::parser::types::basic_short_opt_conf_t<short_option_func_t>>
 clapp::option::gen_short_option(short_option_func_t&& sof,
                                 const std::vector<char>& short_option) {
-    std::vector<
-        clapp::basic_parser_t::basic_short_opt_conf_t<short_option_func_t>>
-        ret;
+    std::vector<parser::types::basic_short_opt_conf_t<short_option_func_t>> ret;
     for (const auto opt : short_option) {
         check_short_option(opt);
         ret.emplace_back(
-            basic_parser_t::basic_short_opt_conf_t<short_option_func_t>{opt,
-                                                                        sof});
+            parser::types::basic_short_opt_conf_t<short_option_func_t>{opt,
+                                                                       sof});
     }
     return ret;
 }
 
 template <typename long_option_func_t>
-std::vector<clapp::basic_parser_t::basic_long_opt_conf_t<long_option_func_t>>
+std::vector<clapp::parser::types::basic_long_opt_conf_t<long_option_func_t>>
 clapp::option::gen_long_option(long_option_func_t&& lof,
                                const std::vector<std::string>& long_option) {
-    std::vector<
-        clapp::basic_parser_t::basic_long_opt_conf_t<long_option_func_t>>
-        ret;
+    std::vector<parser::types::basic_long_opt_conf_t<long_option_func_t>> ret;
     for (const auto& opt : long_option) {
         check_long_option(opt);
         ret.emplace_back(
-            basic_parser_t::basic_long_opt_conf_t<long_option_func_t>{opt,
-                                                                      lof});
+            parser::types::basic_long_opt_conf_t<long_option_func_t>{opt, lof});
     }
     return ret;
 }
 
 template <typename T, typename VALUE_FUNC>
-std::optional<clapp::basic_parser_t::validate_func_t>
+std::optional<clapp::parser::types::validate_func_t>
 clapp::option::gen_opt_validate_func(
     std::optional<VALUE_FUNC>&& value_func_param,
     std::optional<has_value_func_t>&& has_value_func_param,
     std::optional<given_func_t>&& given_func_param,
     std::vector<typename opt_params_t<T>::validate_func_t>&& validate_funcs,
-    const std::string& option_string, const basic_parser_t::purpose_t purpose) {
+    const std::string& option_string, const parser::types::purpose_t purpose) {
     if (!validate_funcs.empty() ||
         purpose ==
-            basic_parser_t::purpose_t::
+            parser::types::purpose_t::
                 mandatory) {  // TODO: get rid of creating a validate function,
                               // for all mandatory options. (this is the parsers
                               // responsibility, just iterate in the parser over
@@ -129,7 +124,7 @@ clapp::option::gen_opt_validate_func(
                 has_value_func = std::move(has_value_func_param),
                 given_func = std::move(given_func_param), option_string,
                 validate_funcs = std::move(validate_funcs)]() {
-            if (purpose == basic_parser_t::purpose_t::mandatory && given_func) {
+            if (purpose == parser::types::purpose_t::mandatory && given_func) {
                 if (!given_func.value()()) {
                     throw clapp::exception::option_param_exception_t(
                         std::string{"Mandatory parameter for option '"} +
@@ -252,9 +247,7 @@ clapp::option::opt_conf_container_t<T, OPT_CONF> clapp::option::gen_opt_conf1(
     const std::vector<char>& short_option, const std::string& description,
     Params&&... parameters) {
     opt_params_t<T> opt_params;
-    if (std::is_same<
-            OPT_CONF,
-            basic_parser_t::basic_parser_t::opt_vector_param_conf_t>::value) {
+    if (std::is_same<OPT_CONF, parser::types::opt_vector_param_conf_t>::value) {
         opt_params.restrictions.push_back("vector option");
     }
 
@@ -262,7 +255,7 @@ clapp::option::opt_conf_container_t<T, OPT_CONF> clapp::option::gen_opt_conf1(
                                 std::forward<Params>(parameters)...);
 
     const std::string purpose{
-        basic_parser_t::to_string_view(opt_params.purpose).value()};
+        types::to_string_view(opt_params.purpose).value()};
 
     std::string restriction{std::accumulate(
         opt_params.restrictions.begin(), opt_params.restrictions.end(), purpose,
@@ -288,25 +281,24 @@ OPT_CONF clapp::option::gen_opt_conf2(
     CALLBACKS&& callbacks, const std::vector<std::string>& long_option,
     const std::vector<char>& short_option,
     std::vector<typename opt_params_t<T>::validate_func_t>&& validate_funcs,
-    const std::string& description, basic_parser_t::purpose_t purpose) {
+    const std::string& description, parser::types::purpose_t purpose) {
     std::string option_string{
         OPT_CONF::create_option_string(short_option, long_option)};
 
     using short_opt_func_t = typename std::decay_t<CALLBACKS>::short_opt_func_t;
     using short_opt_conf_vec_t =
-        std::vector<clapp::parser::basic_parser_t::basic_short_opt_conf_t<
-            short_opt_func_t>>;
+        std::vector<parser::types::basic_short_opt_conf_t<short_opt_func_t>>;
     short_opt_conf_vec_t short_options{
         gen_short_option(std::move(callbacks.soh), short_option)};
 
     using long_opt_func_t = typename std::decay_t<CALLBACKS>::long_opt_func_t;
-    using long_opt_conf_vec_t = std::vector<
-        clapp::parser::basic_parser_t::basic_long_opt_conf_t<long_opt_func_t>>;
+    using long_opt_conf_vec_t =
+        std::vector<parser::types::basic_long_opt_conf_t<long_opt_func_t>>;
     long_opt_conf_vec_t long_options{
         gen_long_option(std::move(callbacks.loh), long_option)};
 
     using optional_validate_func_t =
-        std::optional<basic_parser_t::validate_func_t>;
+        std::optional<parser::types::validate_func_t>;
     optional_validate_func_t opt_validate_func{gen_opt_validate_func<T>(
         std::move(callbacks.value), std::move(callbacks.has_value),
         std::move(callbacks.given), std::move(validate_funcs),
@@ -319,7 +311,7 @@ OPT_CONF clapp::option::gen_opt_conf2(
 template <typename T>
 template <typename... Params>
 clapp::option::basic_param_option_t<T>::basic_param_option_t(
-    clapp::basic_parser_t& parser, Params... parameters) {
+    basic_parser_t& parser, Params... parameters) {
     opt_conf_container_t<T, opt_conf_t> conf{gen_opt_conf<T, opt_conf_t>(
         create_callbacks(this), std::forward<Params>(parameters)...)};
     parser.reg(std::move(conf.opt_conf));
@@ -387,7 +379,7 @@ constexpr bool clapp::option::basic_param_option_t<T>::given() const noexcept {
 template <typename T>
 template <typename... Params>
 clapp::option::basic_vector_param_option_t<T>::basic_vector_param_option_t(
-    clapp::basic_parser_t& parser, Params... parameters) {
+    basic_parser_t& parser, Params... parameters) {
     opt_conf_container_t<T, opt_conf_t> conf{gen_opt_conf<T, opt_conf_t>(
         create_callbacks(this), std::forward<Params>(parameters)...)};
     if (conf.default_value) {
@@ -458,8 +450,7 @@ constexpr bool clapp::option::basic_vector_param_option_t<T>::given()
 template <typename T, T default_value>
 template <typename... Params>
 clapp::option::basic_option_t<T, default_value>::basic_option_t(
-    clapp::basic_parser_t& parser, callbacks_t&& callbacks,
-    Params&&... parameters) {
+    basic_parser_t& parser, callbacks_t&& callbacks, Params&&... parameters) {
     opt_conf_container_t<T, opt_conf_t> conf{gen_opt_conf<T, opt_conf_t>(
         callbacks, std::forward<Params>(parameters)...)};
     parser.reg(std::move(conf.opt_conf));
@@ -492,7 +483,7 @@ constexpr bool clapp::option::basic_option_t<T, default_value>::has_value()
 }
 
 template <typename... Params>
-clapp::option::bool_option_t::bool_option_t(clapp::basic_parser_t& parser,
+clapp::option::bool_option_t::bool_option_t(basic_parser_t& parser,
                                             Params... parameters)
     : clapp::basic_option_t<bool, false>{parser, create_callbacks(this),
                                          std::forward<Params>(parameters)...} {
@@ -516,7 +507,7 @@ clapp::option::basic_help_option_t<EXIT_CODE>::gen_func_print_help_and_req_exit(
 }
 
 template <typename... Params>
-clapp::option::count_option_t::count_option_t(clapp::basic_parser_t& parser,
+clapp::option::count_option_t::count_option_t(basic_parser_t& parser,
                                               Params... parameters)
     : clapp::basic_option_t<std::uint32_t, 0U>{
           parser, create_callbacks(this), std::forward<Params>(parameters)...} {

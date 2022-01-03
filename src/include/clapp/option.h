@@ -36,8 +36,8 @@ using vector_value_func_t = std::function<std::vector<T>(void)>;
 
 template <typename T>
 struct option_callbacks_t {
-    using long_opt_func_t = basic_parser_t::long_opt_func_t;
-    using short_opt_func_t = basic_parser_t::short_opt_func_t;
+    using long_opt_func_t = parser::types::long_opt_func_t;
+    using short_opt_func_t = parser::types::short_opt_func_t;
     long_opt_func_t loh;
     short_opt_func_t soh;
     std::optional<given_func_t> given;
@@ -47,8 +47,8 @@ struct option_callbacks_t {
 
 template <typename T>
 struct option_param_callbacks_t {
-    using long_opt_func_t = basic_parser_t::long_opt_param_func_t;
-    using short_opt_func_t = basic_parser_t::short_opt_param_func_t;
+    using long_opt_func_t = parser::types::long_opt_param_func_t;
+    using short_opt_func_t = parser::types::short_opt_param_func_t;
     long_opt_func_t loh;
     short_opt_func_t soh;
     std::optional<given_func_t> given;
@@ -58,8 +58,8 @@ struct option_param_callbacks_t {
 
 template <typename T>
 struct option_vector_param_callbacks_t {
-    using long_opt_func_t = basic_parser_t::long_opt_param_func_t;
-    using short_opt_func_t = basic_parser_t::short_opt_param_func_t;
+    using long_opt_func_t = parser::types::long_opt_param_func_t;
+    using short_opt_func_t = parser::types::short_opt_param_func_t;
     long_opt_func_t loh;
     short_opt_func_t soh;
     std::optional<given_func_t> given;
@@ -79,7 +79,7 @@ struct opt_params_t {
         std::function<void(const T&, const std::string& option_string)>;
     std::vector<std::string> restrictions{};
     std::vector<validate_func_t> validate_funcs{};
-    basic_parser_t::purpose_t purpose{basic_parser_t::purpose_t::optional};
+    parser::types::purpose_t purpose{parser::types::purpose_t::optional};
     std::optional<T> default_value{};
     std::vector<clapp::value::found_func_t> found{};
 };
@@ -96,7 +96,7 @@ class basic_param_option_t {
    public:
     using value_t = T;
     using callbacks_t = option_param_callbacks_t<T>;
-    using opt_conf_t = basic_parser_t::opt_scalar_param_conf_t;
+    using opt_conf_t = parser::types::opt_scalar_param_conf_t;
 
     template <typename... Params>
     explicit basic_param_option_t(basic_parser_t& parser, Params... parameters);
@@ -128,7 +128,7 @@ class basic_vector_param_option_t {
    public:
     using value_t = T;
     using callbacks_t = option_vector_param_callbacks_t<T>;
-    using opt_conf_t = basic_parser_t::opt_vector_param_conf_t;
+    using opt_conf_t = parser::types::opt_vector_param_conf_t;
 
     template <typename... Params>
     explicit basic_vector_param_option_t(basic_parser_t& parser,
@@ -165,7 +165,7 @@ class basic_option_t {
    public:
     using value_t = T;
     using callbacks_t = option_callbacks_t<T>;
-    using opt_conf_t = basic_parser_t::opt_no_param_conf_t;
+    using opt_conf_t = parser::types::opt_no_param_conf_t;
 
     template <typename... Params>
     basic_option_t(basic_parser_t& parser, callbacks_t&& callbacks,
@@ -251,22 +251,22 @@ void gen_opt_conf_process_params(opt_params_t<T>& opt_params, Param&& param,
                                  Params&&... parameters);
 
 template <typename short_option_func_t>
-std::vector<basic_parser_t::basic_short_opt_conf_t<short_option_func_t>>
+std::vector<parser::types::basic_short_opt_conf_t<short_option_func_t>>
 gen_short_option(short_option_func_t&& sof,
                  const std::vector<char>& short_option);
 
 template <typename long_option_func_t>
-std::vector<basic_parser_t::basic_long_opt_conf_t<long_option_func_t>>
+std::vector<parser::types::basic_long_opt_conf_t<long_option_func_t>>
 gen_long_option(long_option_func_t&& lof,
                 const std::vector<std::string>& long_option);
 
 template <typename T, typename VALUE_FUNC>
-std::optional<basic_parser_t::validate_func_t> gen_opt_validate_func(
+std::optional<parser::types::validate_func_t> gen_opt_validate_func(
     std::optional<VALUE_FUNC>&& value_func_param,
     std::optional<has_value_func_t>&& has_value_func_param,
     std::optional<given_func_t>&& given_func_param,
     std::vector<typename opt_params_t<T>::validate_func_t>&& validate_funcs,
-    const std::string& option_string, basic_parser_t::purpose_t purpose);
+    const std::string& option_string, parser::types::purpose_t purpose);
 
 template <typename T, typename OPT_CONF, typename CALLBACKS, typename T1,
           typename... Params>
@@ -294,7 +294,7 @@ OPT_CONF gen_opt_conf2(
     CALLBACKS&& callbacks, const std::vector<std::string>& long_option,
     const std::vector<char>& short_option,
     std::vector<typename opt_params_t<T>::validate_func_t>&& validate_funcs,
-    const std::string& description, basic_parser_t::purpose_t purpose);
+    const std::string& description, parser::types::purpose_t purpose);
 
 using help_option_t = basic_help_option_t<EXIT_SUCCESS>;
 

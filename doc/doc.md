@@ -69,14 +69,14 @@ Currently, there exist different types of options:
 Examples are `--string-opt='parameter'` or `--string-opt 'parameter'`. 
 * vector-parameter options: These are required, if parameter options can be given multiple times. In this case, the parsed parameters are stored in a `std::vector`. E.g. `--path /tmp/xxx --path=/tmp/yyy`.
 
-As a default, all options are optional. If an option is required, the additional parameter `clapp::purpose_t::mandatory` must be given to the constructor.
+As a default, all options are optional. If an option is required, the additional parameter `clapp::parser::types::purpose_t::mandatory` must be given to the constructor.
 
 A complete colletion of supported options is available in [Complete collection of supported argument or option parameter types](#complete-collection-of-supported-argument-or-option-parameter-types).
 
 Example constructor calls for some different options are the following lines:
 
 ```c++
-clapp::option::uint8_param_option_t{parser_inst, "--long-uint8-param", "a description for an unit8-param", clapp::purpose_t::mandatory};
+clapp::option::uint8_param_option_t{parser_inst, "--long-uint8-param", "a description for an unit8-param", clapp::parser::types::purpose_t::mandatory};
 clapp::option::sec_param_option_t{parser_inst, "-s", "number of seconds"}
 clapp::option::vector_path_param_option_t{parser_inst, "--path", '-p', "a path the the required file", clapp::value::path_exists_t{}};
 clapp::option::vector_path_param_option_t{parser_inst, {"--file", "--f"}, '-f', "a path to the required file", clapp::value::path_exists_t{}};
@@ -120,7 +120,7 @@ Currently, there exist two types of positional arguments:
 * regular arguments: are positional arguments that are either mandatory or optional. Note, that mandatory arguments must be registered before optional arguments. Otherwise, positional arguments can't be assigned uniquely.
 * variadic arguments: sometimes, it is required to give a variable number of arguments. In this case, variadic position argument types can be used. Similar to the optional arguments before, it is required to define all mandatory arguments before variadic arguments are registered. Also note, that optional arguments and variadic arguments can't be used together. In order to make sure, that the arguments can be parsed uniquely.
 
-As a default, all arguments are mandatory. If an argument is optional, the additional parameter `clapp::purpose_t::optional` must be given to the constructor.
+As a default, all arguments are mandatory. If an argument is optional, the additional parameter `clapp::parser::types::purpose_t::optional` must be given to the constructor.
 
 A complete colletion of supported arguments is available in [Complete collection of supported argument or option parameter types](#complete-collection-of-supported-argument-or-option-parameter-types).
 
@@ -129,7 +129,7 @@ Example constructor calls for arguments are the following lines:
 
 ```c++
 clapp::string_argument_t string_arg{parser_inst, "string-arg", "String argument"};
-clapp::int32_argument_t int_arg{parser_inst, "int-arg", "Int argument", clapp::purpose_t::optional};
+clapp::int32_argument_t int_arg{parser_inst, "int-arg", "Int argument", clapp::parser::types::purpose_t::optional};
 clapp::variadic_string_argument_t variadic_string_arg{parser_inst, "variadic-string-arg", "Variadic String argument"};
 ```
 
@@ -365,8 +365,8 @@ As a default (i.e. no mandatory is given), each option is optional!
 Some example options are: 
 
 ```c++
-clapp::option::int32_param_option_t int_opt{ptr_to_parser, "option", 'o', "Description for mandatory option.", clapp::purpose_t::mandatory};
-clapp::option::bool_option_t int_opt{ptr_to_parser, "yes", 'y', "Description for optional option.", clapp::purpose_t::optional};
+clapp::option::int32_param_option_t int_opt{ptr_to_parser, "option", 'o', "Description for mandatory option.", clapp::parser::types::purpose_t::mandatory};
+clapp::option::bool_option_t int_opt{ptr_to_parser, "yes", 'y', "Description for optional option.", clapp::parser::types::purpose_t::optional};
 ```
 
 Arguments can also be mandatory or optional:
@@ -378,8 +378,8 @@ As a default (i.e. no optional is given), each argument is mandatory!
 Some example arguments are: 
 
 ```c++
-clapp::argument::int32_argument_t int_arg{ptr_to_parser, "argument", "Description for mandatory argument.", clapp::purpose_t::mandatory};
-clapp::argument::bool_option_t int_opt{ptr_to_parser, "argument", "Description for optional argument.", clapp::purpose_t::optional};
+clapp::argument::int32_argument_t int_arg{ptr_to_parser, "argument", "Description for mandatory argument.", clapp::parser::types::purpose_t::mandatory};
+clapp::argument::bool_option_t int_opt{ptr_to_parser, "argument", "Description for optional argument.", clapp::parser::types::purpose_t::optional};
 ```
 
 ### Default value:
@@ -393,8 +393,8 @@ A default value is also reflected in the help message, as `(default-value: <valu
 Examples are:
 
 ```c++
-clapp::option::int32_option_t int_opt{ptr_to_parser, "int-option", 'i', "Description for optional option.", clapp::purpose_t::optional, clapp::value::default_value_t{10}};
-clapp::option::string_argument_t string_arg{ptr_to_parser, "string-argument", "Description for optional argument.", clapp::purpose_t::optional, clapp::value::default_value_t{"default-string"}};
+clapp::option::int32_option_t int_opt{ptr_to_parser, "int-option", 'i', "Description for optional option.", clapp::parser::types::purpose_t::optional, clapp::value::default_value_t{10}};
+clapp::option::string_argument_t string_arg{ptr_to_parser, "string-argument", "Description for optional argument.", clapp::parser::types::purpose_t::optional, clapp::value::default_value_t{"default-string"}};
 ```
 
 ### Min/Max value:

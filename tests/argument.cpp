@@ -8,12 +8,12 @@ class argument_test_parser_t : public clapp::parser::basic_parser_t {
    public:
     ~argument_test_parser_t() override;
 
-    using clapp::parser::basic_parser_t::purpose_t;
-
-    using clapp::parser::basic_parser_t::argument_descriptions_vec_t;
-    using clapp::parser::basic_parser_t::argument_func_t;
-    using clapp::parser::basic_parser_t::argument_type_t;
-    using clapp::parser::basic_parser_t::validate_func_vec_t;
+    using purpose_t = clapp::parser::types::purpose_t;
+    using argument_func_t = clapp::parser::types::argument_func_t;
+    using argument_type_t = clapp::parser::types::argument_type_t;
+    using argument_descriptions_vec_t =
+        clapp::parser::basic_parser_t::argument_descriptions_vec_t;
+    using validate_func_t = clapp::parser::types::validate_func_t;
 
     using clapp::parser::basic_parser_t::get_argument_help;
     using clapp::parser::basic_parser_t::get_arguments;
@@ -34,9 +34,9 @@ class tiny_sub_parser_t : public clapp::parser::basic_sub_parser_t {
 tiny_sub_parser_t::~tiny_sub_parser_t() = default;
 
 template <typename ARGUMENT_T>
-static std::optional<argument_test_parser_t::variant_arg_conf_t>
+static std::optional<clapp::parser::types::variant_arg_conf_t>
 contains_argument(
-    std::vector<argument_test_parser_t::variant_arg_conf_t>& arguments,
+    std::vector<clapp::parser::types::variant_arg_conf_t>& arguments,
     ARGUMENT_T&& argument) {
     for (const auto& arg : arguments) {
         const bool found{std::visit(
@@ -52,16 +52,16 @@ contains_argument(
 }
 
 template <typename ARGUMENT_T, typename RESULT_LISTENER_T>
-static std::optional<argument_test_parser_t::variant_arg_conf_t>
+static std::optional<clapp::parser::types::variant_arg_conf_t>
 contains_argument(
-    std::vector<argument_test_parser_t::variant_arg_conf_t>& arguments,
+    std::vector<clapp::parser::types::variant_arg_conf_t>& arguments,
     ARGUMENT_T&& argument, RESULT_LISTENER_T&& result_listener) {
     if (arguments.empty()) {
         *result_listener
             << "Parser-arguments doesn't contain any arguments at all.";
         return std::nullopt;
     }
-    std::optional<argument_test_parser_t::variant_arg_conf_t> ret{
+    std::optional<clapp::parser::types::variant_arg_conf_t> ret{
         contains_argument(arguments, std::forward<ARGUMENT_T>(argument))};
     if (!ret) {
         *result_listener << "Parser-arguments doesn't contain argument '"
@@ -72,9 +72,9 @@ contains_argument(
 }
 
 MATCHER_P(ContainsArgument, argument, "Checks, if argument is contained.") {
-    std::vector<clapp::parser::basic_parser_t::variant_arg_conf_t> arguments{
+    std::vector<clapp::parser::types::variant_arg_conf_t> arguments{
         arg.get_arguments()};
-    std::optional<clapp::parser::basic_parser_t::variant_arg_conf_t> found_arg{
+    std::optional<clapp::parser::types::variant_arg_conf_t> found_arg{
         contains_argument(arguments, argument, result_listener)};
     if (found_arg == std::nullopt) {
         return false;
@@ -177,9 +177,9 @@ argument_test_parser_t::~argument_test_parser_t() = default;
 template <typename ARG_FUNC_T>
 static ARG_FUNC_T get_arg_func(argument_test_parser_t& atp,
                                const std::string& argument) {
-    std::vector<argument_test_parser_t::variant_arg_conf_t> arguments{
+    std::vector<clapp::parser::types::variant_arg_conf_t> arguments{
         atp.get_arguments()};
-    std::optional<argument_test_parser_t::variant_arg_conf_t> found_arg{
+    std::optional<clapp::parser::types::variant_arg_conf_t> found_arg{
         contains_argument(arguments, argument)};
     if (found_arg == std::nullopt) {
         throw std::runtime_error("no argument with '" + argument +
@@ -200,9 +200,9 @@ template <typename ARGUMENT_T>
 static std::optional<argument_test_parser_t::validate_func_t> get_validate_func(
     argument_test_parser_t& atp, ARGUMENT_T&& argument) {
     std::string argument_string{argument};
-    std::vector<argument_test_parser_t::variant_arg_conf_t> arguments{
+    std::vector<clapp::parser::types::variant_arg_conf_t> arguments{
         atp.get_arguments()};
-    std::optional<argument_test_parser_t::variant_arg_conf_t> found_arg{
+    std::optional<clapp::parser::types::variant_arg_conf_t> found_arg{
         contains_argument(arguments,
                           std::forward<decltype(argument)>(argument))};
     if (found_arg == std::nullopt) {
@@ -493,7 +493,7 @@ TEST_F(argumentT, boolArgumentConstructOptionalStrWithNotNullValue) {
 TEST_F(argumentT, boolArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::bool_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
@@ -501,7 +501,7 @@ TEST_F(argumentT, boolArgumentConstructOptionalStrAndCallGetOptionHelp) {
     clapp::argument::bool_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
@@ -592,7 +592,7 @@ TEST_F(argumentT,
        variadicBoolArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::variadic_bool_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ", " +
                                   variadic_argument_desc_restriction + ")"}}));
 }
@@ -737,7 +737,7 @@ TEST_F(argumentT, stringArgumentConstructStrWithDefaultValueAndCallArgFunc) {
 TEST_F(argumentT, stringArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::string_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
@@ -745,7 +745,7 @@ TEST_F(argumentT, stringArgumentConstructOptionalStrAndCallGetOptionHelp) {
     clapp::argument::string_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
@@ -824,7 +824,7 @@ TEST_F(argumentT, variadicStringArgumentConstructCStrWithoutCallArgFunc) {
 TEST_F(argumentT, variadicStringArgumentConstructStrAndCallGetOptionHelp) {
     clapp::argument::variadic_string_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ", " +
                                   variadic_argument_desc_restriction + ")"}}));
 }
@@ -925,7 +925,7 @@ TEST_F(argumentT, int64ArgumentConstructStrWithDefaultValueAndCallArgFunc) {
 TEST_F(argumentT, int64ArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::int64_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
@@ -933,7 +933,7 @@ TEST_F(argumentT, int64ArgumentConstructOptionalStrAndCallGetOptionHelp) {
     clapp::argument::int64_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
@@ -1062,7 +1062,7 @@ TEST_F(argumentT,
        variadicInt64ArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::variadic_int64_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ", " +
                                   variadic_argument_desc_restriction + ")"}}));
 }
@@ -1215,7 +1215,7 @@ TEST_F(argumentT, uint64ArgumentConstructStrWithDefaultValueAndCallArgFunc) {
 TEST_F(argumentT, uint64ArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::uint64_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
@@ -1223,7 +1223,7 @@ TEST_F(argumentT, uint64ArgumentConstructOptionalStrAndCallGetOptionHelp) {
     clapp::argument::uint64_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
@@ -1338,7 +1338,7 @@ TEST_F(argumentT,
        variadicUint64ArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::variadic_uint64_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ", " +
                                   variadic_argument_desc_restriction + ")"}}));
 }
@@ -1439,7 +1439,7 @@ TEST_F(argumentT, int32ArgumentConstructStrWithDefaultValueAndCallArgFunc) {
 TEST_F(argumentT, int32ArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::int32_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
@@ -1447,7 +1447,7 @@ TEST_F(argumentT, int32ArgumentConstructOptionalStrAndCallGetOptionHelp) {
     clapp::argument::int32_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
@@ -1527,7 +1527,7 @@ TEST_F(argumentT,
        variadicInt32ArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::variadic_int32_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ", " +
                                   variadic_argument_desc_restriction + ")"}}));
 }
@@ -1628,7 +1628,7 @@ TEST_F(argumentT, uint32ArgumentConstructStrWithDefaultValueAndCallArgFunc) {
 TEST_F(argumentT, uint32ArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::uint32_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
@@ -1636,7 +1636,7 @@ TEST_F(argumentT, uint32ArgumentConstructOptionalStrAndCallGetOptionHelp) {
     clapp::argument::uint32_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
@@ -1716,7 +1716,7 @@ TEST_F(argumentT,
        variadicUint32ArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::variadic_uint32_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ", " +
                                   variadic_argument_desc_restriction + ")"}}));
 }
@@ -1817,7 +1817,7 @@ TEST_F(argumentT, int16ArgumentConstructStrWithDefaultValueAndCallArgFunc) {
 TEST_F(argumentT, int16ArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::int16_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
@@ -1825,7 +1825,7 @@ TEST_F(argumentT, int16ArgumentConstructOptionalStrAndCallGetOptionHelp) {
     clapp::argument::int16_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
@@ -1905,7 +1905,7 @@ TEST_F(argumentT,
        variadicInt16ArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::variadic_int16_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ", " +
                                   variadic_argument_desc_restriction + ")"}}));
 }
@@ -2006,7 +2006,7 @@ TEST_F(argumentT, uint16ArgumentConstructStrWithDefaultValueAndCallArgFunc) {
 TEST_F(argumentT, uint16ArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::uint16_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
@@ -2014,7 +2014,7 @@ TEST_F(argumentT, uint16ArgumentConstructOptionalStrAndCallGetOptionHelp) {
     clapp::argument::uint16_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
@@ -2094,7 +2094,7 @@ TEST_F(argumentT,
        variadicUint16ArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::variadic_uint16_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ", " +
                                   variadic_argument_desc_restriction + ")"}}));
 }
@@ -2195,7 +2195,7 @@ TEST_F(argumentT, int8ArgumentConstructStrWithDefaultValueAndCallArgFunc) {
 TEST_F(argumentT, int8ArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::int8_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
@@ -2203,7 +2203,7 @@ TEST_F(argumentT, int8ArgumentConstructOptionalStrAndCallGetOptionHelp) {
     clapp::argument::int8_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
@@ -2279,7 +2279,7 @@ TEST_F(argumentT,
        variadicInt8ArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::variadic_int8_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ", " +
                                   variadic_argument_desc_restriction + ")"}}));
 }
@@ -2380,7 +2380,7 @@ TEST_F(argumentT, uint8ArgumentConstructStrWithDefaultValueAndCallArgFunc) {
 TEST_F(argumentT, uint8ArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::uint8_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
@@ -2388,7 +2388,7 @@ TEST_F(argumentT, uint8ArgumentConstructOptionalStrAndCallGetOptionHelp) {
     clapp::argument::uint8_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
@@ -2468,7 +2468,7 @@ TEST_F(argumentT,
        variadicUint8ArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::variadic_uint8_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ", " +
                                   variadic_argument_desc_restriction + ")"}}));
 }
@@ -2569,7 +2569,7 @@ TEST_F(argumentT, ptrdiffArgumentConstructStrWithDefaultValueAndCallArgFunc) {
 TEST_F(argumentT, ptrdiffArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::ptrdiff_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
@@ -2577,7 +2577,7 @@ TEST_F(argumentT, ptrdiffArgumentConstructOptionalStrAndCallGetOptionHelp) {
     clapp::argument::ptrdiff_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
@@ -2658,7 +2658,7 @@ TEST_F(argumentT,
        variadicPtrdiffArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::variadic_ptrdiff_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ", " +
                                   variadic_argument_desc_restriction + ")"}}));
 }
@@ -2759,7 +2759,7 @@ TEST_F(argumentT, sizeArgumentConstructStrWithDefaultValueAndCallArgFunc) {
 TEST_F(argumentT, sizeArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::size_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
@@ -2767,7 +2767,7 @@ TEST_F(argumentT, sizeArgumentConstructOptionalStrAndCallGetOptionHelp) {
     clapp::argument::size_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
@@ -2843,7 +2843,7 @@ TEST_F(argumentT,
        variadicSizeArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::variadic_size_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ", " +
                                   variadic_argument_desc_restriction + ")"}}));
 }
@@ -2944,7 +2944,7 @@ TEST_F(argumentT, floatArgumentConstructStrWithDefaultValueAndCallArgFunc) {
 TEST_F(argumentT, floatArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::float_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
@@ -2952,7 +2952,7 @@ TEST_F(argumentT, floatArgumentConstructOptionalStrAndCallGetOptionHelp) {
     clapp::argument::float_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
@@ -3032,7 +3032,7 @@ TEST_F(argumentT,
        variadicFloatArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::variadic_float_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ", " +
                                   variadic_argument_desc_restriction + ")"}}));
 }
@@ -3135,7 +3135,7 @@ TEST_F(argumentT, doubleArgumentConstructStrWithDefaultValueAndCallArgFunc) {
 TEST_F(argumentT, doubleArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::double_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
@@ -3143,7 +3143,7 @@ TEST_F(argumentT, doubleArgumentConstructOptionalStrAndCallGetOptionHelp) {
     clapp::argument::double_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
@@ -3225,7 +3225,7 @@ TEST_F(argumentT,
        variadicDoubleArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::variadic_double_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ", " +
                                   variadic_argument_desc_restriction + ")"}}));
 }
@@ -3326,7 +3326,7 @@ TEST_F(argumentT, nsArgumentConstructStrWithDefaultValueAndCallArgFunc) {
 TEST_F(argumentT, nsArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::ns_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
@@ -3334,7 +3334,7 @@ TEST_F(argumentT, nsArgumentConstructOptionalStrAndCallGetOptionHelp) {
     clapp::argument::ns_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
@@ -3414,7 +3414,7 @@ TEST_F(argumentT, variadicNsArgumentConstructCStrWithoutCallArgFunc) {
 TEST_F(argumentT, variadicNsArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::variadic_ns_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ", " +
                                   variadic_argument_desc_restriction + ")"}}));
 }
@@ -3515,7 +3515,7 @@ TEST_F(argumentT, usArgumentConstructStrWithDefaultValueAndCallArgFunc) {
 TEST_F(argumentT, usArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::us_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
@@ -3523,7 +3523,7 @@ TEST_F(argumentT, usArgumentConstructOptionalStrAndCallGetOptionHelp) {
     clapp::argument::us_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
@@ -3603,7 +3603,7 @@ TEST_F(argumentT, variadicUsArgumentConstructCStrWithoutCallArgFunc) {
 TEST_F(argumentT, variadicUsArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::variadic_us_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ", " +
                                   variadic_argument_desc_restriction + ")"}}));
 }
@@ -3705,7 +3705,7 @@ TEST_F(argumentT, msArgumentConstructStrWithDefaultValueAndCallArgFunc) {
 TEST_F(argumentT, msArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::ms_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
@@ -3713,7 +3713,7 @@ TEST_F(argumentT, msArgumentConstructOptionalStrAndCallGetOptionHelp) {
     clapp::argument::ms_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
@@ -3793,7 +3793,7 @@ TEST_F(argumentT, variadicMsArgumentConstructCStrWithoutCallArgFunc) {
 TEST_F(argumentT, variadicMsArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::variadic_ms_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ", " +
                                   variadic_argument_desc_restriction + ")"}}));
 }
@@ -3895,7 +3895,7 @@ TEST_F(argumentT, secArgumentConstructStrWithDefaultValueAndCallArgFunc) {
 TEST_F(argumentT, secArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::sec_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
@@ -3903,7 +3903,7 @@ TEST_F(argumentT, secArgumentConstructOptionalStrAndCallGetOptionHelp) {
     clapp::argument::sec_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
@@ -3981,7 +3981,7 @@ TEST_F(argumentT,
        variadicSecArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::variadic_sec_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ", " +
                                   variadic_argument_desc_restriction + ")"}}));
 }
@@ -4083,7 +4083,7 @@ TEST_F(argumentT, minArgumentConstructStrWithDefaultValueAndCallArgFunc) {
 TEST_F(argumentT, minArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::min_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
@@ -4091,7 +4091,7 @@ TEST_F(argumentT, minArgumentConstructOptionalStrAndCallGetOptionHelp) {
     clapp::argument::min_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
@@ -4168,7 +4168,7 @@ TEST_F(argumentT,
        variadicMinArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::variadic_min_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ", " +
                                   variadic_argument_desc_restriction + ")"}}));
 }
@@ -4270,7 +4270,7 @@ TEST_F(argumentT, hoursArgumentConstructStrWithDefaultValueAndCallArgFunc) {
 TEST_F(argumentT, hoursArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::hours_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
@@ -4278,7 +4278,7 @@ TEST_F(argumentT, hoursArgumentConstructOptionalStrAndCallGetOptionHelp) {
     clapp::argument::hours_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
@@ -4360,7 +4360,7 @@ TEST_F(argumentT,
        variadicHoursArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::variadic_hours_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ", " +
                                   variadic_argument_desc_restriction + ")"}}));
 }
@@ -4464,7 +4464,7 @@ TEST_F(argumentT, pathArgumentConstructStrWithDefaultValueAndCallArgFunc) {
 TEST_F(argumentT, pathArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::path_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ")"}}));
 }
 
@@ -4472,7 +4472,7 @@ TEST_F(argumentT, pathArgumentConstructOptionalStrAndCallGetOptionHelp) {
     clapp::argument::path_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
@@ -4548,7 +4548,7 @@ TEST_F(argumentT,
        variadicPathArgumentConstructMandatoryStrAndCallGetOptionHelp) {
     clapp::argument::variadic_path_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp.get_argument_help(),
-                testing::ContainerEq(argument_test_parser_t::help_entry_vec_t{
+                testing::ContainerEq(clapp::parser::types::help_entry_vec_t{
                     {arg_str, desc_str + " (" + purpose_mandatory_str + ", " +
                                   variadic_argument_desc_restriction + ")"}}));
 }

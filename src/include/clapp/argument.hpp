@@ -72,7 +72,7 @@ void clapp::argument::gen_arg_conf_process_params(arg_params_t<T>& arg_params,
         arg_params.found.push_back(param);
     }
     if constexpr (std::is_same<typename std::decay<Param>::type,
-                               basic_parser_t::purpose_t>::value) {
+                               parser::types::purpose_t>::value) {
         arg_params.purpose = param;
     }
 }
@@ -87,18 +87,18 @@ void clapp::argument::gen_arg_conf_process_params(arg_params_t<T>& arg_params,
 }
 
 template <typename T, typename VALUE_FUNC>
-std::optional<clapp::basic_parser_t::validate_func_t>
+std::optional<clapp::parser::types::validate_func_t>
 clapp::argument::gen_arg_validate_func(
     std::optional<VALUE_FUNC>&& vf, std::optional<has_value_func_t>&& hvf,
     std::optional<given_func_t>&& gf,
     std::vector<typename arg_params_t<T>::validate_func_t>&& validate_funcs,
-    const std::string& argument_name, const basic_parser_t::purpose_t purpose) {
+    const std::string& argument_name, const parser::types::purpose_t purpose) {
     if (validate_funcs.size() > 0 ||
-        purpose == basic_parser_t::purpose_t::mandatory) {
+        purpose == parser::types::purpose_t::mandatory) {
         return [purpose, value_func = std::move(vf),
                 has_value_func = std::move(hvf), given_func = std::move(gf),
                 argument_name, validate_funcs = std::move(validate_funcs)]() {
-            if (purpose == basic_parser_t::purpose_t::mandatory && given_func) {
+            if (purpose == parser::types::purpose_t::mandatory && given_func) {
                 if (!given_func.value()()) {
                     throw clapp::exception::argument_exception_t(
                         std::string{"Mandatory argument '"} + argument_name +
@@ -147,9 +147,9 @@ template <typename T, typename ARG_CONF, typename CALLBACKS>
 ARG_CONF clapp::argument::gen_arg_conf(
     CALLBACKS&& callbacks, const std::string& argument_name,
     std::vector<typename arg_params_t<T>::validate_func_t>&& validate_funcs,
-    const std::string& description, basic_parser_t::purpose_t purpose) {
+    const std::string& description, parser::types::purpose_t purpose) {
     using optional_arg_validate_func_t =
-        std::optional<basic_parser_t::validate_func_t>;
+        std::optional<parser::types::validate_func_t>;
     optional_arg_validate_func_t arg_validate_func{gen_arg_validate_func<T>(
         std::move(callbacks.value), std::move(callbacks.has_value),
         std::move(callbacks.given), std::move(validate_funcs), argument_name,
@@ -166,7 +166,7 @@ clapp::argument::gen_arg_conf(CALLBACKS&& callbacks,
                               const std::string& description,
                               Params&&... parameters) {
     arg_params_t<T> arg_params;
-    if (std::is_same<ARG_CONF, basic_parser_t::variadic_arg_conf_t>::value) {
+    if (std::is_same<ARG_CONF, parser::types::variadic_arg_conf_t>::value) {
         arg_params.restrictions.push_back(
             clapp::argument::basic_variadic_argument_t<
                 T>::variadic_argument_restrictions());
@@ -175,7 +175,7 @@ clapp::argument::gen_arg_conf(CALLBACKS&& callbacks,
                                 std::forward<Params>(parameters)...);
 
     const std::string purpose{
-        basic_parser_t::to_string_view(arg_params.purpose).value()};
+        parser::types::to_string_view(arg_params.purpose).value()};
 
     std::string restriction{std::accumulate(
         arg_params.restrictions.begin(), arg_params.restrictions.end(), purpose,
@@ -211,7 +211,7 @@ clapp::argument::basic_argument_t<T>::create_callbacks(
 template <typename T>
 template <typename... Params>
 clapp::argument::basic_argument_t<T>::basic_argument_t(
-    clapp::basic_parser_t& parser, const std::string& argument_name,
+    basic_parser_t& parser, const std::string& argument_name,
     const std::string& description, Params&&... parameters)
     : _argument_name{argument_name} {
     arg_conf_container_t<T, arg_conf_t> conf{gen_arg_conf<T, arg_conf_t>(
@@ -274,7 +274,7 @@ clapp::argument::basic_variadic_argument_t<T>::create_callbacks(
 template <typename T>
 template <typename... Params>
 clapp::argument::basic_variadic_argument_t<T>::basic_variadic_argument_t(
-    clapp::basic_parser_t& parser, const std::string& argument_name,
+    basic_parser_t& parser, const std::string& argument_name,
     const std::string& description, Params&&... parameters)
     : _argument_name{argument_name} {
     arg_conf_container_t<T, arg_conf_t> conf{gen_arg_conf<T, arg_conf_t>(

@@ -37,7 +37,7 @@ using variadic_value_func_t = std::function<std::vector<T>(void)>;
 
 template <typename T>
 struct argument_callbacks_t {
-    using argument_func_t = basic_parser_t::argument_func_t;
+    using argument_func_t = parser::types::argument_func_t;
     argument_func_t af;
     std::optional<given_func_t> given;
     std::optional<has_value_func_t> has_value;
@@ -46,7 +46,7 @@ struct argument_callbacks_t {
 
 template <typename T>
 struct variadic_argument_callbacks_t {
-    using argument_func_t = basic_parser_t::argument_func_t;
+    using argument_func_t = parser::types::argument_func_t;
     argument_func_t af;
     std::optional<given_func_t> given;
     std::optional<has_value_func_t> has_value;
@@ -59,7 +59,7 @@ struct arg_params_t {
         std::function<void(const T&, const std::string& option_string)>;
     std::vector<std::string> restrictions{};
     std::vector<validate_func_t> validate_funcs{};
-    basic_parser_t::purpose_t purpose{basic_parser_t::purpose_t::mandatory};
+    parser::types::purpose_t purpose{parser::types::purpose_t::mandatory};
     std::optional<T> default_value{};
     std::vector<clapp::value::found_func_t> found{};
 };
@@ -82,17 +82,17 @@ void gen_arg_conf_process_params(arg_params_t<T>& arg_params, Param&& param,
                                  Params&&... parameters);
 
 template <typename T, typename VALUE_FUNC>
-std::optional<basic_parser_t::validate_func_t> gen_arg_validate_func(
+std::optional<parser::types::validate_func_t> gen_arg_validate_func(
     std::optional<VALUE_FUNC>&& vf, std::optional<has_value_func_t>&& hvf,
     std::optional<given_func_t>&& gf,
     std::vector<typename arg_params_t<T>::validate_func_t>&& validate_funcs,
-    const std::string& argument_name, const basic_parser_t::purpose_t purpose);
+    const std::string& argument_name, const parser::types::purpose_t purpose);
 
 template <typename T, typename ARG_CONF, typename CALLBACKS>
 ARG_CONF gen_arg_conf(
     CALLBACKS&& callbacks, const std::string& argument_name,
     std::vector<typename arg_params_t<T>::validate_func_t>&& validate_funcs,
-    const std::string& description, basic_parser_t::purpose_t purpose);
+    const std::string& description, parser::types::purpose_t purpose);
 
 template <typename T, typename ARG_CONF, typename CALLBACKS, typename... Params>
 arg_conf_container_t<T, ARG_CONF> gen_arg_conf(CALLBACKS&& callbacks,
@@ -105,7 +105,7 @@ class basic_argument_t {
    public:
     using value_t = T;
     using callbacks_t = argument_callbacks_t<T>;
-    using arg_conf_t = basic_parser_t::single_arg_conf_t;
+    using arg_conf_t = parser::types::single_arg_conf_t;
 
     template <typename... Params>
     basic_argument_t(basic_parser_t& parser, const std::string& argument_name,
@@ -139,7 +139,7 @@ class basic_variadic_argument_t {
    public:
     using value_t = T;
     using callbacks_t = variadic_argument_callbacks_t<T>;
-    using arg_conf_t = basic_parser_t::variadic_arg_conf_t;
+    using arg_conf_t = parser::types::variadic_arg_conf_t;
 
     template <typename... Params>
     basic_variadic_argument_t(basic_parser_t& parser,
