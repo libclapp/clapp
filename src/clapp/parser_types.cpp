@@ -30,3 +30,55 @@ bool clapp::parser::types::help_entry_t::operator!=(
     const help_entry_t& inst) const {
     return !(*this == inst);
 }
+
+const clapp::parser::types::variant_opt_conf_t*
+clapp::parser::types::variant_opt_conf_container_t::find_option(
+    std::string_view long_option) const {
+    for (types::variant_opt_conf_vec_t::const_iterator it{options.cbegin()};
+         it != options.cend(); it++) {
+        if (std::visit(
+                [long_option](auto&& opt) {
+                    return bool{opt.contains_option(long_option)};
+                },
+                *it)) {
+            return &(*it);
+        }
+    }
+    for (types::variant_opt_conf_container_ptr_vec_t::const_iterator it{
+             containers.cbegin()};
+         it != containers.cend(); it++) {
+        Expects(*it != nullptr);
+        const clapp::parser::types::variant_opt_conf_t* ret{
+            (*it)->find_option(long_option)};
+        if (ret != nullptr) {
+            return ret;
+        }
+    }
+    return nullptr;
+}
+
+const clapp::parser::types::variant_opt_conf_t*
+clapp::parser::types::variant_opt_conf_container_t::find_option(
+    char short_option) const {
+    for (types::variant_opt_conf_vec_t::const_iterator it{options.cbegin()};
+         it != options.end(); it++) {
+        if (std::visit(
+                [short_option](auto&& opt) {
+                    return bool{opt.contains_option(short_option)};
+                },
+                *it)) {
+            return &(*it);
+        }
+    }
+    for (types::variant_opt_conf_container_ptr_vec_t::const_iterator it{
+             containers.cbegin()};
+         it != containers.cend(); it++) {
+        Expects(*it != nullptr);
+        const clapp::parser::types::variant_opt_conf_t* ret{
+            (*it)->find_option(short_option)};
+        if (ret != nullptr) {
+            return ret;
+        }
+    }
+    return nullptr;
+}

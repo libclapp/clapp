@@ -48,7 +48,8 @@ class basic_option_container_t {
 
    private:
     types::validate_func_vec_t validate_functions{};
-    types::variant_opt_conf_vec_t options{};
+    types::variant_opt_conf_container_t options{
+        types::logic_operator_type_t::logic_and};
 };
 
 }  // namespace parser

@@ -22,8 +22,9 @@ clapp::parser::basic_option_container_t::basic_option_container_t() = default;
 const clapp::parser::types::variant_opt_conf_t*
 clapp::parser::basic_option_container_t::find_option(
     const std::string_view opt) const {
-    for (types::variant_opt_conf_vec_t::const_iterator it{options.begin()};
-         it != options.end(); it++) {
+    for (types::variant_opt_conf_vec_t::const_iterator it{
+             get_options().begin()};
+         it != get_options().end(); it++) {
         if (std::visit(
                 [opt](auto&& option) {
                     return bool{option.contains_option(opt)};
@@ -37,8 +38,9 @@ clapp::parser::basic_option_container_t::find_option(
 
 const clapp::parser::types::variant_opt_conf_t*
 clapp::parser::basic_option_container_t::find_option(const char opt) const {
-    for (types::variant_opt_conf_vec_t::const_iterator it{options.begin()};
-         it != options.end(); it++) {
+    for (types::variant_opt_conf_vec_t::const_iterator it{
+             get_options().begin()};
+         it != get_options().end(); it++) {
         if (std::visit(
                 [opt](auto&& option) {
                     return bool{option.contains_option(opt)};
@@ -52,12 +54,12 @@ clapp::parser::basic_option_container_t::find_option(const char opt) const {
 
 clapp::parser::types::variant_opt_conf_vec_t&
 clapp::parser::basic_option_container_t::get_options() {
-    return options;
+    return options.options;
 }
 
 const clapp::parser::types::variant_opt_conf_vec_t&
 clapp::parser::basic_option_container_t::get_options() const {
-    return options;
+    return options.options;
 }
 
 clapp::parser::types::validate_func_vec_t&

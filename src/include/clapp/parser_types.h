@@ -128,10 +128,29 @@ using opt_scalar_param_conf_t =
 using opt_vector_param_conf_t =
     basic_reg_option_conf_t<short_opt_param_func_t, long_opt_param_func_t,
                             option_type_t::vector>;
+
 using variant_opt_conf_t =
     std::variant<opt_no_param_conf_t, opt_scalar_param_conf_t,
                  opt_vector_param_conf_t>;
 using variant_opt_conf_vec_t = std::vector<variant_opt_conf_t>;
+
+struct variant_opt_conf_container_t;
+using variant_opt_conf_container_ptr_vec_t =
+    std::vector<variant_opt_conf_container_t*>;
+
+struct variant_opt_conf_container_t {
+    logic_operator_type_t logic_operator_type;
+    variant_opt_conf_vec_t options{};
+    variant_opt_conf_container_ptr_vec_t containers{};
+
+    [[nodiscard]] const variant_opt_conf_t* find_option(
+        std::string_view long_option) const;
+    [[nodiscard]] const variant_opt_conf_t* find_option(
+        char short_option) const;
+};
+
+using variant_opt_conf_container_vec_t =
+    std::vector<variant_opt_conf_container_t>;
 
 template <argument_type_t arg_type>
 struct basic_reg_argument_conf_t {
