@@ -16,6 +16,7 @@
 #ifndef CLAPP_PARSER_H
 #define CLAPP_PARSER_H
 
+#include <clapp/option_container.h>
 #include <clapp/parser_types.h>
 #include <clapp/value.h>
 
@@ -33,7 +34,7 @@ inline namespace parser {
 
 class basic_sub_parser_t;
 
-class basic_parser_t {
+class basic_parser_t : public basic_option_container_t {
    public:
     using purpose_t = types::purpose_t;
 
@@ -92,16 +93,12 @@ class basic_parser_t {
     basic_parser_t& operator=(const basic_parser_t&) = delete;
     basic_parser_t& operator=(basic_parser_t&&) noexcept = delete;
 
-    virtual ~basic_parser_t();
+    ~basic_parser_t() override;
 
-    template <typename short_option_func_t, typename long_option_func_t,
-              types::option_type_t option_type>
-    void reg(types::basic_reg_option_conf_t<
-             short_option_func_t, long_option_func_t, option_type>&& config);
+    using basic_option_container_t::reg;
 
     template <types::argument_type_t argument_type>
     void reg(types::basic_reg_argument_conf_t<argument_type>&& config);
-
     void reg(reg_sub_parser_conf_t&& config);
 
     struct parse_result_t {
@@ -151,13 +148,8 @@ class basic_parser_t {
     [[nodiscard]] sub_parsers_map_t& get_sub_parsers();
     [[nodiscard]] types::help_entry_vec_t get_option_help() const;
     [[nodiscard]] types::help_entry_vec_t get_argument_help() const;
-    [[nodiscard]] types::variant_opt_conf_vec_t::const_iterator find_option(
-        std::string_view opt) const;
-    [[nodiscard]] types::variant_opt_conf_vec_t::const_iterator find_option(
-        char opt) const;
-    [[nodiscard]] types::variant_arg_conf_vec_t get_arguments() const;
-    [[nodiscard]] types::validate_func_vec_t& get_validate_functions();
-    [[nodiscard]] types::variant_opt_conf_vec_t get_options() const;
+    [[nodiscard]] types::variant_arg_conf_vec_t& get_arguments();
+    [[nodiscard]] const types::variant_arg_conf_vec_t& get_arguments() const;
     [[nodiscard]] sub_parser_descriptions_vec_t& get_sub_parser_descriptions();
     [[nodiscard]] argument_descriptions_vec_t&
     get_mandatory_argument_descriptions();
@@ -176,14 +168,12 @@ class basic_parser_t {
                                              types::arg_iterator_t end);
 
     sub_parsers_map_t sub_parsers{};
-    types::validate_func_vec_t validate_functions{};
     sub_parser_descriptions_vec_t sub_parser_descriptions{};
     argument_descriptions_vec_t mandatory_argument_descriptions{};
     argument_descriptions_vec_t optional_argument_descriptions{};
     std::size_t num_processed_arguments{0};
     types::print_and_exit_func_t print_and_exit_func{default_print_and_exit};
 
-    types::variant_opt_conf_vec_t options{};
     types::variant_arg_conf_vec_t arguments{};
 
    public:

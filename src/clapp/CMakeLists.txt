@@ -1,4 +1,4 @@
-add_library(clapp SHARED option.cpp value.cpp parser.cpp parser_types.cpp main_parser.cpp sub_parser.cpp exception.cpp)
+add_library(clapp SHARED option.cpp value.cpp option_container.cpp parser.cpp parser_types.cpp main_parser.cpp sub_parser.cpp exception.cpp)
 set(libClaPP_INCLUDE_DIRS $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
                           $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../include>
                           $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>

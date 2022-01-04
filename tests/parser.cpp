@@ -528,16 +528,6 @@ TEST(parser, constructSimpleTestParser4AndGenHelpMessage) {
             "-o|--opt=<param> Arg desc (optional)\n"));
 }
 
-TEST(parser, constructSimpleTestParser5AndGenHelpMessage) {
-    simple_test_parser5_t stp;
-    ASSERT_THAT(
-        stp.gen_help_msg(255),
-        testing::StrEq(
-            "simple-test-parser5 <arg-name> [<var-arg-name>...]\n\n  "
-            "Arguments:\n    arg-name     Arg desc (mandatory)\n    "
-            "var-arg-name Var arg desc (optional, variadic argument)\n"));
-}
-
 TEST(parser, constructSubParserContainerAndGenHelpMessage) {
     sub_parser_container_t spc;
     ASSERT_THAT(
