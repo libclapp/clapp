@@ -76,3 +76,8 @@ std::string clapp::parser::basic_option_container_t::gen_short_option_line()
     const {
     return options.gen_short_option_line();
 }
+
+clapp::parser::types::help_entry_vec_t
+clapp::parser::basic_option_container_t::get_option_help() const {
+    return options.get_option_help();
+}

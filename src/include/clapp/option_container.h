@@ -47,6 +47,7 @@ class basic_option_container_t {
     [[nodiscard]] const types::variant_opt_conf_vec_t& get_options() const;
 
     std::string gen_short_option_line() const;
+    types::help_entry_vec_t get_option_help() const;
 
    private:
     types::validate_func_vec_t validate_functions{};

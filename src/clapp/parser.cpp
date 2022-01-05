@@ -37,19 +37,6 @@ clapp::parser::basic_parser_t::get_sub_parsers() {
 }
 
 typename clapp::parser::types::help_entry_vec_t
-clapp::parser::basic_parser_t::get_option_help() const {
-    typename clapp::parser::types::help_entry_vec_t ret;
-    for (const auto& option : get_options()) {
-        ret.push_back(std::visit(
-            [](const auto& opt) {
-                return types::help_entry_t{opt.get_option_help()};
-            },
-            option));
-    }
-    return ret;
-}
-
-typename clapp::parser::types::help_entry_vec_t
 clapp::parser::basic_parser_t::get_argument_help() const {
     typename clapp::parser::types::help_entry_vec_t ret;
     for (const auto& argument : arguments) {

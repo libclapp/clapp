@@ -146,7 +146,6 @@ class basic_parser_t : public basic_option_container_t {
 
    protected:
     [[nodiscard]] sub_parsers_map_t& get_sub_parsers();
-    [[nodiscard]] types::help_entry_vec_t get_option_help() const;
     [[nodiscard]] types::help_entry_vec_t get_argument_help() const;
     [[nodiscard]] types::variant_arg_conf_vec_t& get_arguments();
     [[nodiscard]] const types::variant_arg_conf_vec_t& get_arguments() const;

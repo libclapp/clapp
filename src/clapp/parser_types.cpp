@@ -107,3 +107,24 @@ clapp::parser::types::variant_opt_conf_container_t::gen_short_option_line()
     }
     return short_line;
 }
+
+clapp::parser::types::help_entry_vec_t
+clapp::parser::types::variant_opt_conf_container_t::get_option_help() const {
+    clapp::parser::types::help_entry_vec_t ret;
+    for (const auto& option : options) {
+        ret.push_back(std::visit(
+            [](const auto& opt) {
+                return types::help_entry_t{opt.get_option_help()};
+            },
+            option));
+    }
+    for (types::variant_opt_conf_container_ptr_vec_t::const_iterator it{
+             containers.cbegin()};
+         it != containers.cend(); it++) {
+        Expects(*it != nullptr);
+        clapp::parser::types::help_entry_vec_t tmp{(*it)->get_option_help()};
+        ret.insert(ret.end(), std::make_move_iterator(tmp.begin()),
+                   std::make_move_iterator(tmp.end()));
+    }
+    return ret;
+}
