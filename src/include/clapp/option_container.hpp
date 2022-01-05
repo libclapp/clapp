@@ -69,7 +69,7 @@ void clapp::parser::basic_option_container_t::reg(
         get_validate_functions().push_back(config.validate_func.value());
     }
 
-    get_options().push_back(std::move(config));
+    options.options.push_back(std::move(config));
 }
 
 #endif
