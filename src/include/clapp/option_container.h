@@ -33,10 +33,9 @@ class basic_option_container_t {
              short_option_func_t, long_option_func_t, option_type>&& config);
 
    protected:
-    [[nodiscard]] types::variant_opt_conf_vec_t::const_iterator find_option(
+    [[nodiscard]] const types::variant_opt_conf_t* find_option(
         std::string_view opt) const;
-    [[nodiscard]] types::variant_opt_conf_vec_t::const_iterator find_option(
-        char opt) const;
+    [[nodiscard]] const types::variant_opt_conf_t* find_option(char opt) const;
 
     [[nodiscard]] types::validate_func_vec_t&
     get_validate_functions();  // todo: move to validate_func_container

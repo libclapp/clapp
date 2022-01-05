@@ -414,9 +414,10 @@ clapp::parser::basic_parser_t::parse_long(const std::string_view option,
     const std::size_t equal_index{option.find_first_of('=')};
     const std::string_view opt{option.data(),
                                std::min(equal_index, option.size())};
-    types::variant_opt_conf_vec_t::const_iterator found{find_option(opt)};
-    if (found == get_options().end()) {
-        return parse_result_t{ait, std::nullopt, std::string{opt}, std::nullopt};
+    const types::variant_opt_conf_t* found{find_option(opt)};
+    if (found == nullptr) {
+        return parse_result_t{ait, std::nullopt, std::string{opt},
+                              std::nullopt};
     }
     return std::visit(
         [option, equal_index, &ait, opt, end](auto&& found_opt) {
@@ -466,8 +467,8 @@ clapp::parser::basic_parser_t::parse_short(const std::string_view option,
     Expects(!option.empty());
     const std::size_t equal_index{option.find_first_of('=')};
     const char opt{option[0U]};
-    types::variant_opt_conf_vec_t::const_iterator found{find_option(opt)};
-    if (found == get_options().end()) {
+    const types::variant_opt_conf_t* found{find_option(opt)};
+    if (found == nullptr) {
         return parse_result_t{ait, opt, std::nullopt, std::nullopt};
     }
 
