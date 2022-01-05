@@ -46,6 +46,8 @@ class basic_option_container_t {
     get_options();  // todo: move to option_container
     [[nodiscard]] const types::variant_opt_conf_vec_t& get_options() const;
 
+    std::string gen_short_option_line() const;
+
    private:
     types::validate_func_vec_t validate_functions{};
     types::variant_opt_conf_container_t options{

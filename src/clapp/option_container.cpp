@@ -71,3 +71,8 @@ const clapp::parser::types::validate_func_vec_t&
 clapp::parser::basic_option_container_t::get_validate_functions() const {
     return validate_functions;
 }
+
+std::string clapp::parser::basic_option_container_t::gen_short_option_line()
+    const {
+    return options.gen_short_option_line();
+}

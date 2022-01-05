@@ -82,3 +82,28 @@ clapp::parser::types::variant_opt_conf_container_t::find_option(
     }
     return nullptr;
 }
+
+std::string
+clapp::parser::types::variant_opt_conf_container_t::gen_short_option_line()
+    const {
+    std::string short_line;
+    bool first{true};
+    for (const auto& option : options) {
+        if (!first && logic_operator_type == logic_operator_type_t::logic_xor) {
+            short_line += " |";
+        }
+        short_line += " " + std::visit(
+                                [](const auto& opt) {
+                                    return opt.create_option_string();
+                                },
+                                option);
+        first = false;
+    }
+    for (types::variant_opt_conf_container_ptr_vec_t::const_iterator it{
+             containers.cbegin()};
+         it != containers.end(); it++) {
+        Expects(*it != nullptr);
+        short_line += " ( " + (*it)->gen_short_option_line() + " )";
+    }
+    return short_line;
+}

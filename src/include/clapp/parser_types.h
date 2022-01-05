@@ -143,6 +143,8 @@ struct variant_opt_conf_container_t {
     variant_opt_conf_vec_t options{};
     variant_opt_conf_container_ptr_vec_t containers{};
 
+    [[nodiscard]] std::string gen_short_option_line() const;
+
     [[nodiscard]] const variant_opt_conf_t* find_option(
         std::string_view long_option) const;
     [[nodiscard]] const variant_opt_conf_t* find_option(

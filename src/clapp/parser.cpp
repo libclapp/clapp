@@ -163,15 +163,7 @@ clapp::parser::basic_parser_t::gen_detailed_help_contents() const {
 }
 
 std::string clapp::parser::basic_parser_t::gen_short_line() const {
-    std::string short_line;
-
-    for (const auto& option : get_options()) {
-        short_line += " " + std::visit(
-                                [](const auto& opt) {
-                                    return opt.create_option_string();
-                                },
-                                option);
-    }
+    std::string short_line{gen_short_option_line()};
 
     for (const auto& argument : get_arguments()) {
         if (!short_line.empty()) {
