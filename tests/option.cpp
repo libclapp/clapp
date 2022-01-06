@@ -224,7 +224,7 @@ MATCHER(VectorParamOptionNotGiven,
 
 MATCHER_P(ContainsLongOption, option, "Checks, if long option is given.") {
     std::vector<clapp::parser::types::variant_opt_conf_t> options{
-        arg.get_options()};
+        arg.get_options().options};
     std::optional<clapp::parser::types::variant_opt_conf_t> found_opt{
         contains_option(options, option, result_listener)};
     if (found_opt == std::nullopt) {
@@ -239,7 +239,7 @@ MATCHER_P(ContainsLongOption, option, "Checks, if long option is given.") {
 
 MATCHER_P(ContainsShortOption, option, "Checks, if short option is given.") {
     std::vector<clapp::parser::types::variant_opt_conf_t> options{
-        arg.get_options()};
+        arg.get_options().options};
     std::optional<clapp::parser::types::variant_opt_conf_t> found_opt{
         contains_option(options, option, result_listener)};
     if (found_opt == std::nullopt) {
@@ -272,7 +272,7 @@ template <typename LONG_OPT_FUNC_T>
 static LONG_OPT_FUNC_T get_long_opt_func(option_test_parser_t& otp,
                                          const std::string& long_opt_name) {
     std::vector<clapp::parser::types::variant_opt_conf_t> options{
-        otp.get_options()};
+        otp.get_options().options};
     std::optional<clapp::parser::types::variant_opt_conf_t> found_opt{
         contains_option(options, long_opt_name)};
     if (found_opt == std::nullopt) {
@@ -307,7 +307,7 @@ template <typename SHORT_OPT_FUNC_T>
 static SHORT_OPT_FUNC_T get_short_opt_func(option_test_parser_t& otp,
                                            const char short_opt_name) {
     std::vector<clapp::parser::types::variant_opt_conf_t> options{
-        otp.get_options()};
+        otp.get_options().options};
     std::optional<clapp::parser::types::variant_opt_conf_t> found_opt{
         contains_option(options, short_opt_name)};
     if (found_opt == std::nullopt) {
@@ -327,7 +327,7 @@ static std::optional<option_test_parser_t::validate_func_t> get_validate_func(
     option_test_parser_t& otp, OPTION_T&& option) {
     std::string option_string{option};
     std::vector<clapp::parser::types::variant_opt_conf_t> options{
-        otp.get_options()};
+        otp.get_options().options};
     std::optional<clapp::parser::types::variant_opt_conf_t> found_opt{
         contains_option(options, std::forward<decltype(option)>(option))};
     if (found_opt == std::nullopt) {

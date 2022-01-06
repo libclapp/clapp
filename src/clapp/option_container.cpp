@@ -52,14 +52,14 @@ clapp::parser::basic_option_container_t::find_option(const char opt) const {
     return nullptr;
 }
 
-clapp::parser::types::variant_opt_conf_vec_t&
+clapp::parser::types::variant_opt_conf_container_t&
 clapp::parser::basic_option_container_t::get_options() {
-    return options.options;
+    return options;
 }
 
-const clapp::parser::types::variant_opt_conf_vec_t&
+const clapp::parser::types::variant_opt_conf_container_t&
 clapp::parser::basic_option_container_t::get_options() const {
-    return options.options;
+    return options;
 }
 
 clapp::parser::types::validate_func_vec_t&

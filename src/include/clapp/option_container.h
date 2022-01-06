@@ -42,12 +42,12 @@ class basic_option_container_t {
     [[nodiscard]] const types::validate_func_vec_t& get_validate_functions()
         const;
 
-    [[nodiscard]] types::variant_opt_conf_vec_t&
-    get_options();  // todo: move to option_container
-    [[nodiscard]] const types::variant_opt_conf_vec_t& get_options() const;
+    [[nodiscard]] types::variant_opt_conf_container_t& get_options();
+    [[nodiscard]] const types::variant_opt_conf_container_t& get_options()
+        const;
 
-    std::string gen_short_option_line() const;
-    types::help_entry_vec_t get_option_help() const;
+    [[nodiscard]] std::string gen_short_option_line() const;
+    [[nodiscard]] types::help_entry_vec_t get_option_help() const;
 
    private:
     types::validate_func_vec_t validate_functions{};
