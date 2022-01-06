@@ -24,7 +24,8 @@ inline namespace parser {
 
 class basic_option_container_t {
    public:
-    basic_option_container_t();
+    explicit basic_option_container_t(
+        types::logic_operator_type_t logic_operator_type);
     virtual ~basic_option_container_t();
 
     template <typename short_option_func_t, typename long_option_func_t,
@@ -37,8 +38,7 @@ class basic_option_container_t {
         std::string_view opt) const;
     [[nodiscard]] const types::variant_opt_conf_t* find_option(char opt) const;
 
-    [[nodiscard]] types::validate_func_vec_t&
-    get_validate_functions();  // todo: move to validate_func_container
+    [[nodiscard]] types::validate_func_vec_t& get_validate_functions();
     [[nodiscard]] const types::validate_func_vec_t& get_validate_functions()
         const;
 
@@ -51,8 +51,7 @@ class basic_option_container_t {
 
    private:
     types::validate_func_vec_t validate_functions{};
-    types::variant_opt_conf_container_t options{
-        types::logic_operator_type_t::logic_and};
+    types::variant_opt_conf_container_t options;
 };
 
 }  // namespace parser

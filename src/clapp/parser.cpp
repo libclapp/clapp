@@ -29,7 +29,8 @@ template <typename IT_T>
 static std::optional<clapp::parser::basic_parser_t::parse_result_t>
 handle_parse_ret_or_nullopt(clapp::value::found_func_t::ret_t ret, IT_T pit);
 
-clapp::parser::basic_parser_t::basic_parser_t() = default;
+clapp::parser::basic_parser_t::basic_parser_t()
+    : basic_option_container_t{types::logic_operator_type_t::logic_and} {}
 
 clapp::parser::basic_parser_t::sub_parsers_map_t&
 clapp::parser::basic_parser_t::get_sub_parsers() {

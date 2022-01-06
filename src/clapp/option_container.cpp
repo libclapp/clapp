@@ -17,7 +17,9 @@
 
 clapp::parser::basic_option_container_t::~basic_option_container_t() = default;
 
-clapp::parser::basic_option_container_t::basic_option_container_t() = default;
+clapp::parser::basic_option_container_t::basic_option_container_t(
+    const types::logic_operator_type_t logic_operator_type)
+    : options{logic_operator_type} {}
 
 const clapp::parser::types::variant_opt_conf_t*
 clapp::parser::basic_option_container_t::find_option(
