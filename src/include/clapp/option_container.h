@@ -35,6 +35,8 @@ class basic_option_container_t {
     void reg(types::basic_reg_option_conf_t<
              short_option_func_t, long_option_func_t, option_type>&& config);
 
+    void reg(types::variant_opt_conf_container_t* opt_container);
+
     [[nodiscard]] virtual basic_parser_t& get_parser() = 0;
 
    protected:
@@ -56,6 +58,18 @@ class basic_option_container_t {
    private:
     types::validate_func_vec_t validate_functions{};
     types::variant_opt_conf_container_t options;
+};
+
+class option_container_t : public basic_option_container_t {
+   public:
+    option_container_t(basic_option_container_t& container,
+                       types::logic_operator_type_t logic_operator_type);
+    ~option_container_t() override;
+
+    [[nodiscard]] basic_parser_t& get_parser() override;
+
+   private:
+    basic_option_container_t& cont;  // TODO: may use shared ptr.
 };
 
 }  // namespace parser

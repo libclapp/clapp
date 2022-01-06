@@ -83,3 +83,23 @@ clapp::parser::types::help_entry_vec_t
 clapp::parser::basic_option_container_t::get_option_help() const {
     return options.get_option_help();
 }
+
+void clapp::parser::basic_option_container_t::reg(
+    types::variant_opt_conf_container_t* opt_container) {
+    if (opt_container != nullptr) {
+        options.containers.push_back(opt_container);
+    }
+}
+
+clapp::parser::option_container_t::option_container_t(
+    basic_option_container_t& container,
+    const types::logic_operator_type_t logic_operator_type)
+    : basic_option_container_t{logic_operator_type}, cont{container} {
+    container.reg(&get_options());
+}
+
+clapp::parser::option_container_t::~option_container_t() = default;
+
+clapp::parser::basic_parser_t& clapp::parser::option_container_t::get_parser() {
+    return cont.get_parser();
+}
