@@ -311,10 +311,10 @@ OPT_CONF clapp::option::gen_opt_conf2(
 template <typename T>
 template <typename... Params>
 clapp::option::basic_param_option_t<T>::basic_param_option_t(
-    basic_parser_t& parser, Params... parameters) {
+    basic_option_container_t& container, Params... parameters) {
     opt_conf_container_t<T, opt_conf_t> conf{gen_opt_conf<T, opt_conf_t>(
         create_callbacks(this), std::forward<Params>(parameters)...)};
-    parser.reg(std::move(conf.opt_conf));
+    container.reg(std::move(conf.opt_conf));
     _value = conf.default_value;
     _found = std::move(conf.found);
 }
@@ -379,7 +379,7 @@ constexpr bool clapp::option::basic_param_option_t<T>::given() const noexcept {
 template <typename T>
 template <typename... Params>
 clapp::option::basic_vector_param_option_t<T>::basic_vector_param_option_t(
-    basic_parser_t& parser, Params... parameters) {
+    basic_option_container_t& container, Params... parameters) {
     opt_conf_container_t<T, opt_conf_t> conf{gen_opt_conf<T, opt_conf_t>(
         create_callbacks(this), std::forward<Params>(parameters)...)};
     if (conf.default_value) {
@@ -389,7 +389,7 @@ clapp::option::basic_vector_param_option_t<T>::basic_vector_param_option_t(
                       << "' possible.";
         throw clapp::exception::option_param_exception_t{string_stream.str()};
     }
-    parser.reg(std::move(conf.opt_conf));
+    container.reg(std::move(conf.opt_conf));
     _found = std::move(conf.found);
 }
 
@@ -450,10 +450,11 @@ constexpr bool clapp::option::basic_vector_param_option_t<T>::given()
 template <typename T, T default_value>
 template <typename... Params>
 clapp::option::basic_option_t<T, default_value>::basic_option_t(
-    basic_parser_t& parser, callbacks_t&& callbacks, Params&&... parameters) {
+    basic_option_container_t& container, callbacks_t&& callbacks,
+    Params&&... parameters) {
     opt_conf_container_t<T, opt_conf_t> conf{gen_opt_conf<T, opt_conf_t>(
         callbacks, std::forward<Params>(parameters)...)};
-    parser.reg(std::move(conf.opt_conf));
+    container.reg(std::move(conf.opt_conf));
     if (conf.default_value) {
         _value = conf.default_value.value();
     }
@@ -483,9 +484,9 @@ constexpr bool clapp::option::basic_option_t<T, default_value>::has_value()
 }
 
 template <typename... Params>
-clapp::option::bool_option_t::bool_option_t(basic_parser_t& parser,
+clapp::option::bool_option_t::bool_option_t(basic_option_container_t& container,
                                             Params... parameters)
-    : clapp::basic_option_t<bool, false>{parser, create_callbacks(this),
+    : clapp::basic_option_t<bool, false>{container, create_callbacks(this),
                                          std::forward<Params>(parameters)...} {
     if (!_value) {
         _value = false;
@@ -495,22 +496,23 @@ clapp::option::bool_option_t::bool_option_t(basic_parser_t& parser,
 template <int EXIT_CODE>
 template <typename... Params>
 clapp::option::basic_help_option_t<EXIT_CODE>::basic_help_option_t(
-    basic_parser_t& parser, Params... parameters)
-    : bool_option_t{parser, std::forward<Params>(parameters)...,
-                    gen_func_print_help_and_req_exit(parser)} {}
+    basic_option_container_t& container, Params... parameters)
+    : bool_option_t{container, std::forward<Params>(parameters)...,
+                    gen_func_print_help_and_req_exit(container)} {}
 
 template <int EXIT_CODE>
 clapp::value::found_func_t
 clapp::option::basic_help_option_t<EXIT_CODE>::gen_func_print_help_and_req_exit(
-    basic_parser_t& parser) {
-    return parser.gen_func_print_help_and_req_exit(EXIT_CODE);
+    basic_option_container_t& container) {
+    return container.get_parser().gen_func_print_help_and_req_exit(EXIT_CODE);
 }
 
 template <typename... Params>
-clapp::option::count_option_t::count_option_t(basic_parser_t& parser,
-                                              Params... parameters)
+clapp::option::count_option_t::count_option_t(
+    basic_option_container_t& container, Params... parameters)
     : clapp::basic_option_t<std::uint32_t, 0U>{
-          parser, create_callbacks(this), std::forward<Params>(parameters)...} {
+          container, create_callbacks(this),
+          std::forward<Params>(parameters)...} {
     if (!_value) {
         _value = 0;
     }

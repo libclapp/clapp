@@ -99,7 +99,8 @@ class basic_param_option_t {
     using opt_conf_t = parser::types::opt_scalar_param_conf_t;
 
     template <typename... Params>
-    explicit basic_param_option_t(basic_parser_t& parser, Params... parameters);
+    explicit basic_param_option_t(basic_option_container_t& container,
+                                  Params... parameters);
     explicit basic_param_option_t(const basic_param_option_t&) = delete;
     explicit basic_param_option_t(basic_param_option_t&&) noexcept = delete;
     basic_param_option_t& operator=(const basic_param_option_t&) = delete;
@@ -131,7 +132,7 @@ class basic_vector_param_option_t {
     using opt_conf_t = parser::types::opt_vector_param_conf_t;
 
     template <typename... Params>
-    explicit basic_vector_param_option_t(basic_parser_t& parser,
+    explicit basic_vector_param_option_t(basic_option_container_t& container,
                                          Params... parameters);
     explicit basic_vector_param_option_t(const basic_vector_param_option_t&) =
         delete;
@@ -168,7 +169,7 @@ class basic_option_t {
     using opt_conf_t = parser::types::opt_no_param_conf_t;
 
     template <typename... Params>
-    basic_option_t(basic_parser_t& parser, callbacks_t&& callbacks,
+    basic_option_t(basic_option_container_t& container, callbacks_t&& callbacks,
                    Params&&... parameters);
     explicit basic_option_t(const basic_option_t&) = delete;
     explicit basic_option_t(basic_option_t&&) noexcept = delete;
@@ -193,7 +194,8 @@ class basic_option_t {
 class bool_option_t : public basic_option_t<bool, false> {
    public:
     template <typename... Params>
-    explicit bool_option_t(basic_parser_t& parser, Params... parameters);
+    explicit bool_option_t(basic_option_container_t& container,
+                           Params... parameters);
     explicit bool_option_t(const bool_option_t&) = delete;
     explicit bool_option_t(bool_option_t&&) noexcept = delete;
     bool_option_t& operator=(const bool_option_t&) = delete;
@@ -211,7 +213,8 @@ template <int EXIT_CODE>
 class basic_help_option_t : public bool_option_t {
    public:
     template <typename... Params>
-    explicit basic_help_option_t(basic_parser_t& parser, Params... parameters);
+    explicit basic_help_option_t(basic_option_container_t& container,
+                                 Params... parameters);
     explicit basic_help_option_t(const basic_help_option_t&) = delete;
     explicit basic_help_option_t(basic_help_option_t&&) noexcept = delete;
     basic_help_option_t& operator=(const basic_help_option_t&) = delete;
@@ -220,13 +223,14 @@ class basic_help_option_t : public bool_option_t {
     ~basic_help_option_t() override;
 
     [[nodiscard]] static value::found_func_t gen_func_print_help_and_req_exit(
-        basic_parser_t& parser);
+        basic_option_container_t& container);
 };
 
 class count_option_t : public basic_option_t<std::uint32_t, 0U> {
    public:
     template <typename... Params>
-    explicit count_option_t(basic_parser_t& parser, Params... parameters);
+    explicit count_option_t(basic_option_container_t& container,
+                            Params... parameters);
     explicit count_option_t(const count_option_t&) = delete;
     explicit count_option_t(count_option_t&&) noexcept = delete;
     count_option_t& operator=(const count_option_t&) = delete;
