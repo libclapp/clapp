@@ -144,6 +144,8 @@ class basic_parser_t : public basic_option_container_t {
     void set_print_and_exit_func(types::print_and_exit_func_t&& func);
     [[nodiscard]] types::print_and_exit_func_t& get_print_and_exit_func();
 
+    [[nodiscard]] basic_parser_t& get_parser() override;
+
    protected:
     [[nodiscard]] sub_parsers_map_t& get_sub_parsers();
     [[nodiscard]] types::help_entry_vec_t get_argument_help() const;

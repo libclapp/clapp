@@ -552,3 +552,7 @@ clapp::parser::basic_parser_t::get_print_and_exit_func() {
 }
 
 clapp::parser::basic_parser_t::~basic_parser_t() = default;
+
+clapp::parser::basic_parser_t& clapp::parser::basic_parser_t::get_parser() {
+    return *this;
+}

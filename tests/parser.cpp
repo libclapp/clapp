@@ -259,6 +259,11 @@ help_parser_t::~help_parser_t() = default;
 
 TEST(parser, constructEmptyBasicParser) { empty_basic_parser_t ebp; }
 
+TEST(parser, constructEmptyBasicParserAndCallGetParser) {
+    empty_basic_parser_t ebp;
+    ASSERT_THAT(&(ebp.get_parser()), testing::Eq(&ebp));
+}
+
 TEST(parser, constructEmptyBasicParserAndParseEmptyArguments) {
     constexpr const char* const argv[]{nullptr};
     const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};

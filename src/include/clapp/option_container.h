@@ -22,6 +22,8 @@ namespace clapp {
 
 inline namespace parser {
 
+class basic_parser_t;
+
 class basic_option_container_t {
    public:
     explicit basic_option_container_t(
@@ -32,6 +34,8 @@ class basic_option_container_t {
               types::option_type_t option_type>
     void reg(types::basic_reg_option_conf_t<
              short_option_func_t, long_option_func_t, option_type>&& config);
+
+    [[nodiscard]] virtual basic_parser_t& get_parser() = 0;
 
    protected:
     [[nodiscard]] const types::variant_opt_conf_t* find_option(
