@@ -91,6 +91,23 @@ void clapp::parser::basic_option_container_t::reg(
     }
 }
 
+void clapp::parser::basic_option_container_t::validate_options() const {
+    for (const auto& option : options.options) {
+        std::visit(
+            [](auto&& o) {
+                if (o.purpose == parser::types::purpose_t::mandatory) {
+                    if (!o.given_func()) {
+                        throw clapp::exception::option_param_exception_t(
+                            std::string{"Mandatory parameter for option '"} +
+                            o.option_string + "' not given.");
+                    }
+                }
+                o.validate_value_func(o.option_string);
+            },
+            option);
+    }
+}
+
 clapp::parser::option_container_t::option_container_t(
     basic_option_container_t& container,
     const types::logic_operator_type_t logic_operator_type)

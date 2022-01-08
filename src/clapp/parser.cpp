@@ -304,6 +304,7 @@ void clapp::parser::basic_parser_t::validate() const {
     for (const auto& validate_func : get_validate_functions()) {
         validate_func();
     }
+    validate_options();
 }
 
 void clapp::parser::basic_parser_t::validate_recursive() const {
