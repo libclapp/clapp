@@ -110,7 +110,7 @@ std::optional<clapp::parser::types::validate_func_t>
 clapp::option::gen_opt_validate_func(
     std::optional<VALUE_FUNC>&& value_func_param,
     std::optional<has_value_func_t>&& has_value_func_param,
-    std::optional<given_func_t>&& given_func_param,
+    given_func_t&& given_func_param,
     std::vector<typename opt_params_t<T>::validate_func_t>&& validate_funcs,
     const std::string& option_string, const parser::types::purpose_t purpose) {
     if (!validate_funcs.empty() ||
@@ -125,7 +125,7 @@ clapp::option::gen_opt_validate_func(
                 given_func = std::move(given_func_param), option_string,
                 validate_funcs = std::move(validate_funcs)]() {
             if (purpose == parser::types::purpose_t::mandatory && given_func) {
-                if (!given_func.value()()) {
+                if (!given_func()) {
                     throw clapp::exception::option_param_exception_t(
                         std::string{"Mandatory parameter for option '"} +
                         option_string + "' not given.");
@@ -337,15 +337,11 @@ OPT_CONF clapp::option::gen_opt_conf2(
     long_opt_conf_vec_t long_options{
         gen_long_option(std::move(callbacks.loh), long_option)};
 
-    Expects(callbacks.given);
-    given_func_t given_func{
-        [given = callbacks.given]() { return given.value()(); }};
-
     using optional_validate_func_t =
         std::optional<parser::types::validate_func_t>;
     optional_validate_func_t opt_validate_func{gen_opt_validate_func<T>(
         std::move(callbacks.value), std::move(callbacks.has_value),
-        std::move(callbacks.given), std::move(validate_funcs),
+        given_func_t{callbacks.given}, std::move(validate_funcs),
         std::move(option_string), purpose)};
 
     using validate_value_func_t = parser::types::validate_value_func_t;
@@ -355,7 +351,7 @@ OPT_CONF clapp::option::gen_opt_conf2(
 
     return OPT_CONF{std::move(short_options),
                     std::move(long_options),
-                    std::move(given_func),
+                    std::move(callbacks.given),
                     std::move(validate_value_func),
                     option_string,
                     std::move(opt_validate_func),
