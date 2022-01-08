@@ -41,8 +41,8 @@ struct option_callbacks_t {
     long_opt_func_t loh;
     short_opt_func_t soh;
     given_func_t given;
-    std::optional<has_value_func_t> has_value;
-    std::optional<value_func_t<T>> value;
+    has_value_func_t has_value;
+    value_func_t<T> value;
 };
 
 template <typename T>
@@ -52,8 +52,8 @@ struct option_param_callbacks_t {
     long_opt_func_t loh;
     short_opt_func_t soh;
     given_func_t given;
-    std::optional<has_value_func_t> has_value;
-    std::optional<value_func_t<T>> value;
+    has_value_func_t has_value;
+    value_func_t<T> value;
 };
 
 template <typename T>
@@ -63,8 +63,8 @@ struct option_vector_param_callbacks_t {
     long_opt_func_t loh;
     short_opt_func_t soh;
     given_func_t given;
-    std::optional<has_value_func_t> has_value;
-    std::optional<vector_value_func_t<T>> value;
+    has_value_func_t has_value;
+    vector_value_func_t<T> value;
 };
 
 void check_short_option(char option);
@@ -266,15 +266,14 @@ gen_long_option(long_option_func_t&& lof,
 
 template <typename T, typename VALUE_FUNC>
 std::optional<parser::types::validate_func_t> gen_opt_validate_func(
-    std::optional<VALUE_FUNC>&& value_func_param,
-    std::optional<has_value_func_t>&& has_value_func_param,
+    VALUE_FUNC&& value_func_param, has_value_func_t&& has_value_func_param,
     given_func_t&& given_func_param,
     std::vector<typename opt_params_t<T>::validate_func_t>&& validate_funcs,
     const std::string& option_string, parser::types::purpose_t purpose);
 
 template <typename T, typename VALUE_FUNC>
 parser::types::validate_value_func_t gen_opt_validate_value_func(
-    std::optional<VALUE_FUNC>&& vf, std::optional<has_value_func_t>&& hvf,
+    VALUE_FUNC&& value_func, has_value_func_t&& hvf,
     std::vector<typename opt_params_t<T>::validate_func_t>&& validate_funcs);
 
 template <typename T, typename OPT_CONF, typename CALLBACKS, typename T1,

@@ -3098,26 +3098,6 @@ TEST_F(optionT, invalidShortOptionConstruct) {
                  clapp::exception::option_exception_t);
 }
 
-TEST_F(optionT, genOptValidateFuncAndCallValidateFuncThrows) {
-    std::optional<option_test_parser_t::validate_func_t> validate_func{
-        clapp::option::gen_opt_validate_func<std::int32_t, int32_value_func_t>(
-            std::nullopt, []() { return throw_unexpected_call(); },
-            []() { return false; }, std::vector<int32_validate_func_t>{},
-            "option string", option_test_parser_t::purpose_t::mandatory)};
-    ASSERT_THAT(validate_func.has_value(), testing::Eq(true));
-    ASSERT_THROW((*validate_func)(), clapp::exception::option_exception_t);
-}
-
-TEST_F(optionT, genOptValidateFuncAndCallValidateFuncDoesntThrow) {
-    std::optional<option_test_parser_t::validate_func_t> validate_func{
-        clapp::option::gen_opt_validate_func<std::int32_t, int32_value_func_t>(
-            std::nullopt, []() { return throw_unexpected_call(); },
-            []() { return true; }, std::vector<int32_validate_func_t>{},
-            "option string", option_test_parser_t::purpose_t::mandatory)};
-    ASSERT_THAT(validate_func.has_value(), testing::Eq(true));
-    ASSERT_NO_THROW((*validate_func)());
-}
-
 TEST_F(optionT, genOptValidateFuncWithoutValueFuncAndCallValidateFuncThrows) {
     constexpr std::int32_t return_value{10};
     std::optional<option_test_parser_t::validate_func_t> validate_func{
@@ -3137,26 +3117,6 @@ TEST_F(optionT, genOptValidateFuncWithoutValueFuncAndCallValidateFuncThrows) {
             "option string", option_test_parser_t::purpose_t::mandatory)};
     ASSERT_THAT(validate_func.has_value(), testing::Eq(true));
     ASSERT_NO_THROW((*validate_func)());
-}
-
-TEST(option, genOptValidateFuncAndCallValidateFuncThrows) {
-    using int32_value_func_t = std::function<std::int32_t(void)>;
-    using int32_validate_func_t = std::function<void(
-        const std::int32_t&, const std::string& option_string)>;
-    std::optional<option_test_parser_t::validate_func_t> validate_func{
-        clapp::option::gen_opt_validate_func<std::int32_t, int32_value_func_t>(
-            std::nullopt, std::nullopt, []() { return true; },
-            std::vector<int32_validate_func_t>{
-                [](const std::int32_t& /*value*/,
-                   const std::string& option_string) {
-                    if (option_string != "option string") {
-                        throw std::runtime_error{"option_string invalid"};
-                    }
-                }},
-            "option string", option_test_parser_t::purpose_t::mandatory)};
-    ASSERT_THAT(validate_func.has_value(), testing::Eq(true));
-    ASSERT_THROW((*validate_func)(),
-                 clapp::exception::option_param_exception_t);
 }
 
 TEST_F(optionT,
