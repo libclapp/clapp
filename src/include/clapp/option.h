@@ -27,7 +27,7 @@
 namespace clapp {
 
 inline namespace option {
-using given_func_t = std::function<bool(void)>;
+using given_func_t = parser::types::given_func_t;
 using has_value_func_t = std::function<bool(void)>;
 template <typename T>
 using value_func_t = std::function<T(void)>;
@@ -271,6 +271,11 @@ std::optional<parser::types::validate_func_t> gen_opt_validate_func(
     std::optional<given_func_t>&& given_func_param,
     std::vector<typename opt_params_t<T>::validate_func_t>&& validate_funcs,
     const std::string& option_string, parser::types::purpose_t purpose);
+
+template <typename T, typename VALUE_FUNC>
+parser::types::validate_value_func_t gen_opt_validate_value_func(
+    std::optional<VALUE_FUNC>&& vf, std::optional<has_value_func_t>&& hvf,
+    std::vector<typename opt_params_t<T>::validate_func_t>&& validate_funcs);
 
 template <typename T, typename OPT_CONF, typename CALLBACKS, typename T1,
           typename... Params>

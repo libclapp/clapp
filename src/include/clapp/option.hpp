@@ -162,6 +162,46 @@ clapp::option::gen_opt_validate_func(
     return std::nullopt;
 }
 
+template <typename T, typename VALUE_FUNC>
+clapp::parser::types::validate_value_func_t
+clapp::option::gen_opt_validate_value_func(
+    std::optional<VALUE_FUNC>&& vf, std::optional<has_value_func_t>&& hvf,
+    std::vector<typename opt_params_t<T>::validate_func_t>&& validate_funcs) {
+    if (validate_funcs.size() > 0) {
+        return [value_func = std::move(vf), has_value_func = std::move(hvf),
+                validate_funcs = std::move(validate_funcs)](
+                   const std::string& option_string) {
+            if (value_func && has_value_func) {
+                if (has_value_func.value()()) {
+                    if constexpr (std::is_same<VALUE_FUNC,
+                                               vector_value_func_t<T>>::value) {
+                        const std::vector<T> values{value_func.value()()};
+                        for (const auto& value : values) {
+                            for (const auto& func : validate_funcs) {
+                                func(value, option_string);
+                            }
+                        }
+                    } else if constexpr (std::is_same<VALUE_FUNC,
+                                                      value_func_t<T>>::value) {
+                        const T value{value_func.value()()};
+                        for (const auto& func : validate_funcs) {
+                            func(value, option_string);
+                        }
+                    }
+                }
+            } else {
+                if (validate_funcs.size() > 0) {
+                    throw clapp::exception::option_param_exception_t(
+                        std::string{"Cannot validate option '"} +
+                        option_string +
+                        "' without a given value and has_value function.");
+                }
+            }
+        };
+    }
+    return [](const std::string& /*option_string*/) {};
+}
+
 template <typename T>
 inline std::vector<std::string> clapp::option::gen_string_vec(
     const std::vector<T>& vec) {
@@ -297,6 +337,10 @@ OPT_CONF clapp::option::gen_opt_conf2(
     long_opt_conf_vec_t long_options{
         gen_long_option(std::move(callbacks.loh), long_option)};
 
+    Expects(callbacks.given);
+    given_func_t given_func{
+        [given = callbacks.given]() { return given.value()(); }};
+
     using optional_validate_func_t =
         std::optional<parser::types::validate_func_t>;
     optional_validate_func_t opt_validate_func{gen_opt_validate_func<T>(
@@ -304,8 +348,19 @@ OPT_CONF clapp::option::gen_opt_conf2(
         std::move(callbacks.given), std::move(validate_funcs),
         std::move(option_string), purpose)};
 
-    return OPT_CONF{std::move(short_options), std::move(long_options),
-                    std::move(opt_validate_func), description, purpose};
+    using validate_value_func_t = parser::types::validate_value_func_t;
+    validate_value_func_t validate_value_func{gen_opt_validate_value_func<T>(
+        std::move(callbacks.value), std::move(callbacks.has_value),
+        std::move(validate_funcs))};
+
+    return OPT_CONF{std::move(short_options),
+                    std::move(long_options),
+                    std::move(given_func),
+                    std::move(validate_value_func),
+                    option_string,
+                    std::move(opt_validate_func),
+                    description,
+                    purpose};
 }
 
 template <typename T>

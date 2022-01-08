@@ -46,6 +46,8 @@ using short_opt_param_func_t = std::function<clapp::value::found_func_t::ret_t(
     const char option, const std::string_view param)>;
 using argument_func_t = std::function<clapp::value::found_func_t::ret_t(
     const std::string_view argument)>;
+using given_func_t = std::function<bool(void)>;
+using validate_value_func_t = std::function<void(const std::string&)>;
 using validate_func_t = std::function<void(void)>;
 using validate_func_vec_t = std::vector<validate_func_t>;
 using print_and_exit_func_t = std::function<clapp::value::exit_t(
@@ -114,6 +116,9 @@ struct basic_reg_option_conf_t {
 
     short_opt_conf_vec_t short_options;
     long_opt_conf_vec_t long_options;
+    given_func_t given_func;
+    validate_value_func_t validate_value_func;
+    std::string option_string;
     std::optional<validate_func_t> validate_func;
     std::string description;
     purpose_t purpose{purpose_t::optional};
