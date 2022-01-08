@@ -67,7 +67,7 @@ class simple_test_parser2_t : public clapp::basic_parser_t {
     using clapp::basic_parser_t::basic_parser_t;
     ~simple_test_parser2_t() override;
 
-    clapp::option::bool_option_t count_option{
+    clapp::option::count_option_t count_option{
         *this, "count", 'c', "Count option.",
         clapp::parser::types::purpose_t::mandatory};
 
