@@ -220,7 +220,7 @@ class basic_parser_t {
     virtual ~basic_parser_t();
 
     template <typename short_option_func_t, typename long_option_func_t>
-    constexpr static bool is_param_opt();
+    [[nodiscard]] constexpr static bool is_param_opt();
 
     template <typename short_option_func_t, typename long_option_func_t,
               option_type_t option_type>
@@ -239,7 +239,7 @@ class basic_parser_t {
         std::optional<clapp::value::exit_t> exit;
     };
 
-    static arg_iterator process_parse_result(
+    [[nodiscard]] static arg_iterator process_parse_result(
         arg_iterator it, const parse_result_t& parse_result);
     [[nodiscard]] std::optional<clapp::value::exit_t> parse(arg_iterator begin,
                                                             arg_iterator end);
@@ -250,50 +250,55 @@ class basic_parser_t {
 
     void validate_recursive() const;
 
-    std::string gen_short_line() const;
-    std::string gen_short_lines(std::size_t rec_depth) const;
-    virtual std::string gen_short_line_prefix() const = 0;
-    static constexpr std::string_view gen_usage_prefix() noexcept;
-    virtual help_contents_t gen_detailed_help_contents() const;
-    std::string gen_opt_arg_lines(const help_contents_t& help_contents,
-                                  const std::size_t num_spaces) const;
+    [[nodiscard]] std::string gen_short_line() const;
+    [[nodiscard]] std::string gen_short_lines(std::size_t rec_depth) const;
+    [[nodiscard]] virtual std::string gen_short_line_prefix() const = 0;
+    [[nodiscard]] static constexpr std::string_view gen_usage_prefix() noexcept;
+    [[nodiscard]] virtual help_contents_t gen_detailed_help_contents() const;
+    [[nodiscard]] std::string gen_opt_arg_lines(
+        const help_contents_t& help_contents,
+        const std::size_t num_spaces) const;
 
-    std::string gen_help_desc(std::size_t num_spaces,
-                              std::size_t rec_depth) const;
-    std::string gen_help_msg(std::size_t rec_depth) const;
-    value::found_func_t gen_func_print_help_and_req_exit(int exit_code) const;
+    [[nodiscard]] std::string gen_help_desc(std::size_t num_spaces,
+                                            std::size_t rec_depth) const;
+    [[nodiscard]] std::string gen_help_msg(std::size_t rec_depth) const;
+    [[nodiscard]] value::found_func_t gen_func_print_help_and_req_exit(
+        int exit_code) const;
 
-    std::size_t get_num_processed_arguments() const;
+    [[nodiscard]] std::size_t get_num_processed_arguments() const;
 
-    inline virtual bool is_active() const noexcept;
-    const basic_parser_t& get_active_parser() const;
+    [[nodiscard]] inline virtual bool is_active() const noexcept;
+    [[nodiscard]] const basic_parser_t& get_active_parser() const;
 
-    static exit_t default_print_and_exit(const std::string_view print_msg,
-                                         int exit_code);
+    [[nodiscard]] static exit_t default_print_and_exit(
+        const std::string_view print_msg, int exit_code);
     void set_print_and_exit_func(print_and_exit_func_t&& func);
-    print_and_exit_func_t& get_print_and_exit_func();
+    [[nodiscard]] print_and_exit_func_t& get_print_and_exit_func();
 
    protected:
-    sub_parsers_map_t& get_sub_parsers();
-    help_entry_vec_t get_option_help() const;
-    help_entry_vec_t get_argument_help() const;
-    variant_opt_conf_vec_t::const_iterator find_option(
+    [[nodiscard]] sub_parsers_map_t& get_sub_parsers();
+    [[nodiscard]] help_entry_vec_t get_option_help() const;
+    [[nodiscard]] help_entry_vec_t get_argument_help() const;
+    [[nodiscard]] variant_opt_conf_vec_t::const_iterator find_option(
         std::string_view opt) const;
-    variant_opt_conf_vec_t::const_iterator find_option(char opt) const;
-    variant_arg_conf_vec_t get_arguments() const;
-    validate_func_vec_t& get_validate_functions();
-    variant_opt_conf_vec_t get_options() const;
-    sub_parser_descriptions_vec_t& get_sub_parser_descriptions();
-    argument_descriptions_vec_t& get_mandatory_argument_descriptions();
-    argument_descriptions_vec_t& get_optional_argument_descriptions();
+    [[nodiscard]] variant_opt_conf_vec_t::const_iterator find_option(
+        char opt) const;
+    [[nodiscard]] variant_arg_conf_vec_t get_arguments() const;
+    [[nodiscard]] validate_func_vec_t& get_validate_functions();
+    [[nodiscard]] variant_opt_conf_vec_t get_options() const;
+    [[nodiscard]] sub_parser_descriptions_vec_t& get_sub_parser_descriptions();
+    [[nodiscard]] argument_descriptions_vec_t&
+    get_mandatory_argument_descriptions();
+    [[nodiscard]] argument_descriptions_vec_t&
+    get_optional_argument_descriptions();
 
    private:
-    parse_result_t parse_arg(std::string_view argument, arg_iterator it,
-                             arg_iterator end);
-    parse_result_t parse_long(std::string_view option, arg_iterator it,
-                              arg_iterator end);
-    parse_result_t parse_short(std::string_view option, arg_iterator it,
-                               arg_iterator end);
+    [[nodiscard]] parse_result_t parse_arg(std::string_view argument,
+                                           arg_iterator it, arg_iterator end);
+    [[nodiscard]] parse_result_t parse_long(std::string_view option,
+                                            arg_iterator it, arg_iterator end);
+    [[nodiscard]] parse_result_t parse_short(std::string_view option,
+                                             arg_iterator it, arg_iterator end);
 
     sub_parsers_map_t sub_parsers{};
     validate_func_vec_t validate_functions{};
