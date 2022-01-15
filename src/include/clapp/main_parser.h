@@ -34,10 +34,10 @@ class basic_main_parser_t : public basic_parser_t {
     [[nodiscard]] std::optional<clapp::value::exit_t> parse_and_validate(
         int argc, const char* const* argv);
 
-    explicit operator bool() const;
-    std::string get_executable() const;
+    [[nodiscard]] explicit operator bool() const;
+    [[nodiscard]] std::string get_executable() const;
 
-    std::string gen_short_line_prefix() const override;
+    [[nodiscard]] std::string gen_short_line_prefix() const override;
 
    private:
     std::optional<std::string> executable{};

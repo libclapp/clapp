@@ -44,7 +44,7 @@ TEST(mainParser, constructEmptyMainParserBoolOperator) {
 TEST(mainParser, constructEmptyMainParserGetExecutable) {
     constexpr const char* const argv[]{"main-exec", nullptr};
     empty_main_parser_t emp;
-    ASSERT_THROW(emp.get_executable(),
+    ASSERT_THROW(static_cast<void>(emp.get_executable()),
                  clapp::exception::no_executable_exception_t);
 
     ASSERT_THAT(emp.parse(1, static_cast<const char* const*>(argv)).has_value(),
@@ -56,7 +56,7 @@ TEST(mainParser, constructEmptyMainParserAndGenHelpPrefix) {
     constexpr const char* const argv[]{"main", nullptr};
     empty_main_parser_t emp;
 
-    ASSERT_THROW(emp.gen_short_line_prefix(),
+    ASSERT_THROW(static_cast<void>(emp.gen_short_line_prefix()),
                  clapp::exception::no_executable_exception_t);
 
     ASSERT_THAT(emp.parse(1, static_cast<const char* const*>(argv)).has_value(),

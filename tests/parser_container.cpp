@@ -78,14 +78,16 @@ TEST(parserContainer,
      constructEmptyParserContainerWithoutParseAndGetExecutableViaArrowThrows) {
     example_parser_container_t epc;
 
-    ASSERT_THROW(epc->get_executable(), clapp::not_fully_parsed_exception_t);
+    ASSERT_THROW(static_cast<void>(epc->get_executable()),
+                 clapp::not_fully_parsed_exception_t);
 }
 
 TEST(parserContainer,
      constructEmptyParserContainerWithoutParseAndGetExecutableViaStarThrows) {
     example_parser_container_t epc;
 
-    ASSERT_THROW((*epc).get_executable(), clapp::not_fully_parsed_exception_t);
+    ASSERT_THROW(static_cast<void>((*epc).get_executable()),
+                 clapp::not_fully_parsed_exception_t);
 }
 
 TEST(parserContainer, constructEmptyParserContainerAndParse) {
@@ -156,8 +158,10 @@ TEST(
     ASSERT_THAT(exit.has_value(), testing::Eq(true));
     ASSERT_THAT(exit.value().get_exit_code(), testing::Eq(EXIT_SUCCESS));
 
-    ASSERT_THROW((*epc).get_executable(), clapp::not_fully_parsed_exception_t);
-    ASSERT_THROW(epc->get_executable(), clapp::not_fully_parsed_exception_t);
+    ASSERT_THROW(static_cast<void>((*epc).get_executable()),
+                 clapp::not_fully_parsed_exception_t);
+    ASSERT_THROW(static_cast<void>(epc->get_executable()),
+                 clapp::not_fully_parsed_exception_t);
 }
 
 TEST(parserContainer,
@@ -170,6 +174,8 @@ TEST(parserContainer,
     ASSERT_THAT(exit.has_value(), testing::Eq(true));
     ASSERT_THAT(exit.value().get_exit_code(), testing::Eq(EXIT_SUCCESS));
 
-    ASSERT_THROW((*epc).get_executable(), clapp::not_fully_parsed_exception_t);
-    ASSERT_THROW(epc->get_executable(), clapp::not_fully_parsed_exception_t);
+    ASSERT_THROW(static_cast<void>((*epc).get_executable()),
+                 clapp::not_fully_parsed_exception_t);
+    ASSERT_THROW(static_cast<void>(epc->get_executable()),
+                 clapp::not_fully_parsed_exception_t);
 }
