@@ -27,13 +27,13 @@ class basic_sub_parser_t : public basic_parser_t {
                        std::string description_arg);
     ~basic_sub_parser_t() override;
 
-    inline bool is_active() const noexcept override;
-    constexpr explicit operator bool() const noexcept;
+    [[nodiscard]] inline bool is_active() const noexcept override;
+    [[nodiscard]] constexpr explicit operator bool() const noexcept;
 
-    inline std::string get_sub_parser_name() const;
+    [[nodiscard]] inline std::string get_sub_parser_name() const;
     void sub_parse(arg_iterator begin, arg_iterator end);
 
-    std::string gen_short_line_prefix() const override;
+    [[nodiscard]] std::string gen_short_line_prefix() const override;
 
    private:
     basic_parser_t& parent_parser;
