@@ -40,8 +40,8 @@ struct argument_callbacks_t {
     using argument_func_t = parser::types::argument_func_t;
     argument_func_t af;
     given_func_t given;
-    std::optional<has_value_func_t> has_value;
-    std::optional<arg_value_func_t<T>> value;
+    has_value_func_t has_value;
+    arg_value_func_t<T> value;
 };
 
 template <typename T>
@@ -49,8 +49,8 @@ struct variadic_argument_callbacks_t {
     using argument_func_t = parser::types::argument_func_t;
     argument_func_t af;
     given_func_t given;
-    std::optional<has_value_func_t> has_value;
-    std::optional<variadic_value_func_t<T>> value;
+    has_value_func_t has_value;
+    variadic_value_func_t<T> value;
 };
 
 template <typename T>
@@ -83,8 +83,7 @@ void gen_arg_conf_process_params(arg_params_t<T>& arg_params, Param&& param,
 
 template <typename T, typename VALUE_FUNC>
 std::optional<parser::types::validate_func_t> gen_arg_validate_func(
-    std::optional<VALUE_FUNC>&& vf, std::optional<has_value_func_t>&& hvf,
-    given_func_t&& gf,
+    VALUE_FUNC&& vf, has_value_func_t&& hvf, given_func_t&& gf,
     std::vector<typename arg_params_t<T>::validate_func_t>&& validate_funcs,
     const std::string& argument_name, const parser::types::purpose_t purpose);
 
