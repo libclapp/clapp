@@ -39,9 +39,9 @@ template <typename T>
 struct default_value_t {
     explicit default_value_t(T _value);
 
-    std::string append_restriction_text() const;
+    [[nodiscard]] std::string append_restriction_text() const;
 
-    T default_value() const;
+    [[nodiscard]] T default_value() const;
 
    private:
     T value;
@@ -52,7 +52,7 @@ class min_max_value_t {
    public:
     min_max_value_t(T _min, T _max);
 
-    std::string append_restriction_text() const;
+    [[nodiscard]] std::string append_restriction_text() const;
 
     void validate(const T &value, const std::string &param_name) const;
 
@@ -66,7 +66,8 @@ class not_null_value_t {
    public:
     not_null_value_t();
 
-    static constexpr std::string_view append_restriction_text() noexcept;
+    [[nodiscard]] static constexpr std::string_view
+    append_restriction_text() noexcept;
 
     void validate(const T &value, const std::string &param_name) const;
 };
@@ -98,7 +99,8 @@ class found_func_t {
 #ifdef CLAPP_FS_AVAIL
 class path_exists_t {
    public:
-    static constexpr std::string_view append_restriction_text() noexcept;
+    [[nodiscard]] static constexpr std::string_view
+    append_restriction_text() noexcept;
 
     static void validate(const fs::path &path, const std::string &param_name);
 };
