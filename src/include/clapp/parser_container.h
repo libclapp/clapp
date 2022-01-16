@@ -30,8 +30,8 @@ class basic_parser_container_t {
    public:
     using parser_t = PARSER_T;
     enum class state_t { not_parsed, parsing, parsed };
-    static constexpr std::optional<std::string_view> to_string_view(
-        state_t state) noexcept;
+    [[nodiscard]] static constexpr std::optional<std::string_view>
+    to_string_view(state_t state) noexcept;
 
     template <typename... ARGS_T>
     basic_parser_container_t(ARGS_T&&...);
@@ -47,7 +47,7 @@ class basic_parser_container_t {
     [[nodiscard]] parser_t& operator*();
 
     void change_state(state_t exp_state, state_t new_state);
-    state_t get_state() const;
+    [[nodiscard]] state_t get_state() const;
 
    private:
     std::atomic<state_t> state{state_t::not_parsed};
