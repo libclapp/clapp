@@ -110,10 +110,10 @@ class basic_argument_t {
     template <typename... Params>
     basic_argument_t(basic_parser_t& parser, const std::string& argument_name,
                      const std::string& description, Params&&... parameters);
-    constexpr explicit operator bool() const noexcept;
-    constexpr bool has_value() const noexcept;
-    T value() const;
-    constexpr bool given() const noexcept;
+    [[nodiscard]] constexpr explicit operator bool() const noexcept;
+    [[nodiscard]] constexpr bool has_value() const noexcept;
+    [[nodiscard]] T value() const;
+    [[nodiscard]] constexpr bool given() const noexcept;
 
     virtual ~basic_argument_t();
 
@@ -121,7 +121,8 @@ class basic_argument_t {
     void validate() const;
     [[nodiscard]] clapp::value::found_func_t::ret_t found_entry(
         const std::string_view argument);
-    static callbacks_t create_callbacks(basic_argument_t<T>* inst);
+    [[nodiscard]] static callbacks_t create_callbacks(
+        basic_argument_t<T>* inst);
 
     const std::string _argument_name;
     std::vector<clapp::value::found_func_t> _found{};
@@ -141,18 +142,19 @@ class basic_variadic_argument_t {
                               const std::string& argument_name,
                               const std::string& description,
                               Params&&... parameters);
-    inline explicit operator bool() const noexcept;
-    inline bool has_value() const noexcept;
-    std::vector<T> value() const;
-    constexpr bool given() const noexcept;
+    [[nodiscard]] inline explicit operator bool() const noexcept;
+    [[nodiscard]] inline bool has_value() const noexcept;
+    [[nodiscard]] std::vector<T> value() const;
+    [[nodiscard]] constexpr bool given() const noexcept;
 
-    static std::string variadic_argument_restrictions();
+    [[nodiscard]] static std::string variadic_argument_restrictions();
 
    protected:
     void validate() const;
     [[nodiscard]] clapp::value::found_func_t::ret_t found_entry(
         const std::string_view argument);
-    static callbacks_t create_callbacks(basic_variadic_argument_t<T>* inst);
+    [[nodiscard]] static callbacks_t create_callbacks(
+        basic_variadic_argument_t<T>* inst);
 
     const std::string _argument_name;
     std::vector<clapp::value::found_func_t> _found{};
