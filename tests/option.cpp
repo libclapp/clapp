@@ -159,7 +159,7 @@ MATCHER_P(ParamOptionNotGivenDefaultValue, default_value,
 MATCHER(ParamOptionNotGiven, "Checks, if param option is not given.") {
     bool caught_value_undefined{false};
     try {
-        arg.value();
+        static_cast<void>(arg.value());
     } catch (clapp::exception::value_undefined_t& /*e*/) {
         caught_value_undefined = true;
     }

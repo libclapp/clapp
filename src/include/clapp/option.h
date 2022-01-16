@@ -105,17 +105,18 @@ class basic_param_option_t {
     basic_param_option_t& operator=(const basic_param_option_t&) = delete;
     basic_param_option_t& operator=(basic_param_option_t&&) noexcept = delete;
 
-    constexpr explicit operator bool() const noexcept;
-    constexpr bool has_value() const noexcept;
-    T value() const;
-    constexpr bool given() const noexcept;
+    [[nodiscard]] constexpr explicit operator bool() const noexcept;
+    [[nodiscard]] constexpr bool has_value() const noexcept;
+    [[nodiscard]] T value() const;
+    [[nodiscard]] constexpr bool given() const noexcept;
 
     virtual ~basic_param_option_t();
 
    protected:
     [[nodiscard]] clapp::value::found_func_t::ret_t found_entry(
         const std::string& option, std::string_view param);
-    static callbacks_t create_callbacks(basic_param_option_t<T>* inst);
+    [[nodiscard]] static callbacks_t create_callbacks(
+        basic_param_option_t<T>* inst);
 
     std::vector<clapp::value::found_func_t> _found{};
     std::optional<T> _value{};
@@ -141,17 +142,18 @@ class basic_vector_param_option_t {
     basic_vector_param_option_t& operator=(
         basic_vector_param_option_t&&) noexcept = delete;
 
-    inline explicit operator bool() const noexcept;
-    inline bool has_value() const noexcept;
-    std::vector<T> value() const;
-    constexpr bool given() const noexcept;
+    [[nodiscard]] inline explicit operator bool() const noexcept;
+    [[nodiscard]] inline bool has_value() const noexcept;
+    [[nodiscard]] std::vector<T> value() const;
+    [[nodiscard]] constexpr bool given() const noexcept;
 
     virtual ~basic_vector_param_option_t();
 
    protected:
     [[nodiscard]] clapp::value::found_func_t::ret_t found_entry(
         const std::string& option, std::string_view param);
-    static callbacks_t create_callbacks(basic_vector_param_option_t<T>* inst);
+    [[nodiscard]] static callbacks_t create_callbacks(
+        basic_vector_param_option_t<T>* inst);
 
     std::vector<clapp::value::found_func_t> _found{};
     std::vector<T> _value{};
@@ -175,10 +177,10 @@ class basic_option_t {
 
     virtual ~basic_option_t();
 
-    constexpr explicit operator bool() const noexcept;
-    constexpr bool has_value() const noexcept;
-    T value() const;
-    bool given() const;
+    [[nodiscard]] constexpr explicit operator bool() const noexcept;
+    [[nodiscard]] constexpr bool has_value() const noexcept;
+    [[nodiscard]] T value() const;
+    [[nodiscard]] bool given() const;
 
     static constexpr T default_value = default_value_param;
 
@@ -202,7 +204,7 @@ class bool_option_t : public basic_option_t<bool, false> {
    private:
     [[nodiscard]] clapp::value::found_func_t::ret_t found_entry(
         const std::string& option);
-    static callbacks_t create_callbacks(bool_option_t* inst);
+    [[nodiscard]] static callbacks_t create_callbacks(bool_option_t* inst);
 };
 
 template <int EXIT_CODE>
@@ -217,7 +219,7 @@ class basic_help_option_t : public bool_option_t {
 
     ~basic_help_option_t() override;
 
-    static value::found_func_t gen_func_print_help_and_req_exit(
+    [[nodiscard]] static value::found_func_t gen_func_print_help_and_req_exit(
         basic_parser_t& parser);
 };
 
@@ -235,7 +237,7 @@ class count_option_t : public basic_option_t<std::uint32_t, 0U> {
    private:
     [[nodiscard]] clapp::value::found_func_t::ret_t found_entry(
         const std::string& option);
-    static callbacks_t create_callbacks(count_option_t* inst);
+    [[nodiscard]] static callbacks_t create_callbacks(count_option_t* inst);
 };
 
 template <typename T>
