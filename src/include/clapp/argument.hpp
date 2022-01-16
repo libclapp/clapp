@@ -143,20 +143,63 @@ clapp::argument::gen_arg_validate_func(
     return std::nullopt;
 }
 
+template <typename T, typename VALUE_FUNC>
+clapp::parser::types::validate_value_func_t
+clapp::argument::gen_arg_validate_value_func(
+    VALUE_FUNC&& val_func, has_value_func_t&& hvf,
+    std::vector<typename arg_params_t<T>::validate_func_t>&& validate_funcs) {
+    if (!validate_funcs.empty()) {
+        return [value_func = std::forward<VALUE_FUNC>(val_func),
+                has_value_func = std::move(hvf),
+                validate_funcs = std::move(validate_funcs)](
+                   const std::string& argument_string) {
+            if (has_value_func()) {
+                if constexpr (std::is_same<VALUE_FUNC,
+                                           variadic_value_func_t<T>>::value) {
+                    for (const auto& value : value_func()) {
+                        for (const auto& func : validate_funcs) {
+                            func(value, argument_string);
+                        }
+                    }
+                } else if constexpr (std::is_same<VALUE_FUNC,
+                                                  arg_value_func_t<T>>::value) {
+                    const T value{value_func()};
+                    for (const auto& func : validate_funcs) {
+                        func(value, argument_string);
+                    }
+                }
+            }
+        };
+    }
+    return [](const std::string& /*argument_string*/) {};
+}
+
 template <typename T, typename ARG_CONF, typename CALLBACKS>
 ARG_CONF clapp::argument::gen_arg_conf(
     CALLBACKS&& callbacks, const std::string& argument_name,
     std::vector<typename arg_params_t<T>::validate_func_t>&& validate_funcs,
     const std::string& description, parser::types::purpose_t purpose) {
+    std::decay_t<decltype(callbacks.value)> vf{callbacks.value};
     using optional_arg_validate_func_t =
         std::optional<parser::types::validate_func_t>;
     optional_arg_validate_func_t arg_validate_func{gen_arg_validate_func<T>(
-        std::move(callbacks.value), std::move(callbacks.has_value),
-        std::move(callbacks.given), std::move(validate_funcs), argument_name,
-        purpose)};
+        std::move(vf), std::optional<has_value_func_t>{callbacks.has_value},
+        std::optional<given_func_t>{callbacks.given},
+        std::vector<typename arg_params_t<T>::validate_func_t>{validate_funcs},
+        argument_name, purpose)};
 
-    return ARG_CONF{std::move(callbacks.af), argument_name, description,
-                    std::move(arg_validate_func), purpose};
+    using validate_value_func_t = parser::types::validate_value_func_t;
+    validate_value_func_t validate_value_func{gen_arg_validate_value_func<T>(
+        std::move(callbacks.value), std::move(callbacks.has_value.value()),
+        std::move(validate_funcs))};
+
+    return ARG_CONF{std::move(callbacks.af),
+                    argument_name,
+                    description,
+                    std::move(arg_validate_func),
+                    std::move(callbacks.given.value()),
+                    std::move(validate_value_func),
+                    purpose};
 }
 
 template <typename T, typename ARG_CONF, typename CALLBACKS, typename... Params>

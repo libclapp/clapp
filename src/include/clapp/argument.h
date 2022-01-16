@@ -28,7 +28,7 @@
 namespace clapp {
 
 inline namespace argument {
-using given_func_t = std::function<bool(void)>;
+using given_func_t = parser::types::given_func_t;
 using has_value_func_t = std::function<bool(void)>;
 template <typename T>
 using arg_value_func_t = std::function<T(void)>;
@@ -87,6 +87,11 @@ std::optional<parser::types::validate_func_t> gen_arg_validate_func(
     std::optional<given_func_t>&& gf,
     std::vector<typename arg_params_t<T>::validate_func_t>&& validate_funcs,
     const std::string& argument_name, const parser::types::purpose_t purpose);
+
+template <typename T, typename VALUE_FUNC>
+parser::types::validate_value_func_t gen_arg_validate_value_func(
+    VALUE_FUNC&& val_func, has_value_func_t&& hvf,
+    std::vector<typename arg_params_t<T>::validate_func_t>&& validate_funcs);
 
 template <typename T, typename ARG_CONF, typename CALLBACKS>
 ARG_CONF gen_arg_conf(
