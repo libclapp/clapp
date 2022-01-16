@@ -116,6 +116,8 @@ class basic_parser_t : public basic_option_container_t {
                                        types::arg_iterator_t ait,
                                        types::arg_iterator_t end);
 
+    void validate_arguments() const;
+
     void validate() const;
 
     void validate_recursive() const;

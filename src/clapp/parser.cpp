@@ -111,6 +111,23 @@ void clapp::parser::basic_parser_t::reg(reg_sub_parser_conf_t&& config) {
     get_sub_parsers().emplace(std::move(config.sub_parser_name), config.parser);
 }
 
+void clapp::parser::basic_parser_t::validate_arguments() const {
+    for (const auto& argument : arguments) {
+        std::visit(
+            [](auto&& arg) {
+                if (arg.purpose == parser::types::purpose_t::mandatory) {
+                    if (!arg.given_func()) {
+                        throw clapp::exception::argument_exception_t{
+                            std::string{"Mandatory argument '"} +
+                            arg.argument_name + "' not given."};
+                    }
+                }
+                arg.validate_value_func(arg.argument_name);
+            },
+            argument);
+    }
+}
+
 clapp::parser::basic_parser_t::help_contents_t
 clapp::parser::basic_parser_t::gen_detailed_help_contents() const {
     help_contents_t ret;
@@ -305,6 +322,7 @@ void clapp::parser::basic_parser_t::validate() const {
         validate_func();
     }
     validate_options();
+    validate_arguments();
 }
 
 void clapp::parser::basic_parser_t::validate_recursive() const {
