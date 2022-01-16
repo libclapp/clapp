@@ -120,7 +120,7 @@ clapp::argument::gen_arg_validate_func(
                         }
                     }
                 } else if constexpr (std::is_same<VALUE_FUNC,
-                                                  arg_value_func_t<T>>::value) {
+                                                  value_func_t<T>>::value) {
                     const T value{value_func()};
                     for (const auto& func : validate_funcs) {
                         func(value, argument_name);
@@ -151,7 +151,7 @@ clapp::argument::gen_arg_validate_value_func(
                         }
                     }
                 } else if constexpr (std::is_same<VALUE_FUNC,
-                                                  arg_value_func_t<T>>::value) {
+                                                  value_func_t<T>>::value) {
                     const T value{value_func()};
                     for (const auto& func : validate_funcs) {
                         func(value, argument_string);

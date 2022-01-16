@@ -31,7 +31,7 @@ inline namespace argument {
 using given_func_t = parser::types::given_func_t;
 using has_value_func_t = std::function<bool(void)>;
 template <typename T>
-using arg_value_func_t = std::function<T(void)>;
+using value_func_t = std::function<T(void)>;
 template <typename T>
 using variadic_value_func_t = std::function<std::vector<T>(void)>;
 
@@ -41,7 +41,7 @@ struct argument_callbacks_t {
     argument_func_t af;
     given_func_t given;
     has_value_func_t has_value;
-    arg_value_func_t<T> value;
+    value_func_t<T> value;
 };
 
 template <typename T>
