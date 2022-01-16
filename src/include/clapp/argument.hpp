@@ -90,7 +90,7 @@ template <typename T, typename VALUE_FUNC>
 std::optional<clapp::parser::types::validate_func_t>
 clapp::argument::gen_arg_validate_func(
     std::optional<VALUE_FUNC>&& vf, std::optional<has_value_func_t>&& hvf,
-    std::optional<given_func_t>&& gf,
+    given_func_t&& gf,
     std::vector<typename arg_params_t<T>::validate_func_t>&& validate_funcs,
     const std::string& argument_name, const parser::types::purpose_t purpose) {
     if (validate_funcs.size() > 0 ||
@@ -98,8 +98,8 @@ clapp::argument::gen_arg_validate_func(
         return [purpose, value_func = std::move(vf),
                 has_value_func = std::move(hvf), given_func = std::move(gf),
                 argument_name, validate_funcs = std::move(validate_funcs)]() {
-            if (purpose == parser::types::purpose_t::mandatory && given_func) {
-                if (!given_func.value()()) {
+            if (purpose == parser::types::purpose_t::mandatory) {
+                if (!given_func()) {
                     throw clapp::exception::argument_exception_t(
                         std::string{"Mandatory argument '"} + argument_name +
                         "' not given.");
@@ -184,7 +184,7 @@ ARG_CONF clapp::argument::gen_arg_conf(
         std::optional<parser::types::validate_func_t>;
     optional_arg_validate_func_t arg_validate_func{gen_arg_validate_func<T>(
         std::move(vf), std::optional<has_value_func_t>{callbacks.has_value},
-        std::optional<given_func_t>{callbacks.given},
+        given_func_t{callbacks.given},
         std::vector<typename arg_params_t<T>::validate_func_t>{validate_funcs},
         argument_name, purpose)};
 
@@ -197,7 +197,7 @@ ARG_CONF clapp::argument::gen_arg_conf(
                     argument_name,
                     description,
                     std::move(arg_validate_func),
-                    std::move(callbacks.given.value()),
+                    std::move(callbacks.given),
                     std::move(validate_value_func),
                     purpose};
 }
