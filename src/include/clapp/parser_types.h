@@ -169,7 +169,6 @@ struct basic_reg_argument_conf_t {
     argument_func_t argument;
     std::string argument_name;
     std::string description;
-    std::optional<validate_func_t> validate_func;
     given_func_t given_func;
     validate_value_func_t validate_value_func;
     purpose_t purpose{purpose_t::mandatory};

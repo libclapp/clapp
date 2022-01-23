@@ -14,6 +14,8 @@ class argument_test_parser_t : public clapp::parser::basic_parser_t {
     using argument_descriptions_vec_t =
         clapp::parser::basic_parser_t::argument_descriptions_vec_t;
     using validate_func_t = clapp::parser::types::validate_func_t;
+    using validate_value_func_t = clapp::parser::types::validate_value_func_t;
+    using given_func_t = clapp::parser::types::given_func_t;
 
     using clapp::parser::basic_parser_t::get_argument_help;
     using clapp::parser::basic_parser_t::get_arguments;
@@ -197,7 +199,7 @@ static ARG_FUNC_T get_arg_func(argument_test_parser_t& atp,
 }
 
 template <typename ARGUMENT_T>
-static std::optional<argument_test_parser_t::validate_func_t> get_validate_func(
+static argument_test_parser_t::validate_value_func_t get_validate_value_func(
     argument_test_parser_t& atp, ARGUMENT_T&& argument) {
     std::string argument_string{argument};
     std::vector<clapp::parser::types::variant_arg_conf_t> arguments{
@@ -211,8 +213,26 @@ static std::optional<argument_test_parser_t::validate_func_t> get_validate_func(
     }
 
     return std::visit(
-        [](auto&& validate_func) { return validate_func.validate_func; },
+        [](auto&& value_func) { return value_func.validate_value_func; },
         found_arg.value());
+}
+
+template <typename ARGUMENT_T>
+static argument_test_parser_t::given_func_t get_given_func(
+    argument_test_parser_t& atp, ARGUMENT_T&& argument) {
+    std::string argument_string{argument};
+    std::vector<clapp::parser::types::variant_arg_conf_t> arguments{
+        atp.get_arguments()};
+    std::optional<clapp::parser::types::variant_arg_conf_t> found_arg{
+        contains_argument(arguments,
+                          std::forward<decltype(argument)>(argument))};
+    if (found_arg == std::nullopt) {
+        throw std::runtime_error("no argument with '" + argument_string +
+                                 "' registered.");
+    }
+
+    return std::visit([](auto&& value_func) { return value_func.given_func; },
+                      found_arg.value());
 }
 
 std::string argument_test_parser_t::gen_short_line_prefix() const {
@@ -350,17 +370,18 @@ TEST_F(argumentT, basicArgumentConstructStrAndCallValueThrows) {
                  clapp::exception::value_undefined_t);
 }
 
-TEST_F(argumentT, basicArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT, basicArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     test_argument_t arg{tp, arg_str, desc_str,
                         argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)("my-str"));
 }
 
-TEST_F(argumentT, basicArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT, basicArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     test_argument_t arg{tp, arg_str, desc_str,
                         argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)("arg-str"));
 }
 
 TEST_F(argumentT, basicArgumentConstructStrWithEmpyArgumentNameThrows) {
@@ -423,17 +444,18 @@ TEST_F(argumentT, boolArgumentConstructWithAlreadyRegisteredArgThrows) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST_F(argumentT, boolArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT, boolArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::bool_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, boolArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT, boolArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::bool_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT, boolArgumentCallFoundFunc) {
@@ -478,16 +500,20 @@ TEST_F(argumentT, boolArgumentConstructOptionalStrWithNotNullValue) {
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional,
         clapp::value::not_null_value_t<bool>{}};
 
-    std::optional<argument_test_parser_t::validate_func_t>
-        argument_validate_func{get_validate_func(tp, arg_str)};
-    ASSERT_THAT(argument_validate_func, testing::Ne(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    argument_test_parser_t::validate_value_func_t argument_validate_func{
+        get_validate_value_func(tp, arg_str)};
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(0));
-    ASSERT_THROW((argument_validate_func.value()()),
+
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_THROW((argument_validate_func(arg_str)),
                  clapp::exception::out_of_range_t);
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(1));
-    ASSERT_NO_THROW((argument_validate_func.value()()));
+
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_NO_THROW((argument_validate_func(arg_str)));
 }
 
 TEST_F(argumentT, boolArgumentConstructMandatoryStrAndCallGetOptionHelp) {
@@ -521,17 +547,20 @@ TEST_F(argumentT, boolArgumentConstructOptionalAfterSubParserThrows) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST_F(argumentT, variadicBoolArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT,
+       variadicBoolArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::variadic_bool_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, variadicBoolArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       variadicBoolArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::variadic_bool_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT,
@@ -601,17 +630,19 @@ TEST_F(argumentT, variadicBoolArgumentConstructWithNotNullValue) {
     clapp::argument::variadic_bool_argument_t arg{
         tp, arg_str, desc_str, clapp::value::not_null_value_t<bool>{}};
 
-    std::optional<argument_test_parser_t::validate_func_t>
-        argument_validate_func{get_validate_func(tp, arg_str)};
-    ASSERT_THAT(argument_validate_func, testing::Ne(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    argument_test_parser_t::validate_value_func_t argument_validate_func{
+        get_validate_value_func(tp, arg_str)};
 
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(1));
-    ASSERT_NO_THROW((argument_validate_func.value()()));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_NO_THROW((argument_validate_func(arg_str)));
 
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(0));
-    ASSERT_THROW((argument_validate_func.value()()),
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_THROW((argument_validate_func(arg_str)),
                  clapp::exception::out_of_range_t);
 }
 
@@ -645,21 +676,26 @@ TEST_F(argumentT,
     clapp::argument::variadic_bool_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional,
         clapp::value::min_max_value_t<bool>{min_value, max_value}};
-    std::optional<argument_test_parser_t::validate_func_t>
-        argument_validate_func{get_validate_func(tp, arg_str)};
-    ASSERT_THAT(argument_validate_func, testing::Ne(std::nullopt));
+
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    argument_test_parser_t::validate_value_func_t argument_validate_func{
+        get_validate_value_func(tp, arg_str)};
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(min_value_int64));
-    ASSERT_NO_THROW((argument_validate_func.value()()));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_NO_THROW((argument_validate_func(arg_str)));
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(max_value_int64));
-    ASSERT_NO_THROW((argument_validate_func.value()()));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_NO_THROW((argument_validate_func(arg_str)));
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(min_value_int64));
-    ASSERT_NO_THROW((argument_validate_func.value()()));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_NO_THROW((argument_validate_func(arg_str)));
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(max_value_int64));
-    ASSERT_NO_THROW((argument_validate_func.value()()));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_NO_THROW((argument_validate_func(arg_str)));
 }
 
 TEST_F(argumentT, stringArgumentConstructCStrAndCallValueThrows) {
@@ -684,17 +720,19 @@ TEST_F(argumentT, stringArgumentConstructWithAlreadyRegisteredArgThrows) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST_F(argumentT, stringArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT, stringArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::string_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, stringArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       stringArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::string_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT, stringArgumentCallFoundFunc) {
@@ -750,17 +788,19 @@ TEST_F(argumentT, stringArgumentConstructOptionalStrAndCallGetOptionHelp) {
 }
 
 TEST_F(argumentT,
-       variadicStringArgumentConstructOptionalStrWithoutValidateFunc) {
+       variadicStringArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::string_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, variadicStringArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       variadicStringArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::string_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT,
@@ -872,17 +912,18 @@ TEST_F(argumentT, int64ArgumentConstructWithAlreadyRegisteredArgThrows) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST_F(argumentT, int64ArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT, int64ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::int64_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, int64ArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT, int64ArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::int64_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT, int64ArgumentCallFoundFunc) {
@@ -943,29 +984,35 @@ TEST_F(argumentT, int64ArgumentConstructStrWithMinMaxValueAndCallArgFunc) {
     clapp::argument::int64_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional,
         clapp::value::min_max_value_t<std::int64_t>{min_value, max_value}};
-    std::optional<argument_test_parser_t::validate_func_t>
-        argument_validate_func{get_validate_func(tp, arg_str)};
-    ASSERT_THAT(argument_validate_func, testing::Ne(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    argument_test_parser_t::validate_value_func_t argument_validate_func{
+        get_validate_value_func(tp, arg_str)};
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(value_int32));
-    ASSERT_THROW((argument_validate_func.value()()),
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_THROW((argument_validate_func(arg_str)),
                  clapp::exception::out_of_range_t);
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(value_int8));
-    ASSERT_NO_THROW((argument_validate_func.value()()));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_NO_THROW((argument_validate_func(arg_str)));
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(max_value));
-    ASSERT_NO_THROW((argument_validate_func.value()()));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_NO_THROW((argument_validate_func(arg_str)));
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(min_value));
-    ASSERT_NO_THROW((argument_validate_func.value()()));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_NO_THROW((argument_validate_func(arg_str)));
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(max_value + 1));
-    ASSERT_THROW((argument_validate_func.value()()),
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_THROW((argument_validate_func(arg_str)),
                  clapp::exception::out_of_range_t);
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(min_value - 1));
-    ASSERT_THROW((argument_validate_func.value()()),
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_THROW((argument_validate_func(arg_str)),
                  clapp::exception::out_of_range_t);
 }
 
@@ -974,30 +1021,33 @@ TEST_F(argumentT, int64ArgumentConstructStrWithNotNullValue) {
     clapp::argument::int64_argument_t arg{
         tp, arg_str, desc_str, clapp::value::not_null_value_t<std::int64_t>{}};
 
-    std::optional<argument_test_parser_t::validate_func_t>
-        argument_validate_func{get_validate_func(tp, arg_str)};
-    ASSERT_THAT(argument_validate_func, testing::Ne(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    argument_test_parser_t::validate_value_func_t argument_validate_func{
+        get_validate_value_func(tp, arg_str)};
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(0));
-    ASSERT_THROW((argument_validate_func.value()()),
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_THROW((argument_validate_func(arg_str)),
                  clapp::exception::out_of_range_t);
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(not_null_value));
-    ASSERT_NO_THROW((argument_validate_func.value()()));
+    ASSERT_NO_THROW((argument_validate_func(arg_str)));
 }
 
 TEST_F(argumentT,
-       variadicInt64ArgumentConstructOptionalStrWithoutValidateFunc) {
+       variadicInt64ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::int64_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, variadicInt64ArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       variadicInt64ArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::int64_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT,
@@ -1095,21 +1145,25 @@ TEST_F(argumentT,
     clapp::argument::variadic_int64_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional,
         clapp::value::min_max_value_t<std::int64_t>{min_value, max_value}};
-    std::optional<argument_test_parser_t::validate_func_t>
-        argument_validate_func{get_validate_func(tp, arg_str)};
-    ASSERT_THAT(argument_validate_func, testing::Ne(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    argument_test_parser_t::validate_value_func_t argument_validate_func{
+        get_validate_value_func(tp, arg_str)};
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(value_int8));
-    ASSERT_NO_THROW((argument_validate_func.value()()));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_NO_THROW((argument_validate_func(arg_str)));
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(max_value));
-    ASSERT_NO_THROW((argument_validate_func.value()()));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_NO_THROW((argument_validate_func(arg_str)));
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(min_value));
-    ASSERT_NO_THROW((argument_validate_func.value()()));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_NO_THROW((argument_validate_func(arg_str)));
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(value_int32));
-    ASSERT_THROW((argument_validate_func.value()()),
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_THROW((argument_validate_func(arg_str)),
                  clapp::exception::out_of_range_t);
 }
 
@@ -1118,17 +1172,19 @@ TEST_F(argumentT, variadicInt64ArgumentConstructOptionalWithNotNullValue) {
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional,
         clapp::value::not_null_value_t<std::int64_t>{}};
 
-    std::optional<argument_test_parser_t::validate_func_t>
-        argument_validate_func{get_validate_func(tp, arg_str)};
-    ASSERT_THAT(argument_validate_func, testing::Ne(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    argument_test_parser_t::validate_value_func_t argument_validate_func{
+        get_validate_value_func(tp, arg_str)};
 
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(1));
-    ASSERT_NO_THROW((argument_validate_func.value()()));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_NO_THROW((argument_validate_func(arg_str)));
 
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(0));
-    ASSERT_THROW((argument_validate_func.value()()),
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_THROW((argument_validate_func(arg_str)),
                  clapp::exception::out_of_range_t);
 }
 
@@ -1162,17 +1218,19 @@ TEST_F(argumentT, uint64ArgumentConstructWithAlreadyRegisteredArgThrows) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST_F(argumentT, uint64ArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT, uint64ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::uint64_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, uint64ArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       uint64ArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::uint64_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT, uint64ArgumentCallFoundFunc) {
@@ -1233,47 +1291,57 @@ TEST_F(argumentT, uint64ArgumentConstructStrWithMinMaxValueAndCallArgFunc) {
     clapp::argument::uint64_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional,
         clapp::value::min_max_value_t<std::uint64_t>{min_value, max_value}};
-    std::optional<argument_test_parser_t::validate_func_t>
-        argument_validate_func{get_validate_func(tp, arg_str)};
-    ASSERT_THAT(argument_validate_func, testing::Ne(std::nullopt));
+
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    argument_test_parser_t::validate_value_func_t argument_validate_func{
+        get_validate_value_func(tp, arg_str)};
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(value_uint32));
-    ASSERT_THROW((argument_validate_func.value()()),
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_THROW((argument_validate_func(arg_str)),
                  clapp::exception::out_of_range_t);
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(value_uint16));
-    ASSERT_NO_THROW((argument_validate_func.value()()));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_NO_THROW((argument_validate_func(arg_str)));
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(value_uint8));
-    ASSERT_NO_THROW((argument_validate_func.value()()));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_NO_THROW((argument_validate_func(arg_str)));
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(max_value));
-    ASSERT_NO_THROW((argument_validate_func.value()()));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_NO_THROW((argument_validate_func(arg_str)));
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(min_value));
-    ASSERT_NO_THROW((argument_validate_func.value()()));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_NO_THROW((argument_validate_func(arg_str)));
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(max_value + 1));
-    ASSERT_THROW((argument_validate_func.value()()),
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_THROW((argument_validate_func(arg_str)),
                  clapp::exception::out_of_range_t);
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(min_value - 1));
-    ASSERT_THROW((argument_validate_func.value()()),
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
+    ASSERT_THROW((argument_validate_func(arg_str)),
                  clapp::exception::out_of_range_t);
 }
 
 TEST_F(argumentT,
-       variadicUint64ArgumentConstructOptionalStrWithoutValidateFunc) {
+       variadicUint64ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::uint64_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, variadicUint64ArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       variadicUint64ArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::uint64_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT,
@@ -1386,17 +1454,18 @@ TEST_F(argumentT, int32ArgumentConstructWithAlreadyRegisteredArgThrows) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST_F(argumentT, int32ArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT, int32ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::int32_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, int32ArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT, int32ArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::int32_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT, int32ArgumentCallFoundFunc) {
@@ -1452,17 +1521,19 @@ TEST_F(argumentT, int32ArgumentConstructOptionalStrAndCallGetOptionHelp) {
 }
 
 TEST_F(argumentT,
-       variadicInt32ArgumentConstructOptionalStrWithoutValidateFunc) {
+       variadicInt32ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::int32_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, variadicInt32ArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       variadicInt32ArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::int32_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT,
@@ -1575,17 +1646,19 @@ TEST_F(argumentT, uint32ArgumentConstructWithAlreadyRegisteredArgThrows) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST_F(argumentT, uint32ArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT, uint32ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::uint32_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, uint32ArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       uint32ArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::uint32_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT, uint32ArgumentCallFoundFunc) {
@@ -1641,17 +1714,19 @@ TEST_F(argumentT, uint32ArgumentConstructOptionalStrAndCallGetOptionHelp) {
 }
 
 TEST_F(argumentT,
-       variadicUint32ArgumentConstructOptionalStrWithoutValidateFunc) {
+       variadicUint32ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::uint32_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, variadicUint32ArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       variadicUint32ArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::uint32_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT,
@@ -1764,17 +1839,18 @@ TEST_F(argumentT, int16ArgumentConstructWithAlreadyRegisteredArgThrows) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST_F(argumentT, int16ArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT, int16ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::int16_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, int16ArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT, int16ArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::int16_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT, int16ArgumentCallFoundFunc) {
@@ -1830,17 +1906,19 @@ TEST_F(argumentT, int16ArgumentConstructOptionalStrAndCallGetOptionHelp) {
 }
 
 TEST_F(argumentT,
-       variadicInt16ArgumentConstructOptionalStrWithoutValidateFunc) {
+       variadicInt16ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::int16_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, variadicInt16ArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       variadicInt16ArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::int16_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT,
@@ -1953,17 +2031,19 @@ TEST_F(argumentT, uint16ArgumentConstructWithAlreadyRegisteredArgThrows) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST_F(argumentT, uint16ArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT, uint16ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::uint16_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, uint16ArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       uint16ArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::uint16_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT, uint16ArgumentCallFoundFunc) {
@@ -2019,17 +2099,19 @@ TEST_F(argumentT, uint16ArgumentConstructOptionalStrAndCallGetOptionHelp) {
 }
 
 TEST_F(argumentT,
-       variadicUint16ArgumentConstructOptionalStrWithoutValidateFunc) {
+       variadicUint16ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::uint16_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, variadicUint16ArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       variadicUint16ArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::uint16_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT,
@@ -2142,17 +2224,18 @@ TEST_F(argumentT, int8ArgumentConstructWithAlreadyRegisteredArgThrows) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST_F(argumentT, int8ArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT, int8ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::int8_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, int8ArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT, int8ArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::int8_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT, int8ArgumentCallFoundFunc) {
@@ -2207,17 +2290,20 @@ TEST_F(argumentT, int8ArgumentConstructOptionalStrAndCallGetOptionHelp) {
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
-TEST_F(argumentT, variadicInt8ArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT,
+       variadicInt8ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::int8_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, variadicInt8ArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       variadicInt8ArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::int8_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT,
@@ -2327,17 +2413,18 @@ TEST_F(argumentT, uint8ArgumentConstructWithAlreadyRegisteredArgThrows) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST_F(argumentT, uint8ArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT, uint8ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::uint8_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, uint8ArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT, uint8ArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::uint8_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT, uint8ArgumentCallFoundFunc) {
@@ -2393,17 +2480,19 @@ TEST_F(argumentT, uint8ArgumentConstructOptionalStrAndCallGetOptionHelp) {
 }
 
 TEST_F(argumentT,
-       variadicUint8ArgumentConstructOptionalStrWithoutValidateFunc) {
+       variadicUint8ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::uint8_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, variadicUint8ArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       variadicUint8ArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::uint8_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT,
@@ -2516,17 +2605,20 @@ TEST_F(argumentT, ptrdiffArgumentConstructWithAlreadyRegisteredArgThrows) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST_F(argumentT, ptrdiffArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT,
+       ptrdiffArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::ptrdiff_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, ptrdiffArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       ptrdiffArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::ptrdiff_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT, ptrdiffArgumentCallFoundFunc) {
@@ -2582,18 +2674,19 @@ TEST_F(argumentT, ptrdiffArgumentConstructOptionalStrAndCallGetOptionHelp) {
 }
 
 TEST_F(argumentT,
-       variadicPtrdiffArgumentConstructOptionalStrWithoutValidateFunc) {
+       variadicPtrdiffArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::ptrdiff_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT,
-       variadicPtrdiffArgumentConstructMandatoryStrWithValidateFunc) {
+       variadicPtrdiffArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::ptrdiff_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT,
@@ -2706,17 +2799,18 @@ TEST_F(argumentT, sizeArgumentConstructWithAlreadyRegisteredArgThrows) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST_F(argumentT, sizeArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT, sizeArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::size_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, sizeArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT, sizeArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::size_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT, sizeArgumentCallFoundFunc) {
@@ -2771,17 +2865,20 @@ TEST_F(argumentT, sizeArgumentConstructOptionalStrAndCallGetOptionHelp) {
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
-TEST_F(argumentT, variadicSizeArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT,
+       variadicSizeArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::size_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, variadicSizeArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       variadicSizeArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::size_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT,
@@ -2891,17 +2988,18 @@ TEST_F(argumentT, floatArgumentConstructWithAlreadyRegisteredArgThrows) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST_F(argumentT, floatArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT, floatArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::float_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, floatArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT, floatArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::float_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT, floatArgumentCallFoundFunc) {
@@ -2957,17 +3055,19 @@ TEST_F(argumentT, floatArgumentConstructOptionalStrAndCallGetOptionHelp) {
 }
 
 TEST_F(argumentT,
-       variadicFloatArgumentConstructOptionalStrWithoutValidateFunc) {
+       variadicFloatArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::float_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, variadicFloatArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       variadicFloatArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::float_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT,
@@ -3080,17 +3180,19 @@ TEST_F(argumentT, doubleArgumentConstructWithAlreadyRegisteredArgThrows) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST_F(argumentT, doubleArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT, doubleArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::double_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, doubleArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       doubleArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::double_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT, doubleArgumentCallFoundFunc) {
@@ -3148,17 +3250,19 @@ TEST_F(argumentT, doubleArgumentConstructOptionalStrAndCallGetOptionHelp) {
 }
 
 TEST_F(argumentT,
-       variadicDoubleArgumentConstructOptionalStrWithoutValidateFunc) {
+       variadicDoubleArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::double_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, variadicDoubleArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       variadicDoubleArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::double_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT,
@@ -3273,17 +3377,18 @@ TEST_F(argumentT, nsArgumentConstructWithAlreadyRegisteredArgThrows) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST_F(argumentT, nsArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT, nsArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::ns_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, nsArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT, nsArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::ns_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT, nsArgumentCallFoundFunc) {
@@ -3338,17 +3443,20 @@ TEST_F(argumentT, nsArgumentConstructOptionalStrAndCallGetOptionHelp) {
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
-TEST_F(argumentT, variadicNsArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT,
+       variadicNsArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::ns_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, variadicNsArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       variadicNsArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::ns_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT,
@@ -3462,17 +3570,18 @@ TEST_F(argumentT, usArgumentConstructWithAlreadyRegisteredArgThrows) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST_F(argumentT, usArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT, usArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::us_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, usArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT, usArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::us_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT, usArgumentCallFoundFunc) {
@@ -3527,17 +3636,20 @@ TEST_F(argumentT, usArgumentConstructOptionalStrAndCallGetOptionHelp) {
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
-TEST_F(argumentT, variadicUsArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT,
+       variadicUsArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::us_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, variadicUsArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       variadicUsArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::us_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT,
@@ -3651,17 +3763,18 @@ TEST_F(argumentT, msArgumentConstructWithAlreadyRegisteredArgThrows) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST_F(argumentT, msArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT, msArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::ms_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, msArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT, msArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::ms_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT, msArgumentCallFoundFunc) {
@@ -3717,17 +3830,20 @@ TEST_F(argumentT, msArgumentConstructOptionalStrAndCallGetOptionHelp) {
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
-TEST_F(argumentT, variadicMsArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT,
+       variadicMsArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::ms_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, variadicMsArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       variadicMsArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::ms_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT,
@@ -3841,17 +3957,18 @@ TEST_F(argumentT, secArgumentConstructWithAlreadyRegisteredArgThrows) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST_F(argumentT, secArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT, secArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::sec_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, secArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT, secArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::sec_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT, secArgumentCallFoundFunc) {
@@ -3907,17 +4024,20 @@ TEST_F(argumentT, secArgumentConstructOptionalStrAndCallGetOptionHelp) {
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
-TEST_F(argumentT, variadicSecArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT,
+       variadicSecArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::sec_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, variadicSecArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       variadicSecArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::sec_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT,
@@ -4029,17 +4149,18 @@ TEST_F(argumentT, minArgumentConstructWithAlreadyRegisteredArgThrows) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST_F(argumentT, minArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT, minArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::min_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, minArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT, minArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::min_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT, minArgumentCallFoundFunc) {
@@ -4095,17 +4216,20 @@ TEST_F(argumentT, minArgumentConstructOptionalStrAndCallGetOptionHelp) {
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
-TEST_F(argumentT, variadicMinArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT,
+       variadicMinArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::min_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, variadicMinArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       variadicMinArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::min_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT,
@@ -4216,17 +4340,18 @@ TEST_F(argumentT, hoursArgumentConstructWithAlreadyRegisteredArgThrows) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST_F(argumentT, hoursArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT, hoursArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::hours_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, hoursArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT, hoursArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::hours_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT, hoursArgumentCallFoundFunc) {
@@ -4283,17 +4408,19 @@ TEST_F(argumentT, hoursArgumentConstructOptionalStrAndCallGetOptionHelp) {
 }
 
 TEST_F(argumentT,
-       variadicHoursArgumentConstructOptionalStrWithoutValidateFunc) {
+       variadicHoursArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::hours_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, variadicHoursArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       variadicHoursArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::hours_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT,
@@ -4410,17 +4537,18 @@ TEST_F(argumentT, pathArgumentConstructWithAlreadyRegisteredArgThrows) {
                  clapp::exception::argument_exception_t);
 }
 
-TEST_F(argumentT, pathArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT, pathArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::path_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, pathArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT, pathArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::path_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT, pathArgumentCallFoundFunc) {
@@ -4476,17 +4604,20 @@ TEST_F(argumentT, pathArgumentConstructOptionalStrAndCallGetOptionHelp) {
                     {arg_str, desc_str + " (" + purpose_optional_str + ")"}}));
 }
 
-TEST_F(argumentT, variadicPathArgumentConstructOptionalStrWithoutValidateFunc) {
+TEST_F(argumentT,
+       variadicPathArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
     clapp::argument::path_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, arg_str), testing::Eq(std::nullopt));
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
-TEST_F(argumentT, variadicPathArgumentConstructMandatoryStrWithValidateFunc) {
+TEST_F(argumentT,
+       variadicPathArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
     clapp::argument::path_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::mandatory};
-    ASSERT_THROW(get_validate_func(tp, arg_str).value()(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_validate_value_func(tp, arg_str)(arg_str));
 }
 
 TEST_F(argumentT,
@@ -4579,11 +4710,10 @@ TEST_F(argumentT, variadicPathArgumentCallFoundFunc) {
 TEST_F(argumentT,
        genOptValidateFuncWithoutHasValueFuncAndCallValidateFuncDoesntThrow) {
     constexpr std::int32_t return_value{10};
-    std::optional<argument_test_parser_t::validate_func_t> validate_func{
-        clapp::argument::gen_arg_validate_func<std::int32_t,
-                                               int32_value_func_t>(
+    argument_test_parser_t::validate_value_func_t validate_func{
+        clapp::argument::gen_arg_validate_value_func<std::int32_t,
+                                                     int32_value_func_t>(
             []() { return return_value; }, []() { return true; },
-            []() { return true; },
             std::vector<int32_validate_func_t>{
                 [](const std::int32_t& value,
                    const std::string& argument_string) {
@@ -4593,8 +4723,7 @@ TEST_F(argumentT,
                     if (value != return_value) {
                         throw std::runtime_error{"value invalid"};
                     }
-                }},
-            "argument string", argument_test_parser_t::purpose_t::mandatory)};
-    ASSERT_THAT(validate_func.has_value(), testing::Eq(true));
-    ASSERT_NO_THROW((*validate_func)());
+                }})};
+    ASSERT_NO_THROW(validate_func("argument string"));
+    ASSERT_THROW(validate_func("argument"), std::runtime_error);
 }

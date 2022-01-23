@@ -82,12 +82,6 @@ void gen_arg_conf_process_params(arg_params_t<T>& arg_params, Param&& param,
                                  Params&&... parameters);
 
 template <typename T, typename VALUE_FUNC>
-std::optional<parser::types::validate_func_t> gen_arg_validate_func(
-    VALUE_FUNC&& vf, has_value_func_t&& hvf, given_func_t&& gf,
-    std::vector<typename arg_params_t<T>::validate_func_t>&& validate_funcs,
-    const std::string& argument_name, const parser::types::purpose_t purpose);
-
-template <typename T, typename VALUE_FUNC>
 parser::types::validate_value_func_t gen_arg_validate_value_func(
     VALUE_FUNC&& val_func, has_value_func_t&& hvf,
     std::vector<typename arg_params_t<T>::validate_func_t>&& validate_funcs);

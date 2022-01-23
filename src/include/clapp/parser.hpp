@@ -77,10 +77,6 @@ void clapp::parser::basic_parser_t::reg(
             arg);
     }
 
-    if (config.validate_func) {
-        get_validate_functions().push_back(config.validate_func.value());
-    }
-
     arguments.push_back(config);
 }
 

@@ -87,52 +87,6 @@ void clapp::argument::gen_arg_conf_process_params(arg_params_t<T>& arg_params,
 }
 
 template <typename T, typename VALUE_FUNC>
-std::optional<clapp::parser::types::validate_func_t>
-clapp::argument::gen_arg_validate_func(
-    VALUE_FUNC&& vf, has_value_func_t&& hvf, given_func_t&& gf,
-    std::vector<typename arg_params_t<T>::validate_func_t>&& validate_funcs,
-    const std::string& argument_name, const parser::types::purpose_t purpose) {
-    if (validate_funcs.size() > 0 ||
-        purpose == parser::types::purpose_t::mandatory) {
-        return [purpose, value_func = std::move(vf),
-                has_value_func = std::move(hvf), given_func = std::move(gf),
-                argument_name, validate_funcs = std::move(validate_funcs)]() {
-            if (purpose == parser::types::purpose_t::mandatory) {
-                if (!given_func()) {
-                    throw clapp::exception::argument_exception_t(
-                        std::string{"Mandatory argument '"} + argument_name +
-                        "' not given.");
-                }
-            }
-            if (has_value_func()) {
-                if constexpr (std::is_same<VALUE_FUNC,
-                                           variadic_value_func_t<T>>::value) {
-                    const std::vector<T> values{value_func()};
-                    for (const auto& func : validate_funcs) {
-                        if constexpr (std::is_same<T, bool>::value) {
-                            for (const auto value : values) {
-                                func(value, argument_name);
-                            }
-                        } else {
-                            for (const auto& value : values) {
-                                func(value, argument_name);
-                            }
-                        }
-                    }
-                } else if constexpr (std::is_same<VALUE_FUNC,
-                                                  value_func_t<T>>::value) {
-                    const T value{value_func()};
-                    for (const auto& func : validate_funcs) {
-                        func(value, argument_name);
-                    }
-                }
-            }
-        };
-    }
-    return std::nullopt;
-}
-
-template <typename T, typename VALUE_FUNC>
 clapp::parser::types::validate_value_func_t
 clapp::argument::gen_arg_validate_value_func(
     VALUE_FUNC&& val_func, has_value_func_t&& hvf,
@@ -168,15 +122,6 @@ ARG_CONF clapp::argument::gen_arg_conf(
     CALLBACKS&& callbacks, const std::string& argument_name,
     std::vector<typename arg_params_t<T>::validate_func_t>&& validate_funcs,
     const std::string& description, parser::types::purpose_t purpose) {
-    std::decay_t<decltype(callbacks.value)> vf{callbacks.value};
-    using optional_arg_validate_func_t =
-        std::optional<parser::types::validate_func_t>;
-    optional_arg_validate_func_t arg_validate_func{gen_arg_validate_func<T>(
-        std::move(vf), has_value_func_t{callbacks.has_value},
-        given_func_t{callbacks.given},
-        std::vector<typename arg_params_t<T>::validate_func_t>{validate_funcs},
-        argument_name, purpose)};
-
     using validate_value_func_t = parser::types::validate_value_func_t;
     validate_value_func_t validate_value_func{gen_arg_validate_value_func<T>(
         std::move(callbacks.value), std::move(callbacks.has_value),
@@ -185,7 +130,6 @@ ARG_CONF clapp::argument::gen_arg_conf(
     return ARG_CONF{std::move(callbacks.af),
                     argument_name,
                     description,
-                    std::move(arg_validate_func),
                     std::move(callbacks.given),
                     std::move(validate_value_func),
                     purpose};
