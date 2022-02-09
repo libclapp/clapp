@@ -8,7 +8,10 @@ target_include_directories(clapp PUBLIC ${libClaPP_INCLUDE_DIRS})
 
 target_link_libraries(clapp PUBLIC libClaPP_SANITIZER libClaPP_GSL ${libClaPP_CXX_FS_LINKER_FLAG})
 target_link_libraries(clapp PRIVATE libClaPP_CXX_COMPILE_OPTIONS)
-set_target_properties(clapp PROPERTIES VERSION "${libClaPP_VERSION}" POSITION_INDEPENDENT_CODE ON)
+set_target_properties(clapp PROPERTIES
+	                    VERSION "${libClaPP_VERSION}"
+			    SOVERSION "${libClaPP_VERSION_MAJOR}.${libClaPP_VERSION_MINOR}"
+			    POSITION_INDEPENDENT_CODE ON)
 if(libClaPP_CLANG_TIDY_ARGS)
   set_target_properties(clapp PROPERTIES CXX_CLANG_TIDY "${libClaPP_CLANG_TIDY_ARGS}")
 endif()
