@@ -394,7 +394,7 @@ clapp::option::basic_vector_param_option_t<T>::basic_vector_param_option_t(
         std::stringstream ss;
         ss << "No default value for vector based param option '"
            << conf.opt_conf.create_basic_option_string() << "' possible.";
-        throw clapp::exception::option_param_exception_t(ss.str());
+        throw clapp::exception::option_param_exception_t{ss.str()};
     }
     parser.reg(std::move(conf.opt_conf));
     _found = std::move(conf.found);
