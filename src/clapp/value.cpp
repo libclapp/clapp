@@ -185,7 +185,7 @@ void clapp::path_exists_t::validate(const clapp::fs::path& path,
         std::stringstream ss;
         ss << "CLI value '" << path << "' for '" << param_name
            << "' does not exist.";
-        throw clapp::exception::path_does_not_exist_t(ss.str());
+        throw clapp::exception::path_does_not_exist_t{ss.str()};
     }
 }
 #endif
