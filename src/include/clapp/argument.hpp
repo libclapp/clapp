@@ -268,7 +268,7 @@ clapp::argument::basic_variadic_argument_t<T>::basic_variadic_argument_t(
         std::stringstream ss;
         ss << "No default value for variadic argument '"
            << conf.arg_conf.argument_name << "' allowed.";
-        throw clapp::exception::argument_exception_t(ss.str());
+        throw clapp::exception::argument_exception_t{ss.str()};
     }
     _found = std::move(conf.found);
     parser.reg(std::move(conf.arg_conf));
