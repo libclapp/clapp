@@ -131,7 +131,7 @@ void clapp::parser::basic_parser_t::reg(reg_sub_parser_conf_t&& config) {
         std::stringstream ss;
         ss << "Can't register sub-parser '" << config.sub_parser_name
            << "' as optional arguments are already registered.";
-        throw clapp::exception::sub_parser_exception_t(ss.str());
+        throw clapp::exception::sub_parser_exception_t{ss.str()};
     }
 
     const std::size_t num_arguments{arguments.size()};
@@ -140,7 +140,7 @@ void clapp::parser::basic_parser_t::reg(reg_sub_parser_conf_t&& config) {
         std::stringstream ss;
         ss << "Can't register sub-parser '" << config.sub_parser_name
            << "' as a variadic argument is already registered.";
-        throw clapp::exception::sub_parser_exception_t(ss.str());
+        throw clapp::exception::sub_parser_exception_t{ss.str()};
     }
 
     auto found_sub_parser{get_sub_parsers().find(config.sub_parser_name)};
@@ -148,7 +148,7 @@ void clapp::parser::basic_parser_t::reg(reg_sub_parser_conf_t&& config) {
         std::stringstream ss;
         ss << "Can't register sub-parser '" << config.sub_parser_name
            << "' as a sub-parser with this name is already registered.";
-        throw clapp::exception::sub_parser_exception_t(ss.str());
+        throw clapp::exception::sub_parser_exception_t{ss.str()};
     }
 
     get_sub_parser_descriptions().push_back(
@@ -312,13 +312,13 @@ clapp::basic_parser_t::process_parse_result(
             std::stringstream ss;
             ss << "Invalid (sub-)parser option '-"
                << parse_result.short_option.value() << "'";
-            throw clapp::exception::option_exception_t(ss.str());
+            throw clapp::exception::option_exception_t{ss.str()};
         }
         Expects(parse_result.long_option);
         std::stringstream ss;
         ss << "Invalid (sub-)parser option '--"
            << parse_result.long_option.value() << "'";
-        throw clapp::exception::option_exception_t(ss.str());
+        throw clapp::exception::option_exception_t{ss.str()};
     }
     return parse_result.it;
 }
@@ -431,7 +431,7 @@ clapp::parser::basic_parser_t::parse_arg(const std::string_view argument,
     if (found_sub_parser == get_sub_parsers().end()) {
         std::stringstream ss;
         ss << "Unknown argument/sub-parser '" << argument << "'.";
-        throw clapp::exception::clapp_exception_t(ss.str());
+        throw clapp::exception::clapp_exception_t{ss.str()};
     }
     found_sub_parser->second.sub_parse(it + 1, end);
     return parse_result_t{end, std::nullopt, std::nullopt, std::nullopt};
@@ -458,7 +458,7 @@ clapp::parser::basic_parser_t::parse_long(const std::string_view option,
                                            opt_no_param_conf_t>::value) {
                     std::stringstream ss;
                     ss << "No param allowed for option '--" << opt << "'";
-                    throw clapp::exception::option_param_exception_t(ss.str());
+                    throw clapp::exception::option_param_exception_t{ss.str()};
                 } else {
                     return handle_parse_ret(
                         opt_it->func(
@@ -471,7 +471,7 @@ clapp::parser::basic_parser_t::parse_long(const std::string_view option,
                 if (it + 1 == end) {
                     std::stringstream ss;
                     ss << "No param given for option '--" << opt << "'";
-                    throw clapp::exception::option_param_exception_t(ss.str());
+                    throw clapp::exception::option_param_exception_t{ss.str()};
                 }
                 it++;
                 return handle_parse_ret(
@@ -505,7 +505,7 @@ clapp::parser::basic_parser_t::parse_short(const std::string_view option,
                                            opt_no_param_conf_t>::value) {
                     std::stringstream ss;
                     ss << "No param allowed for option '-" << opt << "'";
-                    throw clapp::exception::option_param_exception_t(ss.str());
+                    throw clapp::exception::option_param_exception_t{ss.str()};
                 } else {
                     return std::make_optional(handle_parse_ret(
                         opt_it->func(
@@ -519,8 +519,8 @@ clapp::parser::basic_parser_t::parse_short(const std::string_view option,
                     if (it + 1 == end) {
                         std::stringstream ss;
                         ss << "No param given for option '-" << opt << "'";
-                        throw clapp::exception::option_param_exception_t(
-                            ss.str());
+                        throw clapp::exception::option_param_exception_t{
+                            ss.str()};
                     }
                     it++;
                     return std::make_optional(handle_parse_ret(
@@ -534,7 +534,7 @@ clapp::parser::basic_parser_t::parse_short(const std::string_view option,
                                         opt_no_param_conf_t>::value) {
                 std::stringstream ss;
                 ss << "No param given for option '-" << opt << "'";
-                throw clapp::exception::option_param_exception_t(ss.str());
+                throw clapp::exception::option_param_exception_t{ss.str()};
             } else {
                 return handle_parse_ret_or_nullopt(opt_it->func(opt), it);
             }
