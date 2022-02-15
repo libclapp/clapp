@@ -92,7 +92,7 @@ void clapp::parser::basic_parser_t::reg(
     if (config.argument_name.size() == 0) {
         std::stringstream ss;
         ss << "Argument name '" << config.argument_name << "' is too short.";
-        throw clapp::exception::argument_exception_t(ss.str());
+        throw clapp::exception::argument_exception_t{ss.str()};
     }
 
     const std::size_t num_arguments{arguments.size()};
@@ -101,7 +101,7 @@ void clapp::parser::basic_parser_t::reg(
         std::stringstream ss;
         ss << "Can't register argument '" << config.argument_name
            << "' when variadic arguments are already registered.";
-        throw clapp::exception::argument_exception_t(ss.str());
+        throw clapp::exception::argument_exception_t{ss.str()};
     }
 
     if (config.purpose == purpose_t::mandatory) {
@@ -109,7 +109,7 @@ void clapp::parser::basic_parser_t::reg(
             std::stringstream ss;
             ss << "Can't register mandatory argument '" << config.argument_name
                << "' when optional arguments are already registered.";
-            throw clapp::exception::argument_exception_t(ss.str());
+            throw clapp::exception::argument_exception_t{ss.str()};
         }
         get_mandatory_argument_descriptions().push_back(
             {config.argument_name, config.description, argument_type});
@@ -118,7 +118,7 @@ void clapp::parser::basic_parser_t::reg(
             std::stringstream ss;
             ss << "Can't register optional argument '" << config.argument_name
                << "' when a sub-parser is already registered.";
-            throw clapp::exception::argument_exception_t(ss.str());
+            throw clapp::exception::argument_exception_t{ss.str()};
         }
         get_optional_argument_descriptions().push_back(
             {config.argument_name, config.description, argument_type});
@@ -132,7 +132,7 @@ void clapp::parser::basic_parser_t::reg(
                     ss << "Can't register argument '" << config.argument_name
                        << "', as another argument with this name is already "
                           "registered.";
-                    throw clapp::exception::argument_exception_t(ss.str());
+                    throw clapp::exception::argument_exception_t{ss.str()};
                 }
             },
             arg);
