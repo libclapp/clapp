@@ -16,7 +16,8 @@ class bo_main_parser_t : public clapp::parser::basic_main_parser_t {
         *this, std::vector<char>{'b'}, "Exits if given.",
         clapp::value::found_func_t{[](const std::string_view /*name*/) {
             return clapp::value::exit_t::exit(EXIT_SUCCESS);
-        }}};
+        }},
+        clapp::parser::types::purpose_t::optional};
 
     ~bo_main_parser_t() override;
 };
