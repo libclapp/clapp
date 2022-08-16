@@ -41,12 +41,17 @@ class simple_test_parser_t : public clapp::basic_parser_t {
     static constexpr std::int32_t min_int{10};
     static constexpr std::int32_t max_int{200};
 
-    clapp::option::bool_option_t bool_option{*this, "bool", 'b',
-                                             "Bool option."};
+    clapp::option::bool_option_t bool_option{
+        *this, "bool", 'b', "Bool option.",
+        clapp::parser::types::purpose_t::optional};
 
     clapp::option::int32_param_option_t int_option{
-        *this, "int", 'i', "Int option.",
-        clapp::value::min_max_value_t<std::int32_t>{min_int, max_int}};
+        *this,
+        "int",
+        'i',
+        "Int option.",
+        clapp::value::min_max_value_t<std::int32_t>{min_int, max_int},
+        clapp::parser::types::purpose_t::optional};
 
     clapp::argument::string_argument_t string_arg{*this, "arg-name",
                                                   "Arg desc"};
@@ -206,11 +211,13 @@ class sub_parser_container_t : public clapp::basic_parser_t {
 
     [[nodiscard]] std::string gen_short_line_prefix() const override;
 
-    clapp::option::bool_option_t bool_option{*this, "bool", 'b',
-                                             "Bool option."};
+    clapp::option::bool_option_t bool_option{
+        *this, "bool", 'b', "Bool option.",
+        clapp::parser::types::purpose_t::optional};
 
-    clapp::option::bool_option_t bool_option2{*this, "second", '2',
-                                              "Second bool option."};
+    clapp::option::bool_option_t bool_option2{
+        *this, "second", '2', "Second bool option.",
+        clapp::parser::types::purpose_t::optional};
 
     clapp::argument::string_argument_t string_arg{*this, "arg-name",
                                                   "Arg desc"};
@@ -218,12 +225,14 @@ class sub_parser_container_t : public clapp::basic_parser_t {
     class simple_sub_parser_t : public clapp::parser::basic_sub_parser_t {
        public:
         ~simple_sub_parser_t() override;
-        clapp::option::bool_option_t bool_option{*this, "bool", 'b',
-                                                 "Bool option."};
+        clapp::option::bool_option_t bool_option{
+            *this, "bool", 'b', "Bool option.",
+            clapp::parser::types::purpose_t::optional};
 
         using clapp::parser::basic_sub_parser_t::basic_sub_parser_t;
-        clapp::option::string_param_option_t string_option{*this, "string", 's',
-                                                           "String option."};
+        clapp::option::string_param_option_t string_option{
+            *this, "string", 's', "String option.",
+            clapp::parser::types::purpose_t::optional};
 
         clapp::argument::string_argument_t string_arg{
             *this, "sub-arg-name", "Sub arg desc",
@@ -248,7 +257,8 @@ class help_parser_t : public clapp::basic_parser_t {
 
     clapp::option::help_option_t help_option{
         *this, std::vector<std::string>{"h", "help"},
-        std::vector<char>{'h', '?'}, "Print help and exit."};
+        std::vector<char>{'h', '?'}, "Print help and exit.",
+        clapp::parser::types::purpose_t::optional};
 
     [[nodiscard]] std::string gen_short_line_prefix() const override;
 };
