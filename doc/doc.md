@@ -69,14 +69,14 @@ Currently, there exist different types of options:
 Examples are `--string-opt='parameter'` or `--string-opt 'parameter'`. 
 * vector-parameter options: These are required, if parameter options can be given multiple times. In this case, the parsed parameters are stored in a `std::vector`. E.g. `--path /tmp/xxx --path=/tmp/yyy`.
 
-As a default, all options are optional. If an option is required, the additional parameter `clapp::parser::types::purpose_t::mandatory` must be given to the constructor.
+As a default, all options are mandatory. If an option is optional, the additional parameter `clapp::parser::types::purpose_t::optional` must be given to the constructor.
 
 A complete colletion of supported options is available in [Complete collection of supported argument or option parameter types](#complete-collection-of-supported-argument-or-option-parameter-types).
 
 Example constructor calls for some different options are the following lines:
 
 ```c++
-clapp::option::uint8_param_option_t{parser_inst, "--long-uint8-param", "a description for an unit8-param", clapp::parser::types::purpose_t::mandatory};
+clapp::option::uint8_param_option_t{parser_inst, "--long-uint8-param", "a description for an unit8-param", clapp::parser::types::purpose_t::optional};
 clapp::option::sec_param_option_t{parser_inst, "-s", "number of seconds"}
 clapp::option::vector_path_param_option_t{parser_inst, "--path", '-p', "a path the the required file", clapp::value::path_exists_t{}};
 clapp::option::vector_path_param_option_t{parser_inst, {"--file", "--f"}, '-f', "a path to the required file", clapp::value::path_exists_t{}};
@@ -572,7 +572,8 @@ string argument:
 
 class cli_parser_t : public clapp::basic_main_parser_t {
    public:
-    clapp::help_option_t help{*this, "help", 'h', "Show help options."};
+    clapp::help_option_t help{*this, "help", 'h', "Show help options.",
+                              clapp::parser::types::purpose_t::optional};
 
     clapp::bool_option_t bool_opt{*this, "bool", 'b', "Bool option."};
 
@@ -716,7 +717,8 @@ parser container:
 
 class cli_parser_t : public clapp::basic_main_parser_t {
    public:
-    clapp::help_option_t help{*this, "help", 'h', "Show help options."};
+    clapp::help_option_t help{*this, "help", 'h', "Show help options.",
+                              clapp::parser::types::purpose_t::optional};
 
     clapp::string_argument_t string_arg{*this, "string-arg", "String argument"};
 };
@@ -878,7 +880,8 @@ this sub-parser.
 
 class cli_parser_t : public clapp::basic_main_parser_t {
    public:
-    clapp::help_option_t help{*this, "help", 'h', "Show help options."};
+    clapp::help_option_t help{*this, "help", 'h', "Show help options.",
+                              clapp::parser::types::purpose_t::optional};
 
     clapp::int32_param_option_t int_opt{*this, 'i', "Int option"};
 
@@ -886,16 +889,20 @@ class cli_parser_t : public clapp::basic_main_parser_t {
        public:
         using clapp::basic_sub_parser_t::basic_sub_parser_t;
 
-        clapp::help_option_t help{*this, "help", 'h', "Show help options."};
+        clapp::help_option_t help{*this, "help", 'h', "Show help options.",
+                                  clapp::parser::types::purpose_t::optional};
 
-        clapp::string_param_option_t string{*this, 's', "String param option."};
+        clapp::string_param_option_t string{
+            *this, 's', "String param option.",
+            clapp::parser::types::purpose_t::optional};
     };
 
     class mode2_parser_t : public clapp::basic_sub_parser_t {
        public:
         using clapp::basic_sub_parser_t::basic_sub_parser_t;
 
-        clapp::help_option_t help{*this, "help", 'h', "Show help options."};
+        clapp::help_option_t help{*this, "help", 'h', "Show help options.",
+                                  clapp::parser::types::purpose_t::optional};
 
         clapp::string_argument_t string_arg{*this, "string-arg",
                                             "String argument"};

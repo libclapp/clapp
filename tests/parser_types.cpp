@@ -198,13 +198,25 @@ TEST_F(optConfT, ConstructOptNoParamConfCreateBasicOptionString) {
                        "|--" + long_option1 + "|--" + long_option2));
 }
 
-TEST_F(optConfT, ConstructOptionalOptNoParamConfCreateOptionString) {
+TEST_F(optConfT, ConstructDefaultOptNoParamConfCreateOptionString) {
     const opt_no_param_conf_t onpc{{std::move(np_soc1), std::move(np_soc2)},
                                    {std::move(np_loc1), std::move(np_loc2)},
                                    std::move(given),
                                    std::move(validate_value),
                                    std::string{option_str},
                                    description};
+    ASSERT_THAT(onpc.create_option_string(),
+                testing::StrEq(onpc.create_basic_option_string()));
+}
+
+TEST_F(optConfT, ConstructOptionalOptNoParamConfCreateOptionString) {
+    const opt_no_param_conf_t onpc{{std::move(np_soc1), std::move(np_soc2)},
+                                   {std::move(np_loc1), std::move(np_loc2)},
+                                   std::move(given),
+                                   std::move(validate_value),
+                                   std::string{option_str},
+                                   description,
+                                   purpose_t::optional};
     ASSERT_THAT(onpc.create_option_string(),
                 testing::StrEq(std::string{"["} +
                                onpc.create_basic_option_string() + "]"));
@@ -559,13 +571,25 @@ TEST_F(optConfT, ConstructOptVectorParamConfCreateBasicOptionString) {
                                long_option2 + "=<param>"));
 }
 
-TEST_F(optConfT, ConstructOptionalOptVectorParamConfCreateOptionString) {
+TEST_F(optConfT, ConstructDefaultOptVectorParamConfCreateOptionString) {
     const opt_vector_param_conf_t ovpc{{std::move(vp_soc1), std::move(vp_soc2)},
                                        {std::move(vp_loc1), std::move(vp_loc2)},
                                        std::move(given),
                                        std::move(validate_value),
                                        std::string{option_str},
                                        description};
+    ASSERT_THAT(ovpc.create_option_string(),
+                testing::StrEq(ovpc.create_basic_option_string() + "..."));
+}
+
+TEST_F(optConfT, ConstructOptionalOptVectorParamConfCreateOptionString) {
+    const opt_vector_param_conf_t ovpc{{std::move(vp_soc1), std::move(vp_soc2)},
+                                       {std::move(vp_loc1), std::move(vp_loc2)},
+                                       std::move(given),
+                                       std::move(validate_value),
+                                       std::string{option_str},
+                                       description,
+                                       purpose_t::optional};
     ASSERT_THAT(ovpc.create_option_string(),
                 testing::StrEq(std::string{"["} +
                                ovpc.create_basic_option_string() + "...]"));

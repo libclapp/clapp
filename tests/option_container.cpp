@@ -116,7 +116,7 @@ TEST(optionContainer,
     simple_test_option_container_t stoc{
         ftp, clapp::parser::types::logic_operator_type_t::logic_xor};
     ASSERT_THAT(stoc.gen_short_option_line(),
-                testing::StrEq("[-b|--bool] | [-i|--int=<param>]"));
+                testing::StrEq("-b|--bool | -i|--int=<param>"));
 }
 
 TEST(optionContainer,
@@ -139,7 +139,7 @@ TEST(optionContainer,
     simple_test_option_container_t stoc{
         ftp, clapp::parser::types::logic_operator_type_t::logic_and};
     ASSERT_THAT(stoc.gen_short_option_line(),
-                testing::StrEq("[-b|--bool] [-i|--int=<param>]"));
+                testing::StrEq("-b|--bool -i|--int=<param>"));
 }
 
 TEST(optionContainer,
@@ -161,10 +161,9 @@ TEST(optionContainer,
     fake_test_parser_t ftp;
     simple_test_option_container2_t stoc{
         ftp, clapp::parser::types::logic_operator_type_t::logic_xor};
-    ASSERT_THAT(
-        stoc.gen_short_option_line(),
-        testing::StrEq(
-            "[-s|--str=<param>] | [-i|--int=<param>] | [-u|--uint=<param>]"));
+    ASSERT_THAT(stoc.gen_short_option_line(),
+                testing::StrEq(
+                    "-s|--str=<param> | -i|--int=<param> | -u|--uint=<param>"));
 }
 
 TEST(optionContainer,
@@ -188,8 +187,7 @@ TEST(optionContainer,
         ftp, clapp::parser::types::logic_operator_type_t::logic_and};
     ASSERT_THAT(
         stoc.gen_short_option_line(),
-        testing::StrEq(
-            "[-s|--str=<param>] [-i|--int=<param>] [-u|--uint=<param>]"));
+        testing::StrEq("-s|--str=<param> -i|--int=<param> -u|--uint=<param>"));
 }
 
 TEST(optionContainer,

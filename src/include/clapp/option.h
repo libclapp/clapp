@@ -79,7 +79,7 @@ struct opt_params_t {
         std::function<void(const T&, const std::string& option_string)>;
     std::vector<std::string> restrictions{};
     std::vector<validate_func_t> validate_funcs{};
-    parser::types::purpose_t purpose{parser::types::purpose_t::optional};
+    parser::types::purpose_t purpose{parser::types::purpose_t::mandatory};
     std::optional<T> default_value{};
     std::vector<clapp::value::found_func_t> found{};
 };

@@ -120,7 +120,7 @@ struct basic_reg_option_conf_t {
     validate_value_func_t validate_value_func;
     std::string option_string;
     std::string description;
-    purpose_t purpose{purpose_t::optional};
+    purpose_t purpose{purpose_t::mandatory};
 };
 
 using opt_no_param_conf_t =
