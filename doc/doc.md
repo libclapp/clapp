@@ -70,6 +70,7 @@ Examples are `--string-opt='parameter'` or `--string-opt 'parameter'`.
 * vector-parameter options: These are required, if parameter options can be given multiple times. In this case, the parsed parameters are stored in a `std::vector`. E.g. `--path /tmp/xxx --path=/tmp/yyy`.
 
 As a default, all options are mandatory. If an option is optional, the additional parameter `clapp::parser::types::purpose_t::optional` must be given to the constructor.
+Note: if the option-container that contains the option is an XOR-container (or an XOR-parser), optional options are not allowed! If optional options are registered for an xor-container, the container throws an `clapp::exception::option_exception_t`.
 
 A complete colletion of supported options is available in [Complete collection of supported argument or option parameter types](#complete-collection-of-supported-argument-or-option-parameter-types).
 

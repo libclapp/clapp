@@ -86,6 +86,22 @@ class simple_test_option_container2_t : public clapp::option_container_t {
 
 simple_test_option_container2_t::~simple_test_option_container2_t() = default;
 
+class optional_test_option_container_t : public clapp::option_container_t {
+   public:
+    using clapp::option_container_t::option_container_t;
+    ~optional_test_option_container_t() override;
+
+    clapp::option::string_param_option_t string_option{
+        *this, "str", 's', "String option.",
+        clapp::parser::types::purpose_t::optional};
+
+    using clapp::basic_option_container_t::get_option_help;
+
+    using clapp::basic_option_container_t::gen_short_option_line;
+};
+
+optional_test_option_container_t::~optional_test_option_container_t() = default;
+
 TEST(optionContainer, constructEmptyBasicOptionContainerDoesNotThrow) {
     ASSERT_NO_THROW(empty_basic_option_container_t{
         clapp::parser::types::logic_operator_type_t::logic_and});
@@ -196,4 +212,18 @@ TEST(optionContainer,
     simple_test_option_container2_t stoc{
         ftp, clapp::parser::types::logic_operator_type_t::logic_and};
     ASSERT_THAT(stoc.get_option_help().size(), testing::Eq(3U));
+}
+
+TEST(optionContainer, constructOptionalTestOptionContainerWithAndDoesNotThrow) {
+    fake_test_parser_t ftp;
+    ASSERT_NO_THROW((optional_test_option_container_t{
+        ftp, clapp::parser::types::logic_operator_type_t::logic_and}));
+}
+
+TEST(optionContainer, constructOptionalTestOptionContainerWithXorThrows) {
+    fake_test_parser_t ftp;
+    ASSERT_THROW(
+        (optional_test_option_container_t{
+            ftp, clapp::parser::types::logic_operator_type_t::logic_xor}),
+        clapp::option_exception_t);
 }

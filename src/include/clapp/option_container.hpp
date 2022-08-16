@@ -65,6 +65,18 @@ void clapp::parser::basic_option_container_t::reg(
         }
     }
 
+    if (options.logic_operator_type ==
+        types::logic_operator_type_t::logic_xor) {
+        if (config.purpose == types::purpose_t::optional) {
+            std::stringstream string_stream;
+            string_stream
+                << "can't register option '" << config.create_option_string()
+                << "', as optional options are not allowed for logic_xor "
+                   "containers.";
+            throw clapp::exception::option_exception_t{string_stream.str()};
+        }
+    }
+
     options.options.push_back(std::move(config));
 }
 
