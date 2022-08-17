@@ -62,10 +62,30 @@ class cli_parser_t : public clapp::basic_main_parser_t {
         cmd1_parser_t &operator=(cmd1_parser_t &&) noexcept = delete;
 
         ~cmd1_parser_t() override;
+
         clapp::bool_option_t help{*this, "help", 'h', "Show help options."};
-        clapp::bool_option_t short_bool{*this, 'b', "Short bool option.",
-                                        purpose_t::mandatory};
-        string_param_t string{*this, 's', "String param option."};
+
+        class and_option_container_t : public clapp::option_container_t {
+           public:
+            using clapp::option_container_t::option_container_t;
+
+            ~and_option_container_t() override;
+
+            clapp::bool_option_t short_bool{*this, 'b', "Short bool option.",
+                                            purpose_t::mandatory};
+
+            // mandatory string option
+            clapp::string_param_option_t string_param{
+                *this, "string", std::vector<char>{'s', '1'},
+                "String option 1.", purpose_t::mandatory};
+
+            // optional string option (multiple string vectors)
+            clapp::vector_string_param_option_t string_vector_param{
+                *this, "string-vector", "String vector param."};
+        };
+
+        and_option_container_t options{
+            *this, clapp::parser::types::logic_operator_type_t::logic_and};
 
         entry_argument_t entry_arg{*this, "entry-arg", "Entry argument",
                                    entry_value_constraint_t{}};
@@ -87,7 +107,11 @@ class cli_parser_t : public clapp::basic_main_parser_t {
         cmd2_parser_t &operator=(cmd2_parser_t &&) noexcept = delete;
 
         ~cmd2_parser_t() override;
+
         clapp::bool_option_t help{*this, "help", 'h', "Show help options."};
+
+        clapp::bool_option_t short_bool{*this, 'b', "Short bool option."};
+
         string_argument_t string_arg_x{
             *this, "string-arg-x", "String argument x", purpose_t::optional,
             clapp::default_value_t<std::string>{"default-string-arg-x"}};
@@ -96,12 +120,15 @@ class cli_parser_t : public clapp::basic_main_parser_t {
             clapp::min_max_value_t<std::int32_t>{5, 10}};
     };
 
-    cmd1_parser_t cmd1{*this, "cmd1", "First usable command."};
-    cmd2_parser_t cmd2{*this, "cmd2", "Second usable command."};
+    cmd1_parser_t cmd1{*this, "cmd1", "First usable command.",
+                       clapp::parser::types::logic_operator_type_t::logic_xor};
+    cmd2_parser_t cmd2{*this, "cmd2", "Second usable command.",
+                       clapp::parser::types::logic_operator_type_t::logic_xor};
 
     string_argument_t string_arg{*this, "string-arg", "String argument"};
 
-    clapp::help_option_t help{*this, "help", 'h', "Show help options."};
+    clapp::help_option_t help{*this, "help", 'h', "Show help options.",
+                              purpose_t::optional};
     clapp::bool_option_t short_bool{*this, 'b', "Short bool option."};
     clapp::bool_option_t long_bool{*this, "long-bool", "Long bool option."};
     clapp::bool_option_t restricted_bool{
@@ -206,6 +233,8 @@ static void process_cmd2(const cli_parser_t::cmd2_parser_t &cmd2);
 
 cli_parser_t::~cli_parser_t() = default;
 cli_parser_t::cmd1_parser_t::~cmd1_parser_t() = default;
+cli_parser_t::cmd1_parser_t::and_option_container_t::~and_option_container_t() =
+    default;
 cli_parser_t::cmd2_parser_t::~cmd2_parser_t() = default;
 cli_parser_t::time_container_t::~time_container_t() = default;
 
@@ -238,8 +267,8 @@ void process_cmd1(const cli_parser_t::cmd1_parser_t &cmd1) {
 
     cmd1.validate();
 
-    if (cmd1.string) {
-        std::cout << "string: " << cmd1.string.value() << "\n";
+    if (cmd1.options.string_param) {
+        std::cout << "string: " << cmd1.options.string_param.value() << "\n";
     } else {
         std::cout << "string: not given\n";
     }
@@ -269,6 +298,7 @@ void process_cmd2(const cli_parser_t::cmd2_parser_t &cmd2) {
                   << cmd2.get_sub_parser_name() << ' ' << cmd2.gen_help_msg(0);
         return;
     }
+    std::cout << "short-bool: " << cmd2.short_bool.value() << std::endl;
 
     cmd2.validate();
 
