@@ -12,7 +12,7 @@ clapp::value::found_func_t::ret_t print_version_and_exit(
 
 class cli_parser_t : public clapp::basic_main_parser_t {
    public:
-    cli_parser_t() = default;
+    cli_parser_t();
 
     explicit cli_parser_t(const cli_parser_t &) = delete;
     explicit cli_parser_t(cli_parser_t &&) noexcept = delete;
@@ -45,14 +45,24 @@ class cli_parser_t : public clapp::basic_main_parser_t {
         *this, "variadic-string-arg", "Variadic String argument",
         purpose_t::optional};
 
-    // mandatory string option
-    clapp::string_param_option_t string_param{
-        *this, "string", std::vector<char>{'s', '1'}, "String option 1.",
-        purpose_t::mandatory};
+    class and_option_container_t : public clapp::option_container_t {
+       public:
+        using clapp::option_container_t::option_container_t;
 
-    // optional string option (multiple string vectors)
-    clapp::vector_string_param_option_t string_vector_param{
-        *this, "string-vector", "String vector param."};
+        ~and_option_container_t() override;
+
+        // mandatory string option
+        clapp::string_param_option_t string_param{
+            *this, "string", std::vector<char>{'s', '1'}, "String option 1.",
+            purpose_t::mandatory};
+
+        // optional string option (multiple string vectors)
+        clapp::vector_string_param_option_t string_vector_param{
+            *this, "string-vector", "String vector param."};
+    };
+
+    and_option_container_t options{
+        *this, clapp::parser::types::logic_operator_type_t::logic_and};
 };
 
 clapp::value::found_func_t::ret_t print_version_and_exit(
@@ -62,6 +72,12 @@ clapp::value::found_func_t::ret_t print_version_and_exit(
 }
 
 cli_parser_t::~cli_parser_t() = default;
+
+cli_parser_t::and_option_container_t::~and_option_container_t() = default;
+
+cli_parser_t::cli_parser_t()
+    : clapp::basic_main_parser_t{
+          clapp::parser::types::logic_operator_type_t::logic_xor} {}
 
 using parser_t = clapp::parser::basic_parser_container_t<cli_parser_t>;
 
@@ -95,16 +111,18 @@ int main(int argc, char *argv[]) {
             std::cout << "variadic-string-arg: not given" << std::endl;
         }
 
-        Expects(parser->string_param);  // The parser ensures that
-                                        // mandatory options are given
-        std::cout << "string_param: '" << parser->string_param.value() << "'"
-                  << std::endl;
+        Expects(parser->options.string_param);  // The parser ensures that
+                                                // mandatory options are given
+        std::cout << "string_param: '" << parser->options.string_param.value()
+                  << "'" << std::endl;
 
-        if (parser->string_vector_param) {  // if string_vector_param is given
+        if (parser->options
+                .string_vector_param) {  // if string_vector_param is given
             std::cout << "string_vector_param (size: "
-                      << parser->string_vector_param.value().size() << "): ";
+                      << parser->options.string_vector_param.value().size()
+                      << "): ";
             // iterate over the vector of options
-            for (auto &val : parser->string_vector_param.value()) {
+            for (auto &val : parser->options.string_vector_param.value()) {
                 std::cout << val << ", ";
             }
             std::cout << std::endl;
