@@ -119,6 +119,44 @@ optional_argument_test_sub_parser_t::gen_short_line_prefix() const {
     return "optional-argument-test-sub-parser" + gen_short_line();
 }
 
+class test_sub_parser_t : public clapp::parser::basic_parser_t {
+   public:
+    using clapp::parser::basic_parser_t::sub_parser_descriptions_vec_t;
+    using clapp::parser::basic_parser_t::sub_parsers_map_t;
+
+    using clapp::parser::basic_parser_t::get_sub_parser_descriptions;
+    using clapp::parser::basic_parser_t::get_sub_parsers;
+
+    clapp::option::count_option_t count_option{*this, "count", 'c',
+                                               "Count option."};
+
+    ~test_sub_parser_t() override;
+
+    [[nodiscard]] std::string gen_short_line_prefix() const override;
+};
+
+test_sub_parser_t::~test_sub_parser_t() = default;
+
+[[nodiscard]] std::string test_sub_parser_t::gen_short_line_prefix() const {
+    return "test-sub-parser" + gen_short_line();
+}
+
+class option_sub_parser_t : public clapp::parser::basic_sub_parser_t {
+   public:
+    using clapp::parser::basic_sub_parser_t::basic_sub_parser_t;
+    clapp::option::bool_option_t first{
+        *this, "first", '1', "first option.",
+        clapp::parser::types::purpose_t::mandatory};
+
+    clapp::option::bool_option_t second{
+        *this, "second", '2', "second option.",
+        clapp::parser::types::purpose_t::mandatory};
+
+    ~option_sub_parser_t() override;
+};
+
+option_sub_parser_t::~option_sub_parser_t() = default;
+
 TEST(subParser, constructEmptySubParserAndParseEmptyArguments) {
     const std::string sub_parser{"sub"};
     const std::string description{"sub parser"};
@@ -338,4 +376,57 @@ TEST(subParser, constructSubParserSetAndCallPrintAndExitWithStringAndExitCode) {
     const clapp::value::exit_t ret{
         sub.get_print_and_exit_func()(text, exit_code)};
     ASSERT_THAT(ret.get_exit_code(), testing::Eq(exit_code));
+}
+
+TEST(
+    subParser,
+    constructOptionSubParserWithLogicXorFirstAndValidateRecursiveDoesNotThrow) {
+    const std::string sub_parser{"sub"};
+    const std::string description{"sub parser"};
+    constexpr const char* const argv[]{"sub", "-1", nullptr};
+    const clapp::parser::types::arg_t arg{sub_parser_make_arg_t(argv)};
+
+    empty_test_parser_t etp;
+    option_sub_parser_t sub{
+        etp, sub_parser, description,
+        clapp::parser::types::logic_operator_type_t::logic_xor};
+
+    ASSERT_THAT(etp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+    ASSERT_NO_THROW(etp.validate_recursive());
+}
+
+TEST(
+    subParser,
+    constructOptionSubParserWithLogicXorSecondAndValidateRecursiveDoesNotThrow) {
+    const std::string sub_parser{"sub"};
+    const std::string description{"sub parser"};
+    constexpr const char* const argv[]{"sub", "-2", nullptr};
+    const clapp::parser::types::arg_t arg{sub_parser_make_arg_t(argv)};
+
+    empty_test_parser_t etp;
+    option_sub_parser_t sub{
+        etp, sub_parser, description,
+        clapp::parser::types::logic_operator_type_t::logic_xor};
+
+    ASSERT_THAT(etp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+    ASSERT_NO_THROW(etp.validate_recursive());
+}
+
+TEST(subParser,
+     constructOptionSubParserWithLogicAndAndValidateRecursiveDoesNotThrow) {
+    const std::string sub_parser{"sub"};
+    const std::string description{"sub parser"};
+    constexpr const char* const argv[]{"sub", "-1", "-2", nullptr};
+    const clapp::parser::types::arg_t arg{sub_parser_make_arg_t(argv)};
+
+    empty_test_parser_t etp;
+    option_sub_parser_t sub{
+        etp, sub_parser, description,
+        clapp::parser::types::logic_operator_type_t::logic_and};
+
+    ASSERT_THAT(etp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+    ASSERT_NO_THROW(etp.validate_recursive());
 }

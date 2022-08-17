@@ -23,8 +23,14 @@ namespace clapp {
 inline namespace parser {
 class basic_sub_parser_t : public basic_parser_t {
    public:
+    basic_sub_parser_t(
+        basic_parser_t& parser, std::string sub_parser_name_arg,
+        std::string description_arg,
+        clapp::parser::types::logic_operator_type_t logic_operator_type);
+
     basic_sub_parser_t(basic_parser_t& parser, std::string sub_parser_name_arg,
                        std::string description_arg);
+
     ~basic_sub_parser_t() override;
 
     // TODO(martinw): enable, if basic_parser has implemented this too

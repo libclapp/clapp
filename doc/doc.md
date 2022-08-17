@@ -813,14 +813,17 @@ Furthermore, if a sub-parser is registered before an argument, the argument posi
 Note: sub-parsers can be stacked. I.e. a sub-parser can itself contain other sub-parsers which iself can contain additional sub-parsers.
 
 ### Sub parser construction:
-The sub-parser base class `clapp::parser::basic_sub_parser_t` contains only one constructor:
+The sub-parser base class `clapp::parser::basic_sub_parser_t` contains two constructors:
 
 ```c++
 basic_sub_parser_t(basic_parser_t& parser, const std::string& sub_parser_name, const std::string& description);
+basic_sub_parser_t(basic_parser_t& parser, const std::string& sub_parser_name, const std::string& description, clapp::parser::types::logic_operator_type_t logic_operator_type);
 ```
 
 Similar to the option and argument constructors, the first argument is a reference to the surrounding parser (i.e. a main parser or other sub-parsers.
 The other two arguments are the name of the sub-parser and a description of the sub-parser.
+The `logic_operator_type`-option of the second constructor can be used to define if the options in the parser are locically XOR- or AND-related.
+The first constructor implicitly sets `logic_operator_type` to `clapp::parser::types::logic_operator_type_t::logic_and`.
 See the listing below for an example how a sub-parser can be created.
 
 ### Sub parser usage:
