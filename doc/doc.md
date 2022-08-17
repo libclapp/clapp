@@ -486,9 +486,16 @@ Thus, by simply passing around a reference (or a pointer) to this main parser, a
 arguments or option can be be accessed easily.
 
 ### Main parser construction:
-The main-parser base class `clapp::parser::basic_main_parser_t` inherits its constructors from its base-class `clapp::parser::basic_parser_t`.
-This constructor has no arguments, but since it is a base-class, you can extend it easily by
-your derived class. See the listing below for an example.
+The main-parser base class `clapp::parser::basic_main_parser_t` inherits the constructors from its base-class `clapp::parser::basic_parser_t`. These are the following:
+```c++
+    basic_main_parser_t();
+    explicit basic_main_parser_t(clapp::parser::types::logic_operator_type_t logic_operator_type);
+```
+
+The constructor without any arguments implicitly sets `logic_operator_type` to `clapp::parser::types::logic_operator_type_t::logic_and`.
+The second constructor takes a `clapp::parser::types::logic_operator_type_t`-parameter. It can be either `clapp::parser::types::logic_operator_type_t::logic_and` or `clapp::parser::types::logic_operator_type_t::logic_xor` and changes the way, how all the options of the parser are logically linked together.
+
+Note: since `main-parser` typically acts as a base-class, the class constructor can be extend by a derived class. See the listing below for an example.
 
 ### Main parser usage:
 The main-parser base class `clapp::parser::basic_main_parser_t` is shipped with several useful methods.

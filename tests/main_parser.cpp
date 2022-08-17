@@ -24,6 +24,21 @@ class bo_main_parser_t : public clapp::parser::basic_main_parser_t {
 
 bo_main_parser_t::~bo_main_parser_t() = default;
 
+class mandatory_main_parser_t : public clapp::parser::basic_main_parser_t {
+   public:
+    using clapp::parser::basic_main_parser_t::basic_main_parser_t;
+
+    clapp::bool_option_t b1{*this, std::vector<char>{'1'}, "first",
+                            clapp::parser::types::purpose_t::mandatory};
+
+    clapp::bool_option_t b2{*this, std::vector<char>{'2'}, "second",
+                            clapp::parser::types::purpose_t::mandatory};
+
+    ~mandatory_main_parser_t() override;
+};
+
+mandatory_main_parser_t::~mandatory_main_parser_t() = default;
+
 TEST(mainParser, constructEmptyMainParserAndParse) {
     constexpr const char* const argv[]{"main", nullptr};
     empty_main_parser_t emp;
@@ -92,6 +107,38 @@ TEST(mainParser, constructBoMainParserAndParseAndValidate) {
         bmp.parse_and_validate(2, static_cast<const char* const*>(argv))};
     ASSERT_THAT(exit.has_value(), testing::Eq(true));
     ASSERT_THAT(exit.value().get_exit_code(), testing::Eq(EXIT_SUCCESS));
+}
+
+TEST(mainParser, constructMandatoryMainParserLogicAndCallParseAndValidate) {
+    constexpr const char* const argv[]{"main", "-1", "-2", nullptr};
+    mandatory_main_parser_t mmp{
+        clapp::parser::types::logic_operator_type_t::logic_and};
+
+    const std::optional<clapp::value::exit_t> exit{
+        mmp.parse_and_validate(3, static_cast<const char* const*>(argv))};
+    ASSERT_THAT(exit.has_value(), testing::Eq(false));
+}
+
+TEST(mainParser,
+     constructMandatoryMainParserLogicXorCallParseAndValidateFirst) {
+    constexpr const char* const argv[]{"main", "-1", nullptr};
+    mandatory_main_parser_t mmp{
+        clapp::parser::types::logic_operator_type_t::logic_xor};
+
+    const std::optional<clapp::value::exit_t> exit{
+        mmp.parse_and_validate(2, static_cast<const char* const*>(argv))};
+    ASSERT_THAT(exit.has_value(), testing::Eq(false));
+}
+
+TEST(mainParser,
+     constructMandatoryMainParserLogicXorCallParseAndValidateSecond) {
+    constexpr const char* const argv[]{"main", "-2", nullptr};
+    mandatory_main_parser_t mmp{
+        clapp::parser::types::logic_operator_type_t::logic_xor};
+
+    const std::optional<clapp::value::exit_t> exit{
+        mmp.parse_and_validate(2, static_cast<const char* const*>(argv))};
+    ASSERT_THAT(exit.has_value(), testing::Eq(false));
 }
 
 TEST(mainParser, constructMainParserIsActiveIsTrue) {

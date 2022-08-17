@@ -88,6 +88,7 @@ class basic_parser_t : public basic_option_container_t {
 
    public:
     basic_parser_t();
+    explicit basic_parser_t(types::logic_operator_type_t logic_operator_type);
     explicit basic_parser_t(const basic_parser_t&) = delete;
     explicit basic_parser_t(basic_parser_t&&) noexcept = delete;
     basic_parser_t& operator=(const basic_parser_t&) = delete;

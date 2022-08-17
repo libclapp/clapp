@@ -204,6 +204,33 @@ std::string simple_test_parser5_t::gen_short_line_prefix() const {
     return "simple-test-parser5 " + gen_short_line();
 }
 
+class mandatory_options_test_parser_t : public clapp::basic_parser_t {
+   public:
+    using clapp::basic_parser_t::basic_parser_t;
+    ~mandatory_options_test_parser_t() override;
+
+    static constexpr std::int32_t min_int{10};
+    static constexpr std::int32_t max_int{200};
+
+    clapp::option::bool_option_t bool_option{*this, "bool", 'b',
+                                             "Bool option."};
+
+    clapp::option::string_param_option_t string_option{*this, "string", 's',
+                                                       "String option."};
+
+    clapp::option::int32_param_option_t int_option{
+        *this, "int", 'i', "Int option.",
+        clapp::value::min_max_value_t<std::int32_t>{min_int, max_int}};
+
+    [[nodiscard]] std::string gen_short_line_prefix() const override;
+};
+
+mandatory_options_test_parser_t::~mandatory_options_test_parser_t() = default;
+
+std::string mandatory_options_test_parser_t::gen_short_line_prefix() const {
+    return "mandatory-options-test-parser " + gen_short_line();
+}
+
 class sub_parser_container_t : public clapp::basic_parser_t {
    public:
     using clapp::basic_parser_t::basic_parser_t;
@@ -945,6 +972,57 @@ TEST(parser, constructSimpleTestParser5AndParseArgument) {
     ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(exit_code));
 }
 
+TEST(parser,
+     constructMandatoryOptionsTestParserLogicAndCallParseAndValidateRecursive) {
+    constexpr const char* const argv[]{"-b", "-s=test", "-i=21", nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    mandatory_options_test_parser_t motp{
+        clapp::parser::types::logic_operator_type_t::logic_and};
+    const clapp::value::found_func_t::ret_t ret{
+        motp.parse(arg.begin(), arg.end())};
+    ASSERT_THAT(ret.has_value(), testing::Eq(false));
+    ASSERT_NO_THROW(motp.validate_recursive());
+}
+
+TEST(
+    parser,
+    constructMandatoryOptionsTestParserLogicXorCallParseBoolAndValidateRecursive) {
+    constexpr const char* const argv[]{"-b", nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    mandatory_options_test_parser_t motp{
+        clapp::parser::types::logic_operator_type_t::logic_xor};
+    const clapp::value::found_func_t::ret_t ret{
+        motp.parse(arg.begin(), arg.end())};
+    ASSERT_THAT(ret.has_value(), testing::Eq(false));
+    ASSERT_NO_THROW(motp.validate_recursive());
+}
+
+TEST(
+    parser,
+    constructMandatoryOptionsTestParserLogicXorCallParseStrAndValidateRecursive) {
+    constexpr const char* const argv[]{"-s=test", nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    mandatory_options_test_parser_t motp{
+        clapp::parser::types::logic_operator_type_t::logic_xor};
+    const clapp::value::found_func_t::ret_t ret{
+        motp.parse(arg.begin(), arg.end())};
+    ASSERT_THAT(ret.has_value(), testing::Eq(false));
+    ASSERT_NO_THROW(motp.validate_recursive());
+}
+
+TEST(
+    parser,
+    constructMandatoryOptionsTestParserLogicXorCallParseIntAndValidateRecursive) {
+    constexpr const char* const argv[]{"-i=11", nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    mandatory_options_test_parser_t motp{
+        clapp::parser::types::logic_operator_type_t::logic_xor};
+    const clapp::value::found_func_t::ret_t ret{
+        motp.parse(arg.begin(), arg.end())};
+    ASSERT_THAT(ret.has_value(), testing::Eq(false));
+    ASSERT_NO_THROW(motp.validate_recursive());
+}
+
 TEST(parser, setAndCallPrintAndExitWithStringAndExitCode) {
     print_and_exit_t pae{};
     simple_test_parser_t stp;
@@ -1034,6 +1112,32 @@ TEST(parser, constructSimpleTestParser5AndGenHelpMessage) {
             "simple-test-parser5 <arg-name> [<var-arg-name>...]\n\n  "
             "Arguments:\n    arg-name     Arg desc (mandatory)\n    "
             "var-arg-name Var arg desc (optional, variadic argument)\n"));
+}
+
+TEST(parser, constructMandatoryOptionsTestParserLogicAndAndGenHelpMessage) {
+    mandatory_options_test_parser_t motp{
+        clapp::parser::types::logic_operator_type_t::logic_and};
+    ASSERT_THAT(
+        motp.gen_help_msg(255),
+        testing::StrEq("mandatory-options-test-parser -b|--bool "
+                       "-s|--string=<param> -i|--int=<param>\n\n  "
+                       "Options:\n    -b|--bool           Bool option. "
+                       "(mandatory)\n    -s|--string=<param> String option. "
+                       "(mandatory)\n    -i|--int=<param>    Int option. "
+                       "(mandatory, constraint: [10,200])\n"));
+}
+
+TEST(parser, constructMandatoryOptionsTestParserLogicAndXorGenHelpMessage) {
+    mandatory_options_test_parser_t motp{
+        clapp::parser::types::logic_operator_type_t::logic_xor};
+    ASSERT_THAT(
+        motp.gen_help_msg(255),
+        testing::StrEq("mandatory-options-test-parser -b|--bool | "
+                       "-s|--string=<param> | -i|--int=<param>\n\n  "
+                       "Options:\n    -b|--bool           Bool option. "
+                       "(mandatory)\n    -s|--string=<param> String option. "
+                       "(mandatory)\n    -i|--int=<param>    Int option. "
+                       "(mandatory, constraint: [10,200])\n"));
 }
 
 TEST(parser, constructSubParserContainerAndGenHelpMessage) {
