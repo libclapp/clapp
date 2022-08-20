@@ -41,9 +41,9 @@ std::optional<clapp::value::exit_t> clapp::parser::basic_main_parser_t::parse(
 
 std::optional<clapp::value::exit_t> clapp::parser::basic_main_parser_t::parse(
     const arg_t& arg) {
-    arg_iterator it{arg.begin()};
-    executable = *it;
-    return parse(it + 1, arg.end());
+    arg_iterator ait{arg.begin()};
+    executable = *ait;
+    return parse(ait + 1, arg.end());
 }
 
 std::optional<clapp::value::exit_t>
@@ -58,7 +58,10 @@ clapp::parser::basic_main_parser_t::parse_and_validate(
 }
 
 std::string clapp::parser::basic_main_parser_t::gen_short_line_prefix() const {
-    const std::string exec{get_executable()};
     const std::string short_line{gen_short_line()};
-    return exec + short_line;
+    std::string exec{get_executable()};
+    if (!short_line.empty()) {
+        return exec + ' ' + short_line;
+    }
+    return exec;
 }
