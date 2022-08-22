@@ -190,29 +190,29 @@ using parser_t = clapp::parser::basic_parser_container_t<cli_parser_t>;
 
 int main(int argc, char *argv[]) {
     try {
-        parser_t cp;
+        parser_t parser;
         const std::optional<clapp::value::exit_t> exit{
-            cp.parse_and_validate(argc, argv)};
+            parser.parse_and_validate(argc, argv)};
         if (exit) {
             return exit.value().get_exit_code();
         }
 
-        if (cp->verbose) {  // if the optional verbose option is given
-            std::cout << "verbose: " << cp->verbose.value() << "\n";
+        if (parser->verbose) {  // if the optional verbose option is given
+            std::cout << "verbose: " << parser->verbose.value() << "\n";
         } else {
             std::cout << "verbose: not given\n";
         }
 
-        if (cp->first) {  // if the first sub-parser is selected
+        if (parser->first) {  // if the first sub-parser is selected
             std::cout << "first parser active" << std::endl;
-            process_first(cp->first);
+            process_first(parser->first);
         } else {
             std::cout << "first parser not active" << std::endl;
         }
 
-        if (cp->second) {  // if the first sub-parser is selected
+        if (parser->second) {  // if the first sub-parser is selected
             std::cout << "second parser active" << std::endl;
-            process_second(cp->second);
+            process_second(parser->second);
         } else {
             std::cout << "second parser not active" << std::endl;
         }
