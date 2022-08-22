@@ -322,48 +322,53 @@ TEST(value, getChronoPostfix) {
 
 TEST(value, defaultValueUint8T) {
     constexpr std::uint8_t value{10};
-    clapp::value::default_value_t<std::uint8_t> dv{value};
-    std::stringstream ss;
-    ss << "default-value: " << static_cast<std::uint16_t>(value);
-    ASSERT_THAT(dv.append_restriction_text(), testing::StrEq(ss.str()));
-    ASSERT_THAT(dv.default_value(), testing::Eq(std::uint8_t{value}));
+    clapp::value::default_value_t<std::uint8_t> dval{value};
+    std::stringstream stringstr;
+    stringstr << "default-value: " << static_cast<std::uint16_t>(value);
+    ASSERT_THAT(dval.append_restriction_text(),
+                testing::StrEq(stringstr.str()));
+    ASSERT_THAT(dval.default_value(), testing::Eq(std::uint8_t{value}));
 }
 
 TEST(value, defaultValueInt8T) {
     constexpr std::int8_t value{-10};
-    clapp::value::default_value_t<std::int8_t> dv{value};
-    std::stringstream ss;
-    ss << "default-value: " << static_cast<std::int16_t>(value);
-    ASSERT_THAT(dv.append_restriction_text(), testing::StrEq(ss.str()));
-    ASSERT_THAT(dv.default_value(), testing::Eq(std::int8_t{value}));
+    clapp::value::default_value_t<std::int8_t> dval{value};
+    std::stringstream stringstr;
+    stringstr << "default-value: " << static_cast<std::int16_t>(value);
+    ASSERT_THAT(dval.append_restriction_text(),
+                testing::StrEq(stringstr.str()));
+    ASSERT_THAT(dval.default_value(), testing::Eq(std::int8_t{value}));
 }
 
 TEST(value, defaultValueInt32T) {
     constexpr std::int32_t value{100'000};
-    clapp::value::default_value_t<std::int32_t> dv{value};
-    std::stringstream ss;
-    ss << "default-value: " << value;
-    ASSERT_THAT(dv.append_restriction_text(), testing::StrEq(ss.str()));
-    ASSERT_THAT(dv.default_value(), testing::Eq(value));
+    clapp::value::default_value_t<std::int32_t> dval{value};
+    std::stringstream stringstr;
+    stringstr << "default-value: " << value;
+    ASSERT_THAT(dval.append_restriction_text(),
+                testing::StrEq(stringstr.str()));
+    ASSERT_THAT(dval.default_value(), testing::Eq(value));
 }
 
 TEST(value, defaultValueString) {
     const std::string value{"value"};
-    clapp::value::default_value_t<std::string> dv{value};
-    std::stringstream ss;
-    ss << "default-value: " << value;
-    ASSERT_THAT(dv.append_restriction_text(), testing::StrEq(ss.str()));
-    ASSERT_THAT(dv.default_value(), testing::Eq(value));
+    clapp::value::default_value_t<std::string> dval{value};
+    std::stringstream stringstr;
+    stringstr << "default-value: " << value;
+    ASSERT_THAT(dval.append_restriction_text(),
+                testing::StrEq(stringstr.str()));
+    ASSERT_THAT(dval.default_value(), testing::Eq(value));
 }
 
 TEST(value, defaultValueMilliseconds) {
     constexpr std::uint64_t value{30};
-    clapp::value::default_value_t<std::chrono::milliseconds> dv{
+    clapp::value::default_value_t<std::chrono::milliseconds> dval{
         std::chrono::milliseconds{value}};
-    std::stringstream ss;
-    ss << "default-value: " << value << "ms";
-    ASSERT_THAT(dv.append_restriction_text(), testing::StrEq(ss.str()));
-    ASSERT_THAT(dv.default_value(),
+    std::stringstream stringstr;
+    stringstr << "default-value: " << value << "ms";
+    ASSERT_THAT(dval.append_restriction_text(),
+                testing::StrEq(stringstr.str()));
+    ASSERT_THAT(dval.default_value(),
                 testing::Eq(std::chrono::milliseconds{value}));
 }
 
@@ -371,10 +376,10 @@ TEST(value, minMaxValueUint8T) {
     constexpr std::uint8_t min{10};
     constexpr std::uint8_t max{50};
     clapp::value::min_max_value_t<std::uint8_t> mmv{min, max};
-    std::stringstream ss;
-    ss << "constraint: [" << static_cast<std::int16_t>(min) << ","
-       << static_cast<std::int16_t>(max) << "]";
-    ASSERT_THAT(mmv.append_restriction_text(), testing::StrEq(ss.str()));
+    std::stringstream stringstr;
+    stringstr << "constraint: [" << static_cast<std::int16_t>(min) << ","
+              << static_cast<std::int16_t>(max) << "]";
+    ASSERT_THAT(mmv.append_restriction_text(), testing::StrEq(stringstr.str()));
     EXPECT_NO_THROW(mmv.validate(min, "option"));
     EXPECT_NO_THROW(mmv.validate(max, "option"));
     EXPECT_NO_THROW(mmv.validate(30, "option"));
@@ -386,9 +391,9 @@ TEST(value, minMaxValueInt32T) {
     constexpr std::int32_t min{-1024};
     constexpr std::int32_t max{50};
     clapp::value::min_max_value_t<std::int32_t> mmv{min, max};
-    std::stringstream ss;
-    ss << "constraint: [" << min << "," << max << "]";
-    ASSERT_THAT(mmv.append_restriction_text(), testing::StrEq(ss.str()));
+    std::stringstream stringstr;
+    stringstr << "constraint: [" << min << "," << max << "]";
+    ASSERT_THAT(mmv.append_restriction_text(), testing::StrEq(stringstr.str()));
     EXPECT_NO_THROW(mmv.validate(min, "option"));
     EXPECT_NO_THROW(mmv.validate(max, "option"));
     EXPECT_NO_THROW(mmv.validate(-100, "option"));
@@ -402,9 +407,9 @@ TEST(value, minMaxValueDoubleT) {
     const double max{200.5};
     const double above{max + 0.1};
     clapp::value::min_max_value_t<double> mmv{min, max};
-    std::stringstream ss;
-    ss << "constraint: [" << min << "," << max << "]";
-    ASSERT_THAT(mmv.append_restriction_text(), testing::StrEq(ss.str()));
+    std::stringstream stringstr;
+    stringstr << "constraint: [" << min << "," << max << "]";
+    ASSERT_THAT(mmv.append_restriction_text(), testing::StrEq(stringstr.str()));
     EXPECT_NO_THROW(mmv.validate(min, "option"));
     EXPECT_NO_THROW(mmv.validate(max, "option"));
     EXPECT_NO_THROW(mmv.validate(130, "option"));
@@ -417,9 +422,10 @@ TEST(value, minMaxValueMillisecondsT) {
     const std::chrono::milliseconds min{std::chrono::milliseconds{100}};
     const std::chrono::milliseconds max{std::chrono::milliseconds{200}};
     clapp::value::min_max_value_t<std::chrono::milliseconds> mmv{min, max};
-    std::stringstream ss;
-    ss << "constraint: [" << min.count() << "ms," << max.count() << "ms]";
-    ASSERT_THAT(mmv.append_restriction_text(), testing::StrEq(ss.str()));
+    std::stringstream stringstr;
+    stringstr << "constraint: [" << min.count() << "ms," << max.count()
+              << "ms]";
+    ASSERT_THAT(mmv.append_restriction_text(), testing::StrEq(stringstr.str()));
     EXPECT_NO_THROW(mmv.validate(min, "option"));
     EXPECT_NO_THROW(mmv.validate(max, "option"));
     EXPECT_NO_THROW(mmv.validate(std::chrono::milliseconds{130}, "option"));
@@ -454,41 +460,44 @@ TEST(value, notNullValueUint8T) {
 }
 
 TEST(value, pathExistsT) {
-    clapp::value::path_exists_t pe;
-    ASSERT_THAT(pe.append_restriction_text(), testing::StrEq("existing path"));
-    EXPECT_NO_THROW(pe.validate(clapp::fs::path{"/tmp"}, "option"));
-    ASSERT_THROW(
-        pe.validate(clapp::fs::path{"/tmp/aba/sadf/aksk/annsp"}, "arg"),
-        clapp::exception::path_does_not_exist_t);
+    clapp::value::path_exists_t path_exists;
+    ASSERT_THAT(path_exists.append_restriction_text(),
+                testing::StrEq("existing path"));
+    EXPECT_NO_THROW(path_exists.validate(clapp::fs::path{"/tmp"}, "option"));
+    ASSERT_THROW(path_exists.validate(
+                     clapp::fs::path{"/tmp/aba/sadf/aksk/annsp"}, "arg"),
+                 clapp::exception::path_does_not_exist_t);
 }
 
 TEST(value, exitTExit) {
     static constexpr int exit_code{0x58};
-    static constexpr clapp::value::exit_t e{
+    static constexpr clapp::value::exit_t exit{
         clapp::value::exit_t::exit(exit_code)};
-    ASSERT_THAT(e.get_exit_code(), testing::Eq(exit_code));
+    ASSERT_THAT(exit.get_exit_code(), testing::Eq(exit_code));
 }
 
 TEST(value, foundFuncTReturnsNothing) {
-    std::stringstream ss;
-    clapp::value::found_func_t ff{[&ss](const std::string& name) {
-        ss << "called func '" << name << "'";
-        return clapp::value::found_func_t::ret_t{};
-    }};
-    ASSERT_THAT(ff.found("name").has_value(), testing::Eq(false));
-    ASSERT_THAT(ss.str(), testing::StrEq("called func 'name'"));
+    std::stringstream stringstr;
+    clapp::value::found_func_t found_func{
+        [&stringstr](const std::string& name) {
+            stringstr << "called func '" << name << "'";
+            return clapp::value::found_func_t::ret_t{};
+        }};
+    ASSERT_THAT(found_func.found("name").has_value(), testing::Eq(false));
+    ASSERT_THAT(stringstr.str(), testing::StrEq("called func 'name'"));
 }
 
 TEST(value, foundFuncTReturnsExit) {
     static constexpr int exit_code{77};
-    std::stringstream ss;
-    clapp::value::found_func_t ff{[&ss](const std::string& name) {
-        ss << "called func-" << name;
-        return clapp::value::found_func_t::ret_t{
-            clapp::value::exit_t::exit(exit_code)};
-    }};
-    const clapp::value::found_func_t::ret_t ret{ff.found("name2")};
+    std::stringstream stringstr;
+    clapp::value::found_func_t found_func{
+        [&stringstr](const std::string& name) {
+            stringstr << "called func-" << name;
+            return clapp::value::found_func_t::ret_t{
+                clapp::value::exit_t::exit(exit_code)};
+        }};
+    const clapp::value::found_func_t::ret_t ret{found_func.found("name2")};
     ASSERT_THAT(ret.has_value(), testing::Eq(true));
     ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(exit_code));
-    ASSERT_THAT(ss.str(), testing::StrEq("called func-name2"));
+    ASSERT_THAT(stringstr.str(), testing::StrEq("called func-name2"));
 }
