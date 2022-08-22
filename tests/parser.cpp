@@ -6,8 +6,8 @@
 #include <gmock/gmock.h>
 
 TEST(helpEntry, Construct) {
-    clapp::parser::basic_parser_t::help_entry_t he{"option-string",
-                                                   "description"};
+    clapp::parser::basic_parser_t::help_entry_t help_entry{"option-string",
+                                                           "description"};
 }
 
 TEST(helpEntry, ConstructAndCompare) {
@@ -15,19 +15,20 @@ TEST(helpEntry, ConstructAndCompare) {
     const std::string description_str{"desc"};
     const std::string option_str2{"os2"};
     const std::string description_str2{"ds2"};
-    clapp::parser::basic_parser_t::help_entry_t he{option_str, description_str};
+    clapp::parser::basic_parser_t::help_entry_t help_entry{option_str,
+                                                           description_str};
     ASSERT_THAT((clapp::parser::basic_parser_t::help_entry_t{option_str,
                                                              description_str}),
-                testing::Eq(he));
+                testing::Eq(help_entry));
     ASSERT_THAT((clapp::parser::basic_parser_t::help_entry_t{option_str2,
                                                              description_str}),
-                testing::Ne(he));
+                testing::Ne(help_entry));
     ASSERT_THAT((clapp::parser::basic_parser_t::help_entry_t{option_str2,
                                                              description_str2}),
-                testing::Ne(he));
+                testing::Ne(help_entry));
     ASSERT_THAT((clapp::parser::basic_parser_t::help_entry_t{option_str,
                                                              description_str2}),
-                testing::Ne(he));
+                testing::Ne(help_entry));
 }
 
 TEST(purpose, ToStringView) {
@@ -919,10 +920,10 @@ class simple_test_parser5_t : public clapp::basic_parser_t {
 
     static clapp::value::found_func_t::ret_t found_cb(
         const std::string_view option) {
-        static std::size_t i{0U};
+        static std::size_t cnt{0U};
         std::cout << "found cb: " << option << std::endl;
-        i++;
-        if (i == 1U) {
+        cnt++;
+        if (cnt == 1U) {
             return clapp::value::found_func_t::ret_t{};
         }
         return clapp::value::exit_t::exit(EXIT_FAILURE);
@@ -1062,19 +1063,19 @@ static constexpr const char help_str[] =
 TEST(parser, constructHelpParserAndParseEmptyArguments) {
     constexpr const char* const argv[]{nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
-    help_parser_t hp;
-    ASSERT_THAT(hp.parse(arg.begin(), arg.end()).has_value(),
+    help_parser_t help_parser;
+    ASSERT_THAT(help_parser.parse(arg.begin(), arg.end()).has_value(),
                 testing::Eq(false));
 }
 
 TEST(parser, constructHelpParserAndParseHelpOptionLong1) {
     constexpr const char* const argv[]{"--help", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
-    help_parser_t hp;
+    help_parser_t help_parser;
     static constexpr int exit_code{EXIT_SUCCESS};
     testing::internal::CaptureStdout();
     const clapp::value::found_func_t::ret_t ret{
-        hp.parse(arg.begin(), arg.end())};
+        help_parser.parse(arg.begin(), arg.end())};
     std::string output = testing::internal::GetCapturedStdout();
     ASSERT_THAT(output, testing::StrEq(help_str));
     ASSERT_THAT(ret.has_value(), testing::Eq(true));
@@ -1084,11 +1085,11 @@ TEST(parser, constructHelpParserAndParseHelpOptionLong1) {
 TEST(parser, constructHelpParserAndParseHelpOptionLong2) {
     constexpr const char* const argv[]{"--h", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
-    help_parser_t hp;
+    help_parser_t help_parser;
     static constexpr int exit_code{EXIT_SUCCESS};
     testing::internal::CaptureStdout();
     const clapp::value::found_func_t::ret_t ret{
-        hp.parse(arg.begin(), arg.end())};
+        help_parser.parse(arg.begin(), arg.end())};
     std::string output = testing::internal::GetCapturedStdout();
     ASSERT_THAT(output, testing::StrEq(help_str));
     ASSERT_THAT(ret.has_value(), testing::Eq(true));
@@ -1098,11 +1099,11 @@ TEST(parser, constructHelpParserAndParseHelpOptionLong2) {
 TEST(parser, constructHelpParserAndParseHelpOptionShort1) {
     constexpr const char* const argv[]{"-h", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
-    help_parser_t hp;
+    help_parser_t help_parser;
     static constexpr int exit_code{EXIT_SUCCESS};
     testing::internal::CaptureStdout();
     const clapp::value::found_func_t::ret_t ret{
-        hp.parse(arg.begin(), arg.end())};
+        help_parser.parse(arg.begin(), arg.end())};
     std::string output = testing::internal::GetCapturedStdout();
     ASSERT_THAT(output, testing::StrEq(help_str));
     ASSERT_THAT(ret.has_value(), testing::Eq(true));
@@ -1112,11 +1113,11 @@ TEST(parser, constructHelpParserAndParseHelpOptionShort1) {
 TEST(parser, constructHelpParserAndParseHelpOptionShort2) {
     constexpr const char* const argv[]{"-?", nullptr};
     const clapp::parser::arg_t arg{parser_make_arg_t(argv)};
-    help_parser_t hp;
+    help_parser_t help_parser;
     static constexpr int exit_code{EXIT_SUCCESS};
     testing::internal::CaptureStdout();
     const clapp::value::found_func_t::ret_t ret{
-        hp.parse(arg.begin(), arg.end())};
+        help_parser.parse(arg.begin(), arg.end())};
     std::string output = testing::internal::GetCapturedStdout();
     ASSERT_THAT(output, testing::StrEq(help_str));
     ASSERT_THAT(ret.has_value(), testing::Eq(true));
@@ -1218,10 +1219,10 @@ TEST(parser, setAndCallPrintAndExitWithStringAndExitCode) {
 TEST(parser, genFuncPrintHelpAndExit) {
     empty_basic_parser_t ebp;
     static constexpr int ret_val{EXIT_SUCCESS};
-    clapp::value::found_func_t ff{
+    clapp::value::found_func_t found_func{
         ebp.gen_func_print_help_and_req_exit(ret_val)};
     testing::internal::CaptureStdout();
-    const clapp::value::found_func_t::ret_t ret{ff.found("name")};
+    const clapp::value::found_func_t::ret_t ret{found_func.found("name")};
     ASSERT_THAT(ret.has_value(), testing::Eq(true));
     ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(ret_val));
     std::string output{testing::internal::GetCapturedStdout()};
