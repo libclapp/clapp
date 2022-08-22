@@ -67,25 +67,27 @@ using parser_t = clapp::parser::basic_parser_container_t<cli_parser_t>;
 
 int main(int argc, char *argv[]) {
     try {
-        parser_t cp;
+        parser_t parser;
         const std::optional<clapp::value::exit_t> exit{
-            cp.parse_and_validate(argc, argv)};
+            parser.parse_and_validate(argc, argv)};
         if (exit) {
             return exit.value().get_exit_code();
         }
 
         Expects(
-            cp->string_arg);  // parser ensures mandatory arguments are given
-        std::cout << "string-arg: " << cp->string_arg.value() << std::endl;
+            parser
+                ->string_arg);  // parser ensures mandatory arguments are given
+        std::cout << "string-arg: " << parser->string_arg.value() << std::endl;
 
-        Expects(cp->int_arg);  // parser ensures mandatory arguments are given
-        std::cout << "int-arg: " << cp->int_arg.value() << std::endl;
+        Expects(
+            parser->int_arg);  // parser ensures mandatory arguments are given
+        std::cout << "int-arg: " << parser->int_arg.value() << std::endl;
 
-        if (cp->variadic_string_arg) {  // if variadic_string_arg is given
+        if (parser->variadic_string_arg) {  // if variadic_string_arg is given
             std::cout << "variadic-string-arg (size: "
-                      << cp->variadic_string_arg.value().size() << "): ";
+                      << parser->variadic_string_arg.value().size() << "): ";
             // iterate over the vector of arguments
-            for (auto &val : cp->variadic_string_arg.value()) {
+            for (auto &val : parser->variadic_string_arg.value()) {
                 std::cout << val << ", ";
             }
             std::cout << std::endl;
@@ -93,16 +95,16 @@ int main(int argc, char *argv[]) {
             std::cout << "variadic-string-arg: not given" << std::endl;
         }
 
-        Expects(cp->string_param);  // The parser ensures that mandatory options
-                                    // are given
-        std::cout << "string_param: '" << cp->string_param.value() << "'"
+        Expects(parser->string_param);  // The parser ensures that
+                                        // mandatory options are given
+        std::cout << "string_param: '" << parser->string_param.value() << "'"
                   << std::endl;
 
-        if (cp->string_vector_param) {  // if string_vector_param is given
+        if (parser->string_vector_param) {  // if string_vector_param is given
             std::cout << "string_vector_param (size: "
-                      << cp->string_vector_param.value().size() << "): ";
+                      << parser->string_vector_param.value().size() << "): ";
             // iterate over the vector of options
-            for (auto &val : cp->string_vector_param.value()) {
+            for (auto &val : parser->string_vector_param.value()) {
                 std::cout << val << ", ";
             }
             std::cout << std::endl;
