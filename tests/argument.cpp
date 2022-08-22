@@ -40,7 +40,9 @@ contains_argument(
     ARGUMENT_T&& argument) {
     for (const auto& arg : arguments) {
         const bool found{std::visit(
-            [&argument](auto&& a) { return argument == a.argument_name; },
+            [&argument](auto&& visit_argument) {
+                return argument == visit_argument.argument_name;
+            },
             arg)};
         if (found) {
             return arg;
@@ -124,25 +126,26 @@ MATCHER_P(VariadicArgumentGiven, value,
     if (!(static_cast<bool>(arg) && arg.has_value() && arg.given())) {
         return false;
     }
-    const auto& a{arg.value()};
+    const auto& argument{arg.value()};
     std::string val_str{
         std::accumulate(value.begin(), value.end(), std::string{},
-                        [](std::string& s, const auto& itm) {
-                            return s += clapp::to_string(itm) + ", ";
+                        [](std::string& str, const auto& itm) {
+                            return str += clapp::to_string(itm) + ", ";
                         })};
     if (!val_str.empty()) {
         val_str = val_str.substr(0, val_str.size() - 2);
     }
-    std::string arg_str{std::accumulate(
-        a.begin(), a.end(), std::string{}, [](std::string& s, const auto& itm) {
-            return s += clapp::to_string(itm) + ", ";
-        })};
+    std::string arg_str{
+        std::accumulate(argument.begin(), argument.end(), std::string{},
+                        [](std::string& str, const auto& itm) {
+                            return str += clapp::to_string(itm) + ", ";
+                        })};
     if (!arg_str.empty()) {
         arg_str = arg_str.substr(0, arg_str.size() - 2);
     }
     *result_listener << ", value(): {" << val_str << "}=={" << arg_str
                      << "} = ";
-    return compare_value_vector(a, value, result_listener);
+    return compare_value_vector(argument, value, result_listener);
 }
 
 MATCHER(VariadicArgumentNotGiven,
@@ -172,10 +175,10 @@ MATCHER(ArgumentNotGiven, "Checks, if argument is not given.") {
 argument_test_parser_t::~argument_test_parser_t() = default;
 
 template <typename ARG_FUNC_T>
-static ARG_FUNC_T get_arg_func(argument_test_parser_t& tp,
+static ARG_FUNC_T get_arg_func(argument_test_parser_t& atp,
                                const std::string& argument) {
     std::vector<argument_test_parser_t::variant_arg_conf_t> arguments{
-        tp.get_arguments()};
+        atp.get_arguments()};
     std::optional<argument_test_parser_t::variant_arg_conf_t> found_arg{
         contains_argument(arguments, argument)};
     if (found_arg == std::nullopt) {
@@ -195,10 +198,10 @@ static ARG_FUNC_T get_arg_func(argument_test_parser_t& tp,
 
 template <typename ARGUMENT_T>
 static std::optional<argument_test_parser_t::validate_func_t> get_validate_func(
-    argument_test_parser_t& tp, ARGUMENT_T&& argument) {
+    argument_test_parser_t& atp, ARGUMENT_T&& argument) {
     std::string argument_string{argument};
     std::vector<argument_test_parser_t::variant_arg_conf_t> arguments{
-        tp.get_arguments()};
+        atp.get_arguments()};
     std::optional<argument_test_parser_t::variant_arg_conf_t> found_arg{
         contains_argument(arguments,
                           std::forward<decltype(argument)>(argument))};
@@ -207,8 +210,9 @@ static std::optional<argument_test_parser_t::validate_func_t> get_validate_func(
                                  "' registered.");
     }
 
-    return std::visit([](auto&& vf) { return vf.validate_func; },
-                      found_arg.value());
+    return std::visit(
+        [](auto&& validate_func) { return validate_func.validate_func; },
+        found_arg.value());
 }
 
 std::string argument_test_parser_t::gen_short_line_prefix() const {
