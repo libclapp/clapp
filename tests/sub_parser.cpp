@@ -125,12 +125,12 @@ TEST(subParser, constructEmptySubParserAndParseEmptyArguments) {
     constexpr const char* const argv[]{"sub", nullptr};
     const clapp::parser::arg_t arg{sub_parser_make_arg_t(argv)};
 
-    empty_test_parser_t tp;
-    empty_sub_parser_t sub{tp, sub_parser, description};
+    empty_test_parser_t etp;
+    empty_sub_parser_t sub{etp, sub_parser, description};
 
-    empty_test_parser_t::sub_parsers_map_t long_options{tp.get_sub_parsers()};
+    empty_test_parser_t::sub_parsers_map_t long_options{etp.get_sub_parsers()};
     empty_test_parser_t::sub_parser_descriptions_vec_t descs{
-        tp.get_sub_parser_descriptions()};
+        etp.get_sub_parser_descriptions()};
 
     ASSERT_THAT(descs.size(), testing::Eq(1));
     ASSERT_THAT(descs[0].sub_parser_string, testing::StrEq(sub_parser));
@@ -139,7 +139,7 @@ TEST(subParser, constructEmptySubParserAndParseEmptyArguments) {
     ASSERT_THAT(static_cast<bool>(sub), testing::Eq(false));
     ASSERT_THAT(sub.get_sub_parser_name(), testing::StrEq(sub_parser));
 
-    ASSERT_THAT(tp.parse(arg.begin(), arg.end()).has_value(),
+    ASSERT_THAT(etp.parse(arg.begin(), arg.end()).has_value(),
                 testing::Eq(false));
 }
 
@@ -150,13 +150,13 @@ TEST(subParser, constructSimpleSubParserAndParseSubOption) {
     constexpr const char* const argv[]{"subbb", "--bool", nullptr};
     const clapp::parser::arg_t arg{sub_parser_make_arg_t(argv)};
 
-    simple_test_sub_parser_t tp;
-    simple_sub_parser_t sub{tp, sub_parser, description};
+    simple_test_sub_parser_t stsp;
+    simple_sub_parser_t sub{stsp, sub_parser, description};
 
     simple_test_sub_parser_t::sub_parsers_map_t long_options{
-        tp.get_sub_parsers()};
+        stsp.get_sub_parsers()};
     simple_test_sub_parser_t::sub_parser_descriptions_vec_t descs{
-        tp.get_sub_parser_descriptions()};
+        stsp.get_sub_parser_descriptions()};
 
     ASSERT_THAT(descs.size(), testing::Eq(1));
     ASSERT_THAT(descs[0].sub_parser_string, testing::StrEq(sub_parser));
@@ -169,7 +169,7 @@ TEST(subParser, constructSimpleSubParserAndParseSubOption) {
     ASSERT_THAT(sub.bool_option.has_value(), testing::Eq(true));
     ASSERT_THAT(sub.bool_option.value(), testing::Eq(false));
 
-    ASSERT_THAT(tp.parse(arg.begin(), arg.end()).has_value(),
+    ASSERT_THAT(stsp.parse(arg.begin(), arg.end()).has_value(),
                 testing::Eq(false));
     ASSERT_THAT(static_cast<bool>(sub.bool_option), testing::Eq(true));
 }
@@ -181,13 +181,13 @@ TEST(subParser, constructSimpleSubParserAndParseBaseOption) {
     constexpr const char* const argv[]{"--count", "subbb", "-b", nullptr};
     const clapp::parser::arg_t arg{sub_parser_make_arg_t(argv)};
 
-    simple_test_sub_parser_t tp;
-    simple_sub_parser_t sub{tp, sub_parser, description};
+    simple_test_sub_parser_t stsp;
+    simple_sub_parser_t sub{stsp, sub_parser, description};
 
     simple_test_sub_parser_t::sub_parsers_map_t long_options{
-        tp.get_sub_parsers()};
+        stsp.get_sub_parsers()};
     simple_test_sub_parser_t::sub_parser_descriptions_vec_t descs{
-        tp.get_sub_parser_descriptions()};
+        stsp.get_sub_parser_descriptions()};
 
     ASSERT_THAT(descs.size(), testing::Eq(1));
     ASSERT_THAT(descs[0].sub_parser_string, testing::StrEq(sub_parser));
@@ -196,19 +196,19 @@ TEST(subParser, constructSimpleSubParserAndParseBaseOption) {
     ASSERT_THAT(static_cast<bool>(sub), testing::Eq(false));
     ASSERT_THAT(sub.get_sub_parser_name(), testing::StrEq(sub_parser));
 
-    ASSERT_THAT(tp.count_option.value(), testing::Eq(0));
-    ASSERT_THAT(tp.parse(arg.begin(), arg.end()).has_value(),
+    ASSERT_THAT(stsp.count_option.value(), testing::Eq(0));
+    ASSERT_THAT(stsp.parse(arg.begin(), arg.end()).has_value(),
                 testing::Eq(false));
-    ASSERT_THAT(tp.count_option.value(), testing::Eq(1));
+    ASSERT_THAT(stsp.count_option.value(), testing::Eq(1));
 }
 
 TEST(subParser, constructSubParserWithSameNameThrows) {
     const std::string sub_parser{"sub"};
     const std::string description{"sub parser"};
 
-    simple_test_sub_parser_t tp;
-    simple_sub_parser_t sub{tp, sub_parser, description};
-    ASSERT_THROW((simple_sub_parser_t{tp, sub_parser, description}),
+    simple_test_sub_parser_t stsp;
+    simple_sub_parser_t sub{stsp, sub_parser, description};
+    ASSERT_THROW((simple_sub_parser_t{stsp, sub_parser, description}),
                  clapp::exception::sub_parser_exception_t);
 }
 
@@ -216,8 +216,8 @@ TEST(subParser, constructSubParserWithVariadicArgumentsParserThrows) {
     const std::string sub_parser{"sub"};
     const std::string description{"sub parser"};
 
-    variadic_argument_test_sub_parser_t tp;
-    ASSERT_THROW((simple_sub_parser_t{tp, sub_parser, description}),
+    variadic_argument_test_sub_parser_t vatsp;
+    ASSERT_THROW((simple_sub_parser_t{vatsp, sub_parser, description}),
                  clapp::exception::sub_parser_exception_t);
 }
 
@@ -225,8 +225,8 @@ TEST(subParser, constructSubParserWithOptionalArgumentParserThrows) {
     const std::string sub_parser{"sub"};
     const std::string description{"sub parser"};
 
-    optional_argument_test_sub_parser_t tp;
-    ASSERT_THROW((simple_sub_parser_t{tp, sub_parser, description}),
+    optional_argument_test_sub_parser_t oatsp;
+    ASSERT_THROW((simple_sub_parser_t{oatsp, sub_parser, description}),
                  clapp::exception::sub_parser_exception_t);
 }
 
@@ -234,8 +234,8 @@ TEST(subParser, constructSubParserAndGenHelpPrefix) {
     const std::string sub_parser{"sub"};
     const std::string description{"sub parser"};
 
-    empty_test_parser_t tp;
-    empty_sub_parser_t sub{tp, sub_parser, description};
+    empty_test_parser_t etp;
+    empty_sub_parser_t sub{etp, sub_parser, description};
 
     ASSERT_THAT(sub.gen_short_line_prefix(),
                 testing::StrEq("empty-test-parser sub"));
@@ -245,8 +245,8 @@ TEST(subParser, constructSubParserIsActiveIsFalse) {
     const std::string sub_parser{"sub"};
     const std::string description{"sub parser"};
 
-    empty_test_parser_t tp;
-    empty_sub_parser_t sub{tp, sub_parser, description};
+    empty_test_parser_t etp;
+    empty_sub_parser_t sub{etp, sub_parser, description};
     ASSERT_THAT(sub.is_active(), testing::Eq(false));
 }
 
@@ -256,16 +256,16 @@ TEST(subParser, constructSubParserAfterParsingSubBecomesActive) {
     constexpr const char* const argv[]{"sub", nullptr};
     const clapp::parser::arg_t arg{sub_parser_make_arg_t(argv)};
 
-    empty_test_parser_t tp;
-    empty_sub_parser_t sub{tp, sub_parser, description};
+    empty_test_parser_t etp;
+    empty_sub_parser_t sub{etp, sub_parser, description};
 
-    ASSERT_THAT(&tp.get_active_parser(), testing::Eq(&tp));
+    ASSERT_THAT(&etp.get_active_parser(), testing::Eq(&etp));
     ASSERT_THAT(sub.is_active(), testing::Eq(false));
 
-    ASSERT_THAT(tp.parse(arg.begin(), arg.end()).has_value(),
+    ASSERT_THAT(etp.parse(arg.begin(), arg.end()).has_value(),
                 testing::Eq(false));
     ASSERT_THAT(sub.is_active(), testing::Eq(true));
-    ASSERT_THAT(&tp.get_active_parser(), testing::Eq(&sub));
+    ASSERT_THAT(&etp.get_active_parser(), testing::Eq(&sub));
 }
 
 TEST(subParser, constructSubParserAndValidateRecursiveDoNotThrow) {
@@ -274,12 +274,12 @@ TEST(subParser, constructSubParserAndValidateRecursiveDoNotThrow) {
     constexpr const char* const argv[]{"sub", "-b", nullptr};
     const clapp::parser::arg_t arg{sub_parser_make_arg_t(argv)};
 
-    empty_test_parser_t tp;
-    simple_sub_parser_t sub{tp, sub_parser, description};
+    empty_test_parser_t etp;
+    simple_sub_parser_t sub{etp, sub_parser, description};
 
-    ASSERT_THAT(tp.parse(arg.begin(), arg.end()).has_value(),
+    ASSERT_THAT(etp.parse(arg.begin(), arg.end()).has_value(),
                 testing::Eq(false));
-    ASSERT_NO_THROW(tp.validate_recursive());
+    ASSERT_NO_THROW(etp.validate_recursive());
 }
 
 TEST(subParser, constructSubParserAndValidateRecursiveDoThrow) {
@@ -288,21 +288,21 @@ TEST(subParser, constructSubParserAndValidateRecursiveDoThrow) {
     constexpr const char* const argv[]{"sub", nullptr};
     const clapp::parser::arg_t arg{sub_parser_make_arg_t(argv)};
 
-    empty_test_parser_t tp;
-    simple_sub_parser_t sub{tp, sub_parser, description};
+    empty_test_parser_t etp;
+    simple_sub_parser_t sub{etp, sub_parser, description};
 
-    ASSERT_THAT(tp.parse(arg.begin(), arg.end()).has_value(),
+    ASSERT_THAT(etp.parse(arg.begin(), arg.end()).has_value(),
                 testing::Eq(false));
-    ASSERT_THROW(tp.validate_recursive(), clapp::clapp_exception_t);
+    ASSERT_THROW(etp.validate_recursive(), clapp::clapp_exception_t);
 }
 
 TEST(subParser, constructSubParserAndCallDefaultExitWithStringAndExitCode) {
     print_and_exit_t pae{};
-    empty_test_parser_t tp;
+    empty_test_parser_t etp;
 
     const std::string sub_parser{"sub"};
     const std::string description{"sub parser"};
-    simple_sub_parser_t sub{tp, sub_parser, description};
+    simple_sub_parser_t sub{etp, sub_parser, description};
 
     static constexpr std::string_view text{"text-string"};
     static constexpr int exit_code{10};
@@ -316,11 +316,11 @@ TEST(subParser, constructSubParserAndCallDefaultExitWithStringAndExitCode) {
 
 TEST(subParser, constructSubParserSetAndCallPrintAndExitWithStringAndExitCode) {
     print_and_exit_t pae{};
-    empty_test_parser_t tp;
+    empty_test_parser_t etp;
 
     const std::string sub_parser{"sub"};
     const std::string description{"sub parser"};
-    simple_sub_parser_t sub{tp, sub_parser, description};
+    simple_sub_parser_t sub{etp, sub_parser, description};
 
     sub.set_print_and_exit_func(
         [&pae](const std::string_view text, const int exit_code) {
