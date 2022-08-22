@@ -175,12 +175,12 @@ class cli_parser_t : public clapp::basic_main_parser_t {
         15,    clapp::min_max_value_t<std::int32_t>{10, 20}};
 };
 
-std::ostream &operator<<(std::ostream &out, const entry_t &e);
+std::ostream &operator<<(std::ostream &out, const entry_t &entry);
 
 template <>
 entry_t clapp::value::convert_value<entry_t>(std::string_view param);
 
-static void process_options_and_args(const cli_parser_t &cp);
+static void process_options_and_args(const cli_parser_t &parser);
 static void process_cmd1(const cli_parser_t::cmd1_parser_t &cmd1);
 static void process_cmd2(const cli_parser_t::cmd2_parser_t &cmd2);
 
@@ -188,10 +188,10 @@ cli_parser_t::~cli_parser_t() = default;
 cli_parser_t::cmd1_parser_t::~cmd1_parser_t() = default;
 cli_parser_t::cmd2_parser_t::~cmd2_parser_t() = default;
 
-std::ostream &operator<<(std::ostream &out, const entry_t &e) {
-    if (e == entry_t::entry1) {
+std::ostream &operator<<(std::ostream &out, const entry_t &entry) {
+    if (entry == entry_t::entry1) {
         out << "entry1";
-    } else if (e == entry_t::entry2) {
+    } else if (entry == entry_t::entry2) {
         out << "entry2";
     }
     return out;
@@ -268,29 +268,29 @@ void process_cmd2(const cli_parser_t::cmd2_parser_t &cmd2) {
     }
 }
 
-void process_options_and_args(const cli_parser_t &cp) {
-    if (cp.string_arg) {
-        std::cout << "string-arg: " << cp.string_arg.value() << "\n";
+void process_options_and_args(const cli_parser_t &parser) {
+    if (parser.string_arg) {
+        std::cout << "string-arg: " << parser.string_arg.value() << "\n";
     } else {
         std::cout << "string-arg: not given\n";
     }
 
-    if (cp.verbose.given()) {
-        std::cout << "verbose: " << cp.verbose.value() << "\n";
+    if (parser.verbose.given()) {
+        std::cout << "verbose: " << parser.verbose.value() << "\n";
     } else {
         std::cout << "verbose: not given\n";
     }
 
-    if (cp.string_param) {
-        std::cout << "string_param: '" << cp.string_param.value() << "'\n";
+    if (parser.string_param) {
+        std::cout << "string_param: '" << parser.string_param.value() << "'\n";
     } else {
         std::cout << "string_param: not given\n";
     }
 
-    if (cp.string_vector_param) {
+    if (parser.string_vector_param) {
         std::cout << "string_vector_param (size: "
-                  << cp.string_vector_param.value().size() << "): ";
-        for (auto &val : cp.string_vector_param.value()) {
+                  << parser.string_vector_param.value().size() << "): ";
+        for (auto &val : parser.string_vector_param.value()) {
             std::cout << val << ", ";
         }
         std::cout << "\n";
@@ -299,33 +299,33 @@ void process_options_and_args(const cli_parser_t &cp) {
         std::cout << "string_vector_param: not given\n";
     }
 
-    if (cp.short_bool.given()) {
+    if (parser.short_bool.given()) {
         std::cout << "short_bool: given\n";
     } else {
         std::cout << "short_bool: not given\n";
     }
 
-    if (cp.restricted_bool.given()) {
+    if (parser.restricted_bool.given()) {
         std::cout << "restricted_bool: given\n";
     } else {
         std::cout << "restricted_bool: not given\n";
     }
 
-    if (cp.long_bool.given()) {
-        std::cout << "long_bool: " << cp.long_bool.value() << "\n";
+    if (parser.long_bool.given()) {
+        std::cout << "long_bool: " << parser.long_bool.value() << "\n";
     } else {
         std::cout << "long_bool: not given\n";
     }
 
-    if (cp.count.given()) {
-        std::cout << "count: " << cp.count.value() << "\n";
+    if (parser.count.given()) {
+        std::cout << "count: " << parser.count.value() << "\n";
     } else {
         std::cout << "count: not given\n";
     }
 
 #ifdef CLAPP_FS_AVAIL
-    if (cp.test_file) {
-        std::cout << "test-file: " << cp.test_file.value() << "\n";
+    if (parser.test_file) {
+        std::cout << "test-file: " << parser.test_file.value() << "\n";
     } else {
         std::cout << "test-file: not given\n";
     }
@@ -333,21 +333,22 @@ void process_options_and_args(const cli_parser_t &cp) {
     std::cout << "without fs\n";
 #endif
 
-    if (cp.constrained_int) {
-        std::cout << "constrained_int: " << cp.constrained_int.value() << "\n";
+    if (parser.constrained_int) {
+        std::cout << "constrained_int: " << parser.constrained_int.value()
+                  << "\n";
     } else {
         std::cout << "constrained_int: not given\n";
     }
-    std::cout << "mandatory_bool: " << cp.mandatory_bool.value() << "\n";
+    std::cout << "mandatory_bool: " << parser.mandatory_bool.value() << "\n";
 
-    std::cout << "mandatory_int: " << cp.mandatory_int.value() << "\n";
-    std::cout << "default_int: " << cp.default_int.value() << "\n";
+    std::cout << "mandatory_int: " << parser.mandatory_int.value() << "\n";
+    std::cout << "default_int: " << parser.default_int.value() << "\n";
 
-    if (cp.optional_int) {
-        std::cout << "optional_int: " << cp.optional_int.value() << "\n";
+    if (parser.optional_int) {
+        std::cout << "optional_int: " << parser.optional_int.value() << "\n";
     }
 
-    std::cout << "entry_param: '" << cp.entry_param.value() << "'\n";
+    std::cout << "entry_param: '" << parser.entry_param.value() << "'\n";
 }
 
 using parser_t = clapp::parser::basic_parser_container_t<cli_parser_t>;
@@ -355,38 +356,39 @@ using parser_t = clapp::parser::basic_parser_container_t<cli_parser_t>;
 int main(int argc, char *argv[]) {
     try {
         std::cout << clapp::build_info::build_info_string << std::endl;
-        parser_t cp;
+        parser_t parser;
         const std::optional<clapp::value::exit_t> exit{
-            cp.parse_and_validate(argc, argv)};
+            parser.parse_and_validate(argc, argv)};
         if (exit) {
             return exit.value().get_exit_code();
         }
 
-        if (!*cp) {
+        if (!*parser) {
             std::cout << "Parsing failed!" << std::endl;
             return EXIT_FAILURE;
         }
 
-        if (cp->help.value()) {
+        if (parser->help.value()) {
             std::cout << "Usage: \n"
-                      << cp->get_executable() << ' ' << cp->gen_help_msg(0);
+                      << parser->get_executable() << ' '
+                      << parser->gen_help_msg(0);
             return EXIT_SUCCESS;
         }
 
-        cp->validate();
+        parser->validate();
 
-        process_options_and_args(*cp);
+        process_options_and_args(*parser);
 
-        if (cp->cmd1) {
+        if (parser->cmd1) {
             std::cout << "cmd1 given" << std::endl;
-            process_cmd1(cp->cmd1);
+            process_cmd1(parser->cmd1);
         } else {
             std::cout << "cmd1 not given" << std::endl;
         }
 
-        if (cp->cmd2) {
+        if (parser->cmd2) {
             std::cout << "cmd2 given" << std::endl;
-            process_cmd2(cp->cmd2);
+            process_cmd2(parser->cmd2);
         } else {
             std::cout << "cmd2 not given" << std::endl;
         }
