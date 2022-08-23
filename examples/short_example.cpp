@@ -21,7 +21,7 @@ class cli_parser_t : public clapp::basic_main_parser_t {
 
     ~cli_parser_t() override;
 
-    // if help is given, help is printed and exit(EXIT_SUCCESS) is called
+    // if help is given, help is printed and exit(EXIT_SUCCESS) is requested
     clapp::help_option_t help{*this, std::vector<std::string>{"help", "usage"},
                               std::vector<char>{'h', '?'},
                               "Show help options."};
