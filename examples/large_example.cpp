@@ -94,16 +94,12 @@ class cli_parser_t : public clapp::basic_main_parser_t {
         variadic_int_argument_t int_arg{
             *this, "variadic-int-arg", "Int argument", purpose_t::optional,
             clapp::min_max_value_t<std::int32_t>{5, 10}};
-        // string_argument_t string_arg_y{*this, "string-arg-y", "String
-        // argument x", purpose_t::optional};//TODO: ensure that this throws
     };
 
     cmd1_parser_t cmd1{*this, "cmd1", "First usable command."};
     cmd2_parser_t cmd2{*this, "cmd2", "Second usable command."};
 
     string_argument_t string_arg{*this, "string-arg", "String argument"};
-    // string_argument_t string_arg_2{*this, "string-arg-2", "String argument
-    // 2", purpose_t::optional};//TODO: ensure that this throws...
 
     clapp::help_option_t help{*this, "help", 'h', "Show help options."};
     clapp::bool_option_t short_bool{*this, 'b', "Short bool option."};
