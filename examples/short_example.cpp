@@ -58,7 +58,17 @@ class cli_parser_t : public clapp::basic_main_parser_t {
 
         // optional string option (multiple string vectors)
         clapp::vector_string_param_option_t string_vector_param{
-            *this, "string-vector", "String vector param."};
+            *this, "string-vector", "String vector param.",
+            purpose_t::optional};
+
+        explicit and_option_container_t(const and_option_container_t &) =
+            delete;
+        explicit and_option_container_t(and_option_container_t &&) noexcept =
+            delete;
+        and_option_container_t &operator=(const and_option_container_t &) =
+            delete;
+        and_option_container_t &operator=(and_option_container_t &&) noexcept =
+            delete;
     };
 
     and_option_container_t options{
