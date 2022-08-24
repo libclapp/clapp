@@ -894,6 +894,7 @@ this sub-parser.
 #include <clapp/option.h>
 #include <clapp/parser_container.h>
 #include <clapp/sub_parser.h>
+
 #include <optional>
 
 class cli_parser_t : public clapp::basic_main_parser_t {
@@ -959,8 +960,9 @@ using parser_t = clapp::parser::basic_parser_container_t<cli_parser_t>;
 int main(int argc, char *argv[]) {
     try {
         parser_t parser;  // create parser instance
-        const std::optional<clapp::value::exit_t> exit{parser.parse_and_validate(
-            argc, argv)};  // parses and validates cli-arguments
+        const std::optional<clapp::value::exit_t> exit{
+            parser.parse_and_validate(
+                argc, argv)};  // parses and validates cli-arguments
         if (exit) {
             return exit.value().get_exit_code();
         }
@@ -968,7 +970,8 @@ int main(int argc, char *argv[]) {
         if (parser->mode1) {
             std::cout << "mode1: ";
             if (parser->mode1.string) {
-                std::cout << "string: '" << parser->mode1.string.value() << "' ";
+                std::cout << "string: '" << parser->mode1.string.value()
+                          << "' ";
             }
             if (parser->int_opt) {
                 std::cout << "int-opt: '" << parser->int_opt.value() << "' ";
@@ -978,8 +981,8 @@ int main(int argc, char *argv[]) {
             std::cout << "mode2: ";
             // parser ensures mandatory arguments are given
             Ensures(parser->mode2.string_arg);
-            std::cout << "string_arg: '" << parser->mode2.string_arg.value() << "'"
-                      << std::endl;
+            std::cout << "string_arg: '" << parser->mode2.string_arg.value()
+                      << "'" << std::endl;
         } else {
             std::cout << "default mode: ";
             if (parser->int_opt) {
