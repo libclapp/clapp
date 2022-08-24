@@ -32,7 +32,7 @@ CLAPP_EXCEPTION_REGEX='^Caught\ ClaPP-Exception:.*$'
     [ "$status" -eq 0 ]
     [ "${lines[0]}" = "verbose: not given" ]
     [ "${lines[1]}" = "string-param: str" ]
-    [ "${lines[2]}" = "u32-param: 15" ]
+    [ "${lines[2]}" = "uint32-param: 15" ]
 }
 
 @test "container-example: give mandatory options and i32" {
@@ -40,15 +40,15 @@ CLAPP_EXCEPTION_REGEX='^Caught\ ClaPP-Exception:.*$'
     [ "$status" -eq 0 ]
     [ "${lines[0]}" = "verbose: not given" ]
     [ "${lines[1]}" = "string-param: string" ]
-    [ "${lines[2]}" = "i32-param: 8" ]
+    [ "${lines[2]}" = "int32-param: 8" ]
 }
 
 @test "container-example: give mandatory options i32 and verbose" {
     run ./libclapp_example_container -s string --i32 17 --verbose -v
     [ "$status" -eq 0 ]
-    [ "${lines[0]}" = "verbose: 2" ]
+    [ "${lines[0]}" = "verbose: 4" ]
     [ "${lines[1]}" = "string-param: string" ]
-    [ "${lines[2]}" = "i32-param: 17" ]
+    [ "${lines[2]}" = "int32-param: 17" ]
 }
 
 @test "container-example: missing int-options throw" {

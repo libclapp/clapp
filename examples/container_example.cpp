@@ -10,9 +10,6 @@
 clapp::value::found_func_t::ret_t print_version_and_exit(
     const std::string &option);
 
-// clapp::value::found_func_t::ret_t print_not_implemented_and_exit(
-//    const std::string &option);
-//
 class cli_parser_t : public clapp::basic_main_parser_t {
    public:
     cli_parser_t();
@@ -43,7 +40,8 @@ class cli_parser_t : public clapp::basic_main_parser_t {
                                       'v',
                                       "Verbose option.",
                                       clapp::min_max_value_t<std::size_t>{0, 7},
-                                      clapp::default_value_t<std::size_t>{2}};
+                                      clapp::default_value_t<std::size_t>{2},
+                                      purpose_t::optional};
 
         // mandatory string option
         clapp::string_param_option_t string_param{
@@ -113,8 +111,8 @@ int main(int argc, char **argv) {
             return exit.value().get_exit_code();
         }
 
-        if (parser->options
-                .verbose) {  // if the optional verbose-option is given
+        if (parser->options.verbose
+                .given()) {  // if the optional verbose-option is given
             std::cout << "verbose: " << parser->options.verbose.value() << "\n";
         } else {
             std::cout << "verbose: not given\n";
