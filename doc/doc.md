@@ -580,7 +580,8 @@ class cli_parser_t : public clapp::basic_main_parser_t {
 
     clapp::bool_option_t bool_opt{*this, "bool", 'b', "Bool option."};
 
-    clapp::string_param_option_t string_opt{*this, "str", 's', "String option."};
+    clapp::string_param_option_t string_opt{*this, "str", 's',
+                                            "String option."};
 
     clapp::string_argument_t string_arg{*this, "string-arg", "String argument"};
 
@@ -601,9 +602,12 @@ int main(int argc, char *argv[]) {
         if (exit) {
             return exit.value().get_exit_code();
         }
-        Ensures(clip.string_arg);  // parser ensures mandatory arguments are given
-        Ensures(clip.bool_opt);  // parser ensures mandatory bool-option is given
-        Ensures(clip.string_opt);  // parser ensures mandatory string-option is given
+        Ensures(
+            clip.string_arg);  // parser ensures mandatory arguments are given
+        Ensures(
+            clip.bool_opt);  // parser ensures mandatory bool-option is given
+        Ensures(clip.string_opt);  // parser ensures mandatory string-option is
+                                   // given
         std::cout << "string-opt: " << clip.string_opt.value() << std::endl;
         std::cout << "string-arg: " << clip.string_arg.value() << std::endl;
     } catch (std::exception &e) {
