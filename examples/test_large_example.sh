@@ -25,7 +25,7 @@ CLAPP_EXCEPTION_REGEX='^Caught\ ClaPP-Exception:.*$'
 }
 
 @test "large-example: give all mandatory options/arguments" {
-    run ./libclapp_example_large str -o -m -c -e entry1 --mandatory-int 1
+    run ./libclapp_example_large str -o -m -c -e entry1 --mandatory-int 1 --time-hours 17
     [ "$status" -eq 0 ]
     [[ "${lines[0]}" =~ $FIRST_LINE_REGEX ]]
     [ "${lines[1]}" = "string-arg: str" ]
@@ -42,12 +42,13 @@ CLAPP_EXCEPTION_REGEX='^Caught\ ClaPP-Exception:.*$'
     [ "${lines[12]}" = "mandatory_int: 1" ]
     [ "${lines[13]}" = "default_int: 10" ]
     [ "${lines[14]}" = "entry_param: 'entry1'" ]
-    [ "${lines[15]}" = "cmd1 not given" ]
-    [ "${lines[16]}" = "cmd2 not given" ]
+    [ "${lines[15]}" = "time-container: time-hours: 17" ]
+    [ "${lines[16]}" = "cmd1 not given" ]
+    [ "${lines[17]}" = "cmd2 not given" ]
 }
 
 @test "large-example: give mandatory and optional options/arguments" {
-    run ./libclapp_example_large str -o -m -c -e entry2 --mandatory-int 3 -b --long-bool -r --hours=10 --minutes 6 --seconds 8 --milliseconds 10 --microseconds 123 --nanoseconds 100 -v --verbose -s string --string-vector vec1 --string-vector=vec2 --test-file=/tmp --default-int=12 --optional-int 1 -f 15
+    run ./libclapp_example_large str -o -m -c -e entry2 --mandatory-int 3 -b --long-bool -r -v --verbose -s string --string-vector vec1 --string-vector=vec2 --test-file=/tmp --default-int=12 --optional-int 1 -f 15 --time-min 200
     [ "$status" -eq 0 ]
     [[ "${lines[0]}" =~ $FIRST_LINE_REGEX ]]
     [ "${lines[1]}" = "string-arg: str" ]
@@ -65,12 +66,13 @@ CLAPP_EXCEPTION_REGEX='^Caught\ ClaPP-Exception:.*$'
     [ "${lines[13]}" = "default_int: 12" ]
     [ "${lines[14]}" = "optional_int: 1" ]
     [ "${lines[15]}" = "entry_param: 'entry2'" ]
-    [ "${lines[16]}" = "cmd1 not given" ]
-    [ "${lines[17]}" = "cmd2 not given" ]
+    [ "${lines[16]}" = "time-container: time-minutes: 200" ]
+    [ "${lines[17]}" = "cmd1 not given" ]
+    [ "${lines[18]}" = "cmd2 not given" ]
 }
 
 @test "large-example: give mandatory and optional options/arguments as well as cmd1" {
-    run ./libclapp_example_large str -o -m -c -e entry2 --mandatory-int 3 -b --long-bool -r --hours=10 --minutes 6 --seconds 8 --milliseconds 10 --microseconds 123 --nanoseconds 100 --verbose -s string --string-vector vec1 --string-vector=vec2 --test-file=/tmp --default-int=12 --optional-int 1 -f 15 cmd1 -s 1 -b entry1 7
+    run ./libclapp_example_large str -o -m -c -e entry2 --mandatory-int 3 -b --long-bool -r --verbose -s string --string-vector vec1 --string-vector=vec2 --test-file=/tmp --default-int=12 --optional-int 1 -f 15 --time-sec 7 cmd1 -s 1 -b entry1 7
     [ "$status" -eq 0 ]
     [[ "${lines[0]}" =~ $FIRST_LINE_REGEX ]]
     [ "${lines[1]}" = "string-arg: str" ]
@@ -88,16 +90,17 @@ CLAPP_EXCEPTION_REGEX='^Caught\ ClaPP-Exception:.*$'
     [ "${lines[13]}" = "default_int: 12" ]
     [ "${lines[14]}" = "optional_int: 1" ]
     [ "${lines[15]}" = "entry_param: 'entry2'" ]
-    [ "${lines[16]}" = "cmd1 given" ]
-    [ "${lines[17]}" = "string: 1" ]
-    [ "${lines[18]}" = "int-arg: 7" ]
-    [ "${lines[19]}" = "string-arg-x: abaa" ]
-    [ "${lines[20]}" = "entry-arg: entry1" ]
-    [ "${lines[21]}" = "cmd2 not given" ]
+    [ "${lines[16]}" = "time-container: time-seconds: 7" ]
+    [ "${lines[17]}" = "cmd1 given" ]
+    [ "${lines[18]}" = "string: 1" ]
+    [ "${lines[19]}" = "int-arg: 7" ]
+    [ "${lines[20]}" = "string-arg-x: abaa" ]
+    [ "${lines[21]}" = "entry-arg: entry1" ]
+    [ "${lines[22]}" = "cmd2 not given" ]
 }
 
 @test "large-example: give mandatory and optional options/arguments as well as cmd2" {
-    run ./libclapp_example_large str -o -m -c -e entry2 --mandatory-int 3 -b --long-bool -r --hours=10 --minutes 6 --seconds 8 --milliseconds 10 --microseconds 123 --nanoseconds 100 -v --verbose -s string --string-vector vec1 --string-vector=vec2 --test-file=/tmp --default-int=12 --optional-int 1 -f 15 cmd2 string1 5 6 7
+    run ./libclapp_example_large str -o -m -c -e entry2 --mandatory-int 3 -b --long-bool -r -v --verbose -s string --string-vector vec1 --string-vector=vec2 --test-file=/tmp --default-int=12 --optional-int 1 -f 15 --time-sec 6 cmd2 string1 5 6 7
     [ "$status" -eq 0 ]
     [[ "${lines[0]}" =~ $FIRST_LINE_REGEX ]]
     [ "${lines[1]}" = "string-arg: str" ]
@@ -115,8 +118,10 @@ CLAPP_EXCEPTION_REGEX='^Caught\ ClaPP-Exception:.*$'
     [ "${lines[13]}" = "default_int: 12" ]
     [ "${lines[14]}" = "optional_int: 1" ]
     [ "${lines[15]}" = "entry_param: 'entry2'" ]
-    [ "${lines[16]}" = "cmd1 not given" ]
-    [ "${lines[17]}" = "cmd2 given" ]
-    [ "${lines[18]}" = "string-arg-x: string1" ]
-    [ "${lines[19]}" = "int_arg (size: 3): 5, 6, 7, " ]
+    [ "${lines[16]}" = "time-container: time-seconds: 6" ]
+    [ "${lines[17]}" = "cmd1 not given" ]
+    [ "${lines[18]}" = "cmd2 given" ]
+    [ "${lines[19]}" = "short-bool: 0" ]
+    [ "${lines[20]}" = "string-arg-x: string1" ]
+    [ "${lines[21]}" = "int_arg (size: 3): 5, 6, 7, " ]
 }

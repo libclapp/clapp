@@ -81,7 +81,17 @@ class cli_parser_t : public clapp::basic_main_parser_t {
 
             // optional string option (multiple string vectors)
             clapp::vector_string_param_option_t string_vector_param{
-                *this, "string-vector", "String vector param."};
+                *this, "string-vector", "String vector param.",
+                purpose_t::optional};
+
+            explicit and_option_container_t(const and_option_container_t &) =
+                delete;
+            explicit and_option_container_t(
+                and_option_container_t &&) noexcept = delete;
+            and_option_container_t &operator=(const and_option_container_t &) =
+                delete;
+            and_option_container_t &operator=(
+                and_option_container_t &&) noexcept = delete;
         };
 
         and_option_container_t options{
@@ -108,9 +118,11 @@ class cli_parser_t : public clapp::basic_main_parser_t {
 
         ~cmd2_parser_t() override;
 
-        clapp::bool_option_t help{*this, "help", 'h', "Show help options."};
+        clapp::bool_option_t help{*this, "help", 'h', "Show help options.",
+                                  purpose_t::optional};
 
-        clapp::bool_option_t short_bool{*this, 'b', "Short bool option."};
+        clapp::bool_option_t short_bool{*this, 'b', "Short bool option.",
+                                        purpose_t::optional};
 
         string_argument_t string_arg_x{
             *this, "string-arg-x", "String argument x", purpose_t::optional,
@@ -123,17 +135,23 @@ class cli_parser_t : public clapp::basic_main_parser_t {
     cmd1_parser_t cmd1{*this, "cmd1", "First usable command.",
                        clapp::parser::types::logic_operator_type_t::logic_xor};
     cmd2_parser_t cmd2{*this, "cmd2", "Second usable command.",
-                       clapp::parser::types::logic_operator_type_t::logic_xor};
+                       clapp::parser::types::logic_operator_type_t::logic_and};
 
     string_argument_t string_arg{*this, "string-arg", "String argument"};
 
     clapp::help_option_t help{*this, "help", 'h', "Show help options.",
                               purpose_t::optional};
-    clapp::bool_option_t short_bool{*this, 'b', "Short bool option."};
-    clapp::bool_option_t long_bool{*this, "long-bool", "Long bool option."};
-    clapp::bool_option_t restricted_bool{
-        *this,           "restricted", 'r', "restricted bool option.",
-        restriction_t{}, no_action_t{}};
+    clapp::bool_option_t short_bool{*this, 'b', "Short bool option.",
+                                    purpose_t::optional};
+    clapp::bool_option_t long_bool{*this, "long-bool", "Long bool option.",
+                                   purpose_t::optional};
+    clapp::bool_option_t restricted_bool{*this,
+                                         "restricted",
+                                         'r',
+                                         "restricted bool option.",
+                                         restriction_t{},
+                                         no_action_t{},
+                                         purpose_t::optional};
     clapp::bool_option_t mandatory_bool{
         *this, 'o', "Mandatory short bool option.", purpose_t::mandatory};
     clapp::bool_option_t mandatory_restricted_bool{
@@ -143,22 +161,6 @@ class cli_parser_t : public clapp::basic_main_parser_t {
         "Mandatory restricted bool option.",
         purpose_t::mandatory,
         restriction_t{}};
-
-    clapp::hours_param_option_t hours{
-        *this, "hours", "hours option.",
-        clapp::default_value_t<std::chrono::hours>{std::chrono::hours{100}}};
-    clapp::min_param_option_t minutes{
-        *this, "minutes", "minutes option.",
-        clapp::min_max_value_t<std::chrono::minutes>{std::chrono::minutes{0},
-                                                     std::chrono::minutes{7}}};
-    clapp::sec_param_option_t seconds{*this, "seconds", "seconds option."};
-    clapp::ms_param_option_t milliseconds{*this, "milliseconds",
-                                          "milliseconds option."};
-    clapp::us_param_option_t microseconds{
-        *this, "microseconds", "microseconds option.",
-        clapp::not_null_value_t<std::chrono::microseconds>{}};
-    clapp::ns_param_option_t nanoseconds{*this, "nanoseconds",
-                                         "nanoseconds option."};
 
     class time_container_t : public clapp::option_container_t {
        public:
@@ -189,18 +191,21 @@ class cli_parser_t : public clapp::basic_main_parser_t {
                                   'v',
                                   "Verbose option.",
                                   clapp::min_max_value_t<std::size_t>{0, 7},
-                                  clapp::default_value_t<std::size_t>{2}};
+                                  clapp::default_value_t<std::size_t>{2},
+                                  purpose_t::optional};
     clapp::count_option_t count{*this, 'c', "Count option ",
                                 purpose_t::mandatory};
 
-    string_param_t string_param{*this, "string", 's', "String option 1."};
+    string_param_t string_param{*this, "string", 's', "String option 1.",
+                                purpose_t::optional};
 
-    string_vector_param_t string_vector_param{*this, "string-vector",
-                                              "String vector param."};
+    string_vector_param_t string_vector_param{
+        *this, "string-vector", "String vector param.", purpose_t::optional};
 
 #ifdef CLAPP_FS_AVAIL
     clapp::path_param_option_t test_file{*this, "test-file", "Test File.",
-                                         clapp::path_exists_t {}};
+                                         clapp::path_exists_t{},
+                                         purpose_t::optional};
 #endif
 
     entry_param_t entry_param{*this,
@@ -211,15 +216,20 @@ class cli_parser_t : public clapp::basic_main_parser_t {
                               purpose_t::mandatory};
 
     int32_param_t mandatory_int{*this, "mandatory-int", "Mandatory Int option.",
-                                purpose_t::mandatory};
+                                purpose_t::mandatory, purpose_t::optional};
     int32_param_t default_int{*this, "default-int", "Default Int option.",
-                              clapp::default_value_t<std::int32_t>{10}};
-    int32_param_t optional_int{*this, "optional-int", "Optional Int option."};
+                              clapp::default_value_t<std::int32_t>{10},
+                              purpose_t::optional};
+    int32_param_t optional_int{*this, "optional-int", "Optional Int option.",
+                               purpose_t::optional};
 
-    int32_param_t constrained_int{
-        *this, "constrained-int",
-        'f',   "Constrained default Int option.",
-        15,    clapp::min_max_value_t<std::int32_t>{10, 20}};
+    int32_param_t constrained_int{*this,
+                                  "constrained-int",
+                                  'f',
+                                  "Constrained default Int option.",
+                                  15,
+                                  clapp::min_max_value_t<std::int32_t>{10, 20},
+                                  purpose_t::optional};
 };
 
 std::ostream &operator<<(std::ostream &out, const entry_t &entry);
@@ -228,6 +238,7 @@ template <>
 entry_t clapp::value::convert_value<entry_t>(std::string_view param);
 
 static void process_options_and_args(const cli_parser_t &parser);
+static void process_time_container(const cli_parser_t::time_container_t &cont);
 static void process_cmd1(const cli_parser_t::cmd1_parser_t &cmd1);
 static void process_cmd2(const cli_parser_t::cmd2_parser_t &cmd2);
 
@@ -256,6 +267,19 @@ entry_t clapp::value::convert_value<entry_t>(const std::string_view param) {
         return entry_t::entry2;
     }
     throw std::runtime_error("Invalid enum param type.");
+}
+
+void process_time_container(const cli_parser_t::time_container_t &cont) {
+    std::cout << "time-container: ";
+    if (cont.time_hours) {
+        std::cout << "time-hours: " << cont.time_hours.value().count() << "\n";
+    } else if (cont.time_minutes) {
+        std::cout << "time-minutes: " << cont.time_minutes.value().count()
+                  << "\n";
+    } else if (cont.time_seconds) {
+        std::cout << "time-seconds: " << cont.time_seconds.value().count()
+                  << "\n";
+    }
 }
 
 void process_cmd1(const cli_parser_t::cmd1_parser_t &cmd1) {
@@ -429,6 +453,8 @@ int main(int argc, char *argv[]) {
         parser->validate();
 
         process_options_and_args(*parser);
+
+        process_time_container(parser->time);
 
         if (parser->cmd1) {
             std::cout << "cmd1 given" << std::endl;
