@@ -212,6 +212,8 @@ class bool_option_t : public basic_option_t<bool, false> {
 template <int EXIT_CODE>
 class basic_help_option_t : public bool_option_t {
    public:
+    static constexpr int exit_code{EXIT_CODE};
+
     template <typename... Params>
     explicit basic_help_option_t(basic_option_container_t& container,
                                  Params... parameters);

@@ -591,6 +591,11 @@ TEST_F(optionT,
     ASSERT_NO_THROW(option_validate_value_func("opt-str"));
 }
 
+TEST_F(optionT, helpOptionContainsExitCodeMember) {
+    ASSERT_THAT(clapp::option::help_option_t::exit_code,
+                testing::Eq(EXIT_SUCCESS));
+}
+
 TEST_F(optionT,
        helpOptionConstructLongStringVecAndShortVecAndCallGetOptionHelp) {
     clapp::option::help_option_t opt{
