@@ -76,6 +76,10 @@ class simple_sub_parser_t : public clapp::parser::basic_sub_parser_t {
         *this, "bool", 'b', "Bool option.",
         clapp::parser::types::purpose_t::mandatory};
 
+    clapp::option::help_option_t help{
+        *this, "help", 'h', "help option.",
+        clapp::parser::types::purpose_t::optional};
+
     ~simple_sub_parser_t() override;
 };
 
@@ -429,4 +433,21 @@ TEST(subParser,
     ASSERT_THAT(etp.parse(arg.begin(), arg.end()).has_value(),
                 testing::Eq(false));
     ASSERT_NO_THROW(etp.validate_recursive());
+}
+
+TEST(subParser,
+     constructSimpleSubParserWithLogicAndSetHelpOptionParseReturnExit) {
+    const std::string sub_parser{"sub"};
+    const std::string description{"sub parser"};
+    constexpr const char* const argv[]{"sub", "-h", nullptr};
+    const clapp::parser::types::arg_t arg{sub_parser_make_arg_t(argv)};
+
+    empty_test_parser_t etp;
+    simple_sub_parser_t sub{
+        etp, sub_parser, description,
+        clapp::parser::types::logic_operator_type_t::logic_and};
+
+    std::optional<clapp::value::exit_t> exit{etp.parse(arg.begin(), arg.end())};
+    ASSERT_THAT(exit.has_value(), testing::Eq(true));
+    ASSERT_THAT(exit.value().get_exit_code(), testing::Eq(sub.help.exit_code));
 }

@@ -43,7 +43,8 @@ class basic_sub_parser_t : public basic_parser_t {
     [[nodiscard]] constexpr explicit operator bool() const noexcept;
 
     [[nodiscard]] inline std::string get_sub_parser_name() const;
-    void sub_parse(types::arg_iterator_t begin, types::arg_iterator_t end);
+    parse_result_t sub_parse(types::arg_iterator_t begin,
+                             types::arg_iterator_t end);
 
     [[nodiscard]] std::string gen_short_line_prefix() const override;
 

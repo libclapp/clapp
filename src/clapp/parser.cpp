@@ -406,8 +406,7 @@ clapp::parser::basic_parser_t::parse_arg(const std::string_view argument,
         string_stream << "Unknown argument/sub-parser '" << argument << "'.";
         throw clapp::exception::clapp_exception_t{string_stream.str()};
     }
-    found_sub_parser->second.sub_parse(ait + 1, end);
-    return parse_result_t{end, std::nullopt, std::nullopt, std::nullopt};
+    return found_sub_parser->second.sub_parse(ait + 1, end);
 }
 
 clapp::parser::basic_parser_t::parse_result_t
