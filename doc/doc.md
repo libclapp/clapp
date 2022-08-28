@@ -648,7 +648,7 @@ Caught Exception: Mandatory argument 'string-arg' not given.
 
 # Give no mandatory option throws:
 $ ./libclapp_doc_simple_main_parser -b my-string-arg
-Caught Exception: Only the following mandatory options '-b|--bool' were given, but at least the following options are required: '-b|--bool', '-s|--str'
+Caught Exception: Only the following mandatory options -b|--bool were given, but at least the following options are required: -b|--bool -s|--str=<param>
 
 ```
 [//]:#end_calls_simple_main_parser
@@ -912,6 +912,7 @@ If the previous example listing is executed, you get the following output:
 
 [//]:#begin_calls_parser_container
 ```bash
+# Print the help message:
 $ ./libclapp_doc_parser_container -h  # this is the same as with option `--help`
 Usage:
 ./libclapp_doc_parser_container -h|--help | ( -b|--bool -s|--str=<param> ) <string-arg>
@@ -1052,7 +1053,8 @@ class cli_parser_t : public clapp::basic_main_parser_t {
     clapp::help_option_t help{*this, "help", 'h', "Show help options.",
                               clapp::parser::types::purpose_t::optional};
 
-    clapp::int32_param_option_t int_opt{*this, 'i', "Int option"};
+    clapp::int32_param_option_t int_opt{
+        *this, 'i', "Int option", clapp::parser::types::purpose_t::optional};
 
     class mode1_parser_t : public clapp::basic_sub_parser_t {
        public:
