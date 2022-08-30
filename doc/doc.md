@@ -773,6 +773,7 @@ But if you want to be conformant to [CppCoreGuideline C.21](https://github.com/i
 
 ### Example cli-outputs when using the previous listing:
 If the previous example listing is executed, you get the following output:
+
 [//]:#begin_calls_parser_container
 ```bash
 # Print the help message:
