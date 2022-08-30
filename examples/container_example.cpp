@@ -38,7 +38,8 @@ class cli_parser_t : public clapp::basic_main_parser_t {
         clapp::count_option_t verbose{*this,
                                       "verbose",
                                       'v',
-                                      "Verbose option.",
+                                      "Verbose option, can be given multiple "
+                                      "times to increase verbosity.",
                                       clapp::min_max_value_t<std::size_t>{0, 7},
                                       clapp::default_value_t<std::size_t>{2},
                                       purpose_t::optional};
