@@ -69,8 +69,9 @@ class basic_option_container_t {
 
     static void validate_options_xor(
         const types::variant_opt_conf_container_t* options,
-        const std::string& options_str, const std::string& xor_options_str,
+        const std::string& options_str,
         std::optional<std::vector<std::string>>& mandatory_and_options,
+        const std::string& xor_options_str,
         std::optional<std::string>& given_xor_option,
         std::optional<std::vector<std::string>>& given_and_options,
         bool summarize_xor_options);

@@ -146,8 +146,8 @@ void clapp::parser::basic_option_container_t::validate_options() const {
         std::optional<std::string> given_xor_option;
         std::optional<std::vector<std::string>> given_and_options;
         validate_options_xor(&options, options.gen_short_option_line(),
-                             options.gen_short_option_line(),
-                             mandatory_and_options, given_xor_option,
+                             mandatory_and_options,
+                             options.gen_short_option_line(), given_xor_option,
                              given_and_options, false);
 
         if (!given_xor_option.has_value()) {
@@ -170,8 +170,9 @@ void clapp::parser::basic_option_container_t::validate_options() const {
 
 void clapp::parser::basic_option_container_t::validate_options_xor(
     const types::variant_opt_conf_container_t* options,
-    const std::string& options_str, const std::string& xor_options_str,
+    const std::string& options_str,
     std::optional<std::vector<std::string>>& mandatory_and_options,
+    const std::string& xor_options_str,
     std::optional<std::string>& given_xor_option,
     std::optional<std::vector<std::string>>& given_and_options,
     bool summarize_xor_options) {
@@ -243,9 +244,8 @@ void clapp::parser::basic_option_container_t::validate_options_xor_container(
         } else if ((*it)->logic_operator_type ==
                    types::logic_operator_type_t::logic_xor) {
             clapp::parser::option_container_t::validate_options_xor(
-                (*it), (*it)->gen_short_option_line(), options_str,
-                mandatory_and_options, given_xor_option, given_and_options,
-                false);
+                (*it), (*it)->gen_short_option_line(), mandatory_and_options,
+                options_str, given_xor_option, given_and_options, false);
         } else {
             Expects(false);
         }
@@ -355,9 +355,9 @@ void clapp::parser::basic_option_container_t::validate_options_and_container(
                 std::vector<std::string>{}};
 
             clapp::parser::option_container_t::validate_options_xor(
-                (*it), (*it)->gen_short_option_line(),
-                (*it)->gen_short_option_line(), mandatory_and_options,
-                my_given_xor_option, my_given_and_options, true);
+                (*it), (*it)->gen_short_option_line(), mandatory_and_options,
+                (*it)->gen_short_option_line(), my_given_xor_option,
+                my_given_and_options, true);
 
             Expects(my_given_and_options.has_value());
             if (my_given_xor_option.has_value()) {
