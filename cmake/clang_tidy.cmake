@@ -29,6 +29,8 @@ if(libClaPP_CLANG_TIDY_BIN)
         list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -altera-id-dependent-backward-branch)
     endif()
 
+    list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -llvm-include-order)
+
     set(libClaPP_CLANG_TIDY_CHECKS ${libClaPP_CLANG_TIDY_CHECKS_LIST})
     string(REPLACE ";" "," libClaPP_CLANG_TIDY_CHECKS "${libClaPP_CLANG_TIDY_CHECKS}")
 
