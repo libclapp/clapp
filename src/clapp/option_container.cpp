@@ -112,11 +112,6 @@ clapp::parser::basic_option_container_t::get_options() const {
     return options;
 }
 
-clapp::parser::types::validate_func_vec_t&
-clapp::parser::basic_option_container_t::get_validate_functions() {
-    return validate_functions;
-}
-
 const clapp::parser::types::validate_func_vec_t&
 clapp::parser::basic_option_container_t::get_validate_functions() const {
     return validate_functions;
