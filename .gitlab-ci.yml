@@ -503,8 +503,8 @@ compile_clang_tidy_ubuntu_20.04_amd64:
         matrix:
             - BUILD_TYPE: [Debug, Release]
               COMPILER: clang
-              COMPILER_VERSION: [10]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
+              COMPILER_VERSION: [10, 11]
+              GENERATOR: ["Unix Makefiles"]
     <<: *compile_clang_tidy_definition
 
 compile_clang_tidy_ubuntu_22.04_amd64:
@@ -515,8 +515,8 @@ compile_clang_tidy_ubuntu_22.04_amd64:
         matrix:
             - BUILD_TYPE: [Debug, Release]
               COMPILER: clang
-              COMPILER_VERSION: [12, 13]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
+              COMPILER_VERSION: [12, 13, 14]
+              GENERATOR: ["Unix Makefiles"]
     <<: *compile_clang_tidy_definition
 
 usage_cmake_subdir_debian_10_amd64:
