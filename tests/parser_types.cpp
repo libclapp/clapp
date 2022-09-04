@@ -62,7 +62,6 @@ class optConfT : public ::testing::Test {
         opt_vector_param_conf_t::short_opt_conf_t;
     using opt_vector_param_long_opt_conf_t =
         opt_vector_param_conf_t::long_opt_conf_t;
-    using validate_func_t = clapp::parser::types::validate_func_t;
     using validate_value_func_t = clapp::parser::types::validate_value_func_t;
     using given_func_t = clapp::parser::types::given_func_t;
     using purpose_t = clapp::parser::types::purpose_t;
@@ -123,7 +122,6 @@ class optConfT : public ::testing::Test {
         [](const std::string_view /*opt*/, const std::string_view /*val*/) {
             return clapp::value::found_func_t::ret_t{};
         }};
-    validate_func_t valid{[]() {}};
     validate_value_func_t validate_value{[](const std::string& /*opt*/) {}};
     given_func_t given{[]() { return true; }};
     given_func_t not_given{[]() { return false; }};
@@ -730,7 +728,6 @@ class argConfT : public ::testing::Test {
     using variadic_arg_conf_t = clapp::parser::types::variadic_arg_conf_t;
 
     using argument_func_t = clapp::parser::types::argument_func_t;
-    using validate_func_t = clapp::parser::types::validate_func_t;
     using validate_value_func_t = clapp::parser::types::validate_value_func_t;
     using given_func_t = clapp::parser::types::given_func_t;
     using purpose_t = clapp::parser::types::purpose_t;
@@ -741,7 +738,6 @@ class argConfT : public ::testing::Test {
     argument_func_t arg_func{[](const std::string_view /*arg*/) {
         return clapp::value::found_func_t::ret_t{};
     }};
-    validate_func_t valid{[]() {}};
     validate_value_func_t validate_value{[](const std::string& /*arg*/) {}};
     given_func_t given{[]() { return true; }};
     given_func_t not_given{[]() { return false; }};

@@ -48,8 +48,6 @@ using argument_func_t = std::function<clapp::value::found_func_t::ret_t(
     const std::string_view argument)>;
 using given_func_t = std::function<bool(void)>;
 using validate_value_func_t = std::function<void(const std::string&)>;
-using validate_func_t = std::function<void(void)>;
-using validate_func_vec_t = std::vector<validate_func_t>;
 using print_and_exit_func_t = std::function<clapp::value::exit_t(
     const std::string_view print_msg, int exit_code)>;
 

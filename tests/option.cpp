@@ -20,13 +20,11 @@ class option_test_parser_t : public clapp::parser::basic_parser_t {
 
     using option_descriptions_vec_t =
         clapp::parser::basic_parser_t::option_descriptions_vec_t;
-    using validate_func_t = clapp::parser::types::validate_func_t;
     using validate_value_func_t = clapp::parser::types::validate_value_func_t;
     using given_func_t = clapp::parser::types::given_func_t;
 
     using clapp::parser::basic_parser_t::get_option_help;
     using clapp::parser::basic_parser_t::get_options;
-    using clapp::parser::basic_parser_t::get_validate_functions;
 
     [[nodiscard]] std::string gen_short_line_prefix() const override;
 };

@@ -322,9 +322,6 @@ clapp::parser::basic_parser_t::parse_result_t clapp::basic_parser_t::parse(
 }
 
 void clapp::parser::basic_parser_t::validate() const {
-    for (const auto& validate_func : get_validate_functions()) {
-        validate_func();
-    }
     validate_options();
     validate_arguments();
 }

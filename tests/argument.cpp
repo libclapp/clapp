@@ -13,7 +13,6 @@ class argument_test_parser_t : public clapp::parser::basic_parser_t {
     using argument_type_t = clapp::parser::types::argument_type_t;
     using argument_descriptions_vec_t =
         clapp::parser::basic_parser_t::argument_descriptions_vec_t;
-    using validate_func_t = clapp::parser::types::validate_func_t;
     using validate_value_func_t = clapp::parser::types::validate_value_func_t;
     using given_func_t = clapp::parser::types::given_func_t;
 
@@ -21,7 +20,6 @@ class argument_test_parser_t : public clapp::parser::basic_parser_t {
     using clapp::parser::basic_parser_t::get_arguments;
     using clapp::parser::basic_parser_t::get_mandatory_argument_descriptions;
     using clapp::parser::basic_parser_t::get_optional_argument_descriptions;
-    using clapp::parser::basic_parser_t::get_validate_functions;
 
     [[nodiscard]] std::string gen_short_line_prefix() const override;
 };

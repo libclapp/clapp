@@ -57,9 +57,6 @@ class basic_option_container_t {
     [[nodiscard]] const types::variant_opt_conf_t* find_parser_option(
         char opt) const;
 
-    [[nodiscard]] const types::validate_func_vec_t& get_validate_functions()
-        const;
-
     [[nodiscard]] types::variant_opt_conf_container_t& get_options();
     [[nodiscard]] const types::variant_opt_conf_container_t& get_options()
         const;
@@ -117,7 +114,6 @@ class basic_option_container_t {
     [[nodiscard]] types::help_entry_vec_t get_option_help() const;
 
    private:
-    types::validate_func_vec_t validate_functions{};
     types::variant_opt_conf_container_t options;
 };
 
