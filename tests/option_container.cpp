@@ -308,3 +308,12 @@ TEST(optionContainer, constructOptionalTestOptionContainerWithXorThrows) {
             ftp, clapp::parser::types::logic_operator_type_t::logic_xor}),
         clapp::option_exception_t);
 }
+
+TEST(optionContainer, constructOptionalTestOptionGetParser) {
+    fake_test_parser_t ftp;
+    clapp::parser::basic_parser_t* parser_ptr{&ftp};
+
+    simple_test_option_container_t stoc{
+        ftp, clapp::parser::types::logic_operator_type_t::logic_and};
+    ASSERT_THAT(&(stoc.get_parser()), testing::Eq(parser_ptr));
+}
