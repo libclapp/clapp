@@ -363,12 +363,12 @@ compile_ubuntu_20.04_amd64:
         matrix:
             - BUILD_TYPE: [Debug, Release]
               COMPILER: clang
-              COMPILER_VERSION: [7, 8, 9, 10, 11, 12]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
+              COMPILER_VERSION: [7, 8, 9, 10, 11]
+              GENERATOR: ["Unix Makefiles"]
             - BUILD_TYPE: [Debug, Release]
               COMPILER: gcc
               COMPILER_VERSION: [7, 8, 9, 10]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
+              GENERATOR: ["Unix Makefiles"]
     <<: *compile_definition
 
 test_gcov_ubuntu_20.04_amd64:
@@ -379,12 +379,12 @@ test_gcov_ubuntu_20.04_amd64:
         matrix:
             - BUILD_TYPE: [Debug, Release]
               COMPILER: clang
-              COMPILER_VERSION: [7, 8, 9, 10, 11, 12]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
+              COMPILER_VERSION: [7, 8, 9, 10, 11]
+              GENERATOR: ["Unix Makefiles"]
             - BUILD_TYPE: [Debug, Release]
               COMPILER: gcc
               COMPILER_VERSION: [7, 8, 9, 10]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
+              GENERATOR: ["Unix Makefiles"]
     needs:
         - job: compile_ubuntu_20.04_amd64
           artifacts: true
@@ -398,12 +398,12 @@ compile_ubuntu_20.04_arm64:
         matrix:
             - BUILD_TYPE: [Debug, Release]
               COMPILER: clang
-              COMPILER_VERSION: [7, 8, 9, 10, 11, 12]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
+              COMPILER_VERSION: [7, 8, 9, 10, 11]
+              GENERATOR: ["Unix Makefiles"]
             - BUILD_TYPE: [Debug, Release]
               COMPILER: gcc
               COMPILER_VERSION: [7, 8, 9, 10]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
+              GENERATOR: ["Unix Makefiles"]
     <<: *compile_definition
 
 test_gcov_ubuntu_20.04_arm64:
@@ -414,12 +414,12 @@ test_gcov_ubuntu_20.04_arm64:
         matrix:
             - BUILD_TYPE: [Debug, Release]
               COMPILER: clang
-              COMPILER_VERSION: [7, 8, 9, 10, 11, 12]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
+              COMPILER_VERSION: [7, 8, 9, 10, 11]
+              GENERATOR: ["Unix Makefiles"]
             - BUILD_TYPE: [Debug, Release]
               COMPILER: gcc
               COMPILER_VERSION: [7, 8, 9, 10]
-              GENERATOR: ["Unix Makefiles", "Ninja"]
+              GENERATOR: ["Unix Makefiles"]
     needs:
         - job: compile_ubuntu_20.04_arm64
           artifacts: true
