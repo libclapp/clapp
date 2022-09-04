@@ -241,13 +241,12 @@ void clapp::parser::basic_option_container_t::validate_options_xor_container(
 
                 given_xor_option = xor_option_str;
             }
-        } else if ((*it)->logic_operator_type ==
-                   types::logic_operator_type_t::logic_xor) {
+        } else {
+            Expects((*it)->logic_operator_type ==
+                    types::logic_operator_type_t::logic_xor);
             clapp::parser::option_container_t::validate_options_xor(
                 (*it), (*it)->gen_short_option_line(), mandatory_and_options,
                 options_str, given_xor_option, given_and_options, false);
-        } else {
-            Expects(false);
         }
     }
 }
@@ -348,8 +347,9 @@ void clapp::parser::basic_option_container_t::validate_options_and_container(
             clapp::parser::option_container_t::validate_options_and(
                 (*it), options_str, xor_options_str, mandatory_and_options,
                 given_xor_option, given_and_options, allow_empty);
-        } else if ((*it)->logic_operator_type ==
-                   types::logic_operator_type_t::logic_xor) {
+        } else {
+            Expects((*it)->logic_operator_type ==
+                    types::logic_operator_type_t::logic_xor);
             std::optional<std::string> my_given_xor_option;
             std::optional<std::vector<std::string>> my_given_and_options{
                 std::vector<std::string>{}};
@@ -364,8 +364,6 @@ void clapp::parser::basic_option_container_t::validate_options_and_container(
                 given_and_options.value().push_back(
                     stringify(my_given_and_options));
             }
-        } else {
-            Expects(false);
         }
     }
 }
