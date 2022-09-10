@@ -46,10 +46,10 @@ bool clapp::value::convert_value<bool>(const std::string_view param) {
     if (param == "FALSE" || param == "false" || param == "0") {
         return false;
     }
-    std::stringstream ss;
-    ss << "convert_value: value '" << param << "' is invalid. "
-       << "(valid values: TRUE, true, 1, FALSE, false, 0)";
-    throw clapp::exception::invalid_value_t{ss.str()};
+    std::stringstream string_stream;
+    string_stream << "convert_value: value '" << param << "' is invalid. "
+                  << "(valid values: TRUE, true, 1, FALSE, false, 0)";
+    throw clapp::exception::invalid_value_t{string_stream.str()};
 }
 
 template <>
@@ -143,15 +143,15 @@ float clapp::value::convert_value<float>(const std::string_view param) {
     try {
         return std::stof(std::string{param}, nullptr);
     } catch (std::out_of_range& e) {
-        std::stringstream ss;
-        ss << "convert_value: value '" << param << "' is out of float-range. ("
-           << e.what() << ")";
-        throw clapp::exception::out_of_range_t{ss.str()};
+        std::stringstream string_stream;
+        string_stream << "convert_value: value '" << param
+                      << "' is out of float-range. (" << e.what() << ")";
+        throw clapp::exception::out_of_range_t{string_stream.str()};
     } catch (std::invalid_argument& e) {
-        std::stringstream ss;
-        ss << "convert_value: value '" << param << "' is invalid. (" << e.what()
-           << ")";
-        throw clapp::exception::invalid_value_t{ss.str()};
+        std::stringstream string_stream;
+        string_stream << "convert_value: value '" << param << "' is invalid. ("
+                      << e.what() << ")";
+        throw clapp::exception::invalid_value_t{string_stream.str()};
     }
 }
 
@@ -160,15 +160,15 @@ double clapp::value::convert_value<double>(const std::string_view param) {
     try {
         return std::stod(std::string{param}, nullptr);
     } catch (std::out_of_range& e) {
-        std::stringstream ss;
-        ss << "convert_value: value '" << param << "' is out of double-range. ("
-           << e.what() << ")";
-        throw clapp::exception::out_of_range_t{ss.str()};
+        std::stringstream string_stream;
+        string_stream << "convert_value: value '" << param
+                      << "' is out of double-range. (" << e.what() << ")";
+        throw clapp::exception::out_of_range_t{string_stream.str()};
     } catch (std::invalid_argument& e) {
-        std::stringstream ss;
-        ss << "convert_value: value '" << param << "' is invalid. (" << e.what()
-           << ")";
-        throw clapp::exception::invalid_value_t{ss.str()};
+        std::stringstream string_stream;
+        string_stream << "convert_value: value '" << param << "' is invalid. ("
+                      << e.what() << ")";
+        throw clapp::exception::invalid_value_t{string_stream.str()};
     }
 }
 
@@ -182,10 +182,10 @@ clapp::fs::path clapp::value::convert_value<clapp::fs::path>(
 void clapp::path_exists_t::validate(const clapp::fs::path& path,
                                     const std::string& param_name) {
     if (!clapp::fs::exists(path)) {
-        std::stringstream ss;
-        ss << "CLI value '" << path << "' for '" << param_name
-           << "' does not exist.";
-        throw clapp::exception::path_does_not_exist_t{ss.str()};
+        std::stringstream string_stream;
+        string_stream << "CLI value '" << path << "' for '" << param_name
+                      << "' does not exist.";
+        throw clapp::exception::path_does_not_exist_t{string_stream.str()};
     }
 }
 #endif
@@ -200,23 +200,25 @@ static T convert_uint(const std::string_view param) {
         const std::uint64_t value{std::stoull(std::string{param}, nullptr, 0)};
 
         if (value > std::numeric_limits<T>::max()) {
-            std::stringstream ss;
-            ss << "convert_value: value '" << value << "' is bigger than max "
-               << std::numeric_limits<T>::max();
-            throw clapp::exception::out_of_range_t{ss.str()};
+            std::stringstream string_stream;
+            string_stream << "convert_value: value '" << value
+                          << "' is bigger than max "
+                          << std::numeric_limits<T>::max();
+            throw clapp::exception::out_of_range_t{string_stream.str()};
         }
         return static_cast<T>(value);
     } catch (std::out_of_range& e) {
-        std::stringstream ss;
-        ss << "convert_value: value '" << param << "' is out of range. ("
-           << std::numeric_limits<T>::min() << " and "
-           << std::numeric_limits<T>::max() << ", " << e.what() << ")";
-        throw clapp::exception::out_of_range_t{ss.str()};
+        std::stringstream string_stream;
+        string_stream << "convert_value: value '" << param
+                      << "' is out of range. (" << std::numeric_limits<T>::min()
+                      << " and " << std::numeric_limits<T>::max() << ", "
+                      << e.what() << ")";
+        throw clapp::exception::out_of_range_t{string_stream.str()};
     } catch (std::invalid_argument& e) {
-        std::stringstream ss;
-        ss << "convert_value: value '" << param << "' is invalid. (" << e.what()
-           << ")";
-        throw clapp::exception::invalid_value_t{ss.str()};
+        std::stringstream string_stream;
+        string_stream << "convert_value: value '" << param << "' is invalid. ("
+                      << e.what() << ")";
+        throw clapp::exception::invalid_value_t{string_stream.str()};
     }
 }
 
@@ -230,29 +232,32 @@ static T convert_int(const std::string_view param) {
         const std::int64_t value{std::stoll(std::string{param}, nullptr, 0)};
 
         if (value > std::numeric_limits<T>::max()) {
-            std::stringstream ss;
-            ss << "convert_value: value '" << value << "' is bigger than max "
-               << std::numeric_limits<T>::max();
-            throw clapp::exception::out_of_range_t{ss.str()};
+            std::stringstream string_stream;
+            string_stream << "convert_value: value '" << value
+                          << "' is bigger than max "
+                          << std::numeric_limits<T>::max();
+            throw clapp::exception::out_of_range_t{string_stream.str()};
         }
 
         if (value < std::numeric_limits<T>::min()) {
-            std::stringstream ss;
-            ss << "convert_value: value '" << value << "' is smaller than min "
-               << std::numeric_limits<T>::max();
-            throw clapp::exception::out_of_range_t{ss.str()};
+            std::stringstream string_stream;
+            string_stream << "convert_value: value '" << value
+                          << "' is smaller than min "
+                          << std::numeric_limits<T>::max();
+            throw clapp::exception::out_of_range_t{string_stream.str()};
         }
         return static_cast<T>(value);
     } catch (std::out_of_range& e) {
-        std::stringstream ss;
-        ss << "convert_value: value '" << param << "' is out of range. ("
-           << std::numeric_limits<T>::min() << " and "
-           << std::numeric_limits<T>::max() << ", " << e.what() << ")";
-        throw clapp::exception::out_of_range_t{ss.str()};
+        std::stringstream string_stream;
+        string_stream << "convert_value: value '" << param
+                      << "' is out of range. (" << std::numeric_limits<T>::min()
+                      << " and " << std::numeric_limits<T>::max() << ", "
+                      << e.what() << ")";
+        throw clapp::exception::out_of_range_t{string_stream.str()};
     } catch (std::invalid_argument& e) {
-        std::stringstream ss;
-        ss << "convert_value: value '" << param << "' is invalid. (" << e.what()
-           << ")";
-        throw clapp::exception::invalid_value_t{ss.str()};
+        std::stringstream string_stream;
+        string_stream << "convert_value: value '" << param << "' is invalid. ("
+                      << e.what() << ")";
+        throw clapp::exception::invalid_value_t{string_stream.str()};
     }
 }
