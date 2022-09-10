@@ -17,11 +17,12 @@
 
 void clapp::option::check_long_option(const std::string_view option) {
     if (option.find_first_of("\n\t\r =") != std::string::npos) {
-        std::stringstream ss;
-        ss << "Whitespaces and equalsigns are not allowed in long options: "
-              "option='"
-           << option << "'";
-        throw clapp::exception::option_exception_t{ss.str()};
+        std::stringstream string_stream;
+        string_stream
+            << "Whitespaces and equalsigns are not allowed in long options: "
+               "option='"
+            << option << "'";
+        throw clapp::exception::option_exception_t{string_stream.str()};
     }
 }
 
@@ -32,11 +33,12 @@ void clapp::option::check_short_option(const char option) {
         case '\r':
         case ' ':
         case '=': {
-            std::stringstream ss;
-            ss << "Whitespaces and equalsigns are not allowed in short "
-                  "options: option='"
-               << option << "'";
-            throw clapp::exception::option_exception_t{ss.str()};
+            std::stringstream string_stream;
+            string_stream
+                << "Whitespaces and equalsigns are not allowed in short "
+                   "options: option='"
+                << option << "'";
+            throw clapp::exception::option_exception_t{string_stream.str()};
         }
         default:
             return;
