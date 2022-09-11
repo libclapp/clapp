@@ -745,15 +745,15 @@ using parser_t = clapp::parser::basic_parser_container_t<cli_parser_t>;
 
 int main(int argc, char *argv[]) {
     try {
-        parser_t cp;  // create parser instance
-        const std::optional<clapp::value::exit_t> exit{cp.parse_and_validate(
+        parser_t parser;  // create parser instance
+        const std::optional<clapp::value::exit_t> exit{parser.parse_and_validate(
             argc, argv)};  // parses and validates cli-arguments
         if (exit) {
             return exit.value().get_exit_code();
         }
         Ensures(
-            cp->string_arg);  // parser ensures mandatory arguments are given
-        std::cout << "string-arg: " << cp->string_arg.value() << std::endl;
+            parser->string_arg);  // parser ensures mandatory arguments are given
+        std::cout << "string-arg: " << parser->string_arg.value() << std::endl;
     } catch (std::exception &e) {
         std::cout << "Caught Exception: " << e.what() << std::endl;
         return EXIT_FAILURE;
