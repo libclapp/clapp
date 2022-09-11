@@ -34,17 +34,17 @@ static std::optional<option_test_parser_t::variant_opt_conf_t> contains_option(
     OPTION_T&& option) {
     for (const auto& opt : options) {
         const bool found{std::visit(
-            [&option](auto&& o) {
+            [&option](auto&& visit_option) {
                 if constexpr (std::is_same<
                                   typename std::decay<decltype(option)>::type,
                                   char>::value) {
-                    for (auto& item : o.short_options) {
+                    for (auto& item : visit_option.short_options) {
                         if (option == item.option) {
                             return true;
                         }
                     }
                 } else {
-                    for (auto& item : o.long_options) {
+                    for (auto& item : visit_option.long_options) {
                         if (option == item.option) {
                             return true;
                         }
@@ -184,25 +184,26 @@ MATCHER_P(VectorParamOptionGiven, value,
     if (!(static_cast<bool>(arg) && arg.has_value() && arg.given())) {
         return false;
     }
-    const auto& a{arg.value()};
+    const auto& argument{arg.value()};
     std::string val_str{
         std::accumulate(value.begin(), value.end(), std::string{},
-                        [](std::string& s, const auto& itm) {
-                            return s += clapp::to_string(itm) + ", ";
+                        [](std::string& str, const auto& itm) {
+                            return str += clapp::to_string(itm) + ", ";
                         })};
     if (!val_str.empty()) {
         val_str = val_str.substr(0, val_str.size() - 2);
     }
-    std::string arg_str{std::accumulate(
-        a.begin(), a.end(), std::string{}, [](std::string& s, const auto& itm) {
-            return s += clapp::to_string(itm) + ", ";
-        })};
+    std::string arg_str{
+        std::accumulate(argument.begin(), argument.end(), std::string{},
+                        [](std::string& str, const auto& itm) {
+                            return str += clapp::to_string(itm) + ", ";
+                        })};
     if (!arg_str.empty()) {
         arg_str = arg_str.substr(0, arg_str.size() - 2);
     }
     *result_listener << ", value(): {" << val_str << "}=={" << arg_str
                      << "} = ";
-    return compare_value_vector(a, value, result_listener);
+    return compare_value_vector(argument, value, result_listener);
 }
 
 MATCHER(VectorParamOptionNotGiven,
@@ -267,10 +268,10 @@ LONG_OPT_FUNC_T process_long_option(OPT_T&& option,
 }
 
 template <typename LONG_OPT_FUNC_T>
-static LONG_OPT_FUNC_T get_long_opt_func(option_test_parser_t& tp,
+static LONG_OPT_FUNC_T get_long_opt_func(option_test_parser_t& otp,
                                          const std::string& long_opt_name) {
     std::vector<option_test_parser_t::variant_opt_conf_t> options{
-        tp.get_options()};
+        otp.get_options()};
     std::optional<option_test_parser_t::variant_opt_conf_t> found_opt{
         contains_option(options, long_opt_name)};
     if (found_opt == std::nullopt) {
@@ -302,10 +303,10 @@ SHORT_OPT_FUNC_T process_short_option(OPT_T&& option,
 }
 
 template <typename SHORT_OPT_FUNC_T>
-static SHORT_OPT_FUNC_T get_short_opt_func(option_test_parser_t& tp,
+static SHORT_OPT_FUNC_T get_short_opt_func(option_test_parser_t& otp,
                                            const char short_opt_name) {
     std::vector<option_test_parser_t::variant_opt_conf_t> options{
-        tp.get_options()};
+        otp.get_options()};
     std::optional<option_test_parser_t::variant_opt_conf_t> found_opt{
         contains_option(options, short_opt_name)};
     if (found_opt == std::nullopt) {
@@ -322,10 +323,10 @@ static SHORT_OPT_FUNC_T get_short_opt_func(option_test_parser_t& tp,
 
 template <typename OPTION_T>
 static std::optional<option_test_parser_t::validate_func_t> get_validate_func(
-    option_test_parser_t& tp, OPTION_T&& option) {
+    option_test_parser_t& otp, OPTION_T&& option) {
     std::string option_string{option};
     std::vector<option_test_parser_t::variant_opt_conf_t> options{
-        tp.get_options()};
+        otp.get_options()};
     std::optional<option_test_parser_t::variant_opt_conf_t> found_opt{
         contains_option(options, std::forward<decltype(option)>(option))};
     if (found_opt == std::nullopt) {
@@ -333,8 +334,9 @@ static std::optional<option_test_parser_t::validate_func_t> get_validate_func(
                                  "' registered.");
     }
 
-    return std::visit([](auto&& vf) { return vf.validate_func; },
-                      found_opt.value());
+    return std::visit(
+        [](auto&& validate_func) { return validate_func.validate_func; },
+        found_opt.value());
 }
 
 option_test_parser_t::~option_test_parser_t() = default;
