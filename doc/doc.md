@@ -954,32 +954,32 @@ using parser_t = clapp::parser::basic_parser_container_t<cli_parser_t>;
 
 int main(int argc, char *argv[]) {
     try {
-        parser_t cp;  // create parser instance
-        const std::optional<clapp::value::exit_t> exit{cp.parse_and_validate(
+        parser_t parser;  // create parser instance
+        const std::optional<clapp::value::exit_t> exit{parser.parse_and_validate(
             argc, argv)};  // parses and validates cli-arguments
         if (exit) {
             return exit.value().get_exit_code();
         }
 
-        if (cp->mode1) {
+        if (parser->mode1) {
             std::cout << "mode1: ";
-            if (cp->mode1.string) {
-                std::cout << "string: '" << cp->mode1.string.value() << "' ";
+            if (parser->mode1.string) {
+                std::cout << "string: '" << parser->mode1.string.value() << "' ";
             }
-            if (cp->int_opt) {
-                std::cout << "int-opt: '" << cp->int_opt.value() << "' ";
+            if (parser->int_opt) {
+                std::cout << "int-opt: '" << parser->int_opt.value() << "' ";
             }
             std::cout << std::endl;
-        } else if (cp->mode2) {
+        } else if (parser->mode2) {
             std::cout << "mode2: ";
             // parser ensures mandatory arguments are given
-            Ensures(cp->mode2.string_arg);
-            std::cout << "string_arg: '" << cp->mode2.string_arg.value() << "'"
+            Ensures(parser->mode2.string_arg);
+            std::cout << "string_arg: '" << parser->mode2.string_arg.value() << "'"
                       << std::endl;
         } else {
             std::cout << "default mode: ";
-            if (cp->int_opt) {
-                std::cout << "int-opt: '" << cp->int_opt.value() << "'";
+            if (parser->int_opt) {
+                std::cout << "int-opt: '" << parser->int_opt.value() << "'";
             }
             std::cout << std::endl;
         }
