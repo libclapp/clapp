@@ -119,7 +119,6 @@ struct basic_reg_option_conf_t {
     given_func_t given_func;
     validate_value_func_t validate_value_func;
     std::string option_string;
-    std::optional<validate_func_t> validate_func;
     std::string description;
     purpose_t purpose{purpose_t::optional};
 };

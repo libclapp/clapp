@@ -65,10 +65,6 @@ void clapp::parser::basic_option_container_t::reg(
         }
     }
 
-    if (config.validate_func) {
-        get_validate_functions().push_back(config.validate_func.value());
-    }
-
     options.options.push_back(std::move(config));
 }
 

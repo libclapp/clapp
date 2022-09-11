@@ -160,7 +160,6 @@ TEST_F(optConfT, ConstructOptNoParamConf) {
                             std::move(given),
                             std::move(validate_value),
                             std::string{option_str},
-                            std::move(valid),
                             description}));
 }
 
@@ -171,7 +170,6 @@ TEST_F(optConfT, ConstructOptionalOptNoParamConf) {
                             std::move(given),
                             std::move(validate_value),
                             std::string{option_str},
-                            std::move(valid),
                             description,
                             purpose_t::optional}));
 }
@@ -183,7 +181,6 @@ TEST_F(optConfT, ConstructMandatoryOptNoParamConf) {
                             std::move(given),
                             std::move(validate_value),
                             std::string{option_str},
-                            std::move(valid),
                             description,
                             purpose_t::mandatory}));
 }
@@ -194,7 +191,6 @@ TEST_F(optConfT, ConstructOptNoParamConfCreateBasicOptionString) {
                                    std::move(given),
                                    std::move(validate_value),
                                    std::string{option_str},
-                                   std::move(valid),
                                    description};
     ASSERT_THAT(
         onpc.create_basic_option_string(),
@@ -208,7 +204,6 @@ TEST_F(optConfT, ConstructOptionalOptNoParamConfCreateOptionString) {
                                    std::move(given),
                                    std::move(validate_value),
                                    std::string{option_str},
-                                   std::move(valid),
                                    description};
     ASSERT_THAT(onpc.create_option_string(),
                 testing::StrEq(std::string{"["} +
@@ -221,7 +216,6 @@ TEST_F(optConfT, ConstructMandatoryOptNoParamConfCreateOptionString) {
                                    std::move(given),
                                    std::move(validate_value),
                                    std::string{option_str},
-                                   std::move(valid),
                                    description,
                                    purpose_t::mandatory};
     ASSERT_THAT(onpc.create_option_string(),
@@ -234,7 +228,6 @@ TEST_F(optConfT, ConstructOptNoParamConfGetOptionHelp) {
                                    std::move(given),
                                    std::move(validate_value),
                                    std::string{option_str},
-                                   std::move(valid),
                                    description};
     ASSERT_THAT(onpc.get_option_help(),
                 testing::Eq(help_entry_t{onpc.create_basic_option_string(),
@@ -242,49 +235,33 @@ TEST_F(optConfT, ConstructOptNoParamConfGetOptionHelp) {
 }
 
 TEST_F(optConfT, ConstructOptNoParamConfFindOptionLongOption1) {
-    const opt_no_param_conf_t onpc{{std::move(np_soc1)},
-                                   {std::move(np_loc1)},
-                                   std::move(given),
-                                   std::move(validate_value),
-                                   std::string{option_str},
-                                   std::move(valid),
-                                   description};
+    const opt_no_param_conf_t onpc{
+        {std::move(np_soc1)},      {std::move(np_loc1)},    std::move(given),
+        std::move(validate_value), std::string{option_str}, description};
     ASSERT_THAT(onpc.find_option(long_option1),
                 testing::Ne(onpc.long_options.end()));
 }
 
 TEST_F(optConfT, ConstructOptNoParamConfFindOptionLongOption2) {
-    const opt_no_param_conf_t onpc{{std::move(np_soc1)},
-                                   {std::move(np_loc1)},
-                                   std::move(given),
-                                   std::move(validate_value),
-                                   std::string{option_str},
-                                   std::move(valid),
-                                   description};
+    const opt_no_param_conf_t onpc{
+        {std::move(np_soc1)},      {std::move(np_loc1)},    std::move(given),
+        std::move(validate_value), std::string{option_str}, description};
     ASSERT_THAT(onpc.find_option(long_option2),
                 testing::Eq(onpc.long_options.end()));
 }
 
 TEST_F(optConfT, ConstructOptNoParamConfFindOptionShortOption1) {
-    const opt_no_param_conf_t onpc{{std::move(np_soc1)},
-                                   {std::move(np_loc1)},
-                                   std::move(given),
-                                   std::move(validate_value),
-                                   std::string{option_str},
-                                   std::move(valid),
-                                   description};
+    const opt_no_param_conf_t onpc{
+        {std::move(np_soc1)},      {std::move(np_loc1)},    std::move(given),
+        std::move(validate_value), std::string{option_str}, description};
     ASSERT_THAT(onpc.find_option(short_option1),
                 testing::Ne(onpc.short_options.end()));
 }
 
 TEST_F(optConfT, ConstructOptNoParamConfFindOptionShortOption2) {
-    const opt_no_param_conf_t onpc{{std::move(np_soc1)},
-                                   {std::move(np_loc1)},
-                                   std::move(given),
-                                   std::move(validate_value),
-                                   std::string{option_str},
-                                   std::move(valid),
-                                   description};
+    const opt_no_param_conf_t onpc{
+        {std::move(np_soc1)},      {std::move(np_loc1)},    std::move(given),
+        std::move(validate_value), std::string{option_str}, description};
     ASSERT_THAT(onpc.find_option(short_option2),
                 testing::Eq(onpc.short_options.end()));
 }
@@ -296,64 +273,44 @@ TEST_F(optConfT,
                                    std::move(given),
                                    std::move(validate_value),
                                    std::string{option_str},
-                                   std::move(valid),
                                    description};
     ASSERT_THAT(onpc.contains_option(short_option1), testing::Eq(false));
 }
 
 TEST_F(optConfT,
        ConstructOptNoParamConfContainsOptionLongOption1WithoutLongOptions) {
-    const opt_no_param_conf_t onpc{{std::move(np_soc1)},
-                                   {},
-                                   std::move(given),
-                                   std::move(validate_value),
-                                   std::string{option_str},
-                                   std::move(valid),
-                                   description};
+    const opt_no_param_conf_t onpc{
+        {std::move(np_soc1)},    {},
+        std::move(given),        std::move(validate_value),
+        std::string{option_str}, description};
     ASSERT_THAT(onpc.contains_option(long_option1), testing::Eq(false));
 }
 
 TEST_F(optConfT, ConstructOptNoParamConfContainsOptionLongOption1) {
-    const opt_no_param_conf_t onpc{{std::move(np_soc1)},
-                                   {std::move(np_loc1)},
-                                   std::move(given),
-                                   std::move(validate_value),
-                                   std::string{option_str},
-                                   std::move(valid),
-                                   description};
+    const opt_no_param_conf_t onpc{
+        {std::move(np_soc1)},      {std::move(np_loc1)},    std::move(given),
+        std::move(validate_value), std::string{option_str}, description};
     ASSERT_THAT(onpc.contains_option(long_option1), testing::Eq(true));
 }
 
 TEST_F(optConfT, ConstructOptNoParamConfContainsOptionLongOption2) {
-    const opt_no_param_conf_t onpc{{std::move(np_soc1)},
-                                   {std::move(np_loc1)},
-                                   std::move(given),
-                                   std::move(validate_value),
-                                   std::string{option_str},
-                                   std::move(valid),
-                                   description};
+    const opt_no_param_conf_t onpc{
+        {std::move(np_soc1)},      {std::move(np_loc1)},    std::move(given),
+        std::move(validate_value), std::string{option_str}, description};
     ASSERT_THAT(onpc.contains_option(long_option2), testing::Eq(false));
 }
 
 TEST_F(optConfT, ConstructOptNoParamConfContainsOptionShortOption1) {
-    const opt_no_param_conf_t onpc{{std::move(np_soc1)},
-                                   {std::move(np_loc1)},
-                                   std::move(given),
-                                   std::move(validate_value),
-                                   std::string{option_str},
-                                   std::move(valid),
-                                   description};
+    const opt_no_param_conf_t onpc{
+        {std::move(np_soc1)},      {std::move(np_loc1)},    std::move(given),
+        std::move(validate_value), std::string{option_str}, description};
     ASSERT_THAT(onpc.contains_option(short_option1), testing::Eq(true));
 }
 
 TEST_F(optConfT, ConstructOptNoParamConfContainsOptionShortOption2) {
-    const opt_no_param_conf_t onpc{{std::move(np_soc1)},
-                                   {std::move(np_loc1)},
-                                   std::move(given),
-                                   std::move(validate_value),
-                                   std::string{option_str},
-                                   std::move(valid),
-                                   description};
+    const opt_no_param_conf_t onpc{
+        {std::move(np_soc1)},      {std::move(np_loc1)},    std::move(given),
+        std::move(validate_value), std::string{option_str}, description};
     ASSERT_THAT(onpc.contains_option(short_option2), testing::Eq(false));
 }
 
@@ -382,7 +339,6 @@ TEST_F(optConfT, ConstructOptScalarParamConf) {
                                 std::move(given),
                                 std::move(validate_value),
                                 std::string{option_str},
-                                std::move(valid),
                                 description}));
 }
 
@@ -393,7 +349,6 @@ TEST_F(optConfT, ConstructOptionalOptScalarParamConf) {
                                 std::move(given),
                                 std::move(validate_value),
                                 std::string{option_str},
-                                std::move(valid),
                                 description,
                                 purpose_t::optional}));
 }
@@ -405,7 +360,6 @@ TEST_F(optConfT, ConstructMandatoryOptScalarParamConf) {
                                 std::move(given),
                                 std::move(validate_value),
                                 std::string{option_str},
-                                std::move(valid),
                                 description}));
 }
 
@@ -415,7 +369,6 @@ TEST_F(optConfT, ConstructOptScalarParamConfCreateBasicOptionString) {
                                        std::move(given),
                                        std::move(validate_value),
                                        std::string{option_str},
-                                       std::move(valid),
                                        description};
     ASSERT_THAT(ospc.create_basic_option_string(),
                 testing::StrEq(std::string{"-"} + short_option1 + "|-" +
@@ -429,7 +382,6 @@ TEST_F(optConfT, ConstructOptionalOptScalarParamConfCreateOptionString) {
                                        std::move(given),
                                        std::move(validate_value),
                                        std::string{option_str},
-                                       std::move(valid),
                                        description,
                                        purpose_t::optional};
     ASSERT_THAT(ospc.create_option_string(),
@@ -443,7 +395,6 @@ TEST_F(optConfT, ConstructMandatoryOptScalarParamConfCreateOptionString) {
                                        std::move(given),
                                        std::move(validate_value),
                                        std::string{option_str},
-                                       std::move(valid),
                                        description,
                                        purpose_t::mandatory};
     ASSERT_THAT(ospc.create_option_string(),
@@ -456,7 +407,6 @@ TEST_F(optConfT, ConstructOptScalarParamConfGetOptionHelp) {
                                        std::move(given),
                                        std::move(validate_value),
                                        std::string{option_str},
-                                       std::move(valid),
                                        description};
     ASSERT_THAT(ospc.get_option_help(),
                 testing::Eq(help_entry_t{ospc.create_basic_option_string(),
@@ -464,49 +414,33 @@ TEST_F(optConfT, ConstructOptScalarParamConfGetOptionHelp) {
 }
 
 TEST_F(optConfT, ConstructOptScalarParamConfFindOptionLongOption1) {
-    const opt_scalar_param_conf_t ospc{{std::move(sp_soc2)},
-                                       {std::move(sp_loc2)},
-                                       std::move(given),
-                                       std::move(validate_value),
-                                       std::string{option_str},
-                                       std::move(valid),
-                                       description};
+    const opt_scalar_param_conf_t ospc{
+        {std::move(sp_soc2)},      {std::move(sp_loc2)},    std::move(given),
+        std::move(validate_value), std::string{option_str}, description};
     ASSERT_THAT(ospc.find_option(long_option1),
                 testing::Eq(ospc.long_options.end()));
 }
 
 TEST_F(optConfT, ConstructOptScalarParamConfFindOptionLongOption2) {
-    const opt_scalar_param_conf_t ospc{{std::move(sp_soc2)},
-                                       {std::move(sp_loc2)},
-                                       std::move(given),
-                                       std::move(validate_value),
-                                       std::string{option_str},
-                                       std::move(valid),
-                                       description};
+    const opt_scalar_param_conf_t ospc{
+        {std::move(sp_soc2)},      {std::move(sp_loc2)},    std::move(given),
+        std::move(validate_value), std::string{option_str}, description};
     ASSERT_THAT(ospc.find_option(long_option2),
                 testing::Ne(ospc.long_options.end()));
 }
 
 TEST_F(optConfT, ConstructOptScalarParamConfFindOptionShortOption1) {
-    const opt_scalar_param_conf_t ospc{{std::move(sp_soc2)},
-                                       {std::move(sp_loc2)},
-                                       std::move(given),
-                                       std::move(validate_value),
-                                       std::string{option_str},
-                                       std::move(valid),
-                                       description};
+    const opt_scalar_param_conf_t ospc{
+        {std::move(sp_soc2)},      {std::move(sp_loc2)},    std::move(given),
+        std::move(validate_value), std::string{option_str}, description};
     ASSERT_THAT(ospc.find_option(short_option1),
                 testing::Eq(ospc.short_options.end()));
 }
 
 TEST_F(optConfT, ConstructOptScalarParamConfFindOptionShortOption2) {
-    const opt_scalar_param_conf_t ospc{{std::move(sp_soc2)},
-                                       {std::move(sp_loc2)},
-                                       std::move(given),
-                                       std::move(validate_value),
-                                       std::string{option_str},
-                                       std::move(valid),
-                                       description};
+    const opt_scalar_param_conf_t ospc{
+        {std::move(sp_soc2)},      {std::move(sp_loc2)},    std::move(given),
+        std::move(validate_value), std::string{option_str}, description};
     ASSERT_THAT(ospc.find_option(short_option2),
                 testing::Ne(ospc.short_options.end()));
 }
@@ -519,64 +453,44 @@ TEST_F(
                                        std::move(given),
                                        std::move(validate_value),
                                        std::string{option_str},
-                                       std::move(valid),
                                        description};
     ASSERT_THAT(ospc.contains_option(short_option1), testing::Eq(false));
 }
 
 TEST_F(optConfT,
        ConstructOptScalarParamConfContainsOptionLongOption1WithoutLongOptions) {
-    const opt_scalar_param_conf_t ospc{{std::move(sp_soc1)},
-                                       {},
-                                       std::move(given),
-                                       std::move(validate_value),
-                                       std::string{option_str},
-                                       std::move(valid),
-                                       description};
+    const opt_scalar_param_conf_t ospc{
+        {std::move(sp_soc1)},    {},
+        std::move(given),        std::move(validate_value),
+        std::string{option_str}, description};
     ASSERT_THAT(ospc.contains_option(long_option1), testing::Eq(false));
 }
 
 TEST_F(optConfT, ConstructOptScalarParamConfContainsOptionLongOption1) {
-    const opt_scalar_param_conf_t ospc{{std::move(sp_soc2)},
-                                       {std::move(sp_loc2)},
-                                       std::move(given),
-                                       std::move(validate_value),
-                                       std::string{option_str},
-                                       std::move(valid),
-                                       description};
+    const opt_scalar_param_conf_t ospc{
+        {std::move(sp_soc2)},      {std::move(sp_loc2)},    std::move(given),
+        std::move(validate_value), std::string{option_str}, description};
     ASSERT_THAT(ospc.contains_option(long_option1), testing::Eq(false));
 }
 
 TEST_F(optConfT, ConstructOptScalarParamConfContainsOptionLongOption2) {
-    const opt_scalar_param_conf_t ospc{{std::move(sp_soc2)},
-                                       {std::move(sp_loc2)},
-                                       std::move(given),
-                                       std::move(validate_value),
-                                       std::string{option_str},
-                                       std::move(valid),
-                                       description};
+    const opt_scalar_param_conf_t ospc{
+        {std::move(sp_soc2)},      {std::move(sp_loc2)},    std::move(given),
+        std::move(validate_value), std::string{option_str}, description};
     ASSERT_THAT(ospc.contains_option(long_option2), testing::Eq(true));
 }
 
 TEST_F(optConfT, ConstructOptScalarParamConfContainsOptionShortOption1) {
-    const opt_scalar_param_conf_t ospc{{std::move(sp_soc2)},
-                                       {std::move(sp_loc2)},
-                                       std::move(given),
-                                       std::move(validate_value),
-                                       std::string{option_str},
-                                       std::move(valid),
-                                       description};
+    const opt_scalar_param_conf_t ospc{
+        {std::move(sp_soc2)},      {std::move(sp_loc2)},    std::move(given),
+        std::move(validate_value), std::string{option_str}, description};
     ASSERT_THAT(ospc.contains_option(short_option1), testing::Eq(false));
 }
 
 TEST_F(optConfT, ConstructOptScalarParamConfContainsOptionShortOption2) {
-    const opt_scalar_param_conf_t ospc{{std::move(sp_soc2)},
-                                       {std::move(sp_loc2)},
-                                       std::move(given),
-                                       std::move(validate_value),
-                                       std::string{option_str},
-                                       std::move(valid),
-                                       description};
+    const opt_scalar_param_conf_t ospc{
+        {std::move(sp_soc2)},      {std::move(sp_loc2)},    std::move(given),
+        std::move(validate_value), std::string{option_str}, description};
     ASSERT_THAT(ospc.contains_option(short_option2), testing::Eq(true));
 }
 
@@ -607,7 +521,6 @@ TEST_F(optConfT, ConstructOptVectorParamConf) {
                                 std::move(given),
                                 std::move(validate_value),
                                 std::string{option_str},
-                                std::move(valid),
                                 description}));
 }
 
@@ -618,7 +531,6 @@ TEST_F(optConfT, ConstructOptionalOptVectorParamConf) {
                                 std::move(given),
                                 std::move(validate_value),
                                 std::string{option_str},
-                                std::move(valid),
                                 description,
                                 purpose_t::optional}));
 }
@@ -630,7 +542,6 @@ TEST_F(optConfT, ConstructMandatoryOptVectorParamConf) {
                                 std::move(given),
                                 std::move(validate_value),
                                 std::string{option_str},
-                                std::move(valid),
                                 description,
                                 purpose_t::mandatory}));
 }
@@ -641,7 +552,6 @@ TEST_F(optConfT, ConstructOptVectorParamConfCreateBasicOptionString) {
                                        std::move(given),
                                        std::move(validate_value),
                                        std::string{option_str},
-                                       std::move(valid),
                                        description};
     ASSERT_THAT(ovpc.create_basic_option_string(),
                 testing::StrEq(std::string{"-"} + short_option1 + "|-" +
@@ -655,7 +565,6 @@ TEST_F(optConfT, ConstructOptionalOptVectorParamConfCreateOptionString) {
                                        std::move(given),
                                        std::move(validate_value),
                                        std::string{option_str},
-                                       std::move(valid),
                                        description};
     ASSERT_THAT(ovpc.create_option_string(),
                 testing::StrEq(std::string{"["} +
@@ -668,7 +577,6 @@ TEST_F(optConfT, ConstructMandatoryOptVectorParamConfCreateOptionString) {
                                        std::move(given),
                                        std::move(validate_value),
                                        std::string{option_str},
-                                       std::move(valid),
                                        description,
                                        purpose_t::mandatory};
     ASSERT_THAT(ovpc.create_option_string(),
@@ -681,7 +589,6 @@ TEST_F(optConfT, ConstructOptVectorParamConfGetOptionHelp) {
                                        std::move(given),
                                        std::move(validate_value),
                                        std::string{option_str},
-                                       std::move(valid),
                                        description};
     ASSERT_THAT(ovpc.get_option_help(),
                 testing::Eq(help_entry_t{ovpc.create_basic_option_string(),
@@ -694,7 +601,6 @@ TEST_F(optConfT, ConstructOptVectorParamConfFindOptionLongOption1) {
                                        std::move(given),
                                        std::move(validate_value),
                                        std::string{option_str},
-                                       std::move(valid),
                                        description};
     ASSERT_THAT(ovpc.find_option(long_option1),
                 testing::Ne(ovpc.long_options.end()));
@@ -706,7 +612,6 @@ TEST_F(optConfT, ConstructOptVectorParamConfFindOptionLongOption2) {
                                        std::move(given),
                                        std::move(validate_value),
                                        std::string{option_str},
-                                       std::move(valid),
                                        description};
     ASSERT_THAT(ovpc.find_option(long_option2),
                 testing::Ne(ovpc.long_options.end()));
@@ -718,7 +623,6 @@ TEST_F(optConfT, ConstructOptVectorParamConfFindOptionShortOption1) {
                                        std::move(given),
                                        std::move(validate_value),
                                        std::string{option_str},
-                                       std::move(valid),
                                        description};
     ASSERT_THAT(ovpc.find_option(short_option1),
                 testing::Ne(ovpc.short_options.end()));
@@ -730,7 +634,6 @@ TEST_F(optConfT, ConstructOptVectorParamConfFindOptionShortOption2) {
                                        std::move(given),
                                        std::move(validate_value),
                                        std::string{option_str},
-                                       std::move(valid),
                                        description};
     ASSERT_THAT(ovpc.find_option(short_option2),
                 testing::Ne(ovpc.short_options.end()));
@@ -744,20 +647,16 @@ TEST_F(
                                        std::move(given),
                                        std::move(validate_value),
                                        std::string{option_str},
-                                       std::move(valid),
                                        description};
     ASSERT_THAT(ovpc.contains_option(short_option1), testing::Eq(false));
 }
 
 TEST_F(optConfT,
        ConstructOptVectorParamConfContainsOptionLongOption1WithoutLongOptions) {
-    const opt_vector_param_conf_t ovpc{{std::move(vp_soc1)},
-                                       {},
-                                       std::move(given),
-                                       std::move(validate_value),
-                                       std::string{option_str},
-                                       std::move(valid),
-                                       description};
+    const opt_vector_param_conf_t ovpc{
+        {std::move(vp_soc1)},    {},
+        std::move(given),        std::move(validate_value),
+        std::string{option_str}, description};
     ASSERT_THAT(ovpc.contains_option(long_option1), testing::Eq(false));
 }
 
@@ -767,7 +666,6 @@ TEST_F(optConfT, ConstructOptVectorParamConfContainsOptionLongOption1) {
                                        std::move(given),
                                        std::move(validate_value),
                                        std::string{option_str},
-                                       std::move(valid),
                                        description};
     ASSERT_THAT(ovpc.contains_option(long_option1), testing::Eq(true));
 }
@@ -778,7 +676,6 @@ TEST_F(optConfT, ConstructOptVectorParamConfContainsOptionLongOption2) {
                                        std::move(given),
                                        std::move(validate_value),
                                        std::string{option_str},
-                                       std::move(valid),
                                        description};
     ASSERT_THAT(ovpc.contains_option(long_option2), testing::Eq(true));
 }
@@ -789,7 +686,6 @@ TEST_F(optConfT, ConstructOptVectorParamConfContainsOptionShortOption1) {
                                        std::move(given),
                                        std::move(validate_value),
                                        std::string{option_str},
-                                       std::move(valid),
                                        description};
     ASSERT_THAT(ovpc.contains_option(short_option1), testing::Eq(true));
 }
@@ -800,7 +696,6 @@ TEST_F(optConfT, ConstructOptVectorParamConfContainsOptionShortOption2) {
                                        std::move(given),
                                        std::move(validate_value),
                                        std::string{option_str},
-                                       std::move(valid),
                                        description};
     ASSERT_THAT(ovpc.contains_option(short_option2), testing::Eq(true));
 }

@@ -21,6 +21,8 @@ class option_test_parser_t : public clapp::parser::basic_parser_t {
     using option_descriptions_vec_t =
         clapp::parser::basic_parser_t::option_descriptions_vec_t;
     using validate_func_t = clapp::parser::types::validate_func_t;
+    using validate_value_func_t = clapp::parser::types::validate_value_func_t;
+    using given_func_t = clapp::parser::types::given_func_t;
 
     using clapp::parser::basic_parser_t::get_option_help;
     using clapp::parser::basic_parser_t::get_options;
@@ -323,7 +325,7 @@ static SHORT_OPT_FUNC_T get_short_opt_func(option_test_parser_t& otp,
 }
 
 template <typename OPTION_T>
-static std::optional<option_test_parser_t::validate_func_t> get_validate_func(
+static option_test_parser_t::validate_value_func_t get_validate_value_func(
     option_test_parser_t& otp, OPTION_T&& option) {
     std::string option_string{option};
     std::vector<clapp::parser::types::variant_opt_conf_t> options{
@@ -336,8 +338,27 @@ static std::optional<option_test_parser_t::validate_func_t> get_validate_func(
     }
 
     return std::visit(
-        [](auto&& validate_func) { return validate_func.validate_func; },
+        [](auto&& validate_value_func) {
+            return validate_value_func.validate_value_func;
+        },
         found_opt.value());
+}
+
+template <typename OPTION_T>
+static option_test_parser_t::given_func_t get_given_func(
+    option_test_parser_t& otp, OPTION_T&& option) {
+    std::string option_string{option};
+    std::vector<clapp::parser::types::variant_opt_conf_t> options{
+        otp.get_options().options};
+    std::optional<clapp::parser::types::variant_opt_conf_t> found_opt{
+        contains_option(options, std::forward<decltype(option)>(option))};
+    if (found_opt == std::nullopt) {
+        throw std::runtime_error("no option with '" + option_string +
+                                 "' registered.");
+    }
+
+    return std::visit([](auto&& given_func) { return given_func.given_func; },
+                      found_opt.value());
 }
 
 option_test_parser_t::~option_test_parser_t() = default;
@@ -750,43 +771,48 @@ TEST_F(optionT,
                 testing::StrEq("-" + std::string{short_opt}));
 }
 
-TEST_F(optionT, boolOptionConstructShortOptionalNoValidateFunc) {
+TEST_F(optionT,
+       boolOptionConstructShortOptionalCallValidateValueFuncDoesNotThrow) {
     clapp::option::bool_option_t opt{tp, short_opt, opt_desc_str,
                                      option_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, short_opt), testing::Eq(std::nullopt));
+    ASSERT_NO_THROW(get_validate_value_func(tp, short_opt)("opt-str"));
 }
 
-TEST_F(optionT, boolOptionConstructLongOptionalNoValidateFunc) {
+TEST_F(optionT,
+       boolOptionConstructLongOptionalCallValidateValueFuncDoesNotThrow) {
     clapp::option::bool_option_t opt{tp, long_opt_str, opt_desc_str,
                                      option_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, long_opt_str), testing::Eq(std::nullopt));
+    ASSERT_NO_THROW(get_validate_value_func(tp, long_opt_str)("opt-str"));
 }
 
-TEST_F(optionT, boolOptionConstructMandatoryLongCallValidateFunc) {
+TEST_F(optionT,
+       boolOptionConstructMandatoryLongCallValidateValueFuncAndGivenFunc) {
     clapp::option::bool_option_t opt{
         tp, long_opt_cstr, opt_desc_str,
         option_test_parser_t::purpose_t::mandatory};
-    std::optional<option_test_parser_t::validate_func_t> option_validate_func{
-        get_validate_func(tp, long_opt_cstr)};
-    ASSERT_THAT(option_validate_func, testing::Ne(std::nullopt));
-    ASSERT_THROW(option_validate_func.value()(),
-                 clapp::exception::option_param_exception_t);
-    get_long_opt_func<option_test_parser_t::long_opt_func_t>(
-        tp, long_opt_cstr)(long_opt_cstr);
-    ASSERT_NO_THROW(option_validate_func.value()());
+    option_test_parser_t::validate_value_func_t option_validate_value_func{
+        get_validate_value_func(tp, long_opt_cstr)};
+    ASSERT_THAT(get_given_func(tp, long_opt_cstr)(), testing::Eq(false));
+    ASSERT_NO_THROW(option_validate_value_func("opt-str"));
+    ASSERT_NO_THROW(get_long_opt_func<option_test_parser_t::long_opt_func_t>(
+        tp, long_opt_cstr)(long_opt_cstr));
+    ASSERT_THAT(get_given_func(tp, long_opt_cstr)(), testing::Eq(true));
+    ASSERT_NO_THROW(option_validate_value_func("opt-str"));
 }
 
-TEST_F(optionT, boolOptionalConstructOptionalLongWithNotNullValue) {
+TEST_F(optionT,
+       boolOptionalConstructOptionalCallValidateValueFuncAndGivenFunc) {
     clapp::option::bool_option_t arg{tp, long_opt_cstr, opt_desc_str,
                                      option_test_parser_t::purpose_t::optional,
                                      clapp::value::not_null_value_t<bool>{}};
-
-    std::optional<option_test_parser_t::validate_func_t> option_validate_func{
-        get_validate_func(tp, long_opt_cstr)};
-    ASSERT_NO_THROW((option_validate_func.value()()));
-    get_long_opt_func<option_test_parser_t::long_opt_func_t>(
-        tp, long_opt_cstr)(long_opt_cstr);
-    ASSERT_NO_THROW((option_validate_func.value()()));
+    option_test_parser_t::validate_value_func_t option_validate_value_func{
+        get_validate_value_func(tp, long_opt_cstr)};
+    ASSERT_THAT(get_given_func(tp, long_opt_cstr)(), testing::Eq(false));
+    ASSERT_NO_THROW(option_validate_value_func("opt-str"));
+    ASSERT_NO_THROW(get_long_opt_func<option_test_parser_t::long_opt_func_t>(
+        tp, long_opt_cstr)(long_opt_cstr));
+    ASSERT_THAT(get_given_func(tp, long_opt_cstr)(), testing::Eq(true));
+    ASSERT_NO_THROW(option_validate_value_func("opt-str"));
 }
 
 TEST_F(optionT,
@@ -927,35 +953,39 @@ TEST_F(
         tp, std::vector<std::string>{long_opt_str}, short_opt, opt_desc_str,
         clapp::value::min_max_value_t<std::uint32_t>{min_value, max_value}};
 
-    std::optional<option_test_parser_t::validate_func_t> option_validate_func{
-        get_validate_func(tp, long_opt_str)};
-    ASSERT_THAT(option_validate_func, testing::Ne(std::nullopt));
+    option_test_parser_t::validate_value_func_t option_validate_value_func{
+        get_validate_value_func(tp, long_opt_str)};
 
-    get_long_opt_func<option_test_parser_t::long_opt_func_t>(
-        tp, long_opt_str)(long_opt_str);
-    get_long_opt_func<option_test_parser_t::long_opt_func_t>(
-        tp, long_opt_str)(long_opt_str);
-    get_long_opt_func<option_test_parser_t::long_opt_func_t>(
-        tp, long_opt_str)(long_opt_str);
-    get_short_opt_func<option_test_parser_t::short_opt_func_t>(
-        tp, short_opt)(short_opt);
+    ASSERT_THAT(get_given_func(tp, long_opt_str)(), testing::Eq(false));
+
+    ASSERT_NO_THROW(get_long_opt_func<option_test_parser_t::long_opt_func_t>(
+        tp, long_opt_str)(long_opt_str));
+    ASSERT_NO_THROW(get_long_opt_func<option_test_parser_t::long_opt_func_t>(
+        tp, long_opt_str)(long_opt_str));
+    ASSERT_NO_THROW(get_long_opt_func<option_test_parser_t::long_opt_func_t>(
+        tp, long_opt_str)(long_opt_str));
+    ASSERT_NO_THROW(get_short_opt_func<option_test_parser_t::short_opt_func_t>(
+        tp, short_opt)(short_opt));
 
     constexpr std::uint32_t num_count_options_first{4U};
     ASSERT_THAT(opt, NumCountOptionGiven(num_count_options_first));
-    ASSERT_NO_THROW((option_validate_func.value()()));
+    ASSERT_NO_THROW((option_validate_value_func("option-str")));
     get_short_opt_func<option_test_parser_t::short_opt_func_t>(
         tp, short_opt)(short_opt);
+    ASSERT_THAT(get_given_func(tp, long_opt_str)(), testing::Eq(true));
 
     constexpr std::uint32_t num_count_options_second{5U};
     ASSERT_THAT(opt, NumCountOptionGiven(num_count_options_second));
-    ASSERT_NO_THROW((option_validate_func.value()()));
+    ASSERT_NO_THROW((option_validate_value_func("option-str")));
     ASSERT_NO_THROW((get_long_opt_func<option_test_parser_t::long_opt_func_t>(
         tp, long_opt_str)(long_opt_str)));
+    ASSERT_THAT(get_given_func(tp, long_opt_str)(), testing::Eq(true));
 
     constexpr std::uint32_t num_count_options_third{6U};
     ASSERT_THAT(opt, NumCountOptionGiven(num_count_options_third));
-    ASSERT_THROW((option_validate_func.value()()),
+    ASSERT_THROW((option_validate_value_func("option-str")),
                  clapp::exception::out_of_range_t);
+    ASSERT_THAT(get_given_func(tp, long_opt_str)(), testing::Eq(true));
 }
 
 TEST_F(
@@ -1097,18 +1127,19 @@ TEST_F(optionT,
                 testing::StrEq("-" + std::string{short_opt}));
 }
 
-TEST_F(optionT, countOptionConstructMandatoryLongCallValidateFunc) {
+TEST_F(optionT,
+       countOptionConstructMandatoryLongCallValidateValueAndGivenFunc) {
     clapp::option::count_option_t opt{
         tp, long_opt_cstr, opt_desc_str,
         option_test_parser_t::purpose_t::mandatory};
-    std::optional<option_test_parser_t::validate_func_t> option_validate_func{
-        get_validate_func(tp, long_opt_cstr)};
-    ASSERT_THAT(option_validate_func, testing::Ne(std::nullopt));
-    ASSERT_THROW(option_validate_func.value()(),
-                 clapp::exception::option_param_exception_t);
-    get_long_opt_func<option_test_parser_t::long_opt_func_t>(
-        tp, long_opt_cstr)(long_opt_cstr);
-    ASSERT_NO_THROW(option_validate_func.value()());
+    option_test_parser_t::validate_value_func_t option_validate_value_func{
+        get_validate_value_func(tp, long_opt_cstr)};
+    ASSERT_NO_THROW(option_validate_value_func("option-str"));
+    ASSERT_THAT(get_given_func(tp, long_opt_cstr)(), testing::Eq(false));
+    ASSERT_NO_THROW(get_long_opt_func<option_test_parser_t::long_opt_func_t>(
+        tp, long_opt_cstr)(long_opt_cstr));
+    ASSERT_THAT(get_given_func(tp, long_opt_cstr)(), testing::Eq(true));
+    ASSERT_NO_THROW(option_validate_value_func("option-str"));
 }
 
 TEST_F(optionT, stringParamOptionConstructShort) {
@@ -1364,19 +1395,21 @@ TEST_F(
                 testing::StrEq("-" + std::string{short_opt}));
 }
 
-TEST_F(optionT,
-       stringParamOptionConstructMandatoryLongCStringAndCallValidateFunc) {
+TEST_F(
+    optionT,
+    stringParamOptionConstructMandatoryLongCStringAndCallValidateValueAndGivenFunc) {
     clapp::option::string_param_option_t opt{
         tp, long_opt_cstr, opt_desc_str,
         option_test_parser_t::purpose_t::mandatory};
-    std::optional<option_test_parser_t::validate_func_t> option_validate_func{
-        get_validate_func(tp, long_opt_cstr)};
-    ASSERT_THAT(option_validate_func, testing::Ne(std::nullopt));
-    ASSERT_THROW(option_validate_func.value()(),
-                 clapp::exception::option_param_exception_t);
-    get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
-        tp, long_opt_cstr)(long_opt_cstr, value_str);
-    ASSERT_NO_THROW(option_validate_func.value()());
+    option_test_parser_t::validate_value_func_t option_validate_value_func{
+        get_validate_value_func(tp, long_opt_cstr)};
+    ASSERT_NO_THROW(option_validate_value_func("option-str"));
+    ASSERT_THAT(get_given_func(tp, long_opt_cstr)(), testing::Eq(false));
+    ASSERT_NO_THROW(
+        get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+            tp, long_opt_cstr)(long_opt_cstr, value_str));
+    ASSERT_NO_THROW(option_validate_value_func("option-str"));
+    ASSERT_THAT(get_given_func(tp, long_opt_cstr)(), testing::Eq(true));
 }
 
 TEST_F(
@@ -1534,19 +1567,21 @@ TEST_F(
                 testing::StrEq("-" + std::string{short_opt}));
 }
 
-TEST_F(optionT,
-       pathParamOptionConstructMandatoryLongCStringAndCallValidateFunc) {
+TEST_F(
+    optionT,
+    pathParamOptionConstructMandatoryLongCStringAndCallValidateValueAndGivenFunc) {
     clapp::option::path_param_option_t opt{
         tp, long_opt_cstr, opt_desc_str,
         option_test_parser_t::purpose_t::mandatory};
-    std::optional<option_test_parser_t::validate_func_t> option_validate_func{
-        get_validate_func(tp, long_opt_cstr)};
-    ASSERT_THAT(option_validate_func, testing::Ne(std::nullopt));
-    ASSERT_THROW(option_validate_func.value()(),
-                 clapp::exception::option_param_exception_t);
-    get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
-        tp, long_opt_cstr)(long_opt_cstr, value_str_path);
-    ASSERT_NO_THROW(option_validate_func.value()());
+    option_test_parser_t::validate_value_func_t option_validate_value_func{
+        get_validate_value_func(tp, long_opt_cstr)};
+    ASSERT_NO_THROW(option_validate_value_func("option-str"));
+    ASSERT_THAT(get_given_func(tp, long_opt_cstr)(), testing::Eq(false));
+    ASSERT_NO_THROW(
+        get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+            tp, long_opt_cstr)(long_opt_cstr, value_str_path));
+    ASSERT_NO_THROW(option_validate_value_func("option-str"));
+    ASSERT_THAT(get_given_func(tp, long_opt_cstr)(), testing::Eq(true));
 }
 
 TEST_F(
@@ -1731,32 +1766,42 @@ TEST_F(
         clapp::exception::invalid_value_t);
 }
 
-TEST_F(optionT, int64ParamOptionConstructShortOptionalNoValidateFunc) {
+TEST_F(optionT,
+       int64ParamOptionConstructShortOptionalAndCallValidateValueAndGivenFunc) {
     clapp::option::int64_param_option_t opt{
         tp, short_opt, opt_desc_str, option_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, short_opt), testing::Eq(std::nullopt));
+    option_test_parser_t::validate_value_func_t option_validate_value_func{
+        get_validate_value_func(tp, short_opt)};
+    ASSERT_NO_THROW(option_validate_value_func("option-str"));
+    ASSERT_THAT(get_given_func(tp, short_opt)(), testing::Eq(false));
 }
 
-TEST_F(optionT, int64ParamOptionConstructLongOptionalNoValidateFunc) {
+TEST_F(optionT,
+       int64ParamOptionConstructLongOptionalAndCallValidateValueAndGivenFunc) {
     clapp::option::int64_param_option_t opt{
         tp, long_opt_str, opt_desc_str,
         option_test_parser_t::purpose_t::optional};
-    ASSERT_THAT(get_validate_func(tp, long_opt_str), testing::Eq(std::nullopt));
+    option_test_parser_t::validate_value_func_t option_validate_value_func{
+        get_validate_value_func(tp, long_opt_str)};
+    ASSERT_NO_THROW(option_validate_value_func("option-str"));
+    ASSERT_THAT(get_given_func(tp, long_opt_str)(), testing::Eq(false));
 }
 
-TEST_F(optionT, int64ParamOptionConstructMandatoryShortAndCallValidateFunc) {
+TEST_F(
+    optionT,
+    int64ParamOptionConstructMandatoryShortAndCallValidateValueAndGivenFunc) {
     clapp::option::int64_param_option_t opt{
         tp, short_opt, opt_desc_str,
         option_test_parser_t::purpose_t::mandatory};
-    std::optional<option_test_parser_t::validate_func_t> option_validate_func{
-        get_validate_func(tp, short_opt)};
-    ASSERT_THAT(option_validate_func, testing::Ne(std::nullopt));
-    ASSERT_THROW(option_validate_func.value()(),
-                 clapp::exception::option_param_exception_t);
+    option_test_parser_t::validate_value_func_t option_validate_value_func{
+        get_validate_value_func(tp, short_opt)};
+    ASSERT_NO_THROW(option_validate_value_func("option-str"));
+    ASSERT_THAT(get_given_func(tp, short_opt)(), testing::Eq(false));
     ASSERT_NO_THROW(
         (get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
             tp, short_opt)(short_opt, std::to_string(value_int64))));
-    ASSERT_NO_THROW(option_validate_func.value()());
+    ASSERT_NO_THROW(option_validate_value_func("option-str"));
+    ASSERT_THAT(get_given_func(tp, short_opt)(), testing::Eq(true));
 }
 
 TEST_F(
@@ -1767,29 +1812,34 @@ TEST_F(
     clapp::option::int64_param_option_t opt{
         tp, std::vector<std::string>{long_opt_str}, short_opt, opt_desc_str,
         clapp::value::min_max_value_t<std::int64_t>{min_value, max_value}};
-    std::optional<option_test_parser_t::validate_func_t> option_validate_func{
-        get_validate_func(tp, long_opt_str)};
-    ASSERT_THAT(option_validate_func, testing::Ne(std::nullopt));
-    get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
-        tp, long_opt_str)(long_opt_str, std::to_string(value_int32));
-    ASSERT_THROW((option_validate_func.value()()),
+    option_test_parser_t::validate_value_func_t option_validate_value_func{
+        get_validate_value_func(tp, long_opt_str)};
+    ASSERT_NO_THROW(
+        get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+            tp, long_opt_str)(long_opt_str, std::to_string(value_int32)));
+    ASSERT_THROW((option_validate_value_func("option-str")),
                  clapp::exception::out_of_range_t);
-    get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
-        tp, long_opt_str)(long_opt_str, std::to_string(value_int8));
-    ASSERT_NO_THROW((option_validate_func.value()()));
-    get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
-        tp, long_opt_str)(long_opt_str, std::to_string(max_value));
-    ASSERT_NO_THROW((option_validate_func.value()()));
-    get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
-        tp, long_opt_str)(long_opt_str, std::to_string(min_value));
-    ASSERT_NO_THROW((option_validate_func.value()()));
-    get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
-        tp, long_opt_str)(long_opt_str, std::to_string(max_value + 1));
-    ASSERT_THROW((option_validate_func.value()()),
+    ASSERT_NO_THROW(
+        get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+            tp, long_opt_str)(long_opt_str, std::to_string(value_int8)));
+    ASSERT_NO_THROW((option_validate_value_func("option-str")));
+    ASSERT_NO_THROW(
+        get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+            tp, long_opt_str)(long_opt_str, std::to_string(max_value)));
+    ASSERT_NO_THROW((option_validate_value_func("option-str")));
+    ASSERT_NO_THROW(
+        get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+            tp, long_opt_str)(long_opt_str, std::to_string(min_value)));
+    ASSERT_NO_THROW((option_validate_value_func("option-str")));
+    ASSERT_NO_THROW(
+        get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+            tp, long_opt_str)(long_opt_str, std::to_string(max_value + 1)));
+    ASSERT_THROW((option_validate_value_func("option-str")),
                  clapp::exception::out_of_range_t);
-    get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
-        tp, long_opt_str)(long_opt_str, std::to_string(min_value - 1));
-    ASSERT_THROW((option_validate_func.value()()),
+    ASSERT_NO_THROW(
+        get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+            tp, long_opt_str)(long_opt_str, std::to_string(min_value - 1)));
+    ASSERT_THROW((option_validate_value_func("option-str")),
                  clapp::exception::out_of_range_t);
 }
 
@@ -1806,7 +1856,9 @@ TEST_F(
     ASSERT_THAT(opt, ParamOptionGiven(value_int64));
 }
 
-TEST_F(optionT, int64ParamOptionConstructMandatoryNotNullValue) {
+TEST_F(
+    optionT,
+    int64ParamOptionConstructMandatoryNotNullValueAndCallValidateValueAndGivenFunc) {
     clapp::option::int64_param_option_t opt{
         tp,
         long_opt_str,
@@ -1814,15 +1866,17 @@ TEST_F(optionT, int64ParamOptionConstructMandatoryNotNullValue) {
         opt_desc_str,
         option_test_parser_t::purpose_t::mandatory,
         clapp::value::not_null_value_t<std::int64_t>{}};
-    std::optional<option_test_parser_t::validate_func_t> option_validate_func{
-        get_validate_func(tp, long_opt_str)};
-    get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
-        tp, long_opt_str)(long_opt_str, std::to_string(0));
-    ASSERT_THROW((option_validate_func.value()()),
+    option_test_parser_t::validate_value_func_t option_validate_value_func{
+        get_validate_value_func(tp, long_opt_str)};
+    ASSERT_NO_THROW(
+        get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+            tp, long_opt_str)(long_opt_str, std::to_string(0)));
+    ASSERT_THROW((option_validate_value_func("option-str")),
                  clapp::exception::out_of_range_t);
-    get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
-        tp, long_opt_str)(long_opt_str, std::to_string(value_int64));
-    ASSERT_NO_THROW(option_validate_func.value()());
+    ASSERT_NO_THROW(
+        get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+            tp, long_opt_str)(long_opt_str, std::to_string(value_int64)));
+    ASSERT_NO_THROW(option_validate_value_func("option-str"));
 }
 
 TEST_F(optionT, int32ParamOptionConstructLongStringAndShortAndCallShortOpt) {
@@ -2329,18 +2383,21 @@ TEST_F(
 
 TEST_F(
     optionT,
-    vectorStringParamOptionConstructMandatoryLongCStringAndCallValidateFunc) {
+    vectorStringParamOptionConstructMandatoryLongCStringAndCallValidateValueAndGivenFunc) {
     clapp::option::vector_string_param_option_t opt{
         tp, long_opt_cstr, opt_desc_str,
         option_test_parser_t::purpose_t::mandatory};
-    std::optional<option_test_parser_t::validate_func_t> option_validate_func{
-        get_validate_func(tp, long_opt_cstr)};
-    ASSERT_THAT(option_validate_func, testing::Ne(std::nullopt));
-    ASSERT_THROW(option_validate_func.value()(),
-                 clapp::exception::option_param_exception_t);
-    get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
-        tp, long_opt_cstr)(long_opt_cstr, value_str);
-    ASSERT_NO_THROW(option_validate_func.value()());
+
+    option_test_parser_t::validate_value_func_t option_validate_value_func{
+        get_validate_value_func(tp, long_opt_cstr)};
+    ASSERT_NO_THROW(option_validate_value_func("option-str"));
+    ASSERT_THAT(get_given_func(tp, long_opt_cstr)(), testing::Eq(false));
+
+    ASSERT_NO_THROW(
+        get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+            tp, long_opt_cstr)(long_opt_cstr, value_str));
+    ASSERT_NO_THROW(option_validate_value_func("option-str"));
+    ASSERT_THAT(get_given_func(tp, long_opt_cstr)(), testing::Eq(true));
 }
 
 #ifdef CLAPP_FS_AVAIL
@@ -2547,19 +2604,22 @@ TEST_F(
                 testing::StrEq("-" + std::string{short_opt}));
 }
 
-TEST_F(optionT,
-       vectorPathParamOptionConstructMandatoryLongCStringAndCallValidateFunc) {
+TEST_F(
+    optionT,
+    vectorPathParamOptionConstructMandatoryLongCStringAndCallValidateValueAndGivenFunc) {
     clapp::option::vector_path_param_option_t opt{
         tp, long_opt_cstr, opt_desc_str,
         option_test_parser_t::purpose_t::mandatory};
-    std::optional<option_test_parser_t::validate_func_t> option_validate_func{
-        get_validate_func(tp, long_opt_cstr)};
-    ASSERT_THAT(option_validate_func, testing::Ne(std::nullopt));
-    ASSERT_THROW(option_validate_func.value()(),
-                 clapp::exception::option_param_exception_t);
-    get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
-        tp, long_opt_cstr)(long_opt_cstr, value_str_path);
-    ASSERT_NO_THROW(option_validate_func.value()());
+    option_test_parser_t::validate_value_func_t option_validate_value_func{
+        get_validate_value_func(tp, long_opt_cstr)};
+    ASSERT_NO_THROW(option_validate_value_func("option-str"));
+    ASSERT_THAT(get_given_func(tp, long_opt_cstr)(), testing::Eq(false));
+
+    ASSERT_NO_THROW(
+        get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+            tp, long_opt_cstr)(long_opt_cstr, value_str_path));
+    ASSERT_NO_THROW(option_validate_value_func("option-str"));
+    ASSERT_THAT(get_given_func(tp, long_opt_cstr)(), testing::Eq(true));
 }
 #endif
 
@@ -2758,20 +2818,21 @@ TEST_F(
         clapp::exception::invalid_value_t);
 }
 
-TEST_F(optionT,
-       vectorInt64ParamOptionConstructMandatoryShortAndCallValidateFunc) {
+TEST_F(
+    optionT,
+    vectorInt64ParamOptionConstructMandatoryShortAndCallValidateValueAndGivenFunc) {
     clapp::option::vector_int64_param_option_t opt{
         tp, short_opt, opt_desc_str,
         option_test_parser_t::purpose_t::mandatory};
-    std::optional<option_test_parser_t::validate_func_t> option_validate_func{
-        get_validate_func(tp, short_opt)};
-    ASSERT_THAT(option_validate_func, testing::Ne(std::nullopt));
-    ASSERT_THROW(option_validate_func.value()(),
-                 clapp::exception::option_param_exception_t);
+    option_test_parser_t::validate_value_func_t option_validate_value_func{
+        get_validate_value_func(tp, short_opt)};
+    ASSERT_NO_THROW(option_validate_value_func("option-str"));
+    ASSERT_THAT(get_given_func(tp, short_opt)(), testing::Eq(false));
     ASSERT_NO_THROW(
         (get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
             tp, short_opt)(short_opt, std::to_string(value_int64))));
-    ASSERT_NO_THROW(option_validate_func.value()());
+    ASSERT_NO_THROW(option_validate_value_func("option-str"));
+    ASSERT_THAT(get_given_func(tp, short_opt)(), testing::Eq(true));
 }
 
 TEST_F(
@@ -2782,28 +2843,33 @@ TEST_F(
     clapp::option::vector_int64_param_option_t opt{
         tp, std::vector<std::string>{long_opt_str}, short_opt, opt_desc_str,
         clapp::value::min_max_value_t<std::int64_t>{min_value, max_value}};
-    std::optional<option_test_parser_t::validate_func_t> option_validate_func{
-        get_validate_func(tp, long_opt_str)};
-    ASSERT_THAT(option_validate_func, testing::Ne(std::nullopt));
-    get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
-        tp, long_opt_str)(long_opt_str, std::to_string(value_int32));
-    ASSERT_THROW((option_validate_func.value()()),
+    option_test_parser_t::validate_value_func_t option_validate_value_func{
+        get_validate_value_func(tp, long_opt_str)};
+    ASSERT_NO_THROW(option_validate_value_func("option-str"));
+    ASSERT_THAT(get_given_func(tp, long_opt_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(
+        get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+            tp, long_opt_str)(long_opt_str, std::to_string(value_int32)));
+    ASSERT_THROW(option_validate_value_func("option-str"),
                  clapp::exception::out_of_range_t);
+    ASSERT_THAT(get_given_func(tp, long_opt_str)(), testing::Eq(true));
 }
 
-TEST_F(optionT, vectorInt64ParamOptionConstructNotNullValue) {
+TEST_F(optionT,
+       vectorInt64ParamOptionConstructAndCallValidateValueAndGivenFunc) {
     clapp::option::int64_param_option_t opt{
         tp, long_opt_str, short_opt, opt_desc_str,
         clapp::value::not_null_value_t<std::int64_t>{}};
-    std::optional<option_test_parser_t::validate_func_t> option_validate_func{
-        get_validate_func(tp, long_opt_str)};
-    get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
-        tp, long_opt_str)(long_opt_str, std::to_string(value_int32));
-    ASSERT_NO_THROW(option_validate_func.value()());
-    get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
-        tp, long_opt_str)(long_opt_str, std::to_string(0));
-    ASSERT_THROW((option_validate_func.value()()),
+    option_test_parser_t::validate_value_func_t option_validate_value_func{
+        get_validate_value_func(tp, long_opt_str)};
+    ASSERT_NO_THROW(option_validate_value_func("option-str"));
+    ASSERT_THAT(get_given_func(tp, long_opt_str)(), testing::Eq(false));
+    ASSERT_NO_THROW(
+        get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
+            tp, long_opt_str)(long_opt_str, std::to_string(0)));
+    ASSERT_THROW(option_validate_value_func("option-str"),
                  clapp::exception::out_of_range_t);
+    ASSERT_THAT(get_given_func(tp, long_opt_str)(), testing::Eq(true));
 }
 
 TEST_F(optionT,
@@ -3098,12 +3164,13 @@ TEST_F(optionT, invalidShortOptionConstruct) {
                  clapp::exception::option_exception_t);
 }
 
-TEST_F(optionT, genOptValidateFuncWithoutValueFuncAndCallValidateFuncThrows) {
+TEST_F(optionT,
+       genOptValidateFuncWithoutValueFuncAndCallValidateValueFuncThrows) {
     constexpr std::int32_t return_value{10};
-    std::optional<option_test_parser_t::validate_func_t> validate_func{
-        clapp::option::gen_opt_validate_func<std::int32_t, int32_value_func_t>(
+    option_test_parser_t::validate_value_func_t validate_func{
+        clapp::option::gen_opt_validate_value_func<std::int32_t,
+                                                   int32_value_func_t>(
             []() { return return_value; }, []() { return true; },
-            []() { return true; },
             std::vector<int32_validate_func_t>{
                 [](const std::int32_t& value,
                    const std::string& option_string) {
@@ -3113,19 +3180,17 @@ TEST_F(optionT, genOptValidateFuncWithoutValueFuncAndCallValidateFuncThrows) {
                     if (value != return_value) {
                         throw std::runtime_error{"value invalid"};
                     }
-                }},
-            "option string", option_test_parser_t::purpose_t::mandatory)};
-    ASSERT_THAT(validate_func.has_value(), testing::Eq(true));
-    ASSERT_NO_THROW((*validate_func)());
+                }})};
+    ASSERT_THROW(validate_func("option-str"), std::runtime_error);
 }
 
 TEST_F(optionT,
-       genOptValidateFuncWithoutHasValueFuncAndCallValidateFuncDoesntThrow) {
+       genOptValidateFuncWithoutValueFuncAndCallValidateValueFuncDoesntThrow) {
     constexpr std::int32_t return_value{10};
-    std::optional<option_test_parser_t::validate_func_t> validate_func{
-        clapp::option::gen_opt_validate_func<std::int32_t, int32_value_func_t>(
+    option_test_parser_t::validate_value_func_t validate_func{
+        clapp::option::gen_opt_validate_value_func<std::int32_t,
+                                                   int32_value_func_t>(
             []() { return return_value; }, []() { return true; },
-            []() { return true; },
             std::vector<int32_validate_func_t>{
                 [](const std::int32_t& value,
                    const std::string& option_string) {
@@ -3135,8 +3200,6 @@ TEST_F(optionT,
                     if (value != return_value) {
                         throw std::runtime_error{"value invalid"};
                     }
-                }},
-            "option string", option_test_parser_t::purpose_t::mandatory)};
-    ASSERT_THAT(validate_func.has_value(), testing::Eq(true));
-    ASSERT_NO_THROW((*validate_func)());
+                }})};
+    ASSERT_NO_THROW(validate_func("option string"));
 }
