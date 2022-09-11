@@ -561,7 +561,7 @@ to this current main-parser instance. If a sub-parser was selected it would retu
 this sub-parser.
 
 ### Example code listing for a main parser:
-The following code-listing illustrates a very basic example of a main parser with an option and a
+The following code-listing illustrates a very basic example of a main parser with several options and a
 string argument:
 
 [//]:#begin_cpp_listing_simple_main_parser
@@ -577,6 +577,10 @@ class cli_parser_t : public clapp::basic_main_parser_t {
     ~cli_parser_t() override;
 
     clapp::help_option_t help{*this, "help", 'h', "Show help options."};
+
+    clapp::bool_option_t bool_opt{*this, "bool", 'b', "Bool option."};
+
+    clapp::string_param_option_t string_opt{*this, "str", 's', "String option."};
 
     clapp::string_argument_t string_arg{*this, "string-arg", "String argument"};
 
@@ -598,6 +602,9 @@ int main(int argc, char *argv[]) {
             return exit.value().get_exit_code();
         }
         Ensures(clip.string_arg);  // parser ensures mandatory arguments are given
+        Ensures(clip.bool_opt);  // parser ensures mandatory bool-option is given
+        Ensures(clip.string_opt);  // parser ensures mandatory string-option is given
+        std::cout << "string-opt: " << clip.string_opt.value() << std::endl;
         std::cout << "string-arg: " << clip.string_arg.value() << std::endl;
     } catch (std::exception &e) {
         std::cout << "Caught Exception: " << e.what() << std::endl;
@@ -619,21 +626,28 @@ If the previous example listing is executed, you get the following output:
 # Print the help message:
 $ ./libclapp_doc_simple_main_parser -h  # this is the same as with option `--help`
 Usage:
-./libclapp_doc_simple_main_parser [-h|--help] <string-arg>
+./libclapp_doc_simple_main_parser [-h|--help] -b|--bool -s|--str=<param> <string-arg>
 
   Arguments:
-    string-arg String argument (mandatory)
+    string-arg       String argument (mandatory)
 
   Options:
-    -h|--help  Show help options. (optional)
+    -h|--help        Show help options. (optional)
+    -b|--bool        Bool option. (mandatory)
+    -s|--str=<param> String option. (mandatory)
 
-# Give mandatory argument:
-$ ./libclapp_doc_simple_main_parser my-string
-string-arg: my-string
+# Give mandatory arguments and options:
+$ ./libclapp_doc_simple_main_parser -b -s "my-string-opt" my-string-arg
+string-opt: my-string-opt
+string-arg: my-string-arg
 
 # Give no mandatory argument throws:
-$ ./libclapp_doc_simple_main_parser
+$ ./libclapp_doc_simple_main_parser -b -s "my-string-opt"
 Caught Exception: Mandatory argument 'string-arg' not given.
+
+# Give no mandatory option throws:
+$ ./libclapp_doc_simple_main_parser -b my-string-arg
+Caught Exception: Only the following mandatory options '-b|--bool' were given, but at least the following options are required: '-b|--bool', '-s|--str'
 
 ```
 [//]:#end_calls_simple_main_parser
