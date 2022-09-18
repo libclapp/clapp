@@ -11,7 +11,7 @@ endif()
 if(libClaPP_CLANG_TIDY_BIN)
     ### default
     message(STATUS "clang-tidy found: ${libClaPP_CLANG_TIDY_BIN}")
-    set(libClaPP_CLANG_TIDY_HEADER_FILTER CACHE STRING ".*/src/include/clapp./*")
+    set(libClaPP_CLANG_TIDY_HEADER_FILTER ".*/(include/clapp/.*\.h|include/clapp/.*\.hpp|tests.*\.h)\$" CACHE STRING "Header-Filter used for clang-tidy")
     list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST "*")
 
     list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -modernize-use-trailing-return-type)
@@ -74,6 +74,7 @@ if(libClaPP_CLANG_TIDY_BIN)
     list(APPEND libClaPP_CLANG_TIDY_CHECKS_GTEST_LIST -hicpp-avoid-c-arrays)
     list(APPEND libClaPP_CLANG_TIDY_CHECKS_GTEST_LIST -hicpp-vararg)
     list(APPEND libClaPP_CLANG_TIDY_CHECKS_GTEST_LIST -hicpp-special-member-functions)
+    list(APPEND libClaPP_CLANG_TIDY_CHECKS_GTEST_LIST -llvm-header-guard)
 
     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "12.0.0")
         list(APPEND libClaPP_CLANG_TIDY_CHECKS_GTEST_LIST -readability-function-cognitive-complexity)
