@@ -1,5 +1,5 @@
 if(NOT libClaPP_CLANG_TIDY_BIN)
-	find_program(libClaPP_CLANG_TIDY_BIN NAMES "clang-tidy" DOC "Path to clang-tidy executable")
+    find_program(libClaPP_CLANG_TIDY_BIN NAMES "clang-tidy" DOC "Path to clang-tidy executable")
 
     if(NOT libClaPP_CLANG_TIDY_BIN)
         message(STATUS "clang-tidy not found.")
