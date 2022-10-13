@@ -37,71 +37,35 @@ struct is_vector : std::false_type {};
 template <typename T, typename A>
 struct is_vector<std::vector<T, A>> : std::true_type {};
 
-template <typename T>
-class has_append_restriction_text {
-   private:
-    template <typename C>
-    constexpr static bool test(
-        [[maybe_unused]] decltype(&C::append_restriction_text) func) {
-        return true;
-    }
-    template <typename C>
-    constexpr static bool test(...) {
-        return false;
-    }
-
-   public:
-    constexpr static bool value{test<T>(nullptr)};
-};
+template <typename T, typename = void>
+struct has_append_restriction_text : std::false_type {};
 
 template <typename T>
-class has_validate {
-   private:
-    template <typename C>
-    constexpr static bool test([[maybe_unused]] decltype(&C::validate) func) {
-        return true;
-    }
-    template <typename C>
-    constexpr static bool test(...) {
-        return false;
-    }
+struct has_append_restriction_text<
+    T, decltype(void(std::declval<T &>().append_restriction_text()))>
+    : std::true_type {};
 
-   public:
-    constexpr static bool value{test<T>(nullptr)};
-};
+template <typename T, typename V, typename = void>
+struct has_validate : std::false_type {};
 
-template <typename T>
-class has_default_value {
-   private:
-    template <typename C>
-    constexpr static bool test(
-        [[maybe_unused]] decltype(&C::default_value) func) {
-        return true;
-    }
-    template <typename C>
-    constexpr static bool test(...) {
-        return false;
-    }
+template <typename T, typename V>
+struct has_validate<
+    T, V, decltype(void(std::declval<T &>().validate(V{}, std::string{})))>
+    : std::true_type {};
 
-   public:
-    constexpr static bool value{test<T>(nullptr)};
-};
+template <typename T, typename = void>
+struct has_default_value : std::false_type {};
 
 template <typename T>
-class has_found {
-   private:
-    template <typename C>
-    constexpr static bool test([[maybe_unused]] decltype(&C::found) func) {
-        return true;
-    }
-    template <typename C>
-    constexpr static bool test(...) {
-        return false;
-    }
+struct has_default_value<T, decltype(void(std::declval<T &>().default_value()))>
+    : std::true_type {};
 
-   public:
-    constexpr static bool value{test<T>(nullptr)};
-};
+template <typename T, typename = void>
+struct has_found : std::false_type {};
+
+template <typename T>
+struct has_found<T, decltype(void(std::declval<T &>().found(std::string{})))>
+    : std::true_type {};
 
 }  // namespace type_traits
 
