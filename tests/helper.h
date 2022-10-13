@@ -1,5 +1,5 @@
-#ifndef TESTS_HELPER_H
-#define TESTS_HELPER_H
+#ifndef CLAPP_TESTS_HELPER_H
+#define CLAPP_TESTS_HELPER_H
 
 template <typename ARG, typename T>
 bool compare_value(const ARG& arg, const T& value,
@@ -11,7 +11,7 @@ bool compare_value(const ARG& arg, const T& value,
                          << " == " << value << " (approx, " << epsilon << "))";
         return ret;
     } else if constexpr (std::is_same<T, float>::value) {
-        const float epsilon{0.01f};
+        const float epsilon{0.01F};
         const bool ret{std::fabs(arg - value) < epsilon};
         *result_listener << (ret ? "true" : "false") << " (" << arg
                          << " == " << value << " (approx, " << epsilon << "))";
