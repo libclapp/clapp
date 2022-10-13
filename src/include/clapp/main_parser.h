@@ -26,6 +26,13 @@ class basic_main_parser_t : public basic_parser_t {
     basic_main_parser_t();
     ~basic_main_parser_t() override;
 
+    // TODO(martinw): enable, if basic_parser has implemented this too
+    basic_main_parser_t(const basic_main_parser_t& inst) = delete;
+    basic_main_parser_t(basic_main_parser_t&& inst) noexcept = delete;
+    basic_main_parser_t& operator=(const basic_main_parser_t& inst) = delete;
+    basic_main_parser_t& operator=(basic_main_parser_t&& inst) noexcept =
+        delete;
+
     using basic_parser_t::parse;
     [[nodiscard]] std::optional<clapp::value::exit_t> parse(
         int argc, const char* const* argv);
