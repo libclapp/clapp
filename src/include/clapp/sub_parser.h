@@ -27,6 +27,12 @@ class basic_sub_parser_t : public basic_parser_t {
                        std::string description_arg);
     ~basic_sub_parser_t() override;
 
+    // TODO(martinw): enable, if basic_parser has implemented this too
+    basic_sub_parser_t(const basic_sub_parser_t& inst) = delete;
+    basic_sub_parser_t(basic_sub_parser_t&& inst) noexcept = delete;
+    basic_sub_parser_t& operator=(const basic_sub_parser_t& inst) = delete;
+    basic_sub_parser_t& operator=(basic_sub_parser_t&& inst) noexcept = delete;
+
     [[nodiscard]] inline bool is_active() const noexcept override;
     [[nodiscard]] constexpr explicit operator bool() const noexcept;
 
