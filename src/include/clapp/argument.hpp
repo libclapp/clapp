@@ -62,7 +62,7 @@ void clapp::argument::gen_arg_conf_process_params(arg_params_t<T>& arg_params,
     if constexpr (has_default_value<typename std::decay<Param>::type>::value) {
         arg_params.default_value = param.default_value();
     }
-    if constexpr (has_validate<typename std::decay<Param>::type>::value) {
+    if constexpr (has_validate<typename std::decay<Param>::type, T>::value) {
         arg_params.validate_funcs.push_back(
             [param](const T& value, const std::string& argument_name) {
                 param.validate(value, argument_name);

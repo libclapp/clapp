@@ -54,7 +54,7 @@ void clapp::option::gen_opt_conf_process_params(opt_params_t<T>& opt_params,
     if constexpr (has_default_value<typename std::decay<Param>::type>::value) {
         opt_params.default_value = param.default_value();
     }
-    if constexpr (has_validate<typename std::decay<Param>::type>::value) {
+    if constexpr (has_validate<typename std::decay<Param>::type, T>::value) {
         opt_params.validate_funcs.push_back(
             [param](const T& value, const std::string& option_string) {
                 param.validate(value, option_string);
