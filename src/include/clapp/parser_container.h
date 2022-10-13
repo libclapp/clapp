@@ -34,14 +34,14 @@ class basic_parser_container_t {
     to_string_view(state_t state) noexcept;
 
     template <typename... ARGS_T>
-    basic_parser_container_t(ARGS_T&&...);
+    explicit basic_parser_container_t(ARGS_T&&... args);
 
     template <typename... ARGS_T>
-    [[nodiscard]] std::optional<clapp::value::exit_t> parse(ARGS_T&&...);
+    [[nodiscard]] std::optional<clapp::value::exit_t> parse(ARGS_T&&... args);
 
     template <typename... ARGS_T>
     [[nodiscard]] std::optional<clapp::value::exit_t> parse_and_validate(
-        ARGS_T&&...);
+        ARGS_T&&... args);
 
     [[nodiscard]] parser_t* operator->();
     [[nodiscard]] parser_t& operator*();
