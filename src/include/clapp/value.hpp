@@ -24,7 +24,8 @@
 #include <sstream>
 
 template <typename T>
-clapp::value::default_value_t<T>::default_value_t(T _value) : value{_value} {}
+clapp::value::default_value_t<T>::default_value_t(T _value)
+    : value{std::move(_value)} {}
 
 template <typename T>
 constexpr const char* clapp::value::get_chrono_postfix() noexcept {
