@@ -79,7 +79,7 @@ class exit_t {
     [[nodiscard]] constexpr int get_exit_code() const noexcept;
 
    private:
-    constexpr exit_t(int exit_code_param) noexcept;
+    constexpr explicit exit_t(int exit_code_param) noexcept;
 
     int exit_code;
 };
