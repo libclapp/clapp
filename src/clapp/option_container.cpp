@@ -267,31 +267,17 @@ void clapp::parser::basic_option_container_t::validate_options_and(
     for (const auto& option : options->options) {
         std::visit(
             [&given_and_options, &given_xor_option,
-             &exclusive_or_options](auto&& opt) {
-                std::cout << "validate_options_and() iter: " << opt.option_string
-                          << std::endl;
+             &xor_options_str](auto&& opt) {
                 if (opt.purpose == parser::types::purpose_t::mandatory) {
                     if (opt.given_func()) {
                         if (given_xor_option) {
-                            const std::string exclusive_or_options_str{
-                                std::accumulate(
-                                    exclusive_or_options.value().begin(),
-                                    exclusive_or_options.value().end(),
-                                    std::string{},
-                                    [](std::string& lhs,
-                                       const std::string& rhs) {
-                                        return lhs.empty()
-                                                   ? ("'" + rhs + "'")
-                                                   : (lhs + ", '" + rhs + "'");
-                                    })};
-
-                            throw clapp::exception::option_param_exception_t{
+                            Expects(!xor_options_str.empty());
+                            throw clapp::exception::option_exception_t{
                                 std::string{"Mutually exclusive option '"} +
                                 opt.option_string + "' given, but option '" +
                                 given_xor_option.value() +
                                 "' was also given! The following options " +
-                                exclusive_or_options_str +
-                                " are mutual exclusive."};
+                                xor_options_str + " are mutual exclusive."};
                         }
                         given_and_options.value().push_back(opt.option_string);
                     }
