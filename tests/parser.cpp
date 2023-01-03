@@ -336,6 +336,96 @@ std::string container_parser_t::gen_short_line_prefix() const {
     return "container-parser " + gen_short_line();
 }
 
+class container_parser_and_t : public clapp::basic_parser_t {
+   public:
+    using clapp::basic_parser_t::basic_parser_t;
+    container_parser_and_t();
+    ~container_parser_and_t() override;
+
+    class container_t : public clapp::option_container_t {
+       public:
+        using clapp::option_container_t::option_container_t;
+        ~container_t() override;
+
+        static constexpr std::int32_t min_int{10};
+        static constexpr std::int32_t max_int{200};
+
+        clapp::option::bool_option_t bool_option{
+            *this, "bool", 'b', "Bool option.",
+            clapp::parser::types::purpose_t::mandatory};
+
+        clapp::option::int32_param_option_t int_option{
+            *this,
+            "int",
+            'i',
+            "Int option.",
+            clapp::value::min_max_value_t<std::int32_t>{min_int, max_int},
+            clapp::parser::types::purpose_t::mandatory};
+    };
+
+    container_t container{
+        *this, clapp::parser::types::logic_operator_type_t::logic_xor};
+
+    [[nodiscard]] std::string gen_short_line_prefix() const override;
+};
+
+container_parser_and_t::container_parser_and_t()
+    : clapp::basic_parser_t{
+          clapp::parser::types::logic_operator_type_t::logic_and} {}
+
+container_parser_and_t::container_t::~container_t() = default;
+
+container_parser_and_t::~container_parser_and_t() = default;
+
+std::string container_parser_and_t::gen_short_line_prefix() const {
+    return "container-parser-and " + gen_short_line();
+}
+
+class container_parser_xor_t : public clapp::basic_parser_t {
+   public:
+    using clapp::basic_parser_t::basic_parser_t;
+    container_parser_xor_t();
+    ~container_parser_xor_t() override;
+
+    class container_t : public clapp::option_container_t {
+       public:
+        using clapp::option_container_t::option_container_t;
+        ~container_t() override;
+
+        static constexpr std::int32_t min_int{10};
+        static constexpr std::int32_t max_int{200};
+
+        clapp::option::bool_option_t bool_option{
+            *this, "bool", 'b', "Bool option.",
+            clapp::parser::types::purpose_t::mandatory};
+
+        clapp::option::int32_param_option_t int_option{
+            *this,
+            "int",
+            'i',
+            "Int option.",
+            clapp::value::min_max_value_t<std::int32_t>{min_int, max_int},
+            clapp::parser::types::purpose_t::mandatory};
+    };
+
+    container_t container{
+        *this, clapp::parser::types::logic_operator_type_t::logic_and};
+
+    [[nodiscard]] std::string gen_short_line_prefix() const override;
+};
+
+container_parser_xor_t::container_parser_xor_t()
+    : clapp::basic_parser_t{
+          clapp::parser::types::logic_operator_type_t::logic_xor} {}
+
+container_parser_xor_t::container_t::~container_t() = default;
+
+container_parser_xor_t::~container_parser_xor_t() = default;
+
+std::string container_parser_xor_t::gen_short_line_prefix() const {
+    return "container-parser-xor " + gen_short_line();
+}
+
 class nested_container_parser_t : public clapp::basic_parser_t {
    public:
     using clapp::basic_parser_t::basic_parser_t;
@@ -369,20 +459,16 @@ class nested_container_parser_t : public clapp::basic_parser_t {
                 *this, "str", 's', "String option.",
                 clapp::parser::types::purpose_t::mandatory};
 
-            // TODO: ensure that xor-containers don't contain optional options
-            // TODO: change default purpose to mandatory (don't create a new
-            // `auto`-purpose_t)
-
             clapp::option::bool_option_t bool_option{
                 *this, "bool", 'b', "Bool option.",
                 clapp::parser::types::purpose_t::mandatory};
         };
 
-        test_container_t toc{
-            *this, clapp::parser::types::logic_operator_type_t::logic_xor};
-
         test_container2_t toc2{
             *this, clapp::parser::types::logic_operator_type_t::logic_and};
+
+        test_container_t toc{
+            *this, clapp::parser::types::logic_operator_type_t::logic_xor};
 
         clapp::option::string_param_option_t cont_string_option{
             *this, "cstr", 'c', "Cont String option.",
@@ -441,9 +527,6 @@ class nested_container_parser2_t : public clapp::basic_parser_t {
             clapp::option::string_param_option_t string_option{
                 *this, "str", 's', "String option.",
                 clapp::parser::types::purpose_t::mandatory};
-            // TODO: ensure that xor-containers don't contain optional options
-            // TODO: change default purpose to mandatory (don't create a new
-            // `auto`-purpose_t)
 
             clapp::option::bool_option_t bool_option{
                 *this, "bool", 'b', "Bool option.",
@@ -478,6 +561,71 @@ nested_container_parser2_t::container_t::~container_t() = default;
 nested_container_parser2_t::~nested_container_parser2_t() = default;
 
 std::string nested_container_parser2_t::gen_short_line_prefix() const {
+    return "container-parser " + gen_short_line();
+}
+
+class nested_container_parser3_t : public clapp::basic_parser_t {
+   public:
+    using clapp::basic_parser_t::basic_parser_t;
+    ~nested_container_parser3_t() override;
+
+    class container_t : public clapp::option_container_t {
+       public:
+        using clapp::option_container_t::option_container_t;
+        ~container_t() override;
+
+        class test_container_t : public clapp::option_container_t {
+           public:
+            using clapp::option_container_t::option_container_t;
+            ~test_container_t() override;
+
+            clapp::option::int64_param_option_t int_option{
+                *this, "int", 'i', "Int option.",
+                clapp::parser::types::purpose_t::mandatory};
+
+            clapp::option::uint64_param_option_t uint_option{
+                *this, "uint", 'u', "Unsigned int option.",
+                clapp::parser::types::purpose_t::mandatory};
+        };
+
+        class test_container2_t : public clapp::option_container_t {
+           public:
+            using clapp::option_container_t::option_container_t;
+            ~test_container2_t() override;
+
+            clapp::option::string_param_option_t string_option{
+                *this, "str", 's', "String option.",
+                clapp::parser::types::purpose_t::mandatory};
+        };
+
+        test_container_t toc{
+            *this, clapp::parser::types::logic_operator_type_t::logic_and};
+
+        test_container2_t toc2{
+            *this, clapp::parser::types::logic_operator_type_t::logic_and};
+
+        clapp::option::string_param_option_t cont_string_option{
+            *this, "cstr", 'c', "Cont String option.",
+            clapp::parser::types::purpose_t::mandatory};
+    };
+
+    container_t container{
+        *this, clapp::parser::types::logic_operator_type_t::logic_xor};
+
+    [[nodiscard]] std::string gen_short_line_prefix() const override;
+};
+
+nested_container_parser3_t::container_t::test_container_t::~test_container_t() =
+    default;
+
+nested_container_parser3_t::container_t::test_container2_t::
+    ~test_container2_t() = default;
+
+nested_container_parser3_t::container_t::~container_t() = default;
+
+nested_container_parser3_t::~nested_container_parser3_t() = default;
+
+std::string nested_container_parser3_t::gen_short_line_prefix() const {
     return "container-parser " + gen_short_line();
 }
 
@@ -1505,18 +1653,147 @@ TEST(parser, constructContainerParserAndParseEmptyOptionThrows) {
                  clapp::exception::option_exception_t);
 }
 
+TEST(parser, constructContainerParserAndAndGenHelpMessage) {
+    container_parser_and_t parser;
+    ASSERT_THAT(
+        parser.gen_help_msg(255),
+        testing::StrEq("container-parser-and ( -b|--bool | -i|--int=<param> "
+                       ")\n\n  Options:\n    -b|--bool        Bool option. "
+                       "(mandatory)\n    -i|--int=<param> Int option. "
+                       "(mandatory, constraint: [10,200])\n"));
+}
+
+TEST(parser, constructContainerParserAndAndParseBoolAndIntOptionThrows) {
+    constexpr const char* const argv[]{"--bool", "--int=66", nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    container_parser_and_t parser;
+    ASSERT_THAT(parser.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(parser.container.bool_option, BoolOptionGiven());
+    ASSERT_THAT(parser.container.int_option, ParamOptionGiven(66));
+
+    ASSERT_THROW(parser.validate_recursive(),
+                 clapp::exception::option_exception_t);
+}
+
+TEST(parser, constructContainerParserAndAndParseBoolOptionDoesNotThrow) {
+    constexpr const char* const argv[]{"-b", nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    container_parser_and_t parser;
+    ASSERT_THAT(parser.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(parser.container.bool_option, BoolOptionGiven());
+    ASSERT_THAT(parser.container.int_option, ParamOptionNotGiven());
+
+    ASSERT_NO_THROW(parser.validate_recursive());
+}
+
+TEST(parser, constructContainerParserAndAndParseIntOptionDoesNotThrow) {
+    constexpr const char* const argv[]{"-i", "56", nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    container_parser_and_t parser;
+    ASSERT_THAT(parser.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(parser.container.bool_option, BoolOptionNotGiven());
+    ASSERT_THAT(parser.container.int_option, ParamOptionGiven(56));
+
+    ASSERT_NO_THROW(parser.validate_recursive());
+}
+
+TEST(parser, constructContainerParserAndAndParseEmptyOptionThrows) {
+    constexpr const char* const argv[]{nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    container_parser_and_t parser;
+    ASSERT_THAT(parser.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(parser.container.bool_option, BoolOptionNotGiven());
+    ASSERT_THAT(parser.container.int_option, ParamOptionNotGiven());
+
+    ASSERT_THROW(parser.validate_recursive(),
+                 clapp::exception::option_exception_t);
+}
+
+TEST(parser, constructContainerParserXorAndGenHelpMessage) {
+    container_parser_xor_t parser;
+    ASSERT_THAT(
+        parser.gen_help_msg(255),
+        testing::StrEq("container-parser-xor ( -b|--bool -i|--int=<param> "
+                       ")\n\n  Options:\n    -b|--bool        Bool option. "
+                       "(mandatory)\n    -i|--int=<param> Int option. "
+                       "(mandatory, constraint: [10,200])\n"));
+}
+
+TEST(parser, constructContainerParserXorAndParseBoolAndIntOptionDoesNotThrow) {
+    constexpr const char* const argv[]{"--bool", "--int=66", nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    container_parser_xor_t parser;
+    ASSERT_THAT(parser.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(parser.container.bool_option, BoolOptionGiven());
+    ASSERT_THAT(parser.container.int_option, ParamOptionGiven(66));
+
+    ASSERT_NO_THROW(parser.validate_recursive());
+}
+
+TEST(parser, constructContainerParserXorAndParseBoolOptionThrows) {
+    constexpr const char* const argv[]{"-b", nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    container_parser_xor_t parser;
+    ASSERT_THAT(parser.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(parser.container.bool_option, BoolOptionGiven());
+    ASSERT_THAT(parser.container.int_option, ParamOptionNotGiven());
+
+    ASSERT_THROW(parser.validate_recursive(),
+                 clapp::exception::option_exception_t);
+}
+
+TEST(parser, constructContainerParserXorAndParseIntOptionThrows) {
+    constexpr const char* const argv[]{"-i", "56", nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    container_parser_xor_t parser;
+    ASSERT_THAT(parser.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(parser.container.bool_option, BoolOptionNotGiven());
+    ASSERT_THAT(parser.container.int_option, ParamOptionGiven(56));
+
+    ASSERT_THROW(parser.validate_recursive(),
+                 clapp::exception::option_exception_t);
+}
+
+TEST(parser, constructContainerParserXorAndParseEmptyOptionThrows) {
+    constexpr const char* const argv[]{nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    container_parser_xor_t parser;
+    ASSERT_THAT(parser.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(parser.container.bool_option, BoolOptionNotGiven());
+    ASSERT_THAT(parser.container.int_option, ParamOptionNotGiven());
+
+    ASSERT_THROW(parser.validate_recursive(),
+                 clapp::exception::option_exception_t);
+}
+
 TEST(parser, constructNestedContainerParserAndGenHelpMessage) {
     nested_container_parser_t ncp;
     ASSERT_THAT(
         ncp.gen_help_msg(255),
         testing::StrEq(
-            "container-parser ( -c|--cstr=<param> | ( -i|--int=<param> | "
-            "-u|--uint=<param> ) | ( -s|--str=<param> -b|--bool ) )\n\n  "
+            "container-parser ( -c|--cstr=<param> | ( -s|--str=<param> "
+            "-b|--bool ) | ( -i|--int=<param> | -u|--uint=<param> ) )\n\n  "
             "Options:\n    -c|--cstr=<param> Cont String option. (mandatory)\n "
-            "   -i|--int=<param>  Int option. (mandatory)\n    "
-            "-u|--uint=<param> Unsigned int option. (mandatory)\n    "
-            "-s|--str=<param>  String option. (mandatory)\n    -b|--bool       "
-            "  Bool option. (mandatory)\n"));
+            "   -s|--str=<param>  String option. (mandatory)\n    -b|--bool    "
+            "     Bool option. (mandatory)\n    -i|--int=<param>  Int option. "
+            "(mandatory)\n    -u|--uint=<param> Unsigned int option. "
+            "(mandatory)\n"));
 }
 
 TEST(parser,
@@ -1706,7 +1983,45 @@ TEST(
 
 TEST(
     parser,
-    constructNestedContainerParserAndParseCStrAndBoolShortOptionValidateRecursiveThrows) {
+    constructNestedContainerParserAndParseBoolStrCStrOptionAndValidateRecursiveThrows) {
+    constexpr const char* const argv[]{"-b", "-s=test", "-c=str", nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    nested_container_parser_t ncp;
+    ASSERT_THAT(ncp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(ncp.container.cont_string_option, ParamOptionGiven("str"));
+    ASSERT_THAT(ncp.container.toc.int_option, ParamOptionNotGiven());
+    ASSERT_THAT(ncp.container.toc.uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionGiven("test"));
+    ASSERT_THAT(ncp.container.toc2.bool_option, BoolOptionGiven());
+
+    ASSERT_THROW(ncp.validate_recursive(),
+                 clapp::exception::option_exception_t);
+}
+
+TEST(
+    parser,
+    constructNestedContainerParserAndParseIntBoolAndStrOptionValidateRecursiveThrows) {
+    constexpr const char* const argv[]{"-i", "123", "-b", "-s=test", nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    nested_container_parser_t ncp;
+    ASSERT_THAT(ncp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(ncp.container.cont_string_option, ParamOptionNotGiven());
+    ASSERT_THAT(ncp.container.toc.int_option, ParamOptionGiven(123));
+    ASSERT_THAT(ncp.container.toc.uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionGiven("test"));
+    ASSERT_THAT(ncp.container.toc2.bool_option, BoolOptionGiven());
+
+    ASSERT_THROW(ncp.validate_recursive(),
+                 clapp::exception::option_exception_t);
+}
+
+TEST(
+    parser,
+    constructNestedContainerParserAndParseIntAndBoolShortOptionValidateRecursiveThrows) {
     constexpr const char* const argv[]{"--int=123", "-b", nullptr};
     const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
     nested_container_parser_t ncp;
@@ -1930,6 +2245,56 @@ TEST(
     ASSERT_THAT(ncp.container.toc.uint_option, ParamOptionGiven(123U));
     ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionGiven("str"));
     ASSERT_THAT(ncp.container.toc2.bool_option, BoolOptionNotGiven());
+
+    ASSERT_THROW(ncp.validate_recursive(),
+                 clapp::exception::option_exception_t);
+}
+
+TEST(parser, constructNestedContainerParser3AndGenHelpMessage) {
+    nested_container_parser3_t ncp;
+    ASSERT_THAT(
+        ncp.gen_help_msg(255),
+        testing::StrEq(
+            "container-parser ( -c|--cstr=<param> | ( -i|--int=<param> "
+            "-u|--uint=<param> ) | ( -s|--str=<param> ) )\n\n  Options:\n    "
+            "-c|--cstr=<param> Cont String option. (mandatory)\n    "
+            "-i|--int=<param>  Int option. (mandatory)\n    -u|--uint=<param> "
+            "Unsigned int option. (mandatory)\n    -s|--str=<param>  String "
+            "option. (mandatory)\n"));
+}
+
+TEST(
+    parser,
+    constructNestedContainerParser3AndParseEmptyOptionValidateRecursiveThrows) {
+    constexpr const char* const argv[]{nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    nested_container_parser3_t ncp;
+    ASSERT_THAT(ncp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(ncp.container.cont_string_option, ParamOptionNotGiven());
+    ASSERT_THAT(ncp.container.toc.int_option, ParamOptionNotGiven());
+    ASSERT_THAT(ncp.container.toc.uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionNotGiven());
+
+    ASSERT_THROW(ncp.validate_recursive(),
+                 clapp::exception::option_exception_t);
+}
+
+TEST(
+    parser,
+    constructNestedContainerParser3AndParseIntUintStrBoolOptionValidateRecursiveDoesNotThrow) {
+    constexpr const char* const argv[]{"-i", "12",  "-u",   "123",
+                                       "-s", "str", nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    nested_container_parser3_t ncp;
+    ASSERT_THAT(ncp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(ncp.container.cont_string_option, ParamOptionNotGiven());
+    ASSERT_THAT(ncp.container.toc.int_option, ParamOptionGiven(12));
+    ASSERT_THAT(ncp.container.toc.uint_option, ParamOptionGiven(123U));
+    ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionGiven("str"));
 
     ASSERT_THROW(ncp.validate_recursive(),
                  clapp::exception::option_exception_t);
