@@ -103,13 +103,15 @@ clapp::parser::types::variant_opt_conf_container_t::gen_short_option_line()
          it != containers.cend(); it++) {
         Expects(*it != nullptr);
         if (!short_line.empty()) {
-            short_line += " ";
-        }
-        if (logic_operator_type == logic_operator_type_t::logic_xor) {
-            short_line += "| ";
+            if (logic_operator_type == logic_operator_type_t::logic_xor) {
+                short_line += " | ";
+            } else {
+                short_line += " ";
+            }
         }
         short_line += "( " + (*it)->gen_short_option_line() + " )";
     }
+
     return short_line;
 }
 
