@@ -140,8 +140,8 @@ void clapp::parser::basic_option_container_t::validate_options() const {
         if (!given_xor_option.has_value()) {
             const std::string options_str{options.gen_short_option_line()};
             throw clapp::exception::option_exception_t{
-                std::string{"None of the mutually exclusive options '"} +
-                options_str + "' was given!"};
+                std::string{"None of the mutually exclusive options "} +
+                options_str + " was given!"};
         }
     } else {
         Expects(options.logic_operator_type ==
@@ -183,10 +183,10 @@ void clapp::parser::basic_option_container_t::validate_options_xor_options(
                     if (given_xor_option.has_value()) {
                         Expects(!xor_options_str.empty());
                         throw clapp::exception::option_exception_t{
-                            std::string{"Mutually exclusive option '"} +
-                            opt.option_string + "' given, but option '" +
+                            std::string{"Mutually exclusive option "} +
+                            opt.option_string + " given, but option " +
                             given_xor_option.value() +
-                            "' was also given! The following options " +
+                            " was also given! The following options " +
                             xor_options_str + " are mutual exclusive."};
                     }
                     given_xor_option = opt.option_string;
@@ -304,10 +304,10 @@ void clapp::parser::basic_option_container_t::validate_options_and_options(
                         if (given_xor_option) {
                             Expects(!xor_options_str.empty());
                             throw clapp::exception::option_exception_t{
-                                std::string{"Mutually exclusive option '"} +
-                                opt.option_string + "' given, but option '" +
+                                std::string{"Mutually exclusive option "} +
+                                opt.option_string + " given, but option " +
                                 given_xor_option.value() +
-                                "' was also given! The following options " +
+                                " was also given! The following options " +
                                 xor_options_str + " are mutual exclusive."};
                         }
                         given_and_options.value().push_back(opt.option_string);
