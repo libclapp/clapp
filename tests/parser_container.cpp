@@ -144,7 +144,7 @@ TEST(parserContainer, constructEmptyParserContainerParseAndValidateThrows) {
 
     ASSERT_THROW(static_cast<void>(epc.parse_and_validate(
                      1, static_cast<const char* const*>(argv))),
-                 clapp::option_param_exception_t);
+                 clapp::option_exception_t);
 }
 
 TEST(

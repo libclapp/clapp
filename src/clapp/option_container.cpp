@@ -127,63 +127,67 @@ void clapp::parser::basic_option_container_t::reg(
 }
 
 void clapp::parser::basic_option_container_t::validate_options() const {
-    std::optional<std::vector<std::string>> exclusive_or_options;
     std::optional<std::vector<std::string>> mandatory_and_options;
     if (options.logic_operator_type ==
         types::logic_operator_type_t::logic_xor) {
         std::optional<std::string> given_xor_option;
         std::optional<std::vector<std::string>> given_and_options;
-        validate_options_xor(&options, exclusive_or_options,
+        validate_options_xor(&options, options.gen_short_option_line(),
+                             options.gen_short_option_line(),
                              mandatory_and_options, given_xor_option,
                              given_and_options, false);
+
+        if (!given_xor_option.has_value()) {
+            const std::string options_str{options.gen_short_option_line()};
+            throw clapp::exception::option_exception_t{
+                std::string{"None of the mutually exclusive options '"} +
+                options_str + "' was given!"};
+        }
     } else {
         Expects(options.logic_operator_type ==
                 types::logic_operator_type_t::logic_and);
+
         std::optional<std::string> given_xor_option;
         std::optional<std::vector<std::string>> given_and_options;
-        validate_options_and(&options, mandatory_and_options,
-                             exclusive_or_options, given_xor_option,
+        validate_options_and(&options, options.gen_short_option_line(), "",
+                             mandatory_and_options, given_xor_option,
                              given_and_options, false);
     }
 }
 
 void clapp::parser::basic_option_container_t::validate_options_xor(
     const types::variant_opt_conf_container_t* options,
-    std::optional<std::vector<std::string>>& exclusive_or_options,
+    const std::string& options_str, const std::string& xor_options_str,
     std::optional<std::vector<std::string>>& mandatory_and_options,
     std::optional<std::string>& given_xor_option,
     std::optional<std::vector<std::string>>& given_and_options,
     bool summarize_xor_options) {
+    validate_options_xor_options(options, xor_options_str, given_xor_option);
 
-    if (!exclusive_or_options.has_value()) {
-        exclusive_or_options.emplace(std::vector<std::string>{});
-        append_exclusive_or_options(options, exclusive_or_options.value());
+    validate_options_xor_container(options, options_str, mandatory_and_options,
+                                   given_xor_option, given_and_options);
+
+    if (summarize_xor_options) {
+        given_and_options.value().push_back(options_str);
     }
+}
 
-    Expects(exclusive_or_options.has_value());
+void clapp::parser::basic_option_container_t::validate_options_xor_options(
+    const types::variant_opt_conf_container_t* options,
+    const std::string& xor_options_str,
+    std::optional<std::string>& given_xor_option) {
     for (const auto& option : options->options) {
         std::visit(
-            [&exclusive_or_options, &given_xor_option](auto&& opt) {
+            [&given_xor_option, &xor_options_str](auto&& opt) {
                 if (opt.given_func()) {
                     if (given_xor_option.has_value()) {
-                        const std::string exclusive_or_options_str{
-                            std::accumulate(
-                                exclusive_or_options.value().begin(),
-                                exclusive_or_options.value().end(),
-                                std::string{},
-                                [](std::string& lhs, const std::string& rhs) {
-                                    return lhs.empty()
-                                               ? ("'" + rhs + "'")
-                                               : (lhs + ", '" + rhs + "'");
-                                })};
-
-                        throw clapp::exception::option_param_exception_t{
+                        Expects(!xor_options_str.empty());
+                        throw clapp::exception::option_exception_t{
                             std::string{"Mutually exclusive option '"} +
                             opt.option_string + "' given, but option '" +
                             given_xor_option.value() +
                             "' was also given! The following options " +
-                            exclusive_or_options_str +
-                            " are mutual exclusive."};
+                            xor_options_str + " are mutual exclusive."};
                     }
                     given_xor_option = opt.option_string;
                     opt.validate_value_func(opt.option_string);
@@ -191,6 +195,14 @@ void clapp::parser::basic_option_container_t::validate_options_xor(
             },
             option);
     }
+}
+
+void clapp::parser::basic_option_container_t::validate_options_xor_container(
+    const types::variant_opt_conf_container_t* options,
+    const std::string& options_str,
+    std::optional<std::vector<std::string>>& mandatory_and_options,
+    std::optional<std::string>& given_xor_option,
+    std::optional<std::vector<std::string>>& given_and_options) {
     for (types::variant_opt_conf_container_ptr_vec_t::const_iterator it{
              options->containers.cbegin()};
          it != options->containers.cend(); it++) {
@@ -200,55 +212,37 @@ void clapp::parser::basic_option_container_t::validate_options_xor(
             std::optional<std::vector<std::string>> new_mandatory_and_options;
             std::optional<std::vector<std::string>> new_given_and_options;
             clapp::parser::option_container_t::validate_options_and(
-                (*it), new_mandatory_and_options, exclusive_or_options,
-                given_xor_option, new_given_and_options, true);
-            std::cout << "validate_options_xor(): new given and options: "
-                      << new_given_and_options.value().size() << std::endl;
+                (*it), (*it)->gen_short_option_line(), options_str,
+                new_mandatory_and_options, given_xor_option,
+                new_given_and_options, true);
             if (new_given_and_options.has_value() &&
                 !new_given_and_options.value().empty()) {
-                const std::string xor_option_str{std::accumulate(
-                    new_given_and_options.value().begin(),
-                    new_given_and_options.value().end(), std::string{},
-                    [](std::string& lhs, const std::string& rhs) {
-                        return lhs.empty() ? ("'" + rhs + "'")
-                                           : (lhs + ", '" + rhs + "'");
-                    })};
-                if (given_xor_option.has_value()) {
-                    throw clapp::exception::option_param_exception_t{
-                        std::string{"Mutually exclusive option '"} +
-                        xor_option_str + "' given, but option '" +
-                        given_xor_option.value() +
-                        "' was also given!"};  // TODO: Generate text the
-                                               // following options are mutual
-                                               // exclusive
-                } else {
-                    given_xor_option = xor_option_str;
-                }
+                const std::string xor_option_str{
+                    stringify(new_given_and_options)};
+
+                // because given_xor_option is checked in the
+                // validate_options_xor() and validate_options_and() function,
+                // this assertion should always hold.
+                Expects(!given_xor_option.has_value());
+
+                given_xor_option = xor_option_str;
             }
         } else if ((*it)->logic_operator_type ==
                    types::logic_operator_type_t::logic_xor) {
             clapp::parser::option_container_t::validate_options_xor(
-                (*it), exclusive_or_options, mandatory_and_options,
-                given_xor_option, given_and_options, false);
+                (*it), (*it)->gen_short_option_line(), options_str,
+                mandatory_and_options, given_xor_option, given_and_options,
+                false);
         } else {
             Expects(false);
         }
-    }
-    if (summarize_xor_options) {
-        const std::string exclusive_or_options_str{
-            std::accumulate(exclusive_or_options.value().begin(),
-                            exclusive_or_options.value().end(), std::string{},
-                            [](std::string& lhs, const std::string& rhs) {
-                                return lhs.empty() ? rhs : (lhs + " | " + rhs);
-                            })};
-        given_and_options.value().push_back(exclusive_or_options_str);
     }
 }
 
 void clapp::parser::basic_option_container_t::validate_options_and(
     const types::variant_opt_conf_container_t* options,
+    const std::string& options_str, const std::string& xor_options_str,
     std::optional<std::vector<std::string>>& mandatory_and_options,
-    std::optional<std::vector<std::string>>& exclusive_or_options,
     std::optional<std::string>& given_xor_option,
     std::optional<std::vector<std::string>>& given_and_options,
     const bool allow_empty) {
@@ -264,6 +258,43 @@ void clapp::parser::basic_option_container_t::validate_options_and(
     }
 
     Expects(mandatory_and_options.has_value());
+    validate_options_and_options(options, xor_options_str, given_xor_option,
+                                 given_and_options);
+    validate_options_and_container(options, options_str, xor_options_str,
+                                   mandatory_and_options, given_xor_option,
+                                   given_and_options, allow_empty);
+
+    if (final_check) {
+        if (allow_empty && given_and_options.value().empty()) {
+            return;
+        }
+        if (given_and_options.value().size() ==
+            mandatory_and_options.value().size()) {
+            return;
+        }
+        const std::string mandatory_and_options_str{
+            stringify(mandatory_and_options)};
+        const std::string given_and_options_str{stringify(given_and_options)};
+        if (given_and_options.value().empty()) {
+            throw clapp::exception::option_exception_t{
+                std::string{"None of the mandatory options were given, but at "
+                            "least the following options are required: "} +
+                mandatory_and_options_str};
+        }
+        throw clapp::exception::option_exception_t{
+            std::string{"Only the following mandatory options "} +
+            given_and_options_str +
+            " were given, but at least the following options are "
+            "required: " +
+            mandatory_and_options_str};
+    }
+}
+
+void clapp::parser::basic_option_container_t::validate_options_and_options(
+    const types::variant_opt_conf_container_t* options,
+    const std::string& xor_options_str,
+    std::optional<std::string>& given_xor_option,
+    std::optional<std::vector<std::string>>& given_and_options) {
     for (const auto& option : options->options) {
         std::visit(
             [&given_and_options, &given_xor_option,
@@ -286,6 +317,15 @@ void clapp::parser::basic_option_container_t::validate_options_and(
             },
             option);
     }
+}
+
+void clapp::parser::basic_option_container_t::validate_options_and_container(
+    const types::variant_opt_conf_container_t* options,
+    const std::string& options_str, const std::string& xor_options_str,
+    std::optional<std::vector<std::string>>& mandatory_and_options,
+    std::optional<std::string>& given_xor_option,
+    std::optional<std::vector<std::string>>& given_and_options,
+    const bool allow_empty) {
     for (types::variant_opt_conf_container_ptr_vec_t::const_iterator it{
              options->containers.cbegin()};
          it != options->containers.cend(); it++) {
@@ -293,60 +333,27 @@ void clapp::parser::basic_option_container_t::validate_options_and(
         if ((*it)->logic_operator_type ==
             types::logic_operator_type_t::logic_and) {
             clapp::parser::option_container_t::validate_options_and(
-                (*it), mandatory_and_options, exclusive_or_options,
+                (*it), options_str, xor_options_str, mandatory_and_options,
                 given_xor_option, given_and_options, allow_empty);
         } else if ((*it)->logic_operator_type ==
                    types::logic_operator_type_t::logic_xor) {
-            std::optional<std::vector<std::string>> my_exclusive_or_options;
             std::optional<std::string> my_given_xor_option;
             std::optional<std::vector<std::string>> my_given_and_options{
                 std::vector<std::string>{}};
 
             clapp::parser::option_container_t::validate_options_xor(
-                (*it), my_exclusive_or_options, mandatory_and_options,
+                (*it), (*it)->gen_short_option_line(),
+                (*it)->gen_short_option_line(), mandatory_and_options,
                 my_given_xor_option, my_given_and_options, true);
 
             Expects(my_given_and_options.has_value());
             if (my_given_xor_option.has_value()) {
-                given_and_options.value().push_back(std::accumulate(
-                    my_given_and_options.value().begin(),
-                    my_given_and_options.value().end(), std::string{},
-                    [](std::string& lhs, const std::string& rhs) {
-                        return lhs.empty() ? ("'" + rhs + "'")
-                                           : (lhs + ", '" + rhs + "'");
-                    }));
+                given_and_options.value().push_back(
+                    stringify(my_given_and_options));
             }
         } else {
             Expects(false);
         }
-    }
-
-    if (final_check) {
-        if (allow_empty && given_and_options.value().empty()) {
-            return;
-        }
-        if (given_and_options.value().size() ==
-            mandatory_and_options.value().size()) {
-            return;
-        }
-        const std::string mandatory_and_options_str{
-            std::accumulate(mandatory_and_options.value().begin(),
-                            mandatory_and_options.value().end(), std::string{},
-                            [](std::string& lhs, const std::string& rhs) {
-                                return lhs.empty() ? ("'" + rhs + "'")
-                                                   : (lhs + ", '" + rhs + "'");
-                            })};
-        const std::string given_and_options_str{std::accumulate(
-            given_and_options.value().begin(), given_and_options.value().end(),
-            std::string{}, [](std::string& lhs, const std::string& rhs) {
-                return lhs.empty() ? ("'" + rhs + "'")
-                                   : (lhs + ", '" + rhs + "'");
-            })};
-        throw clapp::exception::option_param_exception_t{
-            std::string{"Only the following mandatory options "} +
-            given_and_options_str +
-            " were given, but at least the following options are required: " +
-            mandatory_and_options_str};
     }
 }
 
@@ -357,7 +364,8 @@ void clapp::parser::basic_option_container_t::append_mandatory_and_options(
         std::visit(
             [&mandatory_and_options](auto&& opt) {
                 if (opt.purpose == parser::types::purpose_t::mandatory) {
-                    mandatory_and_options.push_back(opt.option_string);
+                    mandatory_and_options.push_back(
+                        opt.create_basic_option_string());
                 }
             },
             option);
@@ -372,60 +380,8 @@ void clapp::parser::basic_option_container_t::append_mandatory_and_options(
                 (*it), mandatory_and_options);
         } else if ((*it)->logic_operator_type ==
                    types::logic_operator_type_t::logic_xor) {
-            std::vector<std::string> exclusive_or_options;
-            clapp::parser::option_container_t::append_exclusive_or_options(
-                (*it), exclusive_or_options);
-            if (exclusive_or_options.size() == 1) {
-                mandatory_and_options.push_back(exclusive_or_options.front());
-            } else {
-                const std::string exclusive_or_options_str{std::accumulate(
-                    exclusive_or_options.begin(), exclusive_or_options.end(),
-                    std::string{},
-                    [](std::string& lhs, const std::string& rhs) {
-                        return lhs.empty() ? rhs : lhs + " | " + rhs;
-                    })};
-                mandatory_and_options.push_back(
-                    " ( " + exclusive_or_options_str + " ) ");
-            }
-        }
-    }
-}
-
-void clapp::parser::basic_option_container_t::append_exclusive_or_options(
-    const types::variant_opt_conf_container_t* options,
-    std::vector<std::string>& exclusive_or_options) {
-    for (const auto& option : options->options) {
-        std::visit(
-            [&exclusive_or_options](auto&& o) {
-                exclusive_or_options.push_back(o.option_string);
-            },
-            option);
-    }
-    for (types::variant_opt_conf_container_ptr_vec_t::const_iterator it{
-             options->containers.cbegin()};
-         it != options->containers.cend(); it++) {
-        Expects(*it != nullptr);
-        if ((*it)->logic_operator_type ==
-            types::logic_operator_type_t::logic_xor) {
-            clapp::parser::option_container_t::append_exclusive_or_options(
-                (*it), exclusive_or_options);
-        } else if ((*it)->logic_operator_type ==
-                   types::logic_operator_type_t::logic_and) {
-            std::vector<std::string> mandatory_and_options;
-            clapp::parser::option_container_t::append_mandatory_and_options(
-                (*it), mandatory_and_options);
-            if (mandatory_and_options.size() == 1) {
-                exclusive_or_options.push_back(mandatory_and_options.front());
-            } else {
-                const std::string mandatory_and_options_str{std::accumulate(
-                    mandatory_and_options.begin(), mandatory_and_options.end(),
-                    std::string{},
-                    [](std::string& lhs, const std::string& rhs) {
-                        return lhs.empty() ? rhs : lhs + " " + rhs;
-                    })};
-                exclusive_or_options.push_back(
-                    " ( " + mandatory_and_options_str + " ) ");
-            }
+            mandatory_and_options.push_back(
+                " ( " + (*it)->gen_short_option_line() + " ) ");
         }
     }
 }

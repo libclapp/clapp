@@ -62,15 +62,42 @@ class basic_option_container_t {
 
     static void validate_options_xor(
         const types::variant_opt_conf_container_t* options,
-        std::optional<std::vector<std::string>>& exclusive_or_options,
+        const std::string& options_str, const std::string& xor_options_str,
         std::optional<std::vector<std::string>>& mandatory_and_options,
         std::optional<std::string>& given_xor_option,
         std::optional<std::vector<std::string>>& given_and_options,
         bool summarize_xor_options);
+
+    static void validate_options_xor_options(
+        const types::variant_opt_conf_container_t* options,
+        const std::string& xor_options_str,
+        std::optional<std::string>& given_xor_option);
+
+    static void validate_options_xor_container(
+        const types::variant_opt_conf_container_t* options,
+        const std::string& options_str,
+        std::optional<std::vector<std::string>>& mandatory_and_options,
+        std::optional<std::string>& given_xor_option,
+        std::optional<std::vector<std::string>>& given_and_options);
+
     static void validate_options_and(
         const types::variant_opt_conf_container_t* options,
+        const std::string& options_str, const std::string& xor_options_str,
         std::optional<std::vector<std::string>>& mandatory_and_options,
-        std::optional<std::vector<std::string>>& exclusive_or_options,
+        std::optional<std::string>& given_xor_option,
+        std::optional<std::vector<std::string>>& given_and_options,
+        bool allow_empty);
+
+    static void validate_options_and_options(
+        const types::variant_opt_conf_container_t* options,
+        const std::string& xor_options_str,
+        std::optional<std::string>& given_xor_option,
+        std::optional<std::vector<std::string>>& given_and_options);
+
+    static void validate_options_and_container(
+        const types::variant_opt_conf_container_t* options,
+        const std::string& options_str, const std::string& xor_options_str,
+        std::optional<std::vector<std::string>>& mandatory_and_options,
         std::optional<std::string>& given_xor_option,
         std::optional<std::vector<std::string>>& given_and_options,
         bool allow_empty);
@@ -78,9 +105,6 @@ class basic_option_container_t {
     static void append_mandatory_and_options(
         const types::variant_opt_conf_container_t* options,
         std::vector<std::string>& mandatory_and_options);
-    static void append_exclusive_or_options(
-        const types::variant_opt_conf_container_t* options,
-        std::vector<std::string>& exclusive_or_options);
 
     [[nodiscard]] std::string gen_short_option_line() const;
     [[nodiscard]] types::help_entry_vec_t get_option_help() const;
