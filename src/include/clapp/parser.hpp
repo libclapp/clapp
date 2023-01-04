@@ -129,13 +129,15 @@ void clapp::parser::basic_parser_t::reg(
 
     for (const auto& arg : arguments) {
         std::visit(
-            [&config](auto&& a) {
-                if (a.argument_name == config.argument_name) {
-                    std::stringstream ss;
-                    ss << "Can't register argument '" << config.argument_name
-                       << "', as another argument with this name is already "
-                          "registered.";
-                    throw clapp::exception::argument_exception_t{ss.str()};
+            [&config](auto&& argument) {
+                if (argument.argument_name == config.argument_name) {
+                    std::stringstream string_stream;
+                    string_stream
+                        << "Can't register argument '" << config.argument_name
+                        << "', as another argument with this name is already "
+                           "registered.";
+                    throw clapp::exception::argument_exception_t{
+                        string_stream.str()};
                 }
             },
             arg);
