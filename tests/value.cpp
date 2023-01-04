@@ -501,3 +501,34 @@ TEST(value, foundFuncTReturnsExit) {
     ASSERT_THAT(ret.value().get_exit_code(), testing::Eq(exit_code));
     ASSERT_THAT(stringstr.str(), testing::StrEq("called func-name2"));
 }
+
+TEST(value, concatStr) {
+    ASSERT_THAT(clapp::value::concat_str("", "b"), testing::StrEq("b"));
+    ASSERT_THAT(clapp::value::concat_str("a", "b"), testing::StrEq("a b"));
+    ASSERT_THAT(clapp::value::concat_str("a", ""), testing::StrEq("a "));
+}
+
+TEST(value, stringifyNulloptThrows) {
+    const std::optional<std::vector<std::string>> opt_str_vec{std::nullopt};
+    ASSERT_THROW(clapp::value::stringify(opt_str_vec),
+                 std::bad_optional_access);
+}
+
+TEST(value, stringifyEmptyVec) {
+    const std::optional<std::vector<std::string>> opt_str_vec{
+        std::vector<std::string>{}};
+    ASSERT_THAT(clapp::value::stringify(opt_str_vec), testing::StrEq(""));
+}
+
+TEST(value, stringifyVecWithOneElement) {
+    const std::optional<std::vector<std::string>> opt_str_vec{
+        std::vector<std::string>{"one"}};
+    ASSERT_THAT(clapp::value::stringify(opt_str_vec), testing::StrEq("one"));
+}
+
+TEST(value, stringifyVecWithTwoElements) {
+    const std::optional<std::vector<std::string>> opt_str_vec{
+        std::vector<std::string>{"one", "two"}};
+    ASSERT_THAT(clapp::value::stringify(opt_str_vec),
+                testing::StrEq("one two"));
+}

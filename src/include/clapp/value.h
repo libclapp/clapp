@@ -19,6 +19,7 @@
 #include <clapp/filesystem.h>
 
 #include <functional>
+#include <numeric>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -105,6 +106,11 @@ class path_exists_t {
     static void validate(const fs::path &path, const std::string &param_name);
 };
 #endif
+
+inline std::string concat_str(const std::string &lhs, const std::string &rhs);
+
+inline std::string stringify(
+    const std::optional<std::vector<std::string>> &opt_str_vec);
 
 }  // namespace value
 

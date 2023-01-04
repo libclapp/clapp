@@ -205,4 +205,16 @@ clapp::fs::path clapp::value::convert_value<clapp::fs::path>(
     std::string_view param);
 #endif
 
+std::string clapp::value::concat_str(const std::string& lhs,
+                                     const std::string& rhs) {
+    return lhs.empty() ? (rhs) : (lhs + " " + rhs);
+}
+
+std::string clapp::value::stringify(
+    const std::optional<std::vector<std::string>>& opt_str_vec) {
+    return std::accumulate(opt_str_vec.value().begin(),
+                           opt_str_vec.value().end(), std::string{},
+                           concat_str);
+}
+
 #endif
