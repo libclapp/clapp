@@ -312,7 +312,7 @@ class basic_parser_t {
     variant_arg_conf_vec_t arguments{};
 
    public:
-    constexpr static std::size_t num_sub_spaces{2u};
+    constexpr static std::size_t num_sub_spaces{2U};
 };
 
 }  // namespace parser
