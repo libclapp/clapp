@@ -270,7 +270,7 @@ class basic_parser_t {
     [[nodiscard]] const basic_parser_t& get_active_parser() const;
 
     [[nodiscard]] static exit_t default_print_and_exit(
-        const std::string_view print_msg, int exit_code);
+        std::string_view print_msg, int exit_code);
     void set_print_and_exit_func(print_and_exit_func_t&& func);
     [[nodiscard]] print_and_exit_func_t& get_print_and_exit_func();
 
