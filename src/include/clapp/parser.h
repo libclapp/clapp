@@ -256,8 +256,7 @@ class basic_parser_t {
     [[nodiscard]] static constexpr std::string_view gen_usage_prefix() noexcept;
     [[nodiscard]] virtual help_contents_t gen_detailed_help_contents() const;
     [[nodiscard]] std::string gen_opt_arg_lines(
-        const help_contents_t& help_contents,
-        const std::size_t num_spaces) const;
+        const help_contents_t& help_contents, std::size_t num_spaces) const;
 
     [[nodiscard]] std::string gen_help_desc(std::size_t num_spaces,
                                             std::size_t rec_depth) const;
