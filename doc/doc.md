@@ -725,8 +725,7 @@ parser container:
 
 class cli_parser_t : public clapp::basic_main_parser_t {
    public:
-    clapp::help_option_t help{*this, "help", 'h', "Show help options.",
-                              clapp::parser::types::purpose_t::optional};
+    clapp::help_option_t help{*this, "help", 'h', "Show help options."};
 
     clapp::string_argument_t string_arg{*this, "string-arg", "String argument"};
 };
