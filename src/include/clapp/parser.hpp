@@ -90,35 +90,38 @@ template <clapp::parser::basic_parser_t::argument_type_t argument_type>
 void clapp::parser::basic_parser_t::reg(
     basic_reg_argument_conf_t<argument_type>&& config) {
     if (config.argument_name.size() == 0) {
-        std::stringstream ss;
-        ss << "Argument name '" << config.argument_name << "' is too short.";
-        throw clapp::exception::argument_exception_t{ss.str()};
+        std::stringstream string_stream;
+        string_stream << "Argument name '" << config.argument_name
+                      << "' is too short.";
+        throw clapp::exception::argument_exception_t{string_stream.str()};
     }
 
     const std::size_t num_arguments{arguments.size()};
     if (num_arguments > 0 && std::holds_alternative<variadic_arg_conf_t>(
                                  arguments[num_arguments - 1])) {
-        std::stringstream ss;
-        ss << "Can't register argument '" << config.argument_name
-           << "' when variadic arguments are already registered.";
-        throw clapp::exception::argument_exception_t{ss.str()};
+        std::stringstream string_stream;
+        string_stream << "Can't register argument '" << config.argument_name
+                      << "' when variadic arguments are already registered.";
+        throw clapp::exception::argument_exception_t{string_stream.str()};
     }
 
     if (config.purpose == purpose_t::mandatory) {
         if (!get_optional_argument_descriptions().empty()) {
-            std::stringstream ss;
-            ss << "Can't register mandatory argument '" << config.argument_name
-               << "' when optional arguments are already registered.";
-            throw clapp::exception::argument_exception_t{ss.str()};
+            std::stringstream string_stream;
+            string_stream
+                << "Can't register mandatory argument '" << config.argument_name
+                << "' when optional arguments are already registered.";
+            throw clapp::exception::argument_exception_t{string_stream.str()};
         }
         get_mandatory_argument_descriptions().push_back(
             {config.argument_name, config.description, argument_type});
     } else {
         if (!get_sub_parser_descriptions().empty()) {
-            std::stringstream ss;
-            ss << "Can't register optional argument '" << config.argument_name
-               << "' when a sub-parser is already registered.";
-            throw clapp::exception::argument_exception_t{ss.str()};
+            std::stringstream string_stream;
+            string_stream << "Can't register optional argument '"
+                          << config.argument_name
+                          << "' when a sub-parser is already registered.";
+            throw clapp::exception::argument_exception_t{string_stream.str()};
         }
         get_optional_argument_descriptions().push_back(
             {config.argument_name, config.description, argument_type});
