@@ -293,11 +293,12 @@ class basic_parser_t {
 
    private:
     [[nodiscard]] parse_result_t parse_arg(std::string_view argument,
-                                           arg_iterator it, arg_iterator end);
+                                           arg_iterator ait, arg_iterator end);
     [[nodiscard]] parse_result_t parse_long(std::string_view option,
-                                            arg_iterator it, arg_iterator end);
+                                            arg_iterator ait, arg_iterator end);
     [[nodiscard]] parse_result_t parse_short(std::string_view option,
-                                             arg_iterator it, arg_iterator end);
+                                             arg_iterator ait,
+                                             arg_iterator end);
 
     sub_parsers_map_t sub_parsers{};
     validate_func_vec_t validate_functions{};
