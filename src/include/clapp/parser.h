@@ -240,11 +240,11 @@ class basic_parser_t {
     };
 
     [[nodiscard]] static arg_iterator process_parse_result(
-        arg_iterator it, const parse_result_t& parse_result);
+        arg_iterator ait, const parse_result_t& parse_result);
     [[nodiscard]] std::optional<clapp::value::exit_t> parse(arg_iterator begin,
                                                             arg_iterator end);
-    [[nodiscard]] parse_result_t parse(std::string_view option, arg_iterator it,
-                                       arg_iterator end);
+    [[nodiscard]] parse_result_t parse(std::string_view option,
+                                       arg_iterator ait, arg_iterator end);
 
     void validate() const;
 
