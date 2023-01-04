@@ -653,6 +653,129 @@ Caught Exception: Only the following mandatory options '-b|--bool' were given, b
 ```
 [//]:#end_calls_simple_main_parser
 
+Option-Container:
+------------------
+From a logical point of view, the previous listing has one major drawback!
+It tells everyone that the bool-option, the string-param-option and the string-argument are mandatory!
+However, if the help-option is given, parsing stops immediately, the help-message is printed and the callee is informed that the program should exit.
+Thus, the binary can be executed with an standalone (optional) help-option, which is not what the usage-message tells you.
+
+In order to be able to use logical-and and logical-xor between the options, option-containers can be used.
+Each option-container can take an arbitrary number of options that are combined via one logical-type: either logical-xor or logical-and.
+Note: since parsers can hold options too, they are also option-containers.
+
+As the name suggests, option-containers can only handle options (unlike parsers (and sub-parsers), which can take options as well as arguments).
+Furthermore, if the logical-type of an option-container is logical-xor, only mandatory options can be used, since optional options would not make sense for logical-xor option-containers.
+
+### Option container usage:
+The option container class `clapp::parser::basic_option_container_t` is mainly used for internal usage only, thus most of the time it should not be required to interfer with its methods.
+However, for a complete collection take a look at
+[src/include/clapp/option_container.h](src/include/clapp/option_container.h).
+
+### Example code listing for a main-parser and option-container:
+The following code-listing illustrates a very basic example of a main parser with several options and a
+string argument using option-container.
+
+[//]:#begin_cpp_listing_simple_main_parser_option_container
+```c++
+#include <clapp/argument.h>
+#include <clapp/main_parser.h>
+#include <clapp/option.h>
+
+class cli_parser_t : public clapp::basic_main_parser_t {
+   public:
+    cli_parser_t();
+
+    clapp::help_option_t help{*this, "help", 'h', "Show help options."};
+
+    class option_container_t : public clapp::option_container_t {
+       public:
+        using clapp::option_container_t::option_container_t;
+
+        clapp::bool_option_t bool_opt{*this, "bool", 'b', "Bool option."};
+
+        clapp::string_param_option_t string_opt{*this, "str", 's',
+                                                "String option."};
+    };
+
+    option_container_t options{
+        *this, clapp::parser::types::logic_operator_type_t::logic_and};
+
+    clapp::string_argument_t string_arg{*this, "string-arg", "String argument"};
+};
+
+cli_parser_t::cli_parser_t()
+    : clapp::basic_main_parser_t{
+          clapp::parser::types::logic_operator_type_t::logic_xor} {}
+
+int main(int argc, char *argv[]) {
+    try {
+        cli_parser_t clip;  // create parser instance
+        const std::optional<clapp::value::exit_t> exit{clip.parse_and_validate(
+            argc, argv)};  // parses and validates cli-arguments
+        if (exit) {
+            return exit.value().get_exit_code();
+        }
+        Ensures(
+            clip.string_arg);  // parser ensures mandatory arguments are given
+        Ensures(
+            clip.options
+                .bool_opt);  // parser ensures mandatory bool-option is given
+        Ensures(clip.options.string_opt);  // parser ensures mandatory
+                                           // string-option is given
+        std::cout << "string-opt: " << clip.options.string_opt.value()
+                  << std::endl;
+        std::cout << "string-arg: " << clip.string_arg.value() << std::endl;
+    } catch (std::exception &e) {
+        std::cout << "Caught Exception: " << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
+}
+```
+[//]:#end_cpp_listing_simple_main_parser_option_container
+
+Note: The previous listing explicitly deletes the copy/move assignment operators and the copy/move constructors.
+Depending on your code style, this may not be necessary, as `clapp::basic_main_parser_t` already deletes the copy/move assignment operators and the copy/move constructors.
+But if you want to be conformant to [CppCoreGuideline C.21](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#c21-if-you-define-or-delete-any-default-operation-define-or-delete-them-all), you should declare them.
+
+### Example cli-outputs when using the previous listing:
+If the previous example listing is executed, you get the following output:
+[//]:#begin_calls_simple_main_parser_option_container
+```bash
+# Print the help message:
+$ ./libclapp_doc_simple_main_parser_option_container -h  # this is the same as with option `--help`
+Usage:
+./libclapp_doc_simple_main_parser_option_container -h|--help | ( -b|--bool -s|--str=<param> ) <string-arg>
+
+  Arguments:
+    string-arg       String argument (mandatory)
+
+  Options:
+    -h|--help        Show help options. (mandatory)
+    -b|--bool        Bool option. (mandatory)
+    -s|--str=<param> String option. (mandatory)
+
+# Give mandatory arguments and options:
+$ ./libclapp_doc_simple_main_parser_option_container -b -s "my-string-opt" my-string-arg
+string-opt: my-string-opt
+string-arg: my-string-arg
+
+# Give no mandatory argument throws:
+$ ./libclapp_doc_simple_main_parser_option_container -b -s "my-string-opt"
+Caught Exception: Mandatory argument 'string-arg' not given.
+
+# Give not all mandatory option throws:
+$ ./libclapp_doc_simple_main_parser_option_container -b my-string-arg
+Caught Exception: Only the following mandatory options -b|--bool were given, but at least the following options are required: -b|--bool -s|--str=<param>
+
+# Give no mandatory option throws:
+./libclapp_doc_simple_main_parser_option_container my-string-arg
+Caught Exception: None of the mutually exclusive options -h|--help | ( -b|--bool -s|--str=<param> ) was given!
+
+```
+[//]:#end_calls_simple_main_parser_option_container
+
 Parser-Container:
 -----------------
 In particular, if the `parse()` function received an exit reason (from a `found_func_t`-callback)
