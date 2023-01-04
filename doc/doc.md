@@ -572,10 +572,6 @@ string argument:
 
 class cli_parser_t : public clapp::basic_main_parser_t {
    public:
-    cli_parser_t() = default;
-
-    ~cli_parser_t() override;
-
     clapp::help_option_t help{*this, "help", 'h', "Show help options."};
 
     clapp::bool_option_t bool_opt{*this, "bool", 'b', "Bool option."};
@@ -584,15 +580,7 @@ class cli_parser_t : public clapp::basic_main_parser_t {
                                             "String option."};
 
     clapp::string_argument_t string_arg{*this, "string-arg", "String argument"};
-
-    // delete copy/mv-ctors and assignmet operators (CppCoreGuideline C.21):
-    explicit cli_parser_t(const cli_parser_t &) = delete;
-    explicit cli_parser_t(cli_parser_t &&) noexcept = delete;
-    cli_parser_t &operator=(const cli_parser_t &) = delete;
-    cli_parser_t &operator=(cli_parser_t &&) noexcept = delete;
 };
-
-cli_parser_t::~cli_parser_t() = default;
 
 int main(int argc, char *argv[]) {
     try {
@@ -728,22 +716,11 @@ parser container:
 
 class cli_parser_t : public clapp::basic_main_parser_t {
    public:
-    cli_parser_t() = default;
-
-    ~cli_parser_t() override;
-
     clapp::help_option_t help{*this, "help", 'h', "Show help options."};
 
     clapp::string_argument_t string_arg{*this, "string-arg", "String argument"};
-
-    // delete copy/mv-ctors and assignmet operators (CppCoreGuideline C.21):
-    explicit cli_parser_t(const cli_parser_t &) = delete;
-    explicit cli_parser_t(cli_parser_t &&) noexcept = delete;
-    cli_parser_t &operator=(const cli_parser_t &) = delete;
-    cli_parser_t &operator=(cli_parser_t &&) noexcept = delete;
 };
 
-cli_parser_t::~cli_parser_t() = default;
 
 using parser_t = clapp::parser::basic_parser_container_t<cli_parser_t>;
 
@@ -901,9 +878,6 @@ this sub-parser.
 
 class cli_parser_t : public clapp::basic_main_parser_t {
    public:
-    cli_parser_t() = default;
-    ~cli_parser_t() override;
-
     clapp::help_option_t help{*this, "help", 'h', "Show help options."};
 
     clapp::int32_param_option_t int_opt{*this, 'i', "Int option"};
@@ -912,50 +886,24 @@ class cli_parser_t : public clapp::basic_main_parser_t {
        public:
         using clapp::basic_sub_parser_t::basic_sub_parser_t;
 
-        ~mode1_parser_t() override;
-
         clapp::help_option_t help{*this, "help", 'h', "Show help options."};
 
         clapp::string_param_option_t string{*this, 's', "String param option."};
-
-        // delete copy/mv-ctors and assignmet operators (CppCoreGuideline C.21):
-        explicit mode1_parser_t(const mode1_parser_t &) = delete;
-        explicit mode1_parser_t(mode1_parser_t &&) noexcept = delete;
-        mode1_parser_t &operator=(const mode1_parser_t &) = delete;
-        mode1_parser_t &operator=(mode1_parser_t &&) noexcept = delete;
     };
 
     class mode2_parser_t : public clapp::basic_sub_parser_t {
        public:
         using clapp::basic_sub_parser_t::basic_sub_parser_t;
 
-        ~mode2_parser_t() override;
-
         clapp::help_option_t help{*this, "help", 'h', "Show help options."};
 
         clapp::string_argument_t string_arg{*this, "string-arg",
                                             "String argument"};
-
-        // delete copy/mv-ctors and assignmet operators (CppCoreGuideline C.21):
-        explicit mode2_parser_t(const mode2_parser_t &) = delete;
-        explicit mode2_parser_t(mode2_parser_t &&) noexcept = delete;
-        mode2_parser_t &operator=(const mode2_parser_t &) = delete;
-        mode2_parser_t &operator=(mode2_parser_t &&) noexcept = delete;
     };
 
     mode1_parser_t mode1{*this, "mode1", "mode1 sub-parser."};
     mode2_parser_t mode2{*this, "mode2", "mode2 sub-parser."};
-
-    // delete copy/mv-ctors and assignmet operators (CppCoreGuideline C.21):
-    explicit cli_parser_t(const cli_parser_t &) = delete;
-    explicit cli_parser_t(cli_parser_t &&) noexcept = delete;
-    cli_parser_t &operator=(const cli_parser_t &) = delete;
-    cli_parser_t &operator=(cli_parser_t &&) noexcept = delete;
 };
-
-cli_parser_t::~cli_parser_t() = default;
-cli_parser_t::mode1_parser_t::~mode1_parser_t() = default;
-cli_parser_t::mode2_parser_t::~mode2_parser_t() = default;
 
 using parser_t = clapp::parser::basic_parser_container_t<cli_parser_t>;
 
