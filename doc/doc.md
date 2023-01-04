@@ -848,11 +848,29 @@ parser container:
 
 class cli_parser_t : public clapp::basic_main_parser_t {
    public:
+    cli_parser_t();
+
     clapp::help_option_t help{*this, "help", 'h', "Show help options."};
+
+    class option_container_t : public clapp::option_container_t {
+       public:
+        using clapp::option_container_t::option_container_t;
+
+        clapp::bool_option_t bool_opt{*this, "bool", 'b', "Bool option."};
+
+        clapp::string_param_option_t string_opt{*this, "str", 's',
+                                                "String option."};
+    };
+
+    option_container_t options{
+        *this, clapp::parser::types::logic_operator_type_t::logic_and};
 
     clapp::string_argument_t string_arg{*this, "string-arg", "String argument"};
 };
 
+cli_parser_t::cli_parser_t()
+    : clapp::basic_main_parser_t{
+          clapp::parser::types::logic_operator_type_t::logic_xor} {}
 
 using parser_t = clapp::parser::basic_parser_container_t<cli_parser_t>;
 
@@ -866,7 +884,15 @@ int main(int argc, char *argv[]) {
             return exit.value().get_exit_code();
         }
         Ensures(
-            parser->string_arg);  // parser ensures mandatory arguments are given
+            parser
+                ->string_arg);  // parser ensures mandatory arguments are given
+        Ensures(
+            parser->options
+                .bool_opt);  // parser ensures mandatory bool-option is given
+        Ensures(parser->options.string_opt);  // parser ensures mandatory
+                                              // string-option is given
+        std::cout << "string-opt: " << parser->options.string_opt.value()
+                  << std::endl;
         std::cout << "string-arg: " << parser->string_arg.value() << std::endl;
     } catch (std::exception &e) {
         std::cout << "Caught Exception: " << e.what() << std::endl;
@@ -886,24 +912,34 @@ If the previous example listing is executed, you get the following output:
 
 [//]:#begin_calls_parser_container
 ```bash
-# Print the help message:
 $ ./libclapp_doc_parser_container -h  # this is the same as with option `--help`
 Usage:
-./libclapp_doc_parser_container [-h|--help] <string-arg>
+./libclapp_doc_parser_container -h|--help | ( -b|--bool -s|--str=<param> ) <string-arg>
 
   Arguments:
-    string-arg String argument (mandatory)
+    string-arg       String argument (mandatory)
 
   Options:
-    -h|--help  Show help options. (optional)
+    -h|--help        Show help options. (mandatory)
+    -b|--bool        Bool option. (mandatory)
+    -s|--str=<param> String option. (mandatory)
 
-# Give mandatory argument:
-$ ./libclapp_doc_parser_container my-string
-string-arg: my-string
+# Give mandatory arguments and options:
+$ ./libclapp_doc_parser_container -b -s "my-string-opt" my-string-arg
+string-opt: my-string-opt
+string-arg: my-string-arg
 
 # Give no mandatory argument throws:
-$ ./libclapp_doc_parser_container
+$ ./libclapp_doc_parser_container -b -s "my-string-opt"
 Caught Exception: Mandatory argument 'string-arg' not given.
+
+# Give not all mandatory option throws:
+$ ./libclapp_doc_parser_container -b my-string-arg
+Caught Exception: Only the following mandatory options -b|--bool were given, but at least the following options are required: -b|--bool -s|--str=<param>
+
+# Give no mandatory option throws:
+./libclapp_doc_parser_container my-string-arg
+Caught Exception: None of the mutually exclusive options -h|--help | ( -b|--bool -s|--str=<param> ) was given!
 
 ```
 [//]:#end_calls_parser_container
