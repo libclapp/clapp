@@ -485,7 +485,7 @@ Thus, by simply passing around a reference (or a pointer) to this main parser, a
 arguments or option can be be accessed easily.
 
 ### Main parser construction:
-The main-parser base class `clapp::parser::basic_main_parser_t` contains only one constructor.
+The main-parser base class `clapp::parser::basic_main_parser_t` inherits its constructors from its base-class `clapp::parser::basic_parser_t`.
 This constructor has no arguments, but since it is a base-class, you can extend it easily by
 your derived class. See the listing below for an example.
 

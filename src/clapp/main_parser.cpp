@@ -16,8 +16,6 @@
 #include <clapp/exception.h>
 #include <clapp/main_parser.h>
 
-clapp::parser::basic_main_parser_t::basic_main_parser_t() = default;
-
 clapp::parser::basic_main_parser_t::~basic_main_parser_t() = default;
 
 clapp::parser::basic_main_parser_t::operator bool() const {

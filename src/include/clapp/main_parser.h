@@ -23,7 +23,7 @@ namespace clapp {
 inline namespace parser {
 class basic_main_parser_t : public basic_parser_t {
    public:
-    basic_main_parser_t();
+    using basic_parser_t::basic_parser_t;
     ~basic_main_parser_t() override;
 
     // TODO(martinw): enable, if basic_parser has implemented this too
