@@ -73,7 +73,7 @@ TEST(mainParser, constructEmptyMainParserAndParseAndValidate) {
                 testing::Eq(false));
 }
 
-TEST(mainParser, constructHelpMainParserAndParse) {
+TEST(mainParser, constructBoMainParserAndParse) {
     constexpr const char* const argv[]{"main", "-b", nullptr};
     bo_main_parser_t bmp;
 
@@ -83,7 +83,7 @@ TEST(mainParser, constructHelpMainParserAndParse) {
     ASSERT_THAT(exit.value().get_exit_code(), testing::Eq(EXIT_SUCCESS));
 }
 
-TEST(mainParser, constructHelpMainParserAndParseAndValidate) {
+TEST(mainParser, constructBoMainParserAndParseAndValidate) {
     constexpr const char* const argv[]{"main", "-b", nullptr};
     bo_main_parser_t bmp;
 
