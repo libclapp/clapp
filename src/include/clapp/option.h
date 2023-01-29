@@ -261,8 +261,9 @@ gen_long_option(long_option_func_t&& lof,
 
 template <typename T, typename VALUE_FUNC>
 std::optional<basic_parser_t::validate_func_t> gen_opt_validate_func(
-    std::optional<VALUE_FUNC>&& vf, std::optional<has_value_func_t>&& hvf,
-    std::optional<given_func_t>&& gf,
+    std::optional<VALUE_FUNC>&& value_func_param,
+    std::optional<has_value_func_t>&& has_value_func_param,
+    std::optional<given_func_t>&& given_func_param,
     std::vector<typename opt_params_t<T>::validate_func_t>&& validate_funcs,
     const std::string& option_string, basic_parser_t::purpose_t purpose);
 

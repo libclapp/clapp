@@ -113,8 +113,9 @@ clapp::option::gen_long_option(long_option_func_t&& lof,
 template <typename T, typename VALUE_FUNC>
 std::optional<clapp::basic_parser_t::validate_func_t>
 clapp::option::gen_opt_validate_func(
-    std::optional<VALUE_FUNC>&& vf, std::optional<has_value_func_t>&& hvf,
-    std::optional<given_func_t>&& gf,
+    std::optional<VALUE_FUNC>&& value_func_param,
+    std::optional<has_value_func_t>&& has_value_func_param,
+    std::optional<given_func_t>&& given_func_param,
     std::vector<typename opt_params_t<T>::validate_func_t>&& validate_funcs,
     const std::string& option_string, const basic_parser_t::purpose_t purpose) {
     if (!validate_funcs.empty() ||
@@ -124,9 +125,10 @@ clapp::option::gen_opt_validate_func(
                               // for all mandatory options. (this is the parsers
                               // responsibility, just iterate in the parser over
                               // all configured options...)
-        return [purpose, value_func = std::move(vf),
-                has_value_func = std::move(hvf), given_func = std::move(gf),
-                option_string, validate_funcs = std::move(validate_funcs)]() {
+        return [purpose, value_func = std::move(value_func_param),
+                has_value_func = std::move(has_value_func_param),
+                given_func = std::move(given_func_param), option_string,
+                validate_funcs = std::move(validate_funcs)]() {
             if (purpose == basic_parser_t::purpose_t::mandatory && given_func) {
                 if (!given_func.value()()) {
                     throw clapp::exception::option_param_exception_t(
