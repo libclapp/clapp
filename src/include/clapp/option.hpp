@@ -117,7 +117,7 @@ clapp::option::gen_opt_validate_func(
     std::optional<given_func_t>&& gf,
     std::vector<typename opt_params_t<T>::validate_func_t>&& validate_funcs,
     const std::string& option_string, const basic_parser_t::purpose_t purpose) {
-    if (validate_funcs.size() > 0 ||
+    if (!validate_funcs.empty() ||
         purpose ==
             basic_parser_t::purpose_t::
                 mandatory) {  // TODO: get rid of creating a validate function,
