@@ -265,9 +265,10 @@ clapp::option::opt_conf_container_t<T, OPT_CONF> clapp::option::gen_opt_conf1(
 
     std::string restriction{std::accumulate(
         opt_params.restrictions.begin(), opt_params.restrictions.end(), purpose,
-        [](const std::string& a, const std::string& b) -> std::string {
-            const std::string sep{a.length() > 0 && b.length() > 0 ? ", " : ""};
-            return a + sep + b;
+        [](const std::string& lhs, const std::string& rhs) -> std::string {
+            const std::string sep{lhs.length() > 0 && rhs.length() > 0 ? ", "
+                                                                       : ""};
+            return lhs + sep + rhs;
         })};
     if (!restriction.empty()) {
         restriction = " (" + restriction + ")";
