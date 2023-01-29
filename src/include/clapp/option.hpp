@@ -168,8 +168,7 @@ clapp::option::gen_opt_validate_func(
 template <typename T>
 inline std::vector<std::string> clapp::option::gen_string_vec(
     const std::vector<T>& vec) {
-    const std::vector<std::string> ret{vec.begin(), vec.end()};
-    return ret;
+    return std::vector<std::string>{vec.begin(), vec.end()};
 }
 
 template <>
