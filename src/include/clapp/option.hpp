@@ -81,7 +81,7 @@ void clapp::option::gen_opt_conf_process_params(opt_params_t<T>& opt_params,
 template <typename short_option_func_t>
 std::vector<clapp::basic_parser_t::basic_short_opt_conf_t<short_option_func_t>>
 clapp::option::gen_short_option(short_option_func_t&& sof,
-                                const std::vector<char> short_option) {
+                                const std::vector<char>& short_option) {
     std::vector<
         clapp::basic_parser_t::basic_short_opt_conf_t<short_option_func_t>>
         ret;

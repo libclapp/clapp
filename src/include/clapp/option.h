@@ -252,7 +252,8 @@ void gen_opt_conf_process_params(opt_params_t<T>& opt_params, Param&& param,
 
 template <typename short_option_func_t>
 std::vector<basic_parser_t::basic_short_opt_conf_t<short_option_func_t>>
-gen_short_option(short_option_func_t&& sof, std::vector<char> short_option);
+gen_short_option(short_option_func_t&& sof,
+                 const std::vector<char>& short_option);
 
 template <typename long_option_func_t>
 std::vector<basic_parser_t::basic_long_opt_conf_t<long_option_func_t>>
