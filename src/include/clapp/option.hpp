@@ -391,10 +391,11 @@ clapp::option::basic_vector_param_option_t<T>::basic_vector_param_option_t(
     opt_conf_container_t<T, opt_conf_t> conf{gen_opt_conf<T, opt_conf_t>(
         create_callbacks(this), std::forward<Params>(parameters)...)};
     if (conf.default_value) {
-        std::stringstream ss;
-        ss << "No default value for vector based param option '"
-           << conf.opt_conf.create_basic_option_string() << "' possible.";
-        throw clapp::exception::option_param_exception_t{ss.str()};
+        std::stringstream string_stream;
+        string_stream << "No default value for vector based param option '"
+                      << conf.opt_conf.create_basic_option_string()
+                      << "' possible.";
+        throw clapp::exception::option_param_exception_t{string_stream.str()};
     }
     parser.reg(std::move(conf.opt_conf));
     _found = std::move(conf.found);
