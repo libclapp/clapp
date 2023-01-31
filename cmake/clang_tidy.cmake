@@ -18,6 +18,7 @@ if(libClaPP_CLANG_TIDY_BIN)
     list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -fuchsia-default-arguments-calls)
     list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -fuchsia-overloaded-operator)
     list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -google-runtime-references)
+    list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -bugprone-easily-swappable-parameters)
     list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -altera-struct-pack-align)
 
     if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "12.0.0")
