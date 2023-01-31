@@ -22,6 +22,7 @@ if(libClaPP_CLANG_TIDY_BIN)
     list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -altera-struct-pack-align)
     list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -misc-non-private-member-variables-in-classes)
     list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -cppcoreguidelines-non-private-member-variables-in-classes)
+    list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -llvm-include-order)
 
     if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "12.0.0")
         list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -hicpp-use-equals-default)
@@ -37,8 +38,6 @@ if(libClaPP_CLANG_TIDY_BIN)
         list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -altera-unroll-loops)
         list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -altera-id-dependent-backward-branch)
     endif()
-
-    list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -llvm-include-order)
 
     set(libClaPP_CLANG_TIDY_CHECKS ${libClaPP_CLANG_TIDY_CHECKS_LIST})
     string(REPLACE ";" "," libClaPP_CLANG_TIDY_CHECKS "${libClaPP_CLANG_TIDY_CHECKS}")
