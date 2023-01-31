@@ -116,10 +116,10 @@ clapp::option::gen_opt_validate_func(
     if (!validate_funcs.empty() ||
         purpose ==
             parser::types::purpose_t::
-                mandatory) {  // TODO: get rid of creating a validate function,
-                              // for all mandatory options. (this is the parsers
-                              // responsibility, just iterate in the parser over
-                              // all configured options...)
+                mandatory) {  // TODO(martinw): get rid of creating a validate
+                              // function, for all mandatory options. (this is
+                              // the parsers responsibility, just iterate in the
+                              // parser over all configured options...)
         return [purpose, value_func = std::move(value_func_param),
                 has_value_func = std::move(has_value_func_param),
                 given_func = std::move(given_func_param), option_string,
