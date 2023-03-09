@@ -331,7 +331,7 @@ template <typename T>
 typename clapp::option::basic_param_option_t<T>::callbacks_t
 clapp::option::basic_param_option_t<T>::create_callbacks(
     basic_param_option_t<T>* inst) {
-    const callbacks_t callbacks{
+    return callbacks_t{
         [inst](const std::string_view option, const std::string_view param) {
             return inst->found_entry("--" + std::string{option}, param);
         },
@@ -341,7 +341,6 @@ clapp::option::basic_param_option_t<T>::create_callbacks(
         [inst]() { return inst->given(); },
         [inst]() { return static_cast<bool>(*inst); },
         [inst]() { return inst->value(); }};
-    return callbacks;
 }
 
 template <typename T>
@@ -377,8 +376,7 @@ T clapp::option::basic_param_option_t<T>::value() const {
         throw clapp::exception::value_undefined_t{
             "Requested value is not defined."};
     }
-    const T ret{_value.value()};
-    return ret;
+    return T{_value.value()};
 }
 
 template <typename T>
@@ -407,7 +405,7 @@ template <typename T>
 typename clapp::basic_vector_param_option_t<T>::callbacks_t
 clapp::option::basic_vector_param_option_t<T>::create_callbacks(
     basic_vector_param_option_t<T>* inst) {
-    const callbacks_t callbacks{
+    return callbacks_t{
         [inst](const std::string_view option, const std::string_view param) {
             return inst->found_entry("--" + std::string{option}, param);
         },
@@ -417,7 +415,6 @@ clapp::option::basic_vector_param_option_t<T>::create_callbacks(
         [inst]() { return inst->given(); },
         [inst]() { return static_cast<bool>(*inst); },
         [inst]() { return inst->value(); }};
-    return callbacks;
 }
 
 template <typename T>
