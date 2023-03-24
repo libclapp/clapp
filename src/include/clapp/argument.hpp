@@ -179,12 +179,12 @@ clapp::argument::gen_arg_conf(CALLBACKS&& callbacks,
 
     std::string restriction{std::accumulate(
         arg_params.restrictions.begin(), arg_params.restrictions.end(), purpose,
-        [](const std::string& a, const std::string& b) -> std::string {
-            const std::string separator{a.length() > 0 && b.length() > 0 ? ", "
-                                                                         : ""};
-            return a + separator + b;
+        [](const std::string& lhs, const std::string& rhs) -> std::string {
+            const std::string separator{
+                lhs.length() > 0 && rhs.length() > 0 ? ", " : ""};
+            return lhs + separator + rhs;
         })};
-    if (restriction.size() > 0) {
+    if (!restriction.empty()) {
         restriction = " (" + restriction + ")";
     }
 
