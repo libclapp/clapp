@@ -181,13 +181,12 @@ template <typename T>
 typename clapp::argument::basic_argument_t<T>::callbacks_t
 clapp::argument::basic_argument_t<T>::create_callbacks(
     basic_argument_t<T>* inst) {
-    const callbacks_t callbacks{[inst](const std::string_view argument) {
-                                    return inst->found_entry(argument);
-                                },
-                                [inst]() { return inst->given(); },
-                                [inst]() { return static_cast<bool>(*inst); },
-                                [inst]() { return inst->value(); }};
-    return callbacks;
+    return callbacks_t{[inst](const std::string_view argument) {
+                           return inst->found_entry(argument);
+                       },
+                       [inst]() { return inst->given(); },
+                       [inst]() { return static_cast<bool>(*inst); },
+                       [inst]() { return inst->value(); }};
 }
 
 template <typename T>
@@ -221,8 +220,7 @@ T clapp::argument::basic_argument_t<T>::value() const {
         throw clapp::exception::value_undefined_t{
             "Requested argument value is not defined."};
     }
-    const T ret{_value.value()};
-    return ret;
+    return T{_value.value()};
 }
 
 template <typename T>
@@ -246,13 +244,12 @@ template <typename T>
 typename clapp::argument::basic_variadic_argument_t<T>::callbacks_t
 clapp::argument::basic_variadic_argument_t<T>::create_callbacks(
     basic_variadic_argument_t<T>* inst) {
-    const callbacks_t callbacks{[inst](const std::string_view argument) {
-                                    return inst->found_entry(argument);
-                                },
-                                [inst]() { return inst->given(); },
-                                [inst]() { return static_cast<bool>(*inst); },
-                                [inst]() { return inst->value(); }};
-    return callbacks;
+    return callbacks_t{[inst](const std::string_view argument) {
+                           return inst->found_entry(argument);
+                       },
+                       [inst]() { return inst->given(); },
+                       [inst]() { return static_cast<bool>(*inst); },
+                       [inst]() { return inst->value(); }};
 }
 
 template <typename T>
@@ -312,8 +309,7 @@ clapp::argument::basic_variadic_argument_t<T>::found_entry(
 template <typename T>
 std::string clapp::argument::basic_variadic_argument_t<
     T>::variadic_argument_restrictions() {
-    const std::string ret{"variadic argument"};
-    return ret;
+    return std::string{"variadic argument"};
 }
 
 #endif
