@@ -26,7 +26,7 @@ inline namespace argument {
 template <typename T>
 basic_argument_t<T>::~basic_argument_t() = default;
 
-}
+}  // namespace argument
 }  // namespace clapp
 
 template <typename T>
