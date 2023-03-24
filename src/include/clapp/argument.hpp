@@ -30,6 +30,24 @@ basic_argument_t<T>::~basic_argument_t() = default;
 }  // namespace clapp
 
 template <typename T>
+clapp::argument::basic_argument_t<T>::basic_argument_t(
+    basic_argument_t&& inst) noexcept = default;
+
+template <typename T>
+clapp::argument::basic_argument_t<T>::basic_argument_t(
+    const basic_argument_t& inst) = default;
+
+template <typename T>
+clapp::argument::basic_argument_t<T>&
+clapp::argument::basic_argument_t<T>::operator=(
+    basic_argument_t&& inst) noexcept = default;
+
+template <typename T>
+clapp::argument::basic_argument_t<T>&
+clapp::argument::basic_argument_t<T>::operator=(const basic_argument_t& inst) =
+    default;
+
+template <typename T>
 inline void clapp::argument::gen_arg_conf_process_params(
     arg_params_t<T>& /*arg_params*/) {}
 

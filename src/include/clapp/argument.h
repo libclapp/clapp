@@ -115,6 +115,10 @@ class basic_argument_t {
     [[nodiscard]] T value() const;
     [[nodiscard]] constexpr bool given() const noexcept;
 
+    basic_argument_t(const basic_argument_t& inst);
+    basic_argument_t(basic_argument_t&& inst) noexcept;
+    basic_argument_t& operator=(const basic_argument_t& inst);
+    basic_argument_t& operator=(basic_argument_t&& inst) noexcept;
     virtual ~basic_argument_t();
 
    protected:
