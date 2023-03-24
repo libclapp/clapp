@@ -30,7 +30,8 @@ basic_argument_t<T>::~basic_argument_t() = default;
 }  // namespace clapp
 
 template <typename T>
-inline void clapp::argument::gen_arg_conf_process_params(arg_params_t<T>&) {}
+inline void clapp::argument::gen_arg_conf_process_params(
+    arg_params_t<T>& /*arg_params*/) {}
 
 template <typename T, typename Param>
 void clapp::argument::gen_arg_conf_process_params(arg_params_t<T>& arg_params,

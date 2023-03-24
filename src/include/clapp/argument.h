@@ -72,7 +72,7 @@ struct arg_conf_container_t {
 };
 
 template <typename T>
-inline void gen_arg_conf_process_params(arg_params_t<T>&);
+inline void gen_arg_conf_process_params(arg_params_t<T>& arg_params);
 
 template <typename T, typename Param>
 void gen_arg_conf_process_params(arg_params_t<T>& arg_params, Param&& param);
