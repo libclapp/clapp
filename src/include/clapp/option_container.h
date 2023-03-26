@@ -127,6 +127,13 @@ class option_container_t : public basic_option_container_t {
                        types::logic_operator_type_t logic_operator_type);
     ~option_container_t() override;
 
+    option_container_t(const option_container_t& inst);
+    option_container_t(option_container_t&& inst) noexcept;
+
+    // TODO(martinw): enable, if cont is no reference anymore
+    option_container_t& operator=(const option_container_t& inst) = delete;
+    option_container_t& operator=(option_container_t&& inst) noexcept = delete;
+
     [[nodiscard]] basic_parser_t& get_parser() override;
     [[nodiscard]] const basic_parser_t& get_const_parser() const override;
 

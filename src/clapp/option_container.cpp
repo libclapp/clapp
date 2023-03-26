@@ -408,6 +408,12 @@ clapp::parser::option_container_t::option_container_t(
 
 clapp::parser::option_container_t::~option_container_t() = default;
 
+clapp::parser::option_container_t::option_container_t(
+    const option_container_t& inst) = default;
+
+clapp::parser::option_container_t::option_container_t(
+    option_container_t&& inst) noexcept = default;
+
 clapp::parser::basic_parser_t& clapp::parser::option_container_t::get_parser() {
     return cont.get_parser();
 }

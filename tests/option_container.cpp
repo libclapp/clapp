@@ -53,6 +53,21 @@ const clapp::parser::basic_parser_t& empty_basic_option_container_t::
     throw std::runtime_error("throws get parser");
 }
 
+class empty_option_container_t : public clapp::option_container_t {
+   public:
+    using clapp::option_container_t::option_container_t;
+    ~empty_option_container_t() override;
+
+    empty_option_container_t(const empty_option_container_t& inst) = default;
+    empty_option_container_t(empty_option_container_t&& inst) noexcept =
+        default;
+
+    static constexpr std::int32_t min_int{10};
+    static constexpr std::int32_t max_int{200};
+};
+
+empty_option_container_t::~empty_option_container_t() = default;
+
 class simple_test_option_container_t : public clapp::option_container_t {
    public:
     using clapp::option_container_t::option_container_t;
@@ -162,6 +177,28 @@ TEST(optionContainer, constructEmptyBasicOptionContainerAndCallGetOptionHelp) {
     empty_basic_option_container_t eboc{
         clapp::parser::types::logic_operator_type_t::logic_and};
     ASSERT_THAT(eboc.get_option_help().empty(), testing::Eq(true));
+}
+
+TEST(optionContainer, constructEmptyOptionContainerDoesNotThrow) {
+    fake_test_parser_t ftp;
+    ASSERT_NO_THROW((empty_option_container_t{
+        ftp, clapp::parser::types::logic_operator_type_t::logic_and}));
+}
+
+TEST(optionContainer,
+     constructEmptyOptionContainerAndCallCopyConstructDoesntThrow) {
+    fake_test_parser_t ftp;
+    empty_option_container_t eoc{
+        ftp, clapp::parser::types::logic_operator_type_t::logic_and};
+    ASSERT_NO_THROW(empty_option_container_t{eoc});
+}
+
+TEST(optionContainer,
+     constructEmptyOptionContainerAndCallMoveConstructDoesntThrow) {
+    fake_test_parser_t ftp;
+    empty_option_container_t eoc{
+        ftp, clapp::parser::types::logic_operator_type_t::logic_and};
+    ASSERT_NO_THROW(empty_option_container_t{std::move(eoc)});
 }
 
 TEST(optionContainer, constructSimpleTestOptionContainerWithXorDoesNotThrow) {
