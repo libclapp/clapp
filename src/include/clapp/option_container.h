@@ -131,7 +131,7 @@ class option_container_t : public basic_option_container_t {
     [[nodiscard]] const basic_parser_t& get_const_parser() const override;
 
    private:
-    basic_option_container_t& cont;  // TODO: may use shared ptr.
+    basic_option_container_t& cont;  // TODO(martinw): may use shared ptr.
 };
 
 }  // namespace parser
