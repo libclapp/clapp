@@ -26,6 +26,16 @@ class empty_basic_option_container_t : public clapp::basic_option_container_t {
     [[nodiscard]] const clapp::basic_parser_t& get_const_parser()
         const override;
 
+    empty_basic_option_container_t(const empty_basic_option_container_t& inst) =
+        default;
+    empty_basic_option_container_t(
+        empty_basic_option_container_t&& inst) noexcept = default;
+
+    empty_basic_option_container_t& operator=(
+        const empty_basic_option_container_t& inst) = default;
+    empty_basic_option_container_t& operator=(
+        empty_basic_option_container_t&& inst) noexcept = default;
+
     using clapp::basic_option_container_t::get_option_help;
 
     using clapp::basic_option_container_t::gen_short_option_line;
@@ -105,6 +115,40 @@ optional_test_option_container_t::~optional_test_option_container_t() = default;
 TEST(optionContainer, constructEmptyBasicOptionContainerDoesNotThrow) {
     ASSERT_NO_THROW(empty_basic_option_container_t{
         clapp::parser::types::logic_operator_type_t::logic_and});
+}
+
+TEST(optionContainer,
+     constructEmptyBasicOptionContainerAndCallCopyConstructDoesntThrow) {
+    empty_basic_option_container_t eboc{
+        clapp::parser::types::logic_operator_type_t::logic_and};
+    ASSERT_NO_THROW(empty_basic_option_container_t{eboc});
+}
+
+TEST(optionContainer,
+     constructEmptyBasicOptionContainerAndCallMoveConstructDoesntThrow) {
+    empty_basic_option_container_t eboc{
+        clapp::parser::types::logic_operator_type_t::logic_and};
+    ASSERT_NO_THROW(empty_basic_option_container_t{std::move(eboc)});
+}
+
+TEST(
+    optionContainer,
+    constructEmptyBasicOptionContainerAndCallCopyAssignmentOperatorDoesntThrow) {
+    empty_basic_option_container_t eboc{
+        clapp::parser::types::logic_operator_type_t::logic_and};
+    empty_basic_option_container_t eboc2{
+        clapp::parser::types::logic_operator_type_t::logic_xor};
+    ASSERT_NO_THROW(eboc = eboc2);
+}
+
+TEST(
+    optionContainer,
+    constructEmptyBasicOptionContainerAndCallMoveAssignmentOperatorDoesntThrow) {
+    empty_basic_option_container_t eboc{
+        clapp::parser::types::logic_operator_type_t::logic_and};
+    empty_basic_option_container_t eboc2{
+        clapp::parser::types::logic_operator_type_t::logic_xor};
+    ASSERT_NO_THROW(eboc = std::move(eboc2));
 }
 
 TEST(optionContainer,

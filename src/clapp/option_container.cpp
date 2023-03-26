@@ -22,6 +22,19 @@ clapp::parser::basic_option_container_t::basic_option_container_t(
     const types::logic_operator_type_t logic_operator_type)
     : options{logic_operator_type} {}
 
+clapp::parser::basic_option_container_t::basic_option_container_t(
+    const basic_option_container_t& inst) = default;
+
+clapp::parser::basic_option_container_t::basic_option_container_t(
+    basic_option_container_t&& inst) noexcept = default;
+
+clapp::parser::basic_option_container_t&
+clapp::parser::basic_option_container_t::operator=(
+    const basic_option_container_t& inst) = default;
+clapp::parser::basic_option_container_t&
+clapp::parser::basic_option_container_t::operator=(
+    basic_option_container_t&& inst) noexcept = default;
+
 const clapp::parser::types::variant_opt_conf_t*
 clapp::parser::basic_option_container_t::find_option(
     const std::string_view opt) const {

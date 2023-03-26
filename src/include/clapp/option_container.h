@@ -30,6 +30,13 @@ class basic_option_container_t {
         types::logic_operator_type_t logic_operator_type);
     virtual ~basic_option_container_t();
 
+    basic_option_container_t(const basic_option_container_t& inst);
+    basic_option_container_t(basic_option_container_t&& inst) noexcept;
+
+    basic_option_container_t& operator=(const basic_option_container_t& inst);
+    basic_option_container_t& operator=(
+        basic_option_container_t&& inst) noexcept;
+
     template <typename short_option_func_t, typename long_option_func_t,
               types::option_type_t option_type>
     void reg(types::basic_reg_option_conf_t<
