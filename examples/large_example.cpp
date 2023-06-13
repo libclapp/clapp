@@ -133,6 +133,30 @@ class cli_parser_t : public clapp::basic_main_parser_t {
     clapp::ns_param_option_t nanoseconds{*this, "nanoseconds",
                                          "nanoseconds option."};
 
+    class time_container_t : public clapp::option_container_t {
+       public:
+        using clapp::option_container_t::option_container_t;
+
+        explicit time_container_t(const time_container_t &) = delete;
+        explicit time_container_t(time_container_t &&) noexcept = delete;
+        time_container_t &operator=(const time_container_t &) = delete;
+        time_container_t &operator=(time_container_t &&) noexcept = delete;
+
+        ~time_container_t() override;
+
+        clapp::hours_param_option_t time_hours{
+            *this, "time-hours", "Time in hours.", purpose_t::mandatory};
+        clapp::min_param_option_t time_minutes{
+            *this, "time-min", "Time in minutes.", purpose_t::mandatory};
+        clapp::sec_param_option_t time_seconds{
+            *this, "time-sec", "Time in seconds.", purpose_t::mandatory,
+            clapp::min_max_value_t<std::chrono::seconds>{
+                std::chrono::seconds{0}, std::chrono::seconds{7}}};
+    };
+
+    time_container_t time{
+        *this, clapp::parser::types::logic_operator_type_t::logic_xor};
+
     clapp::count_option_t verbose{*this,
                                   "verbose",
                                   'v',
@@ -183,6 +207,7 @@ static void process_cmd2(const cli_parser_t::cmd2_parser_t &cmd2);
 cli_parser_t::~cli_parser_t() = default;
 cli_parser_t::cmd1_parser_t::~cmd1_parser_t() = default;
 cli_parser_t::cmd2_parser_t::~cmd2_parser_t() = default;
+cli_parser_t::time_container_t::~time_container_t() = default;
 
 std::ostream &operator<<(std::ostream &out, const entry_t &entry) {
     if (entry == entry_t::entry1) {
