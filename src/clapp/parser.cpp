@@ -556,3 +556,8 @@ clapp::parser::basic_parser_t::~basic_parser_t() = default;
 clapp::parser::basic_parser_t& clapp::parser::basic_parser_t::get_parser() {
     return *this;
 }
+
+const clapp::parser::basic_parser_t&
+clapp::parser::basic_parser_t::get_const_parser() const {
+    return *this;
+}

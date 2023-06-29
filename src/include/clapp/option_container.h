@@ -38,6 +38,7 @@ class basic_option_container_t {
     void reg(types::variant_opt_conf_container_t* opt_container);
 
     [[nodiscard]] virtual basic_parser_t& get_parser() = 0;
+    [[nodiscard]] virtual const basic_parser_t& get_const_parser() const = 0;
 
    protected:
     [[nodiscard]] const types::variant_opt_conf_t* find_option(
@@ -67,6 +68,7 @@ class option_container_t : public basic_option_container_t {
     ~option_container_t() override;
 
     [[nodiscard]] basic_parser_t& get_parser() override;
+    [[nodiscard]] const basic_parser_t& get_const_parser() const override;
 
    private:
     basic_option_container_t& cont;  // TODO: may use shared ptr.

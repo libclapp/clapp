@@ -145,6 +145,7 @@ class basic_parser_t : public basic_option_container_t {
     [[nodiscard]] types::print_and_exit_func_t& get_print_and_exit_func();
 
     [[nodiscard]] basic_parser_t& get_parser() override;
+    [[nodiscard]] const basic_parser_t& get_const_parser() const override;
 
    protected:
     [[nodiscard]] sub_parsers_map_t& get_sub_parsers();

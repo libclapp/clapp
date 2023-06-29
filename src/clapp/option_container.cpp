@@ -103,3 +103,8 @@ clapp::parser::option_container_t::~option_container_t() = default;
 clapp::parser::basic_parser_t& clapp::parser::option_container_t::get_parser() {
     return cont.get_parser();
 }
+
+const clapp::parser::basic_parser_t&
+clapp::parser::option_container_t::get_const_parser() const {
+    return cont.get_const_parser();
+}
