@@ -102,3 +102,30 @@ TEST(mainParser, constructMainParserGetActiveReturnsThisRef) {
     empty_main_parser_t emp;
     ASSERT_THAT(&emp.get_active_parser(), testing::Eq(&emp));
 }
+
+TEST(mainParser, constructEmptyMainParserGenHelpMsg) {
+    constexpr const char* const argv[]{"main", nullptr};
+    empty_main_parser_t emp;
+
+    const std::optional<clapp::value::exit_t> exit{
+        emp.parse(1, static_cast<const char* const*>(argv))};
+
+    ASSERT_THAT(emp.gen_help_msg(255), testing::StrEq("main\n"));
+    ASSERT_THAT(exit.has_value(), testing::Eq(false));
+}
+
+TEST(mainParser, constructBoMainParserGenHelpMsg) {
+    constexpr const char* const argv[]{"main", "-b", nullptr};
+    bo_main_parser_t bmp;
+
+    const std::optional<clapp::value::exit_t> exit{
+        bmp.parse(2, static_cast<const char* const*>(argv))};
+
+    ASSERT_THAT(
+        bmp.gen_help_msg(255),
+        testing::StrEq(
+            "main [-b]\n\n  Options:\n    -b Exits if given. (optional)\n"));
+
+    ASSERT_THAT(exit.has_value(), testing::Eq(true));
+    ASSERT_THAT(exit.value().get_exit_code(), testing::Eq(EXIT_SUCCESS));
+}

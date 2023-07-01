@@ -25,7 +25,7 @@ void clapp::parser::basic_option_container_t::reg(
                                    option_type>&& config) {
     for (auto it{std::begin(config.short_options)};
          it != std::end(config.short_options); it++) {
-        if (find_option(it->option) != nullptr) {
+        if (find_parser_option(it->option) != nullptr) {
             std::stringstream string_stream;
             string_stream << "can't register option '" << it->option
                           << "', as it is already registered.";
@@ -46,7 +46,7 @@ void clapp::parser::basic_option_container_t::reg(
 
     for (auto it{std::begin(config.long_options)};
          it != std::end(config.long_options); it++) {
-        if (find_option(it->option) != nullptr) {
+        if (find_parser_option(it->option) != nullptr) {
             std::stringstream string_stream;
             string_stream << "can't register option '" << it->option
                           << "', as it is already registered.";

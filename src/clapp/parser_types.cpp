@@ -87,23 +87,28 @@ std::string
 clapp::parser::types::variant_opt_conf_container_t::gen_short_option_line()
     const {
     std::string short_line;
-    bool first{true};
     for (const auto& option : options) {
-        if (!first && logic_operator_type == logic_operator_type_t::logic_xor) {
-            short_line += " |";
+        if (!short_line.empty()) {
+            if (logic_operator_type == logic_operator_type_t::logic_xor) {
+                short_line += " | ";
+            } else {
+                short_line += " ";
+            }
         }
-        short_line += " " + std::visit(
-                                [](const auto& opt) {
-                                    return opt.create_option_string();
-                                },
-                                option);
-        first = false;
+        short_line += std::visit(
+            [](const auto& opt) { return opt.create_option_string(); }, option);
     }
     for (types::variant_opt_conf_container_ptr_vec_t::const_iterator it{
              containers.cbegin()};
-         it != containers.end(); it++) {
+         it != containers.cend(); it++) {
         Expects(*it != nullptr);
-        short_line += " ( " + (*it)->gen_short_option_line() + " )";
+        if (!short_line.empty()) {
+            short_line += " ";
+        }
+        if (logic_operator_type == logic_operator_type_t::logic_xor) {
+            short_line += "| ";
+        }
+        short_line += "( " + (*it)->gen_short_option_line() + " )";
     }
     return short_line;
 }

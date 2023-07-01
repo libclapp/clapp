@@ -45,6 +45,11 @@ class basic_option_container_t {
         std::string_view opt) const;
     [[nodiscard]] const types::variant_opt_conf_t* find_option(char opt) const;
 
+    [[nodiscard]] const types::variant_opt_conf_t* find_parser_option(
+        std::string_view opt) const;
+    [[nodiscard]] const types::variant_opt_conf_t* find_parser_option(
+        char opt) const;
+
     [[nodiscard]] types::validate_func_vec_t& get_validate_functions();
     [[nodiscard]] const types::validate_func_vec_t& get_validate_functions()
         const;
@@ -54,6 +59,28 @@ class basic_option_container_t {
         const;
 
     void validate_options() const;
+
+    static void validate_options_xor(
+        const types::variant_opt_conf_container_t* options,
+        std::optional<std::vector<std::string>>& exclusive_or_options,
+        std::optional<std::vector<std::string>>& mandatory_and_options,
+        std::optional<std::string>& given_xor_option,
+        std::optional<std::vector<std::string>>& given_and_options,
+        bool summarize_xor_options);
+    static void validate_options_and(
+        const types::variant_opt_conf_container_t* options,
+        std::optional<std::vector<std::string>>& mandatory_and_options,
+        std::optional<std::vector<std::string>>& exclusive_or_options,
+        std::optional<std::string>& given_xor_option,
+        std::optional<std::vector<std::string>>& given_and_options,
+        bool allow_empty);
+
+    static void append_mandatory_and_options(
+        const types::variant_opt_conf_container_t* options,
+        std::vector<std::string>& mandatory_and_options);
+    static void append_exclusive_or_options(
+        const types::variant_opt_conf_container_t* options,
+        std::vector<std::string>& exclusive_or_options);
 
     [[nodiscard]] std::string gen_short_option_line() const;
     [[nodiscard]] types::help_entry_vec_t get_option_help() const;

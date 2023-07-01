@@ -43,5 +43,8 @@ clapp::parser::basic_sub_parser_t::basic_sub_parser_t(
 std::string clapp::parser::basic_sub_parser_t::gen_short_line_prefix() const {
     const std::string short_line_prefix{parent_parser.gen_short_line_prefix()};
     const std::string short_line{gen_short_line()};
-    return short_line_prefix + " " + sub_parser_name + short_line;
+    if (!short_line.empty()) {
+        return short_line_prefix + " " + sub_parser_name + " " + short_line;
+    }
+    return short_line_prefix + " " + sub_parser_name;
 }
