@@ -444,6 +444,155 @@ std::string nested_container_parser2_t::gen_short_line_prefix() const {
     return "container-parser " + gen_short_line();
 }
 
+class super_nested_container_parser_t : public clapp::basic_parser_t {
+   public:
+    using clapp::basic_parser_t::basic_parser_t;
+    ~super_nested_container_parser_t() override;
+
+    class container_t : public clapp::option_container_t {
+       public:
+        using clapp::option_container_t::option_container_t;
+        ~container_t() override;
+
+        class test_container_t : public clapp::option_container_t {
+           public:
+            using clapp::option_container_t::option_container_t;
+            ~test_container_t() override;
+
+            class test_sub_int_container_t : public clapp::option_container_t {
+               public:
+                using clapp::option_container_t::option_container_t;
+                ~test_sub_int_container_t() override;
+
+                clapp::option::int64_param_option_t sub_int_option{
+                    *this, "sub-int", "Sub int option.",
+                    clapp::parser::types::purpose_t::mandatory};
+
+                clapp::option::int64_param_option_t sub_int_option2{
+                    *this, "sub-int2", "Sub int option2.",
+                    clapp::parser::types::purpose_t::mandatory};
+            };
+
+            class test_sub_uint_container_t : public clapp::option_container_t {
+               public:
+                using clapp::option_container_t::option_container_t;
+                ~test_sub_uint_container_t() override;
+
+                clapp::option::uint64_param_option_t sub_uint_option{
+                    *this, "sub-uint", "Sub unsigned int option.",
+                    clapp::parser::types::purpose_t::mandatory};
+
+                clapp::option::uint64_param_option_t sub_uint_option2{
+                    *this, "sub-uint2", "Sub unsigned int option2.",
+                    clapp::parser::types::purpose_t::mandatory};
+            };
+
+            clapp::option::int64_param_option_t int_option{
+                *this, "int", 'i', "Int option.",
+                clapp::parser::types::purpose_t::mandatory};
+
+            clapp::option::uint64_param_option_t uint_option{
+                *this, "uint", 'u', "Unsigned int option.",
+                clapp::parser::types::purpose_t::mandatory};
+
+            test_sub_int_container_t tsic{
+                *this, clapp::parser::types::logic_operator_type_t::logic_and};
+
+            test_sub_uint_container_t tsuc{
+                *this, clapp::parser::types::logic_operator_type_t::logic_xor};
+        };
+
+        class test_container2_t : public clapp::option_container_t {
+           public:
+            using clapp::option_container_t::option_container_t;
+            ~test_container2_t() override;
+
+            class test_int_container_t : public clapp::option_container_t {
+               public:
+                using clapp::option_container_t::option_container_t;
+                ~test_int_container_t() override;
+
+                clapp::option::int64_param_option_t int1{
+                    *this, "int1", "Int option1.",
+                    clapp::parser::types::purpose_t::mandatory};
+
+                clapp::option::int64_param_option_t int2{
+                    *this, "int2", "Int option2.",
+                    clapp::parser::types::purpose_t::mandatory};
+            };
+
+            class test_uint_container_t : public clapp::option_container_t {
+               public:
+                using clapp::option_container_t::option_container_t;
+                ~test_uint_container_t() override;
+
+                clapp::option::uint64_param_option_t uint1{
+                    *this, "uint1", "Unsigned int option1.",
+                    clapp::parser::types::purpose_t::mandatory};
+
+                clapp::option::uint64_param_option_t uint2{
+                    *this, "uint2", "Unsigned int option2.",
+                    clapp::parser::types::purpose_t::mandatory};
+            };
+
+            clapp::option::string_param_option_t string_option{
+                *this, "str", 's', "String option.",
+                clapp::parser::types::purpose_t::mandatory};
+
+            clapp::option::bool_option_t bool_option{
+                *this, "bool", 'b', "Bool option.",
+                clapp::parser::types::purpose_t::mandatory};
+
+            test_int_container_t tsic{
+                *this, clapp::parser::types::logic_operator_type_t::logic_and};
+
+            test_uint_container_t tsuc{
+                *this, clapp::parser::types::logic_operator_type_t::logic_and};
+        };
+
+        test_container_t toc{
+            *this, clapp::parser::types::logic_operator_type_t::logic_and};
+
+        test_container2_t toc2{
+            *this, clapp::parser::types::logic_operator_type_t::logic_xor};
+
+        clapp::option::string_param_option_t cont_string_option{
+            *this, "cstr", 'c', "Cont String option.",
+            clapp::parser::types::purpose_t::mandatory};
+    };
+
+    container_t container{
+        *this, clapp::parser::types::logic_operator_type_t::logic_xor};
+
+    [[nodiscard]] std::string gen_short_line_prefix() const override;
+};
+
+super_nested_container_parser_t::container_t::test_container_t::
+    ~test_container_t() = default;
+
+super_nested_container_parser_t::container_t::test_container_t::
+    test_sub_int_container_t::~test_sub_int_container_t() = default;
+
+super_nested_container_parser_t::container_t::test_container_t::
+    test_sub_uint_container_t::~test_sub_uint_container_t() = default;
+
+super_nested_container_parser_t::container_t::test_container2_t::
+    ~test_container2_t() = default;
+
+super_nested_container_parser_t::container_t::test_container2_t::
+    test_int_container_t::~test_int_container_t() = default;
+
+super_nested_container_parser_t::container_t::test_container2_t::
+    test_uint_container_t::~test_uint_container_t() = default;
+
+super_nested_container_parser_t::container_t::~container_t() = default;
+
+super_nested_container_parser_t::~super_nested_container_parser_t() = default;
+
+std::string super_nested_container_parser_t::gen_short_line_prefix() const {
+    return "container-parser " + gen_short_line();
+}
+
 class invalid_nested_container_parser_t : public clapp::basic_parser_t {
    public:
     using clapp::basic_parser_t::basic_parser_t;
@@ -1669,6 +1818,455 @@ TEST(
     ASSERT_THAT(ncp.container.toc2.bool_option, BoolOptionNotGiven());
 
     ASSERT_THROW(ncp.validate_recursive(),
+                 clapp::exception::option_param_exception_t);
+}
+
+TEST(parser, constructSuperNestedContainerParserAndGenHelpMessage) {
+    super_nested_container_parser_t sncp;
+    ASSERT_THAT(
+        sncp.gen_help_msg(255),
+        testing::StrEq(
+            "container-parser ( -c|--cstr=<param> | ( -i|--int=<param> "
+            "-u|--uint=<param> ( --sub-int=<param> --sub-int2=<param> ) ( "
+            "--sub-uint=<param> | --sub-uint2=<param> ) ) | ( -s|--str=<param> "
+            "| -b|--bool | ( --int1=<param> --int2=<param> ) | ( "
+            "--uint1=<param> --uint2=<param> ) ) )\n\n  Options:\n    "
+            "-c|--cstr=<param>   Cont String option. (mandatory)\n    "
+            "-i|--int=<param>    Int option. (mandatory)\n    "
+            "-u|--uint=<param>   Unsigned int option. (mandatory)\n    "
+            "--sub-int=<param>   Sub int option. (mandatory)\n    "
+            "--sub-int2=<param>  Sub int option2. (mandatory)\n    "
+            "--sub-uint=<param>  Sub unsigned int option. (mandatory)\n    "
+            "--sub-uint2=<param> Sub unsigned int option2. (mandatory)\n    "
+            "-s|--str=<param>    String option. (mandatory)\n    -b|--bool     "
+            "      Bool option. (mandatory)\n    --int1=<param>      Int "
+            "option1. (mandatory)\n    --int2=<param>      Int option2. "
+            "(mandatory)\n    --uint1=<param>     Unsigned int option1. "
+            "(mandatory)\n    --uint2=<param>     Unsigned int option2. "
+            "(mandatory)\n"));
+}
+
+TEST(
+    parser,
+    constructSuperNestedContainerParserAndParseEmptyOptionValidateRecursiveThrows) {
+    constexpr const char* const argv[]{nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    super_nested_container_parser_t sncp;
+    ASSERT_THAT(sncp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(sncp.container.cont_string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.int_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option2,
+                ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.bool_option, BoolOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionNotGiven());
+
+    ASSERT_THROW(sncp.validate_recursive(),
+                 clapp::exception::option_param_exception_t);
+}
+
+TEST(
+    parser,
+    constructSuperNestedContainerParserAndParseCStrOptionValidateRecursiveDoesNotThrow) {
+    constexpr const char* const argv[]{"--cstr", "te", nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    super_nested_container_parser_t sncp;
+    ASSERT_THAT(sncp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(sncp.container.cont_string_option, ParamOptionGiven("te"));
+    ASSERT_THAT(sncp.container.toc.int_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option2,
+                ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.bool_option, BoolOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionNotGiven());
+
+    ASSERT_NO_THROW(sncp.validate_recursive());
+}
+
+TEST(
+    parser,
+    constructSuperNestedContainerParserAndParseIntUintSubIntSubInt2SubUintOptionValidateRecursiveDoesNotThrow) {
+    constexpr const char* const argv[]{"-i",         "1", "-u",         "2",
+                                       "--sub-int",  "3", "--sub-int2", "4",
+                                       "--sub-uint", "5", nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    super_nested_container_parser_t sncp;
+    ASSERT_THAT(sncp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(sncp.container.cont_string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.int_option, ParamOptionGiven(1));
+    ASSERT_THAT(sncp.container.toc.uint_option, ParamOptionGiven(2U));
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option, ParamOptionGiven(3));
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option2, ParamOptionGiven(4));
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option, ParamOptionGiven(5U));
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option2,
+                ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.bool_option, BoolOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionNotGiven());
+
+    ASSERT_NO_THROW(sncp.validate_recursive());
+}
+
+TEST(
+    parser,
+    constructSuperNestedContainerParserAndParseIntUintSubIntSubInt2SubUint2OptionValidateRecursiveDoesNotThrow) {
+    constexpr const char* const argv[]{"-i",          "1", "-u",         "2",
+                                       "--sub-int",   "3", "--sub-int2", "4",
+                                       "--sub-uint2", "5", nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    super_nested_container_parser_t sncp;
+    ASSERT_THAT(sncp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(sncp.container.cont_string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.int_option, ParamOptionGiven(1));
+    ASSERT_THAT(sncp.container.toc.uint_option, ParamOptionGiven(2U));
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option, ParamOptionGiven(3));
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option2, ParamOptionGiven(4));
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option2, ParamOptionGiven(5U));
+    ASSERT_THAT(sncp.container.toc2.string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.bool_option, BoolOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionNotGiven());
+
+    ASSERT_NO_THROW(sncp.validate_recursive());
+}
+
+TEST(
+    parser,
+    constructSuperNestedContainerParserAndParseIntUintSubIntSubInt2SubUintSubUint2OptionValidateRecursiveThrows) {
+    constexpr const char* const argv[]{"-i",         "1", "-u",          "2",
+                                       "--sub-int",  "3", "--sub-int2",  "4",
+                                       "--sub-uint", "5", "--sub-uint2", "6",
+                                       nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    super_nested_container_parser_t sncp;
+    ASSERT_THAT(sncp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(sncp.container.cont_string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.int_option, ParamOptionGiven(1));
+    ASSERT_THAT(sncp.container.toc.uint_option, ParamOptionGiven(2U));
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option, ParamOptionGiven(3));
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option2, ParamOptionGiven(4));
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option, ParamOptionGiven(5U));
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option2, ParamOptionGiven(6U));
+    ASSERT_THAT(sncp.container.toc2.string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.bool_option, BoolOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionNotGiven());
+
+    ASSERT_THROW(sncp.validate_recursive(),
+                 clapp::exception::option_param_exception_t);
+}
+
+TEST(
+    parser,
+    constructSuperNestedContainerParserAndParseIntUintSubIntSubUintSubUint2OptionValidateRecursiveThrows) {
+    constexpr const char* const argv[]{"--int",      "1",         "--uint",
+                                       "2",          "--sub-int", "3",
+                                       "--sub-uint", "4",         nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    super_nested_container_parser_t sncp;
+    ASSERT_THAT(sncp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(sncp.container.cont_string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.int_option, ParamOptionGiven(1));
+    ASSERT_THAT(sncp.container.toc.uint_option, ParamOptionGiven(2U));
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option, ParamOptionGiven(3));
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option, ParamOptionGiven(4U));
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option2,
+                ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.bool_option, BoolOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionNotGiven());
+
+    ASSERT_THROW(sncp.validate_recursive(),
+                 clapp::exception::option_param_exception_t);
+}
+
+TEST(
+    parser,
+    constructSuperNestedContainerParserAndParseIntSubIntSubInt2SubUint2OptionValidateRecursiveThrows) {
+    constexpr const char* const argv[]{"-i",          "1",          "--sub-int",
+                                       "2",           "--sub-int2", "3",
+                                       "--sub-uint2", "4",          nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    super_nested_container_parser_t sncp;
+    ASSERT_THAT(sncp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(sncp.container.cont_string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.int_option, ParamOptionGiven(1));
+    ASSERT_THAT(sncp.container.toc.uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option, ParamOptionGiven(2));
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option2, ParamOptionGiven(3));
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option2, ParamOptionGiven(4U));
+    ASSERT_THAT(sncp.container.toc2.string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.bool_option, BoolOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionNotGiven());
+
+    ASSERT_THROW(sncp.validate_recursive(),
+                 clapp::exception::option_param_exception_t);
+}
+
+TEST(
+    parser,
+    constructSuperNestedContainerParserAndParseStringOptionValidateRecursiveDoesNotThrow) {
+    constexpr const char* const argv[]{"-s", "string", nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    super_nested_container_parser_t sncp;
+    ASSERT_THAT(sncp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(sncp.container.cont_string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.int_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option2,
+                ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.string_option, ParamOptionGiven("string"));
+    ASSERT_THAT(sncp.container.toc2.bool_option, BoolOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionNotGiven());
+
+    ASSERT_NO_THROW(sncp.validate_recursive());
+}
+
+TEST(
+    parser,
+    constructSuperNestedContainerParserAndParseBoolOptionValidateRecursiveDoesNotThrow) {
+    constexpr const char* const argv[]{"-b", nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    super_nested_container_parser_t sncp;
+    ASSERT_THAT(sncp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(sncp.container.cont_string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.int_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option2,
+                ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.bool_option, BoolOptionGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionNotGiven());
+
+    ASSERT_NO_THROW(sncp.validate_recursive());
+}
+
+TEST(
+    parser,
+    constructSuperNestedContainerParserAndParseInt1Int2OptionValidateRecursiveDoesNotThrow) {
+    constexpr const char* const argv[]{"--int1=1", "--int2=2", nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    super_nested_container_parser_t sncp;
+    ASSERT_THAT(sncp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(sncp.container.cont_string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.int_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option2,
+                ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.bool_option, BoolOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int1, ParamOptionGiven(1));
+    ASSERT_THAT(sncp.container.toc2.tsic.int2, ParamOptionGiven(2));
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionNotGiven());
+
+    ASSERT_NO_THROW(sncp.validate_recursive());
+}
+
+TEST(
+    parser,
+    constructSuperNestedContainerParserAndParseUint1Uint2OptionValidateRecursiveDoesNotThrow) {
+    constexpr const char* const argv[]{"--uint1=1", "--uint2=2", nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    super_nested_container_parser_t sncp;
+    ASSERT_THAT(sncp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(sncp.container.cont_string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.int_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option2,
+                ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.bool_option, BoolOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionGiven(1U));
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionGiven(2U));
+
+    ASSERT_NO_THROW(sncp.validate_recursive());
+}
+
+TEST(
+    parser,
+    constructSuperNestedContainerParserAndParseInt1Int2Uint1Uint2OptionValidateRecursiveThrows) {
+    constexpr const char* const argv[]{"--int1=1", "--int2=2", "--uint1=3",
+                                       "--uint2=4", nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    super_nested_container_parser_t sncp;
+    ASSERT_THAT(sncp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(sncp.container.cont_string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.int_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option2,
+                ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.bool_option, BoolOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int1, ParamOptionGiven(1));
+    ASSERT_THAT(sncp.container.toc2.tsic.int2, ParamOptionGiven(2));
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionGiven(3U));
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionGiven(4U));
+
+    ASSERT_THROW(sncp.validate_recursive(),
+                 clapp::exception::option_param_exception_t);
+}
+
+TEST(
+    parser,
+    constructSuperNestedContainerParserAndParseBoolInt1Int2OptionValidateRecursiveThrows) {
+    constexpr const char* const argv[]{"--bool", "--int1=1", "--int2=2",
+                                       nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    super_nested_container_parser_t sncp;
+    ASSERT_THAT(sncp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(sncp.container.cont_string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.int_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option2,
+                ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.bool_option, BoolOptionGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int1, ParamOptionGiven(1));
+    ASSERT_THAT(sncp.container.toc2.tsic.int2, ParamOptionGiven(2));
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionNotGiven());
+
+    ASSERT_THROW(sncp.validate_recursive(),
+                 clapp::exception::option_param_exception_t);
+}
+
+TEST(
+    parser,
+    constructSuperNestedContainerParserAndParseStringUint1Uint2OptionValidateRecursiveThrows) {
+    constexpr const char* const argv[]{"-s=str", "--uint1=1", "--uint2=2",
+                                       nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    super_nested_container_parser_t sncp;
+    ASSERT_THAT(sncp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(sncp.container.cont_string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.int_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option2,
+                ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.string_option, ParamOptionGiven("str"));
+    ASSERT_THAT(sncp.container.toc2.bool_option, BoolOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionGiven(1U));
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionGiven(2U));
+
+    ASSERT_THROW(sncp.validate_recursive(),
+                 clapp::exception::option_param_exception_t);
+}
+
+TEST(
+    parser,
+    constructSuperNestedContainerParserAndParseStringBoolOptionValidateRecursiveThrows) {
+    constexpr const char* const argv[]{"-s=string", "--bool", nullptr};
+    const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
+    super_nested_container_parser_t sncp;
+    ASSERT_THAT(sncp.parse(arg.begin(), arg.end()).has_value(),
+                testing::Eq(false));
+
+    ASSERT_THAT(sncp.container.cont_string_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.int_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsic.sub_int_option2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc.tsuc.sub_uint_option2,
+                ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.string_option, ParamOptionGiven("string"));
+    ASSERT_THAT(sncp.container.toc2.bool_option, BoolOptionGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsic.int2, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionNotGiven());
+    ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionNotGiven());
+
+    ASSERT_THROW(sncp.validate_recursive(),
                  clapp::exception::option_param_exception_t);
 }
 
