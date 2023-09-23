@@ -23,10 +23,9 @@
 template <clapp::parser::types::argument_type_t argument_type>
 void clapp::parser::basic_parser_t::reg(
     types::basic_reg_argument_conf_t<argument_type>&& config) {
-    if (config.argument_name.size() == 0) {
+    if (config.argument_name.empty()) {
         std::stringstream string_stream;
-        string_stream << "Argument name '" << config.argument_name
-                      << "' is too short.";
+        string_stream << "Argument name must be at least one char long.";
         throw clapp::exception::argument_exception_t{string_stream.str()};
     }
 
