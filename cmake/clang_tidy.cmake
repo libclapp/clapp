@@ -19,6 +19,11 @@ if(libClaPP_CLANG_TIDY_BIN)
     list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -fuchsia-overloaded-operator)
     list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -google-runtime-references)
 
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "12.0.0")
+        list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -hicpp-use-equals-default)
+        list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -modernize-use-equals-default)
+    endif()
+
     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "11.0.0")
         list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -llvmlibc-*)
         list(APPEND libClaPP_CLANG_TIDY_CHECKS_LIST -misc-no-recursion)
