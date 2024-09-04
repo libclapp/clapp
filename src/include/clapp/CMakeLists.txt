@@ -2,6 +2,8 @@ configure_file(build_info.h.in build_info.h)
 install(FILES  "${CMAKE_CURRENT_SOURCE_DIR}/argument.h"
                "${CMAKE_CURRENT_SOURCE_DIR}/argument.hpp"
                "${CMAKE_CURRENT_BINARY_DIR}/build_info.h"
+               "${CMAKE_CURRENT_SOURCE_DIR}/contract.h"
+               "${CMAKE_CURRENT_SOURCE_DIR}/contract.hpp"
                "${CMAKE_CURRENT_SOURCE_DIR}/exception.h"
                "${CMAKE_CURRENT_SOURCE_DIR}/filesystem.h"
                "${CMAKE_CURRENT_SOURCE_DIR}/main_parser.h"
