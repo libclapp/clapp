@@ -19,8 +19,8 @@
 #include <clapp/value.h>
 
 #include <functional>
-#include <gsl/span>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <variant>
@@ -28,9 +28,9 @@
 namespace clapp {
 inline namespace parser {
 namespace types {
-struct arg_t : public gsl::span<const char* const> {
+struct arg_t : public std::span<const char* const> {
    public:
-    using base = gsl::span<const char* const>;
+    using base = std::span<const char* const>;
 
     inline arg_t(const char* const* argv, int argc);
 };

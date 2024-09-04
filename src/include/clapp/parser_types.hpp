@@ -22,7 +22,7 @@
 #include <numeric>
 
 inline clapp::parser::types::arg_t::arg_t(const char* const* argv, int argc)
-    : base{gsl::span{argv, static_cast<std::size_t>(argc)}} {
+    : base{std::span{argv, static_cast<std::size_t>(argc)}} {
     CLAPP_CONTRACT_EXPECTS(argc >= 0);
 }
 
