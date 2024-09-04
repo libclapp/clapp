@@ -151,7 +151,8 @@ void process_first(const cli_parser_t::first_parser_t &first);
 void process_second(const cli_parser_t::second_parser_t &second);
 
 void process_first(const cli_parser_t::first_parser_t &first) {
-    Expects(first.short_bool);  // parser ensures mandatory options are given
+    CLAPP_CONTRACT_EXPECTS(
+        first.short_bool);  // parser ensures mandatory options are given
     std::cout << "short_bool: " << first.short_bool.value() << "\n";
 
     if (first.string) {  // if optional string option is given
@@ -166,15 +167,17 @@ void process_first(const cli_parser_t::first_parser_t &first) {
         std::cout << "string-arg-x: not given\n";
     }
 
-    Expects(first.double_opt);
+    CLAPP_CONTRACT_EXPECTS(first.double_opt);
     std::cout << "double-opt: " << first.double_opt.value() << "\n";
 }
 
 void process_second(const cli_parser_t::second_parser_t &second) {
-    Expects(second.int_arg);  // parser ensures mandatory arguments are given
+    CLAPP_CONTRACT_EXPECTS(
+        second.int_arg);  // parser ensures mandatory arguments are given
     std::cout << "int-arg: " << second.int_arg.value() << "\n";
 
-    Expects(second.double_arg);  // parser ensures mandatory arguments are given
+    CLAPP_CONTRACT_EXPECTS(
+        second.double_arg);  // parser ensures mandatory arguments are given
     std::cout << "double-arg: " << second.double_arg.value() << "\n";
 
     if (second.string_arg_x) {  // if optional string-arg-x option is given

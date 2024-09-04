@@ -16,11 +16,11 @@
 #ifndef CLAPP_VALUE_HPP
 #define CLAPP_VALUE_HPP
 
+#include <clapp/contract.h>
 #include <clapp/exception.h>
 #include <clapp/type_traits.h>
 #include <clapp/value.h>
 
-#include <gsl/gsl_assert>
 #include <sstream>
 
 template <typename T>
@@ -73,7 +73,7 @@ T clapp::value::default_value_t<T>::default_value() const {
 template <typename T>
 clapp::value::min_max_value_t<T>::min_max_value_t(T _min, T _max)
     : min{_min}, max{_max} {
-    Expects(min < max);
+    CLAPP_CONTRACT_EXPECTS(min < max);
 }
 
 template <typename T>

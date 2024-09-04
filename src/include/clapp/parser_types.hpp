@@ -16,13 +16,14 @@
 #ifndef CLAPP_PARSER_TYPES_HPP
 #define CLAPP_PARSER_TYPES_HPP
 
+#include <clapp/contract.h>
 #include <clapp/parser_types.h>
 
 #include <numeric>
 
 inline clapp::parser::types::arg_t::arg_t(const char* const* argv, int argc)
     : base{gsl::span{argv, static_cast<std::size_t>(argc)}} {
-    Expects(argc >= 0);
+    CLAPP_CONTRACT_EXPECTS(argc >= 0);
 }
 
 constexpr std::optional<std::string_view> clapp::parser::types::to_string_view(

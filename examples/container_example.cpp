@@ -119,7 +119,7 @@ int main(int argc, char **argv) {
             std::cout << "verbose: not given\n";
         }
 
-        Expects(
+        CLAPP_CONTRACT_EXPECTS(
             parser->options
                 .string_param);  // parser ensures, that string-option is given
         std::cout << "string-param: " << parser->options.string_param.value()

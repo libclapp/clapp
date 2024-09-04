@@ -100,12 +100,12 @@ int main(int argc, char *argv[]) {
             return exit.value().get_exit_code();
         }
 
-        Expects(
+        CLAPP_CONTRACT_EXPECTS(
             parser
                 ->string_arg);  // parser ensures mandatory arguments are given
         std::cout << "string-arg: " << parser->string_arg.value() << std::endl;
 
-        Expects(
+        CLAPP_CONTRACT_EXPECTS(
             parser->int_arg);  // parser ensures mandatory arguments are given
         std::cout << "int-arg: " << parser->int_arg.value() << std::endl;
 
@@ -121,8 +121,9 @@ int main(int argc, char *argv[]) {
             std::cout << "variadic-string-arg: not given" << std::endl;
         }
 
-        Expects(parser->options.string_param);  // The parser ensures that
-                                                // mandatory options are given
+        CLAPP_CONTRACT_EXPECTS(
+            parser->options.string_param);  // The parser ensures that
+                                            // mandatory options are given
         std::cout << "string_param: '" << parser->options.string_param.value()
                   << "'" << std::endl;
 

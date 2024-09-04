@@ -13,6 +13,7 @@
 // SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <clapp/contract.h>
 #include <clapp/parser.h>
 #include <clapp/sub_parser.h>
 #include <unistd.h>
@@ -47,7 +48,7 @@ clapp::parser::types::variant_opt_conf_container_t::find_option(
     for (types::variant_opt_conf_container_ptr_vec_t::const_iterator it{
              containers.cbegin()};
          it != containers.cend(); it++) {
-        Expects(*it != nullptr);
+        CLAPP_CONTRACT_EXPECTS(*it != nullptr);
         const clapp::parser::types::variant_opt_conf_t* ret{
             (*it)->find_option(long_option)};
         if (ret != nullptr) {
@@ -73,7 +74,7 @@ clapp::parser::types::variant_opt_conf_container_t::find_option(
     for (types::variant_opt_conf_container_ptr_vec_t::const_iterator it{
              containers.cbegin()};
          it != containers.cend(); it++) {
-        Expects(*it != nullptr);
+        CLAPP_CONTRACT_EXPECTS(*it != nullptr);
         const clapp::parser::types::variant_opt_conf_t* ret{
             (*it)->find_option(short_option)};
         if (ret != nullptr) {
@@ -101,7 +102,7 @@ clapp::parser::types::variant_opt_conf_container_t::gen_short_option_line()
     for (types::variant_opt_conf_container_ptr_vec_t::const_iterator it{
              containers.cbegin()};
          it != containers.cend(); it++) {
-        Expects(*it != nullptr);
+        CLAPP_CONTRACT_EXPECTS(*it != nullptr);
         if (!short_line.empty()) {
             if (logic_operator_type == logic_operator_type_t::logic_xor) {
                 short_line += " | ";
@@ -128,7 +129,7 @@ clapp::parser::types::variant_opt_conf_container_t::get_option_help() const {
     for (types::variant_opt_conf_container_ptr_vec_t::const_iterator it{
              containers.cbegin()};
          it != containers.cend(); it++) {
-        Expects(*it != nullptr);
+        CLAPP_CONTRACT_EXPECTS(*it != nullptr);
         clapp::parser::types::help_entry_vec_t tmp{(*it)->get_option_help()};
         ret.insert(ret.end(), std::make_move_iterator(tmp.begin()),
                    std::make_move_iterator(tmp.end()));

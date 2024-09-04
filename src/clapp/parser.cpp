@@ -13,6 +13,7 @@
 // SOFTWARE.
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <clapp/contract.h>
 #include <clapp/parser.h>
 #include <clapp/sub_parser.h>
 #include <unistd.h>
@@ -195,7 +196,8 @@ std::string clapp::parser::basic_parser_t::gen_opt_arg_lines(
         ret += "\n" + std::string(num_spaces + num_sub_spaces, ' ') +
                "Arguments:\n";
         for (const types::help_entry_t& entry : argument_help_entries) {
-            Expects((help_contents.max_name_size + 1) > entry.name.size());
+            CLAPP_CONTRACT_EXPECTS((help_contents.max_name_size + 1) >
+                                   entry.name.size());
             ret +=
                 "  " + std::string(num_spaces + num_sub_spaces, ' ') +
                 entry.name +
@@ -210,7 +212,8 @@ std::string clapp::parser::basic_parser_t::gen_opt_arg_lines(
         ret +=
             "\n" + std::string(num_spaces + num_sub_spaces, ' ') + "Options:\n";
         for (const types::help_entry_t& entry : option_help_entries) {
-            Expects((help_contents.max_name_size + 1) > entry.name.size());
+            CLAPP_CONTRACT_EXPECTS((help_contents.max_name_size + 1) >
+                                   entry.name.size());
             ret +=
                 "  " + std::string(num_spaces + num_sub_spaces, ' ') +
                 entry.name +
@@ -276,14 +279,15 @@ clapp::basic_parser_t::process_parse_result(
     const types::arg_iterator_t ait,
     const clapp::basic_parser_t::parse_result_t& parse_result) {
     if (ait == parse_result.it) {
-        Expects(parse_result.long_option || parse_result.short_option);
+        CLAPP_CONTRACT_EXPECTS(parse_result.long_option ||
+                               parse_result.short_option);
         if (parse_result.short_option) {
             std::stringstream string_stream;
             string_stream << "Invalid (sub-)parser option '-"
                           << parse_result.short_option.value() << "'";
             throw clapp::exception::option_exception_t{string_stream.str()};
         }
-        Expects(parse_result.long_option);
+        CLAPP_CONTRACT_EXPECTS(parse_result.long_option);
         std::stringstream string_stream;
         string_stream << "Invalid (sub-)parser option '--"
                       << parse_result.long_option.value() << "'";
@@ -423,7 +427,7 @@ clapp::parser::basic_parser_t::parse_long(const std::string_view option,
             using current_option_type_t = std::decay_t<decltype(found_opt)>;
             typename current_option_type_t::long_opt_conf_vec_cit_t opt_it{
                 found_opt.find_option(opt)};
-            Ensures(opt_it != std::end(found_opt.long_options));
+            CLAPP_CONTRACT_ENSURES(opt_it != std::end(found_opt.long_options));
             if (equal_index != std::string_view::npos) {
                 if constexpr (std::is_same<current_option_type_t,
                                            types::opt_no_param_conf_t>::value) {
@@ -463,7 +467,7 @@ clapp::parser::basic_parser_t::parse_result_t
 clapp::parser::basic_parser_t::parse_short(const std::string_view option,
                                            types::arg_iterator_t ait,
                                            types::arg_iterator_t end) {
-    Expects(!option.empty());
+    CLAPP_CONTRACT_EXPECTS(!option.empty());
     const std::size_t equal_index{option.find_first_of('=')};
     const char opt{option[0U]};
     const types::variant_opt_conf_t* found{find_option(opt)};
@@ -476,7 +480,7 @@ clapp::parser::basic_parser_t::parse_short(const std::string_view option,
             using current_option_type_t = std::decay_t<decltype(found_opt)>;
             typename current_option_type_t::short_opt_conf_vec_cit_t opt_it{
                 found_opt.find_option(opt)};
-            Ensures(opt_it != std::end(found_opt.short_options));
+            CLAPP_CONTRACT_ENSURES(opt_it != std::end(found_opt.short_options));
             if (equal_index == 1U) {
                 if constexpr (std::is_same<current_option_type_t,
                                            types::opt_no_param_conf_t>::value) {
@@ -525,7 +529,7 @@ clapp::parser::basic_parser_t::parse_short(const std::string_view option,
     if (ret) {
         return ret.value();
     }
-    Expects(option.size() > 1U);
+    CLAPP_CONTRACT_EXPECTS(option.size() > 1U);
     return parse_short(std::string_view{option.data() + 1U, option.size() - 1U},
                        ait, end);
 }

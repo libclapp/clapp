@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
         if (exit) {
             return exit.value().get_exit_code();
         }
-        Ensures(p->string_arg);
+        CLAPP_CONTRACT_ENSURES(p->string_arg);
         std::cout << "string-arg: " << p->string_arg.value() << std::endl;
     } catch (std::exception &e) {
         std::cout << "Caught Exception: " << e.what() << std::endl;

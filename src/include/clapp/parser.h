@@ -20,7 +20,6 @@
 #include <clapp/parser_types.h>
 #include <clapp/value.h>
 
-#include <gsl/gsl_assert>
 #include <gsl/span>
 #include <map>
 #include <optional>

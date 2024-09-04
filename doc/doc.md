@@ -599,12 +599,12 @@ int main(int argc, char *argv[]) {
         if (exit) {
             return exit.value().get_exit_code();
         }
-        Ensures(
+        CLAPP_CONTRACT_ENSURES(
             clip.string_arg);  // parser ensures mandatory arguments are given
-        Ensures(
+        CLAPP_CONTRACT_ENSURES(
             clip.bool_opt);  // parser ensures mandatory bool-option is given
-        Ensures(clip.string_opt);  // parser ensures mandatory string-option is
-                                   // given
+        CLAPP_CONTRACT_ENSURES(clip.string_opt);  // parser ensures mandatory
+                                                  // string-option is given
         std::cout << "string-opt: " << clip.string_opt.value() << std::endl;
         std::cout << "string-arg: " << clip.string_arg.value() << std::endl;
     } catch (std::exception &e) {
@@ -716,13 +716,14 @@ int main(int argc, char *argv[]) {
         if (exit) {
             return exit.value().get_exit_code();
         }
-        Ensures(
+        CLAPP_CONTRACT_ENSURES(
             clip.string_arg);  // parser ensures mandatory arguments are given
-        Ensures(
+        CLAPP_CONTRACT_ENSURES(
             clip.options
                 .bool_opt);  // parser ensures mandatory bool-option is given
-        Ensures(clip.options.string_opt);  // parser ensures mandatory
-                                           // string-option is given
+        CLAPP_CONTRACT_ENSURES(
+            clip.options.string_opt);  // parser ensures mandatory
+                                       // string-option is given
         std::cout << "string-opt: " << clip.options.string_opt.value()
                   << std::endl;
         std::cout << "string-arg: " << clip.string_arg.value() << std::endl;
@@ -883,14 +884,15 @@ int main(int argc, char *argv[]) {
         if (exit) {
             return exit.value().get_exit_code();
         }
-        Ensures(
+        CLAPP_CONTRACT_ENSURES(
             parser
                 ->string_arg);  // parser ensures mandatory arguments are given
-        Ensures(
+        CLAPP_CONTRACT_ENSURES(
             parser->options
                 .bool_opt);  // parser ensures mandatory bool-option is given
-        Ensures(parser->options.string_opt);  // parser ensures mandatory
-                                              // string-option is given
+        CLAPP_CONTRACT_ENSURES(
+            parser->options.string_opt);  // parser ensures mandatory
+                                          // string-option is given
         std::cout << "string-opt: " << parser->options.string_opt.value()
                   << std::endl;
         std::cout << "string-arg: " << parser->string_arg.value() << std::endl;
@@ -1108,7 +1110,7 @@ int main(int argc, char *argv[]) {
         } else if (parser->mode2) {
             std::cout << "mode2: ";
             // parser ensures mandatory arguments are given
-            Ensures(parser->mode2.string_arg);
+            CLAPP_CONTRACT_ENSURES(parser->mode2.string_arg);
             std::cout << "string_arg: '" << parser->mode2.string_arg.value()
                       << "'" << std::endl;
         } else {
