@@ -17,5 +17,5 @@ add_library(libClaPP_GSL INTERFACE)
 target_include_directories(libClaPP_GSL INTERFACE ${libClaPP_GSL_INCLUDE_DIR}/..)
 
 add_executable(usage_cmake_pkgconfig ../main.cpp)
-target_compile_features(usage_cmake_pkgconfig PRIVATE cxx_std_17)
+target_compile_features(usage_cmake_pkgconfig PRIVATE cxx_std_20)
 target_link_libraries(usage_cmake_pkgconfig PRIVATE libClaPP::clapp libClaPP_GSL)
