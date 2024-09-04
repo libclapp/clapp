@@ -53,7 +53,6 @@ if(libClaPP_CPPCHECK)
 endif()
 
 include(cmake/sanitizer.cmake)
-include(cmake/gsl.cmake)
 include(cmake/gtest.cmake)
 
 enable_testing()

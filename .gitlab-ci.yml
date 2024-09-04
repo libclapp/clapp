@@ -26,12 +26,8 @@ variables:
         - if [ "${COMPILER}" == "clang" ]; then export CC="clang-${COMPILER_VERSION}"; export CXX="clang++-${COMPILER_VERSION}"; fi
         - export BUILD_DIR="build_${COMPILER}_${COMPILER_VERSION}_${BUILD_TYPE}"
         - echo "Using ${CXX} and ${CC} to build ${BUILD_TYPE}, build dir ${BUILD_DIR}"
-        - mkdir "third_party/GSL/${BUILD_DIR}"
-        - cd "third_party/GSL/${BUILD_DIR}"
-        - cmake -DGSL_CXX_STANDARD="17" -DGSL_TEST=Off -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
-        - cmake --build . --target install
-        - mkdir "../../../${BUILD_DIR}"
-        - cd "../../../${BUILD_DIR}"
+        - mkdir "${BUILD_DIR}"
+        - cd "${BUILD_DIR}"
         - cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DlibClaPP_PEDANTIC_COMPILER_FLAGS=On -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
         - cmake --build . --target install
         - mkdir "../usage/cmake_import/${BUILD_DIR}"
@@ -47,12 +43,8 @@ variables:
         - if [ "${COMPILER}" == "clang" ]; then export CC="clang-${COMPILER_VERSION}"; export CXX="clang++-${COMPILER_VERSION}"; fi
         - export BUILD_DIR="build_${COMPILER}_${COMPILER_VERSION}_${BUILD_TYPE}"
         - echo "Using ${CXX} and ${CC} to build ${BUILD_TYPE}, build dir ${BUILD_DIR}"
-        - mkdir "third_party/GSL/${BUILD_DIR}"
-        - cd "third_party/GSL/${BUILD_DIR}"
-        - cmake -DGSL_CXX_STANDARD="17" -DGSL_TEST=Off -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
-        - cmake --build . --target install
-        - mkdir "../../../${BUILD_DIR}"
-        - cd "../../../${BUILD_DIR}"
+        - mkdir "${BUILD_DIR}"
+        - cd "${BUILD_DIR}"
         - cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DlibClaPP_PEDANTIC_COMPILER_FLAGS=On -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
         - cmake --build . --target install
         - mkdir "../usage/cmake_pkgconfig/${BUILD_DIR}"
@@ -68,12 +60,8 @@ variables:
         - if [ "${COMPILER}" == "clang" ]; then export CC="clang-${COMPILER_VERSION}"; export CXX="clang++-${COMPILER_VERSION}"; fi
         - export BUILD_DIR="build_${COMPILER}_${COMPILER_VERSION}_${BUILD_TYPE}"
         - echo "Using ${CXX} and ${CC} to build ${BUILD_TYPE}, build dir ${BUILD_DIR}"
-        - mkdir "third_party/GSL/${BUILD_DIR}"
-        - cd "third_party/GSL/${BUILD_DIR}"
-        - cmake -DGSL_CXX_STANDARD="17" -DGSL_TEST=Off -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
-        - cmake --build . --target install
-        - mkdir "../../../${BUILD_DIR}"
-        - cd "../../../${BUILD_DIR}"
+        - mkdir "${BUILD_DIR}"
+        - cd "${BUILD_DIR}"
         - cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON -DlibClaPP_PEDANTIC_COMPILER_FLAGS=On -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ..
         - cmake --build . --target install
         - cd ../usage/make_pkgconfig
