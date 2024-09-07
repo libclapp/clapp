@@ -530,8 +530,9 @@ clapp::parser::basic_parser_t::parse_short(const std::string_view option,
         return ret.value();
     }
     CLAPP_CONTRACT_EXPECTS(option.size() > 1U);
-    return parse_short(std::string_view{option.data() + 1U, option.size() - 1U},
-                       ait, end);
+    const std::string_view remain_option{std::next(option.begin()),
+                                         option.end()};
+    return parse_short(remain_option, ait, end);
 }
 
 clapp::value::found_func_t
