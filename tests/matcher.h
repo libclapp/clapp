@@ -217,7 +217,7 @@ MATCHER_P(VectorParamOptionGiven, value,
     const auto& argument{arg.value()};
     std::string val_str{
         std::accumulate(value.begin(), value.end(), std::string{},
-                        [](std::string& str, const auto& itm) {
+                        [](std::string str, const auto& itm) {
                             return str += clapp::to_string(itm) + ", ";
                         })};
     if (!val_str.empty()) {
@@ -225,7 +225,7 @@ MATCHER_P(VectorParamOptionGiven, value,
     }
     std::string arg_str{
         std::accumulate(argument.begin(), argument.end(), std::string{},
-                        [](std::string& str, const auto& itm) {
+                        [](std::string str, const auto& itm) {
                             return str += clapp::to_string(itm) + ", ";
                         })};
     if (!arg_str.empty()) {
@@ -339,15 +339,16 @@ MATCHER_P(VariadicArgumentGiven, value,
     const auto& argument{arg.value()};
     std::string val_str{
         std::accumulate(value.begin(), value.end(), std::string{},
-                        [](std::string& str, const auto& itm) {
+                        [](std::string str, const auto itm) {
                             return str += clapp::to_string(itm) + ", ";
                         })};
+
     if (!val_str.empty()) {
         val_str = val_str.substr(0, val_str.size() - 2);
     }
     std::string arg_str{
         std::accumulate(argument.begin(), argument.end(), std::string{},
-                        [](std::string& str, const auto& itm) {
+                        [](std::string str, const auto& itm) {
                             return str += clapp::to_string(itm) + ", ";
                         })};
     if (!arg_str.empty()) {
