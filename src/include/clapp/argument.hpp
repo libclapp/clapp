@@ -94,20 +94,20 @@ clapp::argument::gen_arg_validate_value_func(
     if (!validate_funcs.empty()) {
         return [value_func = std::forward<VALUE_FUNC>(val_func),
                 has_value_func = std::move(hvf),
-                validate_funcs = std::move(validate_funcs)](
+                validate_funcs_capt = std::move(validate_funcs)](
                    const std::string& argument_string) {
             if (has_value_func()) {
                 if constexpr (std::is_same<VALUE_FUNC,
                                            variadic_value_func_t<T>>::value) {
                     for (const auto& value : value_func()) {
-                        for (const auto& func : validate_funcs) {
+                        for (const auto& func : validate_funcs_capt) {
                             func(value, argument_string);
                         }
                     }
                 } else if constexpr (std::is_same<VALUE_FUNC,
                                                   value_func_t<T>>::value) {
                     const T value{value_func()};
-                    for (const auto& func : validate_funcs) {
+                    for (const auto& func : validate_funcs_capt) {
                         func(value, argument_string);
                     }
                 }
