@@ -111,22 +111,22 @@ clapp::option::gen_opt_validate_value_func(
     VALUE_FUNC&& value_func, has_value_func_t&& hvf,
     std::vector<typename opt_params_t<T>::validate_func_t>&& validate_funcs) {
     if (!validate_funcs.empty()) {
-        return [value_func = std::forward<VALUE_FUNC>(value_func),
+        return [value_func_capt = std::forward<VALUE_FUNC>(value_func),
                 has_value_func = std::move(hvf),
-                validate_funcs = std::move(validate_funcs)](
+                validate_funcs_capt = std::move(validate_funcs)](
                    const std::string& option_string) {
             if (has_value_func()) {
                 if constexpr (std::is_same<VALUE_FUNC,
                                            vector_value_func_t<T>>::value) {
-                    for (const auto& value : value_func()) {
-                        for (const auto& func : validate_funcs) {
+                    for (const auto& value : value_func_capt()) {
+                        for (const auto& func : validate_funcs_capt) {
                             func(value, option_string);
                         }
                     }
                 } else if constexpr (std::is_same<VALUE_FUNC,
                                                   value_func_t<T>>::value) {
-                    const T value{value_func()};
-                    for (const auto& func : validate_funcs) {
+                    const T value{value_func_capt()};
+                    for (const auto& func : validate_funcs_capt) {
                         func(value, option_string);
                     }
                 }
