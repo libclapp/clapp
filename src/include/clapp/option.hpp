@@ -62,8 +62,8 @@ void clapp::option::gen_opt_conf_process_params(opt_params_t<T>& opt_params,
     if constexpr (type_traits::has_found<std::decay_t<Param>>::value) {
         opt_params.found.push_back(std::forward<Param>(param));
     }
-    if constexpr (std::is_same<std::decay_t<Param>,
-                               parser::types::purpose_t>::value) {
+    if constexpr (std::is_same_v<std::decay_t<Param>,
+                                 parser::types::purpose_t>) {
         opt_params.purpose = std::forward<Param>(param);
     }
 }
@@ -115,15 +115,15 @@ clapp::option::gen_opt_validate_value_func(
                 validate_funcs_capt = std::move(validate_funcs)](
                    const std::string& option_string) {
             if (has_value_func()) {
-                if constexpr (std::is_same<VALUE_FUNC,
-                                           vector_value_func_t<T>>::value) {
+                if constexpr (std::is_same_v<VALUE_FUNC,
+                                             vector_value_func_t<T>>) {
                     for (const auto& value : value_func_capt()) {
                         for (const auto& func : validate_funcs_capt) {
                             func(value, option_string);
                         }
                     }
-                } else if constexpr (std::is_same<VALUE_FUNC,
-                                                  value_func_t<T>>::value) {
+                } else if constexpr (std::is_same_v<VALUE_FUNC,
+                                                    value_func_t<T>>) {
                     const T value{value_func_capt()};
                     for (const auto& func : validate_funcs_capt) {
                         func(value, option_string);
@@ -153,8 +153,7 @@ clapp::option::opt_conf_container_t<T, OPT_CONF> clapp::option::gen_opt_conf(
     CALLBACKS&& callbacks, T1&& single_option, const std::string& description,
     Params&&... parameters) {
     if constexpr (clapp::type_traits::is_vector<std::decay_t<T1>>::value) {
-        if constexpr (std::is_same<std::decay_t<T1>,
-                                   std::vector<char>>::value) {
+        if constexpr (std::is_same_v<std::decay_t<T1>, std::vector<char>>) {
             return gen_opt_conf1<T, OPT_CONF>(
                 std::forward<CALLBACKS>(callbacks), std::vector<std::string>{},
                 std::forward<T1>(single_option), description,
@@ -166,7 +165,7 @@ clapp::option::opt_conf_container_t<T, OPT_CONF> clapp::option::gen_opt_conf(
                 std::vector<char>{}, description,
                 std::forward<Params>(parameters)...);
         }
-    } else if constexpr (std::is_same<std::decay_t<T1>, char>::value) {
+    } else if constexpr (std::is_same_v<std::decay_t<T1>, char>) {
         return gen_opt_conf1<T, OPT_CONF>(
             std::forward<CALLBACKS>(callbacks), std::vector<std::string>{},
             std::vector<char>{std::forward<T1>(single_option)}, description,
@@ -220,7 +219,7 @@ clapp::option::opt_conf_container_t<T, OPT_CONF> clapp::option::gen_opt_conf1(
     const std::vector<char>& short_option, const std::string& description,
     Params&&... parameters) {
     opt_params_t<T> opt_params;
-    if (std::is_same<OPT_CONF, parser::types::opt_vector_param_conf_t>::value) {
+    if (std::is_same_v<OPT_CONF, parser::types::opt_vector_param_conf_t>) {
         opt_params.restrictions.push_back("vector option");
     }
 
