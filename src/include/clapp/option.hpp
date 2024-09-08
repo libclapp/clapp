@@ -45,27 +45,24 @@ template <typename T, typename Param>
 void clapp::option::gen_opt_conf_process_params(opt_params_t<T>& opt_params,
                                                 Param&& param) {
     if constexpr (type_traits::has_append_restriction_text<
-                      typename std::decay<Param>::type>::value) {
+                      std::decay_t<Param>>::value) {
         opt_params.restrictions.push_back(
             std::string{param.append_restriction_text()});
     }
-    if constexpr (type_traits::has_default_value<
-                      typename std::decay<Param>::type>::value) {
+    if constexpr (type_traits::has_default_value<std::decay_t<Param>>::value) {
         opt_params.default_value = param.default_value();
     }
-    if constexpr (type_traits::has_validate<typename std::decay<Param>::type,
-                                            T>::value) {
+    if constexpr (type_traits::has_validate<std::decay_t<Param>, T>::value) {
         opt_params.validate_funcs.push_back(
             [param_capt = std::forward<Param>(param)](
                 const T& value, const std::string& option_string) {
                 param_capt.validate(value, option_string);
             });
     }
-    if constexpr (type_traits::has_found<
-                      typename std::decay<Param>::type>::value) {
+    if constexpr (type_traits::has_found<std::decay_t<Param>>::value) {
         opt_params.found.push_back(std::forward<Param>(param));
     }
-    if constexpr (std::is_same<typename std::decay<Param>::type,
+    if constexpr (std::is_same<std::decay_t<Param>,
                                parser::types::purpose_t>::value) {
         opt_params.purpose = std::forward<Param>(param);
     }
@@ -188,26 +185,22 @@ template <typename T, typename OPT_CONF, typename CALLBACKS, typename T1,
 clapp::option::opt_conf_container_t<T, OPT_CONF> clapp::option::gen_opt_conf(
     CALLBACKS&& callbacks, T1&& long_option, T2&& short_option,
     const std::string& description, Params&&... parameters) {
-    if constexpr (clapp::type_traits::is_vector<
-                      typename std::decay<T1>::type>::value &&
-                  clapp::type_traits::is_vector<
-                      typename std::decay<T2>::type>::value) {
+    if constexpr (clapp::type_traits::is_vector<std::decay_t<T1>>::value &&
+                  clapp::type_traits::is_vector<std::decay_t<T2>>::value) {
         return gen_opt_conf1<T, OPT_CONF>(
             std::forward<CALLBACKS>(callbacks),
             gen_string_vec(std::forward<T1>(long_option)),
             std::forward<T2>(short_option), description,
             std::forward<Params>(parameters)...);
     }
-    if constexpr (clapp::type_traits::is_vector<
-                      typename std::decay<T1>::type>::value) {
+    if constexpr (clapp::type_traits::is_vector<std::decay_t<T1>>::value) {
         return gen_opt_conf1<T, OPT_CONF>(
             std::forward<CALLBACKS>(callbacks),
             gen_string_vec(std::forward<T1>(long_option)),
             std::vector<char>{std::forward<T2>(short_option)}, description,
             std::forward<Params>(parameters)...);
     }
-    if constexpr (clapp::type_traits::is_vector<
-                      typename std::decay<T2>::type>::value) {
+    if constexpr (clapp::type_traits::is_vector<std::decay_t<T2>>::value) {
         return gen_opt_conf1<T, OPT_CONF>(
             std::forward<CALLBACKS>(callbacks),
             std::vector<std::string>{std::forward<T1>(long_option)},
