@@ -22,7 +22,7 @@ void clapp::option::check_long_option(const std::string_view option) {
             << "Whitespaces and equalsigns are not allowed in long options: "
                "option='"
             << option << "'";
-        throw clapp::exception::option_exception_t{string_stream.str()};
+        throw clapp::option_exception_t{string_stream.str()};
     }
 }
 
@@ -38,7 +38,7 @@ void clapp::option::check_short_option(const char option) {
                 << "Whitespaces and equalsigns are not allowed in short "
                    "options: option='"
                 << option << "'";
-            throw clapp::exception::option_exception_t{string_stream.str()};
+            throw clapp::option_exception_t{string_stream.str()};
         }
         default:
             return;

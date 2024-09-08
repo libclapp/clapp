@@ -134,7 +134,7 @@ int main(int argc, char **argv) {
                       << parser->options.int_options.uint32.value()
                       << std::endl;
         }
-    } catch (clapp::exception::clapp_exception_t &e) {
+    } catch (clapp::clapp_exception_t &e) {
         std::cout << "Caught ClaPP-Exception: " << e.what() << std::endl;
         return EXIT_FAILURE;
     } catch (std::exception &e) {

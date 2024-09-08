@@ -219,14 +219,12 @@ bool argumentT::throw_unexpected_call() {
 
 TEST_F(argumentT, basicArgumentToShortArgumentNameThrows) {
     test_argument_t arg{tp, arg_cstr, desc_cstr};
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, basicArgumentConstructStrAndCallValueThrows) {
     test_argument_t arg{tp, arg_str, desc_str};
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, basicArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
@@ -246,7 +244,7 @@ TEST_F(argumentT, basicArgumentConstructMandatoryCallValidateFuncDoesNotThrow) {
 TEST_F(argumentT, basicArgumentConstructStrWithEmpyArgumentNameThrows) {
     const std::string empty{};
     ASSERT_THROW((test_argument_t{tp, empty, desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, basicArgumentConstructStrAndCallArgFunc) {
@@ -285,22 +283,20 @@ TEST_F(argumentT, boolArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::bool_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, boolArgumentConstructStrAndCallValueThrows) {
     clapp::argument::bool_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, boolArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::bool_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::bool_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, boolArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
@@ -334,7 +330,7 @@ TEST_F(argumentT, boolArgumentCallFoundFunc) {
 
 TEST_F(argumentT, boolArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::bool_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, boolArgumentConstructStrAndCallArgFunc) {
@@ -366,8 +362,7 @@ TEST_F(argumentT, boolArgumentConstructOptionalStrWithNotNullValue) {
         tp, arg_str)(std::to_string(0));
 
     ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
-    ASSERT_THROW((argument_validate_func(arg_str)),
-                 clapp::exception::out_of_range_t);
+    ASSERT_THROW((argument_validate_func(arg_str)), clapp::out_of_range_t);
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(1));
 
@@ -394,7 +389,7 @@ TEST_F(argumentT, boolArgumentConstructMandatoryAfterOptionalThrows) {
     clapp::argument::bool_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_THROW((clapp::argument::bool_argument_t{tp, arg_cstr, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, boolArgumentConstructOptionalAfterSubParserThrows) {
@@ -403,7 +398,7 @@ TEST_F(argumentT, boolArgumentConstructOptionalAfterSubParserThrows) {
     ASSERT_THROW((clapp::argument::bool_argument_t{
                      tp, arg_cstr, desc_str,
                      argument_test_parser_t::purpose_t::optional}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,
@@ -433,12 +428,12 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicBoolArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::variadic_bool_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::bool_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, variadicBoolArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::variadic_bool_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,
@@ -501,8 +496,7 @@ TEST_F(argumentT, variadicBoolArgumentConstructWithNotNullValue) {
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(0));
     ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
-    ASSERT_THROW((argument_validate_func(arg_str)),
-                 clapp::exception::out_of_range_t);
+    ASSERT_THROW((argument_validate_func(arg_str)), clapp::out_of_range_t);
 }
 
 TEST_F(argumentT, variadicBoolArgumentCallFoundFunc) {
@@ -561,22 +555,20 @@ TEST_F(argumentT, stringArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::string_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, stringArgumentConstructStrAndCallValueThrows) {
     clapp::argument::string_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, stringArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::string_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::string_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, stringArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
@@ -611,7 +603,7 @@ TEST_F(argumentT, stringArgumentCallFoundFunc) {
 
 TEST_F(argumentT, stringArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::string_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, stringArgumentConstructStrAndCallArgFunc) {
@@ -674,13 +666,13 @@ TEST_F(argumentT,
        variadicStringArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::variadic_string_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::string_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, variadicStringArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW(
         (clapp::argument::variadic_string_argument_t{tp, "", desc_cstr}),
-        clapp::exception::argument_exception_t);
+        clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,
@@ -753,22 +745,20 @@ TEST_F(argumentT, int64ArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::int64_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, int64ArgumentConstructStrAndCallValueThrows) {
     clapp::argument::int64_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, int64ArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::int64_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::int64_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, int64ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
@@ -802,7 +792,7 @@ TEST_F(argumentT, int64ArgumentCallFoundFunc) {
 
 TEST_F(argumentT, int64ArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::int64_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, int64ArgumentConstructStrAndCallArgFunc) {
@@ -849,8 +839,7 @@ TEST_F(argumentT, int64ArgumentConstructStrWithMinMaxValueAndCallArgFunc) {
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(value_int32));
     ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
-    ASSERT_THROW((argument_validate_func(arg_str)),
-                 clapp::exception::out_of_range_t);
+    ASSERT_THROW((argument_validate_func(arg_str)), clapp::out_of_range_t);
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(value_int8));
     ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
@@ -866,13 +855,11 @@ TEST_F(argumentT, int64ArgumentConstructStrWithMinMaxValueAndCallArgFunc) {
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(max_value + 1));
     ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
-    ASSERT_THROW((argument_validate_func(arg_str)),
-                 clapp::exception::out_of_range_t);
+    ASSERT_THROW((argument_validate_func(arg_str)), clapp::out_of_range_t);
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(min_value - 1));
     ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
-    ASSERT_THROW((argument_validate_func(arg_str)),
-                 clapp::exception::out_of_range_t);
+    ASSERT_THROW((argument_validate_func(arg_str)), clapp::out_of_range_t);
 }
 
 TEST_F(argumentT, int64ArgumentConstructStrWithNotNullValue) {
@@ -886,8 +873,7 @@ TEST_F(argumentT, int64ArgumentConstructStrWithNotNullValue) {
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(0));
     ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
-    ASSERT_THROW((argument_validate_func(arg_str)),
-                 clapp::exception::out_of_range_t);
+    ASSERT_THROW((argument_validate_func(arg_str)), clapp::out_of_range_t);
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(not_null_value));
     ASSERT_NO_THROW((argument_validate_func(arg_str)));
@@ -921,13 +907,13 @@ TEST_F(argumentT,
        variadicInt64ArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::variadic_int64_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::int64_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, variadicInt64ArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW(
         (clapp::argument::variadic_int64_argument_t{tp, "", desc_cstr}),
-        clapp::exception::argument_exception_t);
+        clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,
@@ -1022,8 +1008,7 @@ TEST_F(argumentT,
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(value_int32));
     ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
-    ASSERT_THROW((argument_validate_func(arg_str)),
-                 clapp::exception::out_of_range_t);
+    ASSERT_THROW((argument_validate_func(arg_str)), clapp::out_of_range_t);
 }
 
 TEST_F(argumentT, variadicInt64ArgumentConstructOptionalWithNotNullValue) {
@@ -1043,8 +1028,7 @@ TEST_F(argumentT, variadicInt64ArgumentConstructOptionalWithNotNullValue) {
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(0));
     ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
-    ASSERT_THROW((argument_validate_func(arg_str)),
-                 clapp::exception::out_of_range_t);
+    ASSERT_THROW((argument_validate_func(arg_str)), clapp::out_of_range_t);
 }
 
 TEST_F(argumentT,
@@ -1052,29 +1036,27 @@ TEST_F(argumentT,
     ASSERT_THROW((clapp::argument::variadic_int64_argument_t{
                      tp, arg_str, desc_str,
                      clapp::value::default_value_t<std::int64_t>{value_int32}}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, uint64ArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::uint64_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, uint64ArgumentConstructStrAndCallValueThrows) {
     clapp::argument::uint64_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, uint64ArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::uint64_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::uint64_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, uint64ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
@@ -1109,7 +1091,7 @@ TEST_F(argumentT, uint64ArgumentCallFoundFunc) {
 
 TEST_F(argumentT, uint64ArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::uint64_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, uint64ArgumentConstructStrAndCallArgFunc) {
@@ -1157,8 +1139,7 @@ TEST_F(argumentT, uint64ArgumentConstructStrWithMinMaxValueAndCallArgFunc) {
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(value_uint32));
     ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
-    ASSERT_THROW((argument_validate_func(arg_str)),
-                 clapp::exception::out_of_range_t);
+    ASSERT_THROW((argument_validate_func(arg_str)), clapp::out_of_range_t);
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(value_uint16));
     ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
@@ -1178,13 +1159,11 @@ TEST_F(argumentT, uint64ArgumentConstructStrWithMinMaxValueAndCallArgFunc) {
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(max_value + 1));
     ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
-    ASSERT_THROW((argument_validate_func(arg_str)),
-                 clapp::exception::out_of_range_t);
+    ASSERT_THROW((argument_validate_func(arg_str)), clapp::out_of_range_t);
     get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(std::to_string(min_value - 1));
     ASSERT_THAT(get_given_func(tp, arg_str)(), testing::Eq(true));
-    ASSERT_THROW((argument_validate_func(arg_str)),
-                 clapp::exception::out_of_range_t);
+    ASSERT_THROW((argument_validate_func(arg_str)), clapp::out_of_range_t);
 }
 
 TEST_F(argumentT,
@@ -1215,13 +1194,13 @@ TEST_F(argumentT,
        variadicUint64ArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::variadic_uint64_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::uint64_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, variadicUint64ArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW(
         (clapp::argument::variadic_uint64_argument_t{tp, "", desc_cstr}),
-        clapp::exception::argument_exception_t);
+        clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,
@@ -1295,22 +1274,20 @@ TEST_F(argumentT, int32ArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::int32_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, int32ArgumentConstructStrAndCallValueThrows) {
     clapp::argument::int32_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, int32ArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::int32_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::int32_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, int32ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
@@ -1344,7 +1321,7 @@ TEST_F(argumentT, int32ArgumentCallFoundFunc) {
 
 TEST_F(argumentT, int32ArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::int32_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, int32ArgumentConstructStrAndCallArgFunc) {
@@ -1407,13 +1384,13 @@ TEST_F(argumentT,
        variadicInt32ArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::variadic_int32_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::int32_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, variadicInt32ArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW(
         (clapp::argument::variadic_int32_argument_t{tp, "", desc_cstr}),
-        clapp::exception::argument_exception_t);
+        clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,
@@ -1487,22 +1464,20 @@ TEST_F(argumentT, uint32ArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::uint32_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, uint32ArgumentConstructStrAndCallValueThrows) {
     clapp::argument::uint32_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, uint32ArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::uint32_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::uint32_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, uint32ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
@@ -1537,7 +1512,7 @@ TEST_F(argumentT, uint32ArgumentCallFoundFunc) {
 
 TEST_F(argumentT, uint32ArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::uint32_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, uint32ArgumentConstructStrAndCallArgFunc) {
@@ -1600,13 +1575,13 @@ TEST_F(argumentT,
        variadicUint32ArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::variadic_uint32_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::uint32_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, variadicUint32ArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW(
         (clapp::argument::variadic_uint32_argument_t{tp, "", desc_cstr}),
-        clapp::exception::argument_exception_t);
+        clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,
@@ -1680,22 +1655,20 @@ TEST_F(argumentT, int16ArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::int16_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, int16ArgumentConstructStrAndCallValueThrows) {
     clapp::argument::int16_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, int16ArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::int16_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::int16_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, int16ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
@@ -1729,7 +1702,7 @@ TEST_F(argumentT, int16ArgumentCallFoundFunc) {
 
 TEST_F(argumentT, int16ArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::int16_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, int16ArgumentConstructStrAndCallArgFunc) {
@@ -1792,13 +1765,13 @@ TEST_F(argumentT,
        variadicInt16ArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::variadic_int16_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::int16_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, variadicInt16ArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW(
         (clapp::argument::variadic_int16_argument_t{tp, "", desc_cstr}),
-        clapp::exception::argument_exception_t);
+        clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,
@@ -1872,22 +1845,20 @@ TEST_F(argumentT, uint16ArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::uint16_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, uint16ArgumentConstructStrAndCallValueThrows) {
     clapp::argument::uint16_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, uint16ArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::uint16_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::uint16_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, uint16ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
@@ -1922,7 +1893,7 @@ TEST_F(argumentT, uint16ArgumentCallFoundFunc) {
 
 TEST_F(argumentT, uint16ArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::uint16_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, uint16ArgumentConstructStrAndCallArgFunc) {
@@ -1985,13 +1956,13 @@ TEST_F(argumentT,
        variadicUint16ArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::variadic_uint16_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::uint16_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, variadicUint16ArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW(
         (clapp::argument::variadic_uint16_argument_t{tp, "", desc_cstr}),
-        clapp::exception::argument_exception_t);
+        clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,
@@ -2065,22 +2036,20 @@ TEST_F(argumentT, int8ArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::int8_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, int8ArgumentConstructStrAndCallValueThrows) {
     clapp::argument::int8_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, int8ArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::int8_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::int8_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, int8ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
@@ -2114,7 +2083,7 @@ TEST_F(argumentT, int8ArgumentCallFoundFunc) {
 
 TEST_F(argumentT, int8ArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::int8_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, int8ArgumentConstructStrAndCallArgFunc) {
@@ -2176,12 +2145,12 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicInt8ArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::variadic_int8_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::int8_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, variadicInt8ArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::variadic_int8_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,
@@ -2254,22 +2223,20 @@ TEST_F(argumentT, uint8ArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::uint8_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, uint8ArgumentConstructStrAndCallValueThrows) {
     clapp::argument::uint8_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, uint8ArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::uint8_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::uint8_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, uint8ArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
@@ -2303,7 +2270,7 @@ TEST_F(argumentT, uint8ArgumentCallFoundFunc) {
 
 TEST_F(argumentT, uint8ArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::uint8_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, uint8ArgumentConstructStrAndCallArgFunc) {
@@ -2366,13 +2333,13 @@ TEST_F(argumentT,
        variadicUint8ArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::variadic_uint8_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::uint8_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, variadicUint8ArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW(
         (clapp::argument::variadic_uint8_argument_t{tp, "", desc_cstr}),
-        clapp::exception::argument_exception_t);
+        clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,
@@ -2446,22 +2413,20 @@ TEST_F(argumentT, ptrdiffArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::ptrdiff_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, ptrdiffArgumentConstructStrAndCallValueThrows) {
     clapp::argument::ptrdiff_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, ptrdiffArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::ptrdiff_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::ptrdiff_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,
@@ -2497,7 +2462,7 @@ TEST_F(argumentT, ptrdiffArgumentCallFoundFunc) {
 
 TEST_F(argumentT, ptrdiffArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::ptrdiff_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, ptrdiffArgumentConstructStrAndCallArgFunc) {
@@ -2560,13 +2525,13 @@ TEST_F(argumentT,
        variadicPtrdiffArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::variadic_ptrdiff_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::ptrdiff_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, variadicPtrdiffArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW(
         (clapp::argument::variadic_ptrdiff_argument_t{tp, "", desc_cstr}),
-        clapp::exception::argument_exception_t);
+        clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,
@@ -2640,22 +2605,20 @@ TEST_F(argumentT, sizeArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::size_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, sizeArgumentConstructStrAndCallValueThrows) {
     clapp::argument::size_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, sizeArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::size_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::size_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, sizeArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
@@ -2689,7 +2652,7 @@ TEST_F(argumentT, sizeArgumentCallFoundFunc) {
 
 TEST_F(argumentT, sizeArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::size_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, sizeArgumentConstructStrAndCallArgFunc) {
@@ -2751,12 +2714,12 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicSizeArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::variadic_size_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::size_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, variadicSizeArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::variadic_size_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,
@@ -2829,22 +2792,20 @@ TEST_F(argumentT, floatArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::float_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, floatArgumentConstructStrAndCallValueThrows) {
     clapp::argument::float_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, floatArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::float_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::float_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, floatArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
@@ -2878,7 +2839,7 @@ TEST_F(argumentT, floatArgumentCallFoundFunc) {
 
 TEST_F(argumentT, floatArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::float_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, floatArgumentConstructStrAndCallArgFunc) {
@@ -2941,13 +2902,13 @@ TEST_F(argumentT,
        variadicFloatArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::variadic_float_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::float_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, variadicFloatArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW(
         (clapp::argument::variadic_float_argument_t{tp, "", desc_cstr}),
-        clapp::exception::argument_exception_t);
+        clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,
@@ -3021,22 +2982,20 @@ TEST_F(argumentT, doubleArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::double_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, doubleArgumentConstructStrAndCallValueThrows) {
     clapp::argument::double_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, doubleArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::double_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::double_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, doubleArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
@@ -3071,7 +3030,7 @@ TEST_F(argumentT, doubleArgumentCallFoundFunc) {
 
 TEST_F(argumentT, doubleArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::double_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, doubleArgumentConstructStrAndCallArgFunc) {
@@ -3136,13 +3095,13 @@ TEST_F(argumentT,
        variadicDoubleArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::variadic_double_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::double_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, variadicDoubleArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW(
         (clapp::argument::variadic_double_argument_t{tp, "", desc_cstr}),
-        clapp::exception::argument_exception_t);
+        clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,
@@ -3218,22 +3177,20 @@ TEST_F(argumentT, nsArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::ns_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, nsArgumentConstructStrAndCallValueThrows) {
     clapp::argument::ns_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, nsArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::ns_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::ns_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, nsArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
@@ -3267,7 +3224,7 @@ TEST_F(argumentT, nsArgumentCallFoundFunc) {
 
 TEST_F(argumentT, nsArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::ns_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, nsArgumentConstructStrAndCallArgFunc) {
@@ -3330,12 +3287,12 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicNsArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::variadic_ns_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::ns_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, variadicNsArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::variadic_ns_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,
@@ -3411,22 +3368,20 @@ TEST_F(argumentT, usArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::us_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, usArgumentConstructStrAndCallValueThrows) {
     clapp::argument::us_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, usArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::us_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::us_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, usArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
@@ -3460,7 +3415,7 @@ TEST_F(argumentT, usArgumentCallFoundFunc) {
 
 TEST_F(argumentT, usArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::us_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, usArgumentConstructStrAndCallArgFunc) {
@@ -3523,12 +3478,12 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicUsArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::variadic_us_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::us_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, variadicUsArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::variadic_us_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,
@@ -3604,22 +3559,20 @@ TEST_F(argumentT, msArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::ms_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, msArgumentConstructStrAndCallValueThrows) {
     clapp::argument::ms_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, msArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::ms_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::ms_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, msArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
@@ -3653,7 +3606,7 @@ TEST_F(argumentT, msArgumentCallFoundFunc) {
 
 TEST_F(argumentT, msArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::ms_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, msArgumentConstructStrAndCallArgFunc) {
@@ -3717,12 +3670,12 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicMsArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::variadic_ms_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::ms_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, variadicMsArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::variadic_ms_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,
@@ -3798,22 +3751,20 @@ TEST_F(argumentT, secArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::sec_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, secArgumentConstructStrAndCallValueThrows) {
     clapp::argument::sec_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, secArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::sec_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::sec_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, secArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
@@ -3847,7 +3798,7 @@ TEST_F(argumentT, secArgumentCallFoundFunc) {
 
 TEST_F(argumentT, secArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::sec_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, secArgumentConstructStrAndCallArgFunc) {
@@ -3910,12 +3861,12 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicSecArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::variadic_sec_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::sec_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, variadicSecArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::variadic_sec_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,
@@ -3990,22 +3941,20 @@ TEST_F(argumentT, minArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::min_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, minArgumentConstructStrAndCallValueThrows) {
     clapp::argument::min_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, minArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::min_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::min_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, minArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
@@ -4039,7 +3988,7 @@ TEST_F(argumentT, minArgumentCallFoundFunc) {
 
 TEST_F(argumentT, minArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::min_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, minArgumentConstructStrAndCallArgFunc) {
@@ -4102,12 +4051,12 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicMinArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::variadic_min_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::min_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, variadicMinArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::variadic_min_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,
@@ -4181,22 +4130,20 @@ TEST_F(argumentT, hoursArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::hours_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, hoursArgumentConstructStrAndCallValueThrows) {
     clapp::argument::hours_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, hoursArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::hours_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::hours_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, hoursArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
@@ -4230,7 +4177,7 @@ TEST_F(argumentT, hoursArgumentCallFoundFunc) {
 
 TEST_F(argumentT, hoursArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::hours_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, hoursArgumentConstructStrAndCallArgFunc) {
@@ -4294,13 +4241,13 @@ TEST_F(argumentT,
        variadicHoursArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::variadic_hours_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::hours_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, variadicHoursArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW(
         (clapp::argument::variadic_hours_argument_t{tp, "", desc_cstr}),
-        clapp::exception::argument_exception_t);
+        clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,
@@ -4376,22 +4323,20 @@ TEST_F(argumentT, pathArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::path_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, pathArgumentConstructStrAndCallValueThrows) {
     clapp::argument::path_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THROW(static_cast<void>(arg.value()),
-                 clapp::exception::value_undefined_t);
+    ASSERT_THROW(static_cast<void>(arg.value()), clapp::value_undefined_t);
 }
 
 TEST_F(argumentT, pathArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::path_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::path_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, pathArgumentConstructOptionalCallValidateFuncDoesNotThrow) {
@@ -4425,7 +4370,7 @@ TEST_F(argumentT, pathArgumentCallFoundFunc) {
 
 TEST_F(argumentT, pathArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::path_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, pathArgumentConstructStrAndCallArgFunc) {
@@ -4488,12 +4433,12 @@ TEST_F(argumentT,
 TEST_F(argumentT, variadicPathArgumentConstructWithAlreadyRegisteredArgThrows) {
     clapp::argument::variadic_path_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THROW((clapp::argument::path_argument_t{tp, arg_str, desc_str}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT, variadicPathArgumentConstructWithEmpyArgumentNameThrows) {
     ASSERT_THROW((clapp::argument::variadic_path_argument_t{tp, "", desc_cstr}),
-                 clapp::exception::argument_exception_t);
+                 clapp::argument_exception_t);
 }
 
 TEST_F(argumentT,

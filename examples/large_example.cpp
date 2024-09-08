@@ -467,7 +467,7 @@ int main(int argc, char *argv[]) {
         } else {
             std::cout << "cmd2 not given" << std::endl;
         }
-    } catch (clapp::exception::clapp_exception_t &e) {
+    } catch (clapp::clapp_exception_t &e) {
         std::cout << "Caught ClaPP-Exception: " << e.what() << std::endl;
         return EXIT_FAILURE;
     } catch (std::exception &e) {

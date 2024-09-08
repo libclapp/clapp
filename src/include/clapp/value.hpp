@@ -87,14 +87,14 @@ template <typename T>
 void clapp::value::min_max_value_t<T>::validate(
     const T& value, const std::string& param_name) const {
     if (value < min) {
-        throw clapp::exception::out_of_range_t{
-            "CLI value for '" + param_name + "' is too low (" +
-            to_string(value) + " < " + to_string(min) + ")"};
+        throw clapp::out_of_range_t{"CLI value for '" + param_name +
+                                    "' is too low (" + to_string(value) +
+                                    " < " + to_string(min) + ")"};
     }
     if (value > max) {
-        throw clapp::exception::out_of_range_t{
-            "CLI value for '" + param_name + "' is too high (" +
-            to_string(value) + " > " + to_string(max) + ")"};
+        throw clapp::out_of_range_t{"CLI value for '" + param_name +
+                                    "' is too high (" + to_string(value) +
+                                    " > " + to_string(max) + ")"};
     }
 }
 
@@ -111,9 +111,9 @@ template <typename T>
 void clapp::value::not_null_value_t<T>::validate(
     const T& value, const std::string& param_name) const {
     if (value == T{0}) {
-        throw clapp::exception::out_of_range_t{"CLI value for '" + param_name +
-                                               "' must not be null (" +
-                                               to_string(value) + ")"};
+        throw clapp::out_of_range_t{"CLI value for '" + param_name +
+                                    "' must not be null (" + to_string(value) +
+                                    ")"};
     }
 }
 

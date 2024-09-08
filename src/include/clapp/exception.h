@@ -19,7 +19,6 @@
 #include <stdexcept>
 
 namespace clapp {
-inline namespace exception {
 class clapp_exception_t : public std::runtime_error {
    public:
     explicit clapp_exception_t(const char* message);
@@ -195,7 +194,6 @@ class invalid_parser_state_exception_t : public parser_container_exception_t {
     ~invalid_parser_state_exception_t() noexcept override;
 };
 
-}  // namespace exception
 }  // namespace clapp
 
 #endif

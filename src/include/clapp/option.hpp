@@ -349,8 +349,7 @@ constexpr bool clapp::option::basic_param_option_t<T>::has_value()
 template <typename T>
 T clapp::option::basic_param_option_t<T>::value() const {
     if (!_value) {
-        throw clapp::exception::value_undefined_t{
-            "Requested value is not defined."};
+        throw clapp::value_undefined_t{"Requested value is not defined."};
     }
     return T{_value.value()};
 }
@@ -371,7 +370,7 @@ clapp::option::basic_vector_param_option_t<T>::basic_vector_param_option_t(
         string_stream << "No default value for vector based param option '"
                       << conf.opt_conf.create_basic_option_string()
                       << "' possible.";
-        throw clapp::exception::option_param_exception_t{string_stream.str()};
+        throw clapp::option_param_exception_t{string_stream.str()};
     }
     container.reg(std::move(conf.opt_conf));
     _found = std::move(conf.found);

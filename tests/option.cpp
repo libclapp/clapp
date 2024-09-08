@@ -295,14 +295,14 @@ TEST_F(optionT, boolOptionConstructLongStringVec) {
 TEST_F(optionT, boolOptionConstructLongStringVecTwiceThrows) {
     clapp::option::bool_option_t opt{tp, long_opt_str, opt_desc_str};
     ASSERT_THROW((clapp::option::bool_option_t{tp, long_opt_str, opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 }
 
 TEST_F(optionT, boolOptionConstructLongStringVecWithSameOptionThrows) {
     ASSERT_THROW((clapp::option::bool_option_t{
                      tp, std::vector<std::string>{long_opt_str, long_opt_str},
                      opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 }
 
 TEST_F(optionT, boolOptionConstructLongStringVecAndCallGetOptionHelp) {
@@ -319,7 +319,7 @@ TEST_F(optionT, boolOptionConstructShortCharVecWithSameOptionThrows) {
     ASSERT_THROW(
         (clapp::option::bool_option_t{
             tp, std::vector<char>{short_opt, short_opt}, opt_desc_str}),
-        clapp::exception::option_exception_t);
+        clapp::option_exception_t);
 }
 
 TEST_F(optionT, boolOptionConstructShortCharVecTwiceThrows) {
@@ -327,7 +327,7 @@ TEST_F(optionT, boolOptionConstructShortCharVecTwiceThrows) {
                                      opt_desc_str};
     ASSERT_THROW((clapp::option::bool_option_t{tp, std::vector<char>{short_opt},
                                                opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 }
 
 TEST_F(optionT, boolOptionConstructShortVecAndCallGetOptionHelp) {
@@ -762,7 +762,7 @@ TEST_F(
     constexpr std::uint32_t num_count_options_third{6U};
     ASSERT_THAT(opt, NumCountOptionGiven(num_count_options_third));
     ASSERT_THROW((option_validate_value_func("option-str")),
-                 clapp::exception::out_of_range_t);
+                 clapp::out_of_range_t);
     ASSERT_THAT(get_given_func(tp, long_opt_str)(), testing::Eq(true));
 }
 
@@ -958,14 +958,14 @@ TEST_F(optionT, stringParamOptionConstructLongOptionTwiceThrows) {
     clapp::option::string_param_option_t opt{tp, long_opt_str, opt_desc_str};
     ASSERT_THROW(
         (clapp::option::string_param_option_t{tp, long_opt_str, opt_desc_str}),
-        clapp::exception::option_exception_t);
+        clapp::option_exception_t);
 }
 
 TEST_F(optionT, stringParamOptionConstructShortOptionTwiceThrows) {
     clapp::option::string_param_option_t opt{tp, short_opt, opt_desc_str};
     ASSERT_THROW(
         (clapp::option::string_param_option_t{tp, short_opt, opt_desc_str}),
-        clapp::exception::option_exception_t);
+        clapp::option_exception_t);
 }
 
 TEST_F(optionT, stringParamOptionConstructLongStringVecAndCallGetOptionHelp) {
@@ -1241,14 +1241,14 @@ TEST_F(optionT, pathParamOptionConstructLongOptionTwiceThrows) {
     clapp::option::path_param_option_t opt{tp, long_opt_str, opt_desc_str};
     ASSERT_THROW(
         (clapp::option::path_param_option_t{tp, long_opt_str, opt_desc_str}),
-        clapp::exception::option_exception_t);
+        clapp::option_exception_t);
 }
 
 TEST_F(optionT, pathParamOptionConstructShortOptionTwiceThrows) {
     clapp::option::path_param_option_t opt{tp, short_opt, opt_desc_str};
     ASSERT_THROW(
         (clapp::option::path_param_option_t{tp, short_opt, opt_desc_str}),
-        clapp::exception::option_exception_t);
+        clapp::option_exception_t);
 }
 
 TEST_F(optionT, pathParamOptionConstructLongStringVecAndCallGetOptionHelp) {
@@ -1413,14 +1413,14 @@ TEST_F(optionT, int64ParamOptionConstructLongOptionTwiceThrows) {
     clapp::option::int64_param_option_t opt{tp, long_opt_str, opt_desc_str};
     ASSERT_THROW(
         (clapp::option::int64_param_option_t{tp, long_opt_str, opt_desc_str}),
-        clapp::exception::option_exception_t);
+        clapp::option_exception_t);
 }
 
 TEST_F(optionT, int64ParamOptionConstructShortOptionTwiceThrows) {
     clapp::option::int64_param_option_t opt{tp, short_opt, opt_desc_str};
     ASSERT_THROW(
         (clapp::option::int64_param_option_t{tp, short_opt, opt_desc_str}),
-        clapp::exception::option_exception_t);
+        clapp::option_exception_t);
 }
 
 TEST_F(optionT, int64ParamOptionConstructLongStringVecAndCallGetOptionHelp) {
@@ -1539,7 +1539,7 @@ TEST_F(
     ASSERT_THROW(
         (get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
             tp, short_opt)(short_opt, value_str)),
-        clapp::exception::invalid_value_t);
+        clapp::invalid_value_t);
 }
 
 TEST_F(optionT,
@@ -1594,7 +1594,7 @@ TEST_F(
         get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
             tp, long_opt_str)(long_opt_str, std::to_string(value_int32)));
     ASSERT_THROW((option_validate_value_func("option-str")),
-                 clapp::exception::out_of_range_t);
+                 clapp::out_of_range_t);
     ASSERT_NO_THROW(
         get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
             tp, long_opt_str)(long_opt_str, std::to_string(value_int8)));
@@ -1611,12 +1611,12 @@ TEST_F(
         get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
             tp, long_opt_str)(long_opt_str, std::to_string(max_value + 1)));
     ASSERT_THROW((option_validate_value_func("option-str")),
-                 clapp::exception::out_of_range_t);
+                 clapp::out_of_range_t);
     ASSERT_NO_THROW(
         get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
             tp, long_opt_str)(long_opt_str, std::to_string(min_value - 1)));
     ASSERT_THROW((option_validate_value_func("option-str")),
-                 clapp::exception::out_of_range_t);
+                 clapp::out_of_range_t);
 }
 
 TEST_F(
@@ -1648,7 +1648,7 @@ TEST_F(
         get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
             tp, long_opt_str)(long_opt_str, std::to_string(0)));
     ASSERT_THROW((option_validate_value_func("option-str")),
-                 clapp::exception::out_of_range_t);
+                 clapp::out_of_range_t);
     ASSERT_NO_THROW(
         get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
             tp, long_opt_str)(long_opt_str, std::to_string(value_int64)));
@@ -1844,7 +1844,7 @@ TEST_F(
     ASSERT_THROW((clapp::option::vector_string_param_option_t{
                      tp, long_opt_str, short_opt, opt_desc_str,
                      clapp::value::default_value_t<std::string>{value_cstr}}),
-                 clapp::exception::option_param_exception_t);
+                 clapp::option_param_exception_t);
 }
 
 TEST_F(optionT, vectorStringParamOptionConstructShort) {
@@ -1889,7 +1889,7 @@ TEST_F(optionT, vectorStringParamOptionConstructLongOptionTwiceThrows) {
                                                     opt_desc_str};
     ASSERT_THROW((clapp::option::vector_string_param_option_t{tp, long_opt_str,
                                                               opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 }
 
 TEST_F(optionT, vectorStringParamOptionConstructShortOptionTwiceThrows) {
@@ -1897,7 +1897,7 @@ TEST_F(optionT, vectorStringParamOptionConstructShortOptionTwiceThrows) {
                                                     opt_desc_str};
     ASSERT_THROW((clapp::option::vector_string_param_option_t{tp, short_opt,
                                                               opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 }
 
 TEST_F(optionT,
@@ -2182,7 +2182,7 @@ TEST_F(optionT,
         (clapp::option::vector_path_param_option_t{
             tp, long_opt_str, short_opt, opt_desc_str,
             clapp::value::default_value_t<clapp::fs::path>{value_cstr_path}}),
-        clapp::exception::option_param_exception_t);
+        clapp::option_param_exception_t);
 }
 
 TEST_F(optionT, vectorPathParamOptionConstructShort) {
@@ -2226,14 +2226,14 @@ TEST_F(optionT, vectorPathParamOptionConstructLongOptionTwiceThrows) {
                                                   opt_desc_str};
     ASSERT_THROW((clapp::option::vector_path_param_option_t{tp, long_opt_str,
                                                             opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 }
 
 TEST_F(optionT, vectorPathParamOptionConstructShortOptionTwiceThrows) {
     clapp::option::vector_path_param_option_t opt{tp, short_opt, opt_desc_str};
     ASSERT_THROW((clapp::option::vector_path_param_option_t{tp, short_opt,
                                                             opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 }
 
 TEST_F(optionT,
@@ -2403,7 +2403,7 @@ TEST_F(
     ASSERT_THROW((clapp::option::vector_int64_param_option_t{
                      tp, long_opt_str, short_opt, opt_desc_str,
                      clapp::value::default_value_t<std::int64_t>{value_int64}}),
-                 clapp::exception::option_param_exception_t);
+                 clapp::option_param_exception_t);
 }
 
 TEST_F(optionT, vectorInt64ParamOptionConstructShort) {
@@ -2447,14 +2447,14 @@ TEST_F(optionT, vectorInt64ParamOptionConstructLongOptionTwiceThrows) {
                                                    opt_desc_str};
     ASSERT_THROW((clapp::option::vector_int64_param_option_t{tp, long_opt_str,
                                                              opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 }
 
 TEST_F(optionT, vectorInt64ParamOptionConstructShortOptionTwiceThrows) {
     clapp::option::vector_int64_param_option_t opt{tp, short_opt, opt_desc_str};
     ASSERT_THROW((clapp::option::vector_int64_param_option_t{tp, short_opt,
                                                              opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 }
 
 TEST_F(optionT,
@@ -2589,7 +2589,7 @@ TEST_F(
     ASSERT_THROW(
         (get_short_opt_func<option_test_parser_t::short_opt_param_func_t>(
             tp, short_opt)(short_opt, value_str)),
-        clapp::exception::invalid_value_t);
+        clapp::invalid_value_t);
 }
 
 TEST_F(
@@ -2625,7 +2625,7 @@ TEST_F(
         get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
             tp, long_opt_str)(long_opt_str, std::to_string(value_int32)));
     ASSERT_THROW(option_validate_value_func("option-str"),
-                 clapp::exception::out_of_range_t);
+                 clapp::out_of_range_t);
     ASSERT_THAT(get_given_func(tp, long_opt_str)(), testing::Eq(true));
 }
 
@@ -2642,7 +2642,7 @@ TEST_F(optionT,
         get_long_opt_func<option_test_parser_t::long_opt_param_func_t>(
             tp, long_opt_str)(long_opt_str, std::to_string(0)));
     ASSERT_THROW(option_validate_value_func("option-str"),
-                 clapp::exception::out_of_range_t);
+                 clapp::out_of_range_t);
     ASSERT_THAT(get_given_func(tp, long_opt_str)(), testing::Eq(true));
 }
 
@@ -2865,36 +2865,36 @@ TEST_F(optionT, invalidLongOptionConstruct) {
     const std::string long_opt5{"long ="};
 
     ASSERT_THROW((clapp::option::bool_option_t{tp, long_opt1, opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
     ASSERT_THROW(
         (clapp::option::bool_option_t{tp, long_opt1, short_opt, opt_desc_str}),
-        clapp::exception::option_exception_t);
+        clapp::option_exception_t);
 
     ASSERT_THROW((clapp::option::bool_option_t{tp, long_opt2, opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
     ASSERT_THROW(
         (clapp::option::bool_option_t{tp, long_opt2, short_opt, opt_desc_str}),
-        clapp::exception::option_exception_t);
+        clapp::option_exception_t);
 
     ASSERT_THROW((clapp::option::bool_option_t{tp, long_opt3, opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
     ASSERT_THROW(
         (clapp::option::bool_option_t{tp, long_opt3, short_opt, opt_desc_str}),
-        clapp::exception::option_exception_t);
+        clapp::option_exception_t);
 
     ASSERT_THROW((clapp::option::vector_string_param_option_t{tp, long_opt4,
                                                               opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
     ASSERT_THROW((clapp::option::vector_string_param_option_t{
                      tp, long_opt4, short_opt, opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 
     ASSERT_THROW(
         (clapp::option::int32_param_option_t{tp, long_opt5, opt_desc_str}),
-        clapp::exception::option_exception_t);
+        clapp::option_exception_t);
     ASSERT_THROW((clapp::option::int32_param_option_t{tp, long_opt5, short_opt,
                                                       opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 }
 
 TEST_F(optionT, invalidShortOptionConstruct) {
@@ -2905,37 +2905,37 @@ TEST_F(optionT, invalidShortOptionConstruct) {
     const char short_opt5{'='};
 
     ASSERT_THROW((clapp::option::bool_option_t{tp, short_opt1, opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
     ASSERT_THROW((clapp::option::bool_option_t{tp, long_opt_str, short_opt1,
                                                opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 
     ASSERT_THROW((clapp::option::count_option_t{tp, short_opt2, opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
     ASSERT_THROW((clapp::option::count_option_t{tp, long_opt_str, short_opt2,
                                                 opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 
     ASSERT_THROW(
         (clapp::option::string_param_option_t{tp, short_opt3, opt_desc_str}),
-        clapp::exception::option_exception_t);
+        clapp::option_exception_t);
     ASSERT_THROW((clapp::option::string_param_option_t{
                      tp, long_opt_str, short_opt3, opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 
     ASSERT_THROW((clapp::option::vector_string_param_option_t{tp, short_opt4,
                                                               opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
     ASSERT_THROW((clapp::option::vector_string_param_option_t{
                      tp, long_opt_str, short_opt4, opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 
     ASSERT_THROW(
         (clapp::option::int32_param_option_t{tp, short_opt5, opt_desc_str}),
-        clapp::exception::option_exception_t);
+        clapp::option_exception_t);
     ASSERT_THROW((clapp::option::int32_param_option_t{
                      tp, long_opt_str, short_opt5, opt_desc_str}),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 }
 
 TEST_F(optionT,

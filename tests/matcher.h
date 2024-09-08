@@ -190,7 +190,7 @@ MATCHER(ParamOptionNotGiven, "Checks, if param option is not given.") {
     bool caught_value_undefined{false};
     try {
         static_cast<void>(arg.value());
-    } catch (clapp::exception::value_undefined_t& /*exception*/) {
+    } catch (clapp::value_undefined_t& /*exception*/) {
         caught_value_undefined = true;
     }
     *result_listener << "param-option: "

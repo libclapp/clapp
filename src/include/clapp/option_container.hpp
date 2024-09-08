@@ -29,7 +29,7 @@ void clapp::parser::basic_option_container_t::reg(
             std::stringstream string_stream;
             string_stream << "can't register option '" << it->option
                           << "', as it is already registered.";
-            throw clapp::exception::option_exception_t{string_stream.str()};
+            throw clapp::option_exception_t{string_stream.str()};
         }
         auto next_it{
             std::find_if(std::next(it), std::end(config.short_options),
@@ -40,7 +40,7 @@ void clapp::parser::basic_option_container_t::reg(
             std::stringstream string_stream;
             string_stream << "can't register option '" << it->option
                           << "', as it is contained twice in the same config.";
-            throw clapp::exception::option_exception_t{string_stream.str()};
+            throw clapp::option_exception_t{string_stream.str()};
         }
     }
 
@@ -50,7 +50,7 @@ void clapp::parser::basic_option_container_t::reg(
             std::stringstream string_stream;
             string_stream << "can't register option '" << it->option
                           << "', as it is already registered.";
-            throw clapp::exception::option_exception_t{string_stream.str()};
+            throw clapp::option_exception_t{string_stream.str()};
         }
         auto next_it{
             std::find_if(std::next(it), std::end(config.long_options),
@@ -61,7 +61,7 @@ void clapp::parser::basic_option_container_t::reg(
             std::stringstream string_stream;
             string_stream << "can't register option '" << it->option
                           << "', as it is contained twice in the same config.";
-            throw clapp::exception::option_exception_t{string_stream.str()};
+            throw clapp::option_exception_t{string_stream.str()};
         }
     }
 
@@ -73,7 +73,7 @@ void clapp::parser::basic_option_container_t::reg(
                 << "can't register option '" << config.create_option_string()
                 << "', as optional options are not allowed for logic_xor "
                    "containers.";
-            throw clapp::exception::option_exception_t{string_stream.str()};
+            throw clapp::option_exception_t{string_stream.str()};
         }
     }
 

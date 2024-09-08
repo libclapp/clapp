@@ -215,7 +215,7 @@ constexpr bool clapp::argument::basic_argument_t<T>::has_value()
 template <typename T>
 T clapp::argument::basic_argument_t<T>::value() const {
     if (!_value) {
-        throw clapp::exception::value_undefined_t{
+        throw clapp::value_undefined_t{
             "Requested argument value is not defined."};
     }
     return T{_value.value()};
@@ -263,7 +263,7 @@ clapp::argument::basic_variadic_argument_t<T>::basic_variadic_argument_t(
         std::stringstream string_stream;
         string_stream << "No default value for variadic argument '"
                       << conf.arg_conf.argument_name << "' allowed.";
-        throw clapp::exception::argument_exception_t{string_stream.str()};
+        throw clapp::argument_exception_t{string_stream.str()};
     }
     _found = std::move(conf.found);
     parser.reg(std::move(conf.arg_conf));

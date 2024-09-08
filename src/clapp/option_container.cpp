@@ -143,7 +143,7 @@ void clapp::parser::basic_option_container_t::validate_options() const {
 
         if (!given_xor_option.has_value()) {
             const std::string options_str{options.gen_short_option_line()};
-            throw clapp::exception::option_exception_t{
+            throw clapp::option_exception_t{
                 std::string{"None of the mutually exclusive options "} +
                 options_str + " was given!"};
         }
@@ -187,7 +187,7 @@ void clapp::parser::basic_option_container_t::validate_options_xor_options(
                 if (opt.given_func()) {
                     if (given_xor_option.has_value()) {
                         CLAPP_CONTRACT_EXPECTS(!xor_options_str.empty());
-                        throw clapp::exception::option_exception_t{
+                        throw clapp::option_exception_t{
                             std::string{"Mutually exclusive option "} +
                             opt.option_string + " given, but option " +
                             given_xor_option.value() +
@@ -280,12 +280,12 @@ void clapp::parser::basic_option_container_t::validate_options_and(
         const std::string given_and_options_str{
             value::stringify(given_and_options)};
         if (given_and_options.value().empty()) {
-            throw clapp::exception::option_exception_t{
+            throw clapp::option_exception_t{
                 std::string{"None of the mandatory options were given, but at "
                             "least the following options are required: "} +
                 mandatory_and_options_str};
         }
-        throw clapp::exception::option_exception_t{
+        throw clapp::option_exception_t{
             std::string{"Only the following mandatory options "} +
             given_and_options_str +
             " were given, but at least the following options are "
@@ -307,7 +307,7 @@ void clapp::parser::basic_option_container_t::validate_options_and_options(
                     if (opt.given_func()) {
                         if (given_xor_option) {
                             CLAPP_CONTRACT_EXPECTS(!xor_options_str.empty());
-                            throw clapp::exception::option_exception_t{
+                            throw clapp::option_exception_t{
                                 std::string{"Mutually exclusive option "} +
                                 opt.option_string + " given, but option " +
                                 given_xor_option.value() +

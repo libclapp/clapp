@@ -26,7 +26,7 @@ void clapp::parser::basic_parser_t::reg(
     if (config.argument_name.empty()) {
         std::stringstream string_stream;
         string_stream << "Argument name must be at least one char long.";
-        throw clapp::exception::argument_exception_t{string_stream.str()};
+        throw clapp::argument_exception_t{string_stream.str()};
     }
 
     const std::size_t num_arguments{arguments.size()};
@@ -35,7 +35,7 @@ void clapp::parser::basic_parser_t::reg(
         std::stringstream string_stream;
         string_stream << "Can't register argument '" << config.argument_name
                       << "' when variadic arguments are already registered.";
-        throw clapp::exception::argument_exception_t{string_stream.str()};
+        throw clapp::argument_exception_t{string_stream.str()};
     }
 
     if (config.purpose == types::purpose_t::mandatory) {
@@ -44,7 +44,7 @@ void clapp::parser::basic_parser_t::reg(
             string_stream
                 << "Can't register mandatory argument '" << config.argument_name
                 << "' when optional arguments are already registered.";
-            throw clapp::exception::argument_exception_t{string_stream.str()};
+            throw clapp::argument_exception_t{string_stream.str()};
         }
         get_mandatory_argument_descriptions().push_back(
             {config.argument_name, config.description, argument_type});
@@ -54,7 +54,7 @@ void clapp::parser::basic_parser_t::reg(
             string_stream << "Can't register optional argument '"
                           << config.argument_name
                           << "' when a sub-parser is already registered.";
-            throw clapp::exception::argument_exception_t{string_stream.str()};
+            throw clapp::argument_exception_t{string_stream.str()};
         }
         get_optional_argument_descriptions().push_back(
             {config.argument_name, config.description, argument_type});
@@ -69,8 +69,7 @@ void clapp::parser::basic_parser_t::reg(
                         << "Can't register argument '" << config.argument_name
                         << "', as another argument with this name is already "
                            "registered.";
-                    throw clapp::exception::argument_exception_t{
-                        string_stream.str()};
+                    throw clapp::argument_exception_t{string_stream.str()};
                 }
             },
             arg);

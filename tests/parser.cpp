@@ -1333,7 +1333,7 @@ TEST(parser, constructEmptyBasicParserAndParseUnknownArgumentsThrows) {
     const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
     empty_basic_parser_t ebp;
     ASSERT_THROW(static_cast<void>(ebp.parse(arg.begin(), arg.end())),
-                 clapp::exception::clapp_exception_t);
+                 clapp::clapp_exception_t);
 }
 
 TEST(parser, constructEmptyBasicParserAndParseUnknownLongOptionThrows) {
@@ -1341,7 +1341,7 @@ TEST(parser, constructEmptyBasicParserAndParseUnknownLongOptionThrows) {
     const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
     empty_basic_parser_t ebp;
     ASSERT_THROW(static_cast<void>(ebp.parse(arg.begin(), arg.end())),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 }
 
 TEST(parser, constructEmptyBasicParserAndParseUnknownShortOptionThrows) {
@@ -1349,7 +1349,7 @@ TEST(parser, constructEmptyBasicParserAndParseUnknownShortOptionThrows) {
     const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
     empty_basic_parser_t ebp;
     ASSERT_THROW(static_cast<void>(ebp.parse(arg.begin(), arg.end())),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 }
 
 TEST(parser, constructSimpleTestParserAndParseUnknownLongOptionThrows) {
@@ -1357,7 +1357,7 @@ TEST(parser, constructSimpleTestParserAndParseUnknownLongOptionThrows) {
     const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t stp;
     ASSERT_THROW(static_cast<void>(stp.parse(arg.begin(), arg.end())),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 }
 
 TEST(parser, constructSimpleTestParserAndParseUnknownShortOptionThrows) {
@@ -1365,7 +1365,7 @@ TEST(parser, constructSimpleTestParserAndParseUnknownShortOptionThrows) {
     const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t stp;
     ASSERT_THROW(static_cast<void>(stp.parse(arg.begin(), arg.end())),
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 }
 
 TEST(parser, constructSimpleTestParserAndParseLongBoolOptionWithParamThrows) {
@@ -1373,7 +1373,7 @@ TEST(parser, constructSimpleTestParserAndParseLongBoolOptionWithParamThrows) {
     const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t stp;
     ASSERT_THROW(static_cast<void>(stp.parse(arg.begin(), arg.end())),
-                 clapp::exception::option_param_exception_t);
+                 clapp::option_param_exception_t);
 }
 
 TEST(parser, constructSimpleTestParserAndParseShortOptionWithParamThrows) {
@@ -1381,7 +1381,7 @@ TEST(parser, constructSimpleTestParserAndParseShortOptionWithParamThrows) {
     const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t stp;
     ASSERT_THROW(static_cast<void>(stp.parse(arg.begin(), arg.end())),
-                 clapp::exception::option_param_exception_t);
+                 clapp::option_param_exception_t);
 }
 
 TEST(parser, constructSimpleTestParserAndParseLongIntOptionWithoutParamThrows) {
@@ -1389,7 +1389,7 @@ TEST(parser, constructSimpleTestParserAndParseLongIntOptionWithoutParamThrows) {
     const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t stp;
     ASSERT_THROW(static_cast<void>(stp.parse(arg.begin(), arg.end())),
-                 clapp::exception::option_param_exception_t);
+                 clapp::option_param_exception_t);
 }
 
 TEST(parser,
@@ -1398,7 +1398,7 @@ TEST(parser,
     const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t stp;
     ASSERT_THROW(static_cast<void>(stp.parse(arg.begin(), arg.end())),
-                 clapp::exception::option_param_exception_t);
+                 clapp::option_param_exception_t);
 }
 
 TEST(parser,
@@ -1407,7 +1407,7 @@ TEST(parser,
     const clapp::parser::types::arg_t arg{parser_make_arg_t(argv)};
     simple_test_parser_t stp;
     ASSERT_THROW(static_cast<void>(stp.parse(arg.begin(), arg.end())),
-                 clapp::exception::option_param_exception_t);
+                 clapp::option_param_exception_t);
 }
 
 TEST(parser,
@@ -1425,8 +1425,7 @@ TEST(parser,
 
     ASSERT_THAT(stp.get_num_processed_arguments(), testing::Eq(0));
 
-    ASSERT_THROW(stp.validate_recursive(),
-                 clapp::exception::argument_exception_t);
+    ASSERT_THROW(stp.validate_recursive(), clapp::argument_exception_t);
 }
 
 TEST(parser, constructSimpleTestParserParseArgumentAndValidateRecursive) {
@@ -1655,8 +1654,7 @@ TEST(parser, constructContainerParserAndParseEmptyOptionThrows) {
     ASSERT_THAT(parser.container.bool_option, BoolOptionNotGiven());
     ASSERT_THAT(parser.container.int_option, ParamOptionNotGiven());
 
-    ASSERT_THROW(parser.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(parser.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(parser, constructContainerParserAndAndGenHelpMessage) {
@@ -1679,8 +1677,7 @@ TEST(parser, constructContainerParserAndAndParseBoolAndIntOptionThrows) {
     ASSERT_THAT(parser.container.bool_option, BoolOptionGiven());
     ASSERT_THAT(parser.container.int_option, ParamOptionGiven(66));
 
-    ASSERT_THROW(parser.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(parser.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(parser, constructContainerParserAndAndParseBoolOptionDoesNotThrow) {
@@ -1719,8 +1716,7 @@ TEST(parser, constructContainerParserAndAndParseEmptyOptionThrows) {
     ASSERT_THAT(parser.container.bool_option, BoolOptionNotGiven());
     ASSERT_THAT(parser.container.int_option, ParamOptionNotGiven());
 
-    ASSERT_THROW(parser.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(parser.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(parser, constructContainerParserXorAndGenHelpMessage) {
@@ -1756,8 +1752,7 @@ TEST(parser, constructContainerParserXorAndParseBoolOptionThrows) {
     ASSERT_THAT(parser.container.bool_option, BoolOptionGiven());
     ASSERT_THAT(parser.container.int_option, ParamOptionNotGiven());
 
-    ASSERT_THROW(parser.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(parser.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(parser, constructContainerParserXorAndParseIntOptionThrows) {
@@ -1770,8 +1765,7 @@ TEST(parser, constructContainerParserXorAndParseIntOptionThrows) {
     ASSERT_THAT(parser.container.bool_option, BoolOptionNotGiven());
     ASSERT_THAT(parser.container.int_option, ParamOptionGiven(56));
 
-    ASSERT_THROW(parser.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(parser.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(parser, constructContainerParserXorAndParseEmptyOptionThrows) {
@@ -1784,8 +1778,7 @@ TEST(parser, constructContainerParserXorAndParseEmptyOptionThrows) {
     ASSERT_THAT(parser.container.bool_option, BoolOptionNotGiven());
     ASSERT_THAT(parser.container.int_option, ParamOptionNotGiven());
 
-    ASSERT_THROW(parser.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(parser.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(parser, constructNestedContainerParserAndGenHelpMessage) {
@@ -1816,8 +1809,7 @@ TEST(parser,
     ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionNotGiven());
     ASSERT_THAT(ncp.container.toc2.bool_option, BoolOptionNotGiven());
 
-    ASSERT_THROW(ncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(ncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -1889,8 +1881,7 @@ TEST(
     ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionNotGiven());
     ASSERT_THAT(ncp.container.toc2.bool_option, BoolOptionNotGiven());
 
-    ASSERT_THROW(ncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(ncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -1908,8 +1899,7 @@ TEST(
     ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionNotGiven());
     ASSERT_THAT(ncp.container.toc2.bool_option, BoolOptionNotGiven());
 
-    ASSERT_THROW(ncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(ncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -1927,8 +1917,7 @@ TEST(
     ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionNotGiven());
     ASSERT_THAT(ncp.container.toc2.bool_option, BoolOptionNotGiven());
 
-    ASSERT_THROW(ncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(ncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -1946,8 +1935,7 @@ TEST(
     ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionNotGiven());
     ASSERT_THAT(ncp.container.toc2.bool_option, BoolOptionGiven());
 
-    ASSERT_THROW(ncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(ncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -1965,8 +1953,7 @@ TEST(
     ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionNotGiven());
     ASSERT_THAT(ncp.container.toc2.bool_option, BoolOptionGiven());
 
-    ASSERT_THROW(ncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(ncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -2002,8 +1989,7 @@ TEST(
     ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionGiven("test"));
     ASSERT_THAT(ncp.container.toc2.bool_option, BoolOptionGiven());
 
-    ASSERT_THROW(ncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(ncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -2021,8 +2007,7 @@ TEST(
     ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionGiven("test"));
     ASSERT_THAT(ncp.container.toc2.bool_option, BoolOptionGiven());
 
-    ASSERT_THROW(ncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(ncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -2041,8 +2026,7 @@ TEST(
     ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionNotGiven());
     ASSERT_THAT(ncp.container.toc2.bool_option, BoolOptionGiven());
 
-    ASSERT_THROW(ncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(ncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -2061,8 +2045,7 @@ TEST(
     ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionNotGiven());
     ASSERT_THAT(ncp.container.toc2.bool_option, BoolOptionGiven());
 
-    ASSERT_THROW(ncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(ncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -2081,8 +2064,7 @@ TEST(
     ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionNotGiven());
     ASSERT_THAT(ncp.container.toc2.bool_option, BoolOptionGiven());
 
-    ASSERT_THROW(ncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(ncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -2101,8 +2083,7 @@ TEST(
     ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionGiven("string"));
     ASSERT_THAT(ncp.container.toc2.bool_option, BoolOptionNotGiven());
 
-    ASSERT_THROW(ncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(ncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(parser, constructNestedContainerParser2AndGenHelpMessage) {
@@ -2134,8 +2115,7 @@ TEST(
     ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionNotGiven());
     ASSERT_THAT(ncp.container.toc2.bool_option, BoolOptionNotGiven());
 
-    ASSERT_THROW(ncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(ncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -2192,8 +2172,7 @@ TEST(
     ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionNotGiven());
     ASSERT_THAT(ncp.container.toc2.bool_option, BoolOptionNotGiven());
 
-    ASSERT_THROW(ncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(ncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -2212,8 +2191,7 @@ TEST(
     ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionNotGiven());
     ASSERT_THAT(ncp.container.toc2.bool_option, BoolOptionGiven());
 
-    ASSERT_THROW(ncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(ncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -2232,8 +2210,7 @@ TEST(
     ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionNotGiven());
     ASSERT_THAT(ncp.container.toc2.bool_option, BoolOptionGiven());
 
-    ASSERT_THROW(ncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(ncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -2252,8 +2229,7 @@ TEST(
     ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionGiven("str"));
     ASSERT_THAT(ncp.container.toc2.bool_option, BoolOptionNotGiven());
 
-    ASSERT_THROW(ncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(ncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(parser, constructNestedContainerParser3AndGenHelpMessage) {
@@ -2283,8 +2259,7 @@ TEST(
     ASSERT_THAT(ncp.container.toc.uint_option, ParamOptionNotGiven());
     ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionNotGiven());
 
-    ASSERT_THROW(ncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(ncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -2302,8 +2277,7 @@ TEST(
     ASSERT_THAT(ncp.container.toc.uint_option, ParamOptionGiven(123U));
     ASSERT_THAT(ncp.container.toc2.string_option, ParamOptionGiven("str"));
 
-    ASSERT_THROW(ncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(ncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(parser, constructSuperNestedContainerParserAndGenHelpMessage) {
@@ -2355,8 +2329,7 @@ TEST(
     ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionNotGiven());
     ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionNotGiven());
 
-    ASSERT_THROW(sncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(sncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -2469,8 +2442,7 @@ TEST(
     ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionNotGiven());
     ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionNotGiven());
 
-    ASSERT_THROW(sncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(sncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -2499,8 +2471,7 @@ TEST(
     ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionNotGiven());
     ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionNotGiven());
 
-    ASSERT_THROW(sncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(sncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -2528,8 +2499,7 @@ TEST(
     ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionNotGiven());
     ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionNotGiven());
 
-    ASSERT_THROW(sncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(sncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -2665,8 +2635,7 @@ TEST(
     ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionGiven(3U));
     ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionGiven(4U));
 
-    ASSERT_THROW(sncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(sncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -2694,8 +2663,7 @@ TEST(
     ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionNotGiven());
     ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionNotGiven());
 
-    ASSERT_THROW(sncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(sncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -2723,8 +2691,7 @@ TEST(
     ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionGiven(1U));
     ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionGiven(2U));
 
-    ASSERT_THROW(sncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(sncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(
@@ -2751,21 +2718,20 @@ TEST(
     ASSERT_THAT(sncp.container.toc2.tsuc.uint1, ParamOptionNotGiven());
     ASSERT_THAT(sncp.container.toc2.tsuc.uint2, ParamOptionNotGiven());
 
-    ASSERT_THROW(sncp.validate_recursive(),
-                 clapp::exception::option_exception_t);
+    ASSERT_THROW(sncp.validate_recursive(), clapp::option_exception_t);
 }
 
 TEST(parser, constructInvalidNestedContainerParserThrows) {
     ASSERT_THROW(invalid_nested_container_parser_t{},
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 }
 
 TEST(parser, constructInvalidNestedContainerParser2Throws) {
     ASSERT_THROW(invalid_nested_container_parser2_t{},
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 }
 
 TEST(parser, constructInvalidNestedContainerParser3Throws) {
     ASSERT_THROW(invalid_nested_container_parser3_t{},
-                 clapp::exception::option_exception_t);
+                 clapp::option_exception_t);
 }

@@ -252,7 +252,7 @@ TEST(subParser, constructSubParserWithSameNameThrows) {
     simple_test_sub_parser_t stsp;
     simple_sub_parser_t sub{stsp, sub_parser, description};
     ASSERT_THROW((simple_sub_parser_t{stsp, sub_parser, description}),
-                 clapp::exception::sub_parser_exception_t);
+                 clapp::sub_parser_exception_t);
 }
 
 TEST(subParser, constructSubParserWithVariadicArgumentsParserThrows) {
@@ -261,7 +261,7 @@ TEST(subParser, constructSubParserWithVariadicArgumentsParserThrows) {
 
     variadic_argument_test_sub_parser_t vatsp;
     ASSERT_THROW((simple_sub_parser_t{vatsp, sub_parser, description}),
-                 clapp::exception::sub_parser_exception_t);
+                 clapp::sub_parser_exception_t);
 }
 
 TEST(subParser, constructSubParserWithOptionalArgumentParserThrows) {
@@ -270,7 +270,7 @@ TEST(subParser, constructSubParserWithOptionalArgumentParserThrows) {
 
     optional_argument_test_sub_parser_t oatsp;
     ASSERT_THROW((simple_sub_parser_t{oatsp, sub_parser, description}),
-                 clapp::exception::sub_parser_exception_t);
+                 clapp::sub_parser_exception_t);
 }
 
 TEST(subParser, constructSubParserAndGenHelpPrefix) {
