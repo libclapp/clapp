@@ -56,17 +56,18 @@ void clapp::option::gen_opt_conf_process_params(opt_params_t<T>& opt_params,
     if constexpr (type_traits::has_validate<typename std::decay<Param>::type,
                                             T>::value) {
         opt_params.validate_funcs.push_back(
-            [param](const T& value, const std::string& option_string) {
-                param.validate(value, option_string);
+            [param_capt = std::forward<Param>(param)](
+                const T& value, const std::string& option_string) {
+                param_capt.validate(value, option_string);
             });
     }
     if constexpr (type_traits::has_found<
                       typename std::decay<Param>::type>::value) {
-        opt_params.found.push_back(param);
+        opt_params.found.push_back(std::forward<Param>(param));
     }
     if constexpr (std::is_same<typename std::decay<Param>::type,
                                parser::types::purpose_t>::value) {
-        opt_params.purpose = param;
+        opt_params.purpose = std::forward<Param>(param);
     }
 }
 
