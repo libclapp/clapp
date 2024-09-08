@@ -33,15 +33,16 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
         clapp::value::found_func_t{print_version_and_exit}};
 
     // first mandatory argument of string
-    clapp::string_argument_t string_arg{*this, "string-arg", "String argument"};
+    clapp::argument::string_argument_t string_arg{*this, "string-arg",
+                                                  "String argument"};
 
     // second mandatory argument of int32_t
-    clapp::int32_argument_t int_arg{
+    clapp::argument::int32_argument_t int_arg{
         *this, "int-arg", "Int argument",
         clapp::value::min_max_value_t<std::int32_t>{5, 10}};
 
     // third optional variadic arguments of strings
-    clapp::variadic_string_argument_t variadic_string_arg{
+    clapp::argument::variadic_string_argument_t variadic_string_arg{
         *this, "variadic-string-arg", "Variadic String argument",
         purpose_t::optional};
 

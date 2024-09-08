@@ -25,9 +25,8 @@
 #include <string>
 #include <vector>
 
-namespace clapp {
+namespace clapp::argument {
 
-inline namespace argument {
 using given_func_t = parser::types::given_func_t;
 using has_value_func_t = std::function<bool(void)>;
 template <typename T>
@@ -165,69 +164,54 @@ class basic_variadic_argument_t {
     bool _given{false};
 };
 
-using bool_argument_t = clapp::basic_argument_t<bool>;
-using string_argument_t = clapp::basic_argument_t<std::string>;
-using path_argument_t = clapp::basic_argument_t<clapp::fs::path>;
-using int8_argument_t = clapp::basic_argument_t<std::int8_t>;
-using uint8_argument_t = clapp::basic_argument_t<std::uint8_t>;
-using int16_argument_t = clapp::basic_argument_t<std::int16_t>;
-using uint16_argument_t = clapp::basic_argument_t<std::uint16_t>;
-using int32_argument_t = clapp::basic_argument_t<std::int32_t>;
-using uint32_argument_t = clapp::basic_argument_t<std::uint32_t>;
-using int64_argument_t = clapp::basic_argument_t<std::int64_t>;
-using uint64_argument_t = clapp::basic_argument_t<std::uint64_t>;
-using ptrdiff_argument_t = clapp::basic_argument_t<std::ptrdiff_t>;
-using size_argument_t = clapp::basic_argument_t<std::size_t>;
-using double_argument_t = clapp::basic_argument_t<double>;
-using float_argument_t = clapp::basic_argument_t<float>;
-using ns_argument_t = clapp::basic_argument_t<std::chrono::nanoseconds>;
-using us_argument_t = clapp::basic_argument_t<std::chrono::microseconds>;
-using ms_argument_t = clapp::basic_argument_t<std::chrono::milliseconds>;
-using sec_argument_t = clapp::basic_argument_t<std::chrono::seconds>;
-using min_argument_t = clapp::basic_argument_t<std::chrono::minutes>;
-using hours_argument_t = clapp::basic_argument_t<std::chrono::hours>;
+using bool_argument_t = basic_argument_t<bool>;
+using string_argument_t = basic_argument_t<std::string>;
+using path_argument_t = basic_argument_t<clapp::fs::path>;
+using int8_argument_t = basic_argument_t<std::int8_t>;
+using uint8_argument_t = basic_argument_t<std::uint8_t>;
+using int16_argument_t = basic_argument_t<std::int16_t>;
+using uint16_argument_t = basic_argument_t<std::uint16_t>;
+using int32_argument_t = basic_argument_t<std::int32_t>;
+using uint32_argument_t = basic_argument_t<std::uint32_t>;
+using int64_argument_t = basic_argument_t<std::int64_t>;
+using uint64_argument_t = basic_argument_t<std::uint64_t>;
+using ptrdiff_argument_t = basic_argument_t<std::ptrdiff_t>;
+using size_argument_t = basic_argument_t<std::size_t>;
+using double_argument_t = basic_argument_t<double>;
+using float_argument_t = basic_argument_t<float>;
+using ns_argument_t = basic_argument_t<std::chrono::nanoseconds>;
+using us_argument_t = basic_argument_t<std::chrono::microseconds>;
+using ms_argument_t = basic_argument_t<std::chrono::milliseconds>;
+using sec_argument_t = basic_argument_t<std::chrono::seconds>;
+using min_argument_t = basic_argument_t<std::chrono::minutes>;
+using hours_argument_t = basic_argument_t<std::chrono::hours>;
 
-using variadic_bool_argument_t = clapp::basic_variadic_argument_t<bool>;
-using variadic_string_argument_t =
-    clapp::basic_variadic_argument_t<std::string>;
-using variadic_path_argument_t =
-    clapp::basic_variadic_argument_t<clapp::fs::path>;
-using variadic_int8_argument_t = clapp::basic_variadic_argument_t<std::int8_t>;
-using variadic_uint8_argument_t =
-    clapp::basic_variadic_argument_t<std::uint8_t>;
-using variadic_int16_argument_t =
-    clapp::basic_variadic_argument_t<std::int16_t>;
-using variadic_uint16_argument_t =
-    clapp::basic_variadic_argument_t<std::uint16_t>;
-using variadic_int32_argument_t =
-    clapp::basic_variadic_argument_t<std::int32_t>;
-using variadic_uint32_argument_t =
-    clapp::basic_variadic_argument_t<std::uint32_t>;
-using variadic_int64_argument_t =
-    clapp::basic_variadic_argument_t<std::int64_t>;
-using variadic_uint64_argument_t =
-    clapp::basic_variadic_argument_t<std::uint64_t>;
-using variadic_ptrdiff_argument_t =
-    clapp::basic_variadic_argument_t<std::ptrdiff_t>;
-using variadic_size_argument_t = clapp::basic_variadic_argument_t<std::size_t>;
-using variadic_double_argument_t = clapp::basic_variadic_argument_t<double>;
-using variadic_float_argument_t = clapp::basic_variadic_argument_t<float>;
+using variadic_bool_argument_t = basic_variadic_argument_t<bool>;
+using variadic_string_argument_t = basic_variadic_argument_t<std::string>;
+using variadic_path_argument_t = basic_variadic_argument_t<clapp::fs::path>;
+using variadic_int8_argument_t = basic_variadic_argument_t<std::int8_t>;
+using variadic_uint8_argument_t = basic_variadic_argument_t<std::uint8_t>;
+using variadic_int16_argument_t = basic_variadic_argument_t<std::int16_t>;
+using variadic_uint16_argument_t = basic_variadic_argument_t<std::uint16_t>;
+using variadic_int32_argument_t = basic_variadic_argument_t<std::int32_t>;
+using variadic_uint32_argument_t = basic_variadic_argument_t<std::uint32_t>;
+using variadic_int64_argument_t = basic_variadic_argument_t<std::int64_t>;
+using variadic_uint64_argument_t = basic_variadic_argument_t<std::uint64_t>;
+using variadic_ptrdiff_argument_t = basic_variadic_argument_t<std::ptrdiff_t>;
+using variadic_size_argument_t = basic_variadic_argument_t<std::size_t>;
+using variadic_double_argument_t = basic_variadic_argument_t<double>;
+using variadic_float_argument_t = basic_variadic_argument_t<float>;
 using variadic_ns_argument_t =
-    clapp::basic_variadic_argument_t<std::chrono::nanoseconds>;
+    basic_variadic_argument_t<std::chrono::nanoseconds>;
 using variadic_us_argument_t =
-    clapp::basic_variadic_argument_t<std::chrono::microseconds>;
+    basic_variadic_argument_t<std::chrono::microseconds>;
 using variadic_ms_argument_t =
-    clapp::basic_variadic_argument_t<std::chrono::milliseconds>;
-using variadic_sec_argument_t =
-    clapp::basic_variadic_argument_t<std::chrono::seconds>;
-using variadic_min_argument_t =
-    clapp::basic_variadic_argument_t<std::chrono::minutes>;
-using variadic_hours_argument_t =
-    clapp::basic_variadic_argument_t<std::chrono::hours>;
+    basic_variadic_argument_t<std::chrono::milliseconds>;
+using variadic_sec_argument_t = basic_variadic_argument_t<std::chrono::seconds>;
+using variadic_min_argument_t = basic_variadic_argument_t<std::chrono::minutes>;
+using variadic_hours_argument_t = basic_variadic_argument_t<std::chrono::hours>;
 
-}  // namespace argument
-
-}  // namespace clapp
+}  // namespace clapp::argument
 
 #include <clapp/argument.hpp>
 

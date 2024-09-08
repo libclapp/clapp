@@ -125,7 +125,7 @@ class test_argument_t : public clapp::argument::basic_argument_t<std::int32_t> {
 template <typename... Params>
 test_argument_t::test_argument_t(clapp::parser::basic_parser_t& parser,
                                  Params... parameters)
-    : clapp::basic_argument_t<std::int32_t>{
+    : clapp::argument::basic_argument_t<std::int32_t>{
           parser, std::forward<Params>(parameters)...} {}
 
 clapp::value::found_func_t::ret_t test_argument_t::found_entry(

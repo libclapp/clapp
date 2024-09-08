@@ -8,11 +8,12 @@
 
 #include <iostream>
 
-using string_argument_t = clapp::basic_argument_t<std::string>;
+using string_argument_t = clapp::argument::basic_argument_t<std::string>;
 using variadic_string_argument_t =
-    clapp::basic_variadic_argument_t<std::string>;
-using int_argument_t = clapp::basic_argument_t<std::int32_t>;
-using variadic_int_argument_t = clapp::basic_variadic_argument_t<std::int32_t>;
+    clapp::argument::basic_variadic_argument_t<std::string>;
+using int_argument_t = clapp::argument::basic_argument_t<std::int32_t>;
+using variadic_int_argument_t =
+    clapp::argument::basic_variadic_argument_t<std::int32_t>;
 
 enum class entry_t { entry1, entry2 };
 

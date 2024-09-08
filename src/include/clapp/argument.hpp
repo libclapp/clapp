@@ -21,13 +21,11 @@
 
 #include <numeric>
 
-namespace clapp {
-inline namespace argument {
+namespace clapp::argument {
 template <typename T>
 basic_argument_t<T>::~basic_argument_t() = default;
 
-}  // namespace argument
-}  // namespace clapp
+}  // namespace clapp::argument
 
 template <typename T>
 clapp::argument::basic_argument_t<T>::basic_argument_t(

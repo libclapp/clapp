@@ -92,7 +92,7 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
         clapp::option::string_param_option_t string{
             *this, 's', "String param option.", purpose_t::optional};
 
-        clapp::string_argument_t string_arg_x{
+        clapp::argument::string_argument_t string_arg_x{
             *this, "string-arg-x", "String argument x", purpose_t::optional,
             clapp::value::default_value_t<std::string>{"abaa"}};
     };
@@ -109,19 +109,19 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
 
         ~second_parser_t() override;
 
-        clapp::int32_argument_t int_arg{
+        clapp::argument::int32_argument_t int_arg{
             *this, "int-arg", "Int argument",
             clapp::value::min_max_value_t<std::int32_t>{5, 10}};
 
-        clapp::double_argument_t double_arg{
+        clapp::argument::double_argument_t double_arg{
             *this, "double-arg", "Double argument",
             clapp::value::min_max_value_t<double>{-1000., 1000.}};
 
-        clapp::string_argument_t string_arg_x{
+        clapp::argument::string_argument_t string_arg_x{
             *this, "string-arg-x", "String argument x", purpose_t::optional,
             clapp::value::default_value_t<std::string>{"default-string-arg-x"}};
 
-        clapp::variadic_int64_argument_t variadic_int_arg{
+        clapp::argument::variadic_int64_argument_t variadic_int_arg{
             *this, "variadic-int-arg", "Int argument", purpose_t::optional,
             clapp::value::min_max_value_t<std::int64_t>{5, 10}};
     };

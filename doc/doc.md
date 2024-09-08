@@ -589,7 +589,8 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
     clapp::option::string_param_option_t string_opt{*this, "str", 's',
                                                     "String option."};
 
-    clapp::string_argument_t string_arg{*this, "string-arg", "String argument"};
+    clapp::argument::string_argument_t string_arg{*this, "string-arg",
+                                                  "String argument"};
 };
 
 int main(int argc, char *argv[]) {
@@ -703,7 +704,8 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
     option_container_t options{
         *this, clapp::parser::types::logic_operator_type_t::logic_and};
 
-    clapp::string_argument_t string_arg{*this, "string-arg", "String argument"};
+    clapp::argument::string_argument_t string_arg{*this, "string-arg",
+                                                  "String argument"};
 };
 
 cli_parser_t::cli_parser_t()
@@ -869,7 +871,8 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
     option_container_t options{
         *this, clapp::parser::types::logic_operator_type_t::logic_and};
 
-    clapp::string_argument_t string_arg{*this, "string-arg", "String argument"};
+    clapp::argument::string_argument_t string_arg{*this, "string-arg",
+                                                  "String argument"};
 };
 
 cli_parser_t::cli_parser_t()
@@ -1083,8 +1086,8 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
             *this, "help", 'h', "Show help options.",
             clapp::parser::types::purpose_t::optional};
 
-        clapp::string_argument_t string_arg{*this, "string-arg",
-                                            "String argument"};
+        clapp::argument::string_argument_t string_arg{*this, "string-arg",
+                                                      "String argument"};
     };
 
     mode1_parser_t mode1{*this, "mode1", "mode1 sub-parser."};
