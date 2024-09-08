@@ -22,12 +22,12 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
     ~cli_parser_t() override;
 
     // if help is given, help is printed and exit(EXIT_SUCCESS) is requested
-    clapp::help_option_t help{*this, std::vector<std::string>{"help", "usage"},
-                              std::vector<char>{'h', '?'},
-                              "Show help options."};
+    clapp::option::help_option_t help{
+        *this, std::vector<std::string>{"help", "usage"},
+        std::vector<char>{'h', '?'}, "Show help options."};
 
     // if version is given, print_version_and_exit() is called.
-    clapp::bool_option_t version{
+    clapp::option::bool_option_t version{
         *this, std::vector<std::string>{"version", "vers"}, 'v',
         "Show version info",
         clapp::value::found_func_t{print_version_and_exit}};
@@ -52,12 +52,12 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
         ~and_option_container_t() override;
 
         // mandatory string option
-        clapp::string_param_option_t string_param{
+        clapp::option::string_param_option_t string_param{
             *this, "string", std::vector<char>{'s', '1'}, "String option 1.",
             purpose_t::mandatory};
 
         // optional string option (multiple string vectors)
-        clapp::vector_string_param_option_t string_vector_param{
+        clapp::option::vector_string_param_option_t string_vector_param{
             *this, "string-vector", "String vector param.",
             purpose_t::optional};
 

@@ -15,7 +15,7 @@ class example_main_parser2_t : public clapp::parser::basic_main_parser_t {
         *this, "count", 'c', "Count option.",
         clapp::parser::types::purpose_t::mandatory};
 
-    clapp::bool_option_t bo{
+    clapp::option::bool_option_t bo{
         *this, std::vector<std::string>{"bo"}, "Exits if given.",
         clapp::value::found_func_t{[](const std::string_view /*name*/) {
             return clapp::value::exit_t::exit(EXIT_SUCCESS);

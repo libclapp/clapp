@@ -12,7 +12,7 @@ empty_main_parser_t::~empty_main_parser_t() = default;
 
 class bo_main_parser_t : public clapp::parser::basic_main_parser_t {
    public:
-    clapp::bool_option_t bo{
+    clapp::option::bool_option_t bo{
         *this, std::vector<char>{'b'}, "Exits if given.",
         clapp::value::found_func_t{[](const std::string_view /*name*/) {
             return clapp::value::exit_t::exit(EXIT_SUCCESS);
@@ -28,11 +28,11 @@ class mandatory_main_parser_t : public clapp::parser::basic_main_parser_t {
    public:
     using clapp::parser::basic_main_parser_t::basic_main_parser_t;
 
-    clapp::bool_option_t b1{*this, std::vector<char>{'1'}, "first",
-                            clapp::parser::types::purpose_t::mandatory};
+    clapp::option::bool_option_t b1{*this, std::vector<char>{'1'}, "first",
+                                    clapp::parser::types::purpose_t::mandatory};
 
-    clapp::bool_option_t b2{*this, std::vector<char>{'2'}, "second",
-                            clapp::parser::types::purpose_t::mandatory};
+    clapp::option::bool_option_t b2{*this, std::vector<char>{'2'}, "second",
+                                    clapp::parser::types::purpose_t::mandatory};
 
     ~mandatory_main_parser_t() override;
 };

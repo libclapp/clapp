@@ -580,13 +580,14 @@ string argument:
 
 class cli_parser_t : public clapp::parser::basic_main_parser_t {
    public:
-    clapp::help_option_t help{*this, "help", 'h', "Show help options.",
-                              clapp::parser::types::purpose_t::optional};
+    clapp::option::help_option_t help{
+        *this, "help", 'h', "Show help options.",
+        clapp::parser::types::purpose_t::optional};
 
-    clapp::bool_option_t bool_opt{*this, "bool", 'b', "Bool option."};
+    clapp::option::bool_option_t bool_opt{*this, "bool", 'b', "Bool option."};
 
-    clapp::string_param_option_t string_opt{*this, "str", 's',
-                                            "String option."};
+    clapp::option::string_param_option_t string_opt{*this, "str", 's',
+                                                    "String option."};
 
     clapp::string_argument_t string_arg{*this, "string-arg", "String argument"};
 };
@@ -686,16 +687,17 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
    public:
     cli_parser_t();
 
-    clapp::help_option_t help{*this, "help", 'h', "Show help options."};
+    clapp::option::help_option_t help{*this, "help", 'h', "Show help options."};
 
     class option_container_t : public clapp::parser::option_container_t {
        public:
         using clapp::parser::option_container_t::option_container_t;
 
-        clapp::bool_option_t bool_opt{*this, "bool", 'b', "Bool option."};
+        clapp::option::bool_option_t bool_opt{*this, "bool", 'b',
+                                              "Bool option."};
 
-        clapp::string_param_option_t string_opt{*this, "str", 's',
-                                                "String option."};
+        clapp::option::string_param_option_t string_opt{*this, "str", 's',
+                                                        "String option."};
     };
 
     option_container_t options{
@@ -851,16 +853,17 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
    public:
     cli_parser_t();
 
-    clapp::help_option_t help{*this, "help", 'h', "Show help options."};
+    clapp::option::help_option_t help{*this, "help", 'h', "Show help options."};
 
     class option_container_t : public clapp::parser::option_container_t {
        public:
         using clapp::parser::option_container_t::option_container_t;
 
-        clapp::bool_option_t bool_opt{*this, "bool", 'b', "Bool option."};
+        clapp::option::bool_option_t bool_opt{*this, "bool", 'b',
+                                              "Bool option."};
 
-        clapp::string_param_option_t string_opt{*this, "str", 's',
-                                                "String option."};
+        clapp::option::string_param_option_t string_opt{*this, "str", 's',
+                                                        "String option."};
     };
 
     option_container_t options{
@@ -1052,20 +1055,22 @@ this sub-parser.
 
 class cli_parser_t : public clapp::parser::basic_main_parser_t {
    public:
-    clapp::help_option_t help{*this, "help", 'h', "Show help options.",
-                              clapp::parser::types::purpose_t::optional};
+    clapp::option::help_option_t help{
+        *this, "help", 'h', "Show help options.",
+        clapp::parser::types::purpose_t::optional};
 
-    clapp::int32_param_option_t int_opt{
+    clapp::option::int32_param_option_t int_opt{
         *this, 'i', "Int option", clapp::parser::types::purpose_t::optional};
 
     class mode1_parser_t : public clapp::parser::basic_sub_parser_t {
        public:
         using clapp::parser::basic_sub_parser_t::basic_sub_parser_t;
 
-        clapp::help_option_t help{*this, "help", 'h', "Show help options.",
-                                  clapp::parser::types::purpose_t::optional};
+        clapp::option::help_option_t help{
+            *this, "help", 'h', "Show help options.",
+            clapp::parser::types::purpose_t::optional};
 
-        clapp::string_param_option_t string{
+        clapp::option::string_param_option_t string{
             *this, 's', "String param option.",
             clapp::parser::types::purpose_t::optional};
     };
@@ -1074,8 +1079,9 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
        public:
         using clapp::parser::basic_sub_parser_t::basic_sub_parser_t;
 
-        clapp::help_option_t help{*this, "help", 'h', "Show help options.",
-                                  clapp::parser::types::purpose_t::optional};
+        clapp::option::help_option_t help{
+            *this, "help", 'h', "Show help options.",
+            clapp::parser::types::purpose_t::optional};
 
         clapp::string_argument_t string_arg{*this, "string-arg",
                                             "String argument"};

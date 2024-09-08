@@ -23,8 +23,7 @@
 #include <numeric>
 #include <sstream>
 
-namespace clapp {
-inline namespace option {
+namespace clapp::option {
 template <typename T>
 basic_param_option_t<T>::~basic_param_option_t() = default;
 
@@ -36,8 +35,7 @@ basic_option_t<T, default_value>::~basic_option_t() = default;
 
 template <int EXIT_CODE>
 basic_help_option_t<EXIT_CODE>::~basic_help_option_t() = default;
-}  // namespace option
-}  // namespace clapp
+}  // namespace clapp::option
 
 template <typename T>
 inline void clapp::option::gen_opt_conf_process_params(
@@ -377,7 +375,7 @@ clapp::option::basic_vector_param_option_t<T>::basic_vector_param_option_t(
 }
 
 template <typename T>
-typename clapp::basic_vector_param_option_t<T>::callbacks_t
+typename clapp::option::basic_vector_param_option_t<T>::callbacks_t
 clapp::option::basic_vector_param_option_t<T>::create_callbacks(
     basic_vector_param_option_t<T>* inst) {
     return callbacks_t{
@@ -469,8 +467,9 @@ constexpr bool clapp::option::basic_option_t<T, default_value>::has_value()
 template <typename... Params>
 clapp::option::bool_option_t::bool_option_t(
     parser::basic_option_container_t& container, Params... parameters)
-    : clapp::basic_option_t<bool, false>{container, create_callbacks(this),
-                                         std::forward<Params>(parameters)...} {
+    : clapp::option::basic_option_t<bool, false>{
+          container, create_callbacks(this),
+          std::forward<Params>(parameters)...} {
     if (!_value) {
         _value = false;
     }
@@ -493,7 +492,7 @@ clapp::option::basic_help_option_t<EXIT_CODE>::gen_func_print_help_and_req_exit(
 template <typename... Params>
 clapp::option::count_option_t::count_option_t(
     parser::basic_option_container_t& container, Params... parameters)
-    : clapp::basic_option_t<std::uint32_t, 0U>{
+    : clapp::option::basic_option_t<std::uint32_t, 0U>{
           container, create_callbacks(this),
           std::forward<Params>(parameters)...} {
     if (!_value) {

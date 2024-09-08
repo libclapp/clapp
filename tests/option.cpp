@@ -160,7 +160,7 @@ class test_option_t : public clapp::option::basic_option_t<std::int32_t, 0> {
 template <typename... Params>
 test_option_t::test_option_t(clapp::parser::basic_parser_t& parser,
                              Params... parameters)
-    : clapp::basic_option_t<std::int32_t, 0>{
+    : clapp::option::basic_option_t<std::int32_t, 0>{
           parser, create_callbacks(this),
           std::forward<Params>(parameters)...} {}
 

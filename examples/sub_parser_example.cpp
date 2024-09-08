@@ -27,11 +27,11 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
     ~cli_parser_t() override;
 
     // if help is given, help is printed and exit(EXIT_SUCCESS) is called
-    clapp::help_option_t help{*this, "help", 'h', "Show help options.",
-                              purpose_t::optional};
+    clapp::option::help_option_t help{*this, "help", 'h', "Show help options.",
+                                      purpose_t::optional};
 
     // if version is given, print_version_and_exit() is called.
-    clapp::bool_option_t version{
+    clapp::option::bool_option_t version{
         *this, "version", "Show version info",
         clapp::value::found_func_t{print_version_and_exit},
         purpose_t::optional};
@@ -45,7 +45,7 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
         clapp::value::default_value_t<std::size_t>{2},
         purpose_t::optional};
 
-    clapp::bool_option_t debug{
+    clapp::option::bool_option_t debug{
         *this,
         "debug",
         'd',
@@ -66,8 +66,8 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
 
         ~sub_parser_t() override;
 
-        clapp::help_option_t help{*this, "help", 'h', "Show help options.",
-                                  purpose_t::optional};
+        clapp::option::help_option_t help{
+            *this, "help", 'h', "Show help options.", purpose_t::optional};
     };
 
     // first subparser declaration (inherits help from sub_parser_t)
@@ -82,15 +82,15 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
 
         ~first_parser_t() override;
 
-        clapp::bool_option_t short_bool{*this, 'b', "Short bool option.",
-                                        purpose_t::mandatory};
+        clapp::option::bool_option_t short_bool{
+            *this, 'b', "Short bool option.", purpose_t::mandatory};
 
-        clapp::double_param_option_t double_opt{
+        clapp::option::double_param_option_t double_opt{
             *this, 'd', "Double param option",
             clapp::value::default_value_t<double>{10}, purpose_t::optional};
 
-        clapp::string_param_option_t string{*this, 's', "String param option.",
-                                            purpose_t::optional};
+        clapp::option::string_param_option_t string{
+            *this, 's', "String param option.", purpose_t::optional};
 
         clapp::string_argument_t string_arg_x{
             *this, "string-arg-x", "String argument x", purpose_t::optional,

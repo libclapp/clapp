@@ -24,9 +24,8 @@
 #include <optional>
 #include <string>
 
-namespace clapp {
+namespace clapp::option {
 
-inline namespace option {
 using given_func_t = parser::types::given_func_t;
 using has_value_func_t = std::function<bool(void)>;
 template <typename T>
@@ -301,76 +300,61 @@ OPT_CONF gen_opt_conf2(
 
 using help_option_t = basic_help_option_t<EXIT_SUCCESS>;
 
-using string_param_option_t = clapp::basic_param_option_t<std::string>;
+using string_param_option_t = basic_param_option_t<std::string>;
 
-using path_param_option_t = clapp::basic_param_option_t<clapp::fs::path>;
+using path_param_option_t = basic_param_option_t<clapp::fs::path>;
 
-using bool_param_option_t = clapp::basic_param_option_t<bool>;
-using int8_param_option_t = clapp::basic_param_option_t<std::int8_t>;
-using uint8_param_option_t = clapp::basic_param_option_t<std::uint8_t>;
-using int16_param_option_t = clapp::basic_param_option_t<std::int16_t>;
-using uint16_param_option_t = clapp::basic_param_option_t<std::uint16_t>;
-using int32_param_option_t = clapp::basic_param_option_t<std::int32_t>;
-using uint32_param_option_t = clapp::basic_param_option_t<std::uint32_t>;
-using int64_param_option_t = clapp::basic_param_option_t<std::int64_t>;
-using uint64_param_option_t = clapp::basic_param_option_t<std::uint64_t>;
-using ptrdiff_param_option_t = clapp::basic_param_option_t<std::ptrdiff_t>;
-using size_param_option_t = clapp::basic_param_option_t<std::size_t>;
-using double_param_option_t = clapp::basic_param_option_t<double>;
-using float_param_option_t = clapp::basic_param_option_t<float>;
-using ns_param_option_t = clapp::basic_param_option_t<std::chrono::nanoseconds>;
-using us_param_option_t =
-    clapp::basic_param_option_t<std::chrono::microseconds>;
-using ms_param_option_t =
-    clapp::basic_param_option_t<std::chrono::milliseconds>;
-using sec_param_option_t = clapp::basic_param_option_t<std::chrono::seconds>;
-using min_param_option_t = clapp::basic_param_option_t<std::chrono::minutes>;
-using hours_param_option_t = clapp::basic_param_option_t<std::chrono::hours>;
+using bool_param_option_t = basic_param_option_t<bool>;
+using int8_param_option_t = basic_param_option_t<std::int8_t>;
+using uint8_param_option_t = basic_param_option_t<std::uint8_t>;
+using int16_param_option_t = basic_param_option_t<std::int16_t>;
+using uint16_param_option_t = basic_param_option_t<std::uint16_t>;
+using int32_param_option_t = basic_param_option_t<std::int32_t>;
+using uint32_param_option_t = basic_param_option_t<std::uint32_t>;
+using int64_param_option_t = basic_param_option_t<std::int64_t>;
+using uint64_param_option_t = basic_param_option_t<std::uint64_t>;
+using ptrdiff_param_option_t = basic_param_option_t<std::ptrdiff_t>;
+using size_param_option_t = basic_param_option_t<std::size_t>;
+using double_param_option_t = basic_param_option_t<double>;
+using float_param_option_t = basic_param_option_t<float>;
+using ns_param_option_t = basic_param_option_t<std::chrono::nanoseconds>;
+using us_param_option_t = basic_param_option_t<std::chrono::microseconds>;
+using ms_param_option_t = basic_param_option_t<std::chrono::milliseconds>;
+using sec_param_option_t = basic_param_option_t<std::chrono::seconds>;
+using min_param_option_t = basic_param_option_t<std::chrono::minutes>;
+using hours_param_option_t = basic_param_option_t<std::chrono::hours>;
 
-using vector_string_param_option_t =
-    clapp::basic_vector_param_option_t<std::string>;
+using vector_string_param_option_t = basic_vector_param_option_t<std::string>;
 
-using vector_path_param_option_t =
-    clapp::basic_vector_param_option_t<clapp::fs::path>;
+using vector_path_param_option_t = basic_vector_param_option_t<clapp::fs::path>;
 
-using vector_int8_param_option_t =
-    clapp::basic_vector_param_option_t<std::int8_t>;
-using vector_uint8_param_option_t =
-    clapp::basic_vector_param_option_t<std::uint8_t>;
-using vector_int16_param_option_t =
-    clapp::basic_vector_param_option_t<std::int16_t>;
-using vector_uint16_param_option_t =
-    clapp::basic_vector_param_option_t<std::uint16_t>;
-using vector_int32_param_option_t =
-    clapp::basic_vector_param_option_t<std::int32_t>;
-using vector_uint32_param_option_t =
-    clapp::basic_vector_param_option_t<std::uint32_t>;
-using vector_int64_param_option_t =
-    clapp::basic_vector_param_option_t<std::int64_t>;
-using vector_uint64_param_option_t =
-    clapp::basic_vector_param_option_t<std::uint64_t>;
+using vector_int8_param_option_t = basic_vector_param_option_t<std::int8_t>;
+using vector_uint8_param_option_t = basic_vector_param_option_t<std::uint8_t>;
+using vector_int16_param_option_t = basic_vector_param_option_t<std::int16_t>;
+using vector_uint16_param_option_t = basic_vector_param_option_t<std::uint16_t>;
+using vector_int32_param_option_t = basic_vector_param_option_t<std::int32_t>;
+using vector_uint32_param_option_t = basic_vector_param_option_t<std::uint32_t>;
+using vector_int64_param_option_t = basic_vector_param_option_t<std::int64_t>;
+using vector_uint64_param_option_t = basic_vector_param_option_t<std::uint64_t>;
 using vector_ptrdiff_param_option_t =
-    clapp::basic_vector_param_option_t<std::ptrdiff_t>;
-using vector_size_param_option_t =
-    clapp::basic_vector_param_option_t<std::size_t>;
-using vector_double_param_option_t = clapp::basic_vector_param_option_t<double>;
-using vector_float_param_option_t = clapp::basic_vector_param_option_t<float>;
+    basic_vector_param_option_t<std::ptrdiff_t>;
+using vector_size_param_option_t = basic_vector_param_option_t<std::size_t>;
+using vector_double_param_option_t = basic_vector_param_option_t<double>;
+using vector_float_param_option_t = basic_vector_param_option_t<float>;
 using vector_ns_param_option_t =
-    clapp::basic_vector_param_option_t<std::chrono::nanoseconds>;
+    basic_vector_param_option_t<std::chrono::nanoseconds>;
 using vector_us_param_option_t =
-    clapp::basic_vector_param_option_t<std::chrono::microseconds>;
+    basic_vector_param_option_t<std::chrono::microseconds>;
 using vector_ms_param_option_t =
-    clapp::basic_vector_param_option_t<std::chrono::milliseconds>;
+    basic_vector_param_option_t<std::chrono::milliseconds>;
 using vector_sec_param_option_t =
-    clapp::basic_vector_param_option_t<std::chrono::seconds>;
+    basic_vector_param_option_t<std::chrono::seconds>;
 using vector_min_param_option_t =
-    clapp::basic_vector_param_option_t<std::chrono::minutes>;
+    basic_vector_param_option_t<std::chrono::minutes>;
 using vector_hours_param_option_t =
-    clapp::basic_vector_param_option_t<std::chrono::hours>;
+    basic_vector_param_option_t<std::chrono::hours>;
 
-}  // namespace option
-
-}  // namespace clapp
+}  // namespace clapp::option
 
 #include <clapp/option.hpp>
 

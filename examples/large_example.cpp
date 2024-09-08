@@ -23,15 +23,16 @@ class entry_value_constraint_t {
     }
 };
 
-using string_param_t = clapp::basic_param_option_t<std::string>;
+using string_param_t = clapp::option::basic_param_option_t<std::string>;
 
-using string_vector_param_t = clapp::basic_vector_param_option_t<std::string>;
+using string_vector_param_t =
+    clapp::option::basic_vector_param_option_t<std::string>;
 
-using int32_param_t = clapp::basic_param_option_t<std::int32_t>;
+using int32_param_t = clapp::option::basic_param_option_t<std::int32_t>;
 
-using entry_param_t = clapp::basic_param_option_t<entry_t>;
+using entry_param_t = clapp::option::basic_param_option_t<entry_t>;
 
-using entry_argument_t = clapp::basic_argument_t<entry_t>;
+using entry_argument_t = clapp::argument::basic_argument_t<entry_t>;
 
 struct no_action_t {};
 
@@ -63,7 +64,8 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
 
         ~cmd1_parser_t() override;
 
-        clapp::bool_option_t help{*this, "help", 'h', "Show help options."};
+        clapp::option::bool_option_t help{*this, "help", 'h',
+                                          "Show help options."};
 
         class and_option_container_t
             : public clapp::parser::option_container_t {
@@ -72,16 +74,16 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
 
             ~and_option_container_t() override;
 
-            clapp::bool_option_t short_bool{*this, 'b', "Short bool option.",
-                                            purpose_t::mandatory};
+            clapp::option::bool_option_t short_bool{
+                *this, 'b', "Short bool option.", purpose_t::mandatory};
 
             // mandatory string option
-            clapp::string_param_option_t string_param{
+            clapp::option::string_param_option_t string_param{
                 *this, "string", std::vector<char>{'s', '1'},
                 "String option 1.", purpose_t::mandatory};
 
             // optional string option (multiple string vectors)
-            clapp::vector_string_param_option_t string_vector_param{
+            clapp::option::vector_string_param_option_t string_vector_param{
                 *this, "string-vector", "String vector param.",
                 purpose_t::optional};
 
@@ -120,11 +122,11 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
 
         ~cmd2_parser_t() override;
 
-        clapp::bool_option_t help{*this, "help", 'h', "Show help options.",
-                                  purpose_t::optional};
+        clapp::option::bool_option_t help{
+            *this, "help", 'h', "Show help options.", purpose_t::optional};
 
-        clapp::bool_option_t short_bool{*this, 'b', "Short bool option.",
-                                        purpose_t::optional};
+        clapp::option::bool_option_t short_bool{
+            *this, 'b', "Short bool option.", purpose_t::optional};
 
         string_argument_t string_arg_x{
             *this, "string-arg-x", "String argument x", purpose_t::optional,
@@ -141,22 +143,22 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
 
     string_argument_t string_arg{*this, "string-arg", "String argument"};
 
-    clapp::help_option_t help{*this, "help", 'h', "Show help options.",
-                              purpose_t::optional};
-    clapp::bool_option_t short_bool{*this, 'b', "Short bool option.",
-                                    purpose_t::optional};
-    clapp::bool_option_t long_bool{*this, "long-bool", "Long bool option.",
-                                   purpose_t::optional};
-    clapp::bool_option_t restricted_bool{*this,
-                                         "restricted",
-                                         'r',
-                                         "restricted bool option.",
-                                         restriction_t{},
-                                         no_action_t{},
-                                         purpose_t::optional};
-    clapp::bool_option_t mandatory_bool{
+    clapp::option::help_option_t help{*this, "help", 'h', "Show help options.",
+                                      purpose_t::optional};
+    clapp::option::bool_option_t short_bool{*this, 'b', "Short bool option.",
+                                            purpose_t::optional};
+    clapp::option::bool_option_t long_bool{
+        *this, "long-bool", "Long bool option.", purpose_t::optional};
+    clapp::option::bool_option_t restricted_bool{*this,
+                                                 "restricted",
+                                                 'r',
+                                                 "restricted bool option.",
+                                                 restriction_t{},
+                                                 no_action_t{},
+                                                 purpose_t::optional};
+    clapp::option::bool_option_t mandatory_bool{
         *this, 'o', "Mandatory short bool option.", purpose_t::mandatory};
-    clapp::bool_option_t mandatory_restricted_bool{
+    clapp::option::bool_option_t mandatory_restricted_bool{
         *this,
         "mandatory-restricted",
         'm',
@@ -175,11 +177,11 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
 
         ~time_container_t() override;
 
-        clapp::hours_param_option_t time_hours{
+        clapp::option::hours_param_option_t time_hours{
             *this, "time-hours", "Time in hours.", purpose_t::mandatory};
-        clapp::min_param_option_t time_minutes{
+        clapp::option::min_param_option_t time_minutes{
             *this, "time-min", "Time in minutes.", purpose_t::mandatory};
-        clapp::sec_param_option_t time_seconds{
+        clapp::option::sec_param_option_t time_seconds{
             *this, "time-sec", "Time in seconds.", purpose_t::mandatory,
             clapp::value::min_max_value_t<std::chrono::seconds>{
                 std::chrono::seconds{0}, std::chrono::seconds{7}}};

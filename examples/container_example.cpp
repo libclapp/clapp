@@ -22,10 +22,10 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
     ~cli_parser_t() override;
 
     // if help is given, help is printed and exit(EXIT_SUCCESS) is requested
-    clapp::help_option_t help{*this, "help", 'h', "Show help options."};
+    clapp::option::help_option_t help{*this, "help", 'h', "Show help options."};
 
     // if version is given, print_version_and_exit() is called.
-    clapp::bool_option_t version{
+    clapp::option::bool_option_t version{
         *this, "version", "Show version info",
         clapp::value::found_func_t{print_version_and_exit}};
 
@@ -46,7 +46,7 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
             purpose_t::optional};
 
         // mandatory string option
-        clapp::string_param_option_t string_param{
+        clapp::option::string_param_option_t string_param{
             *this, "string", std::vector<char>{'s', '1'}, "String option 1.",
             purpose_t::mandatory};
 
@@ -57,9 +57,11 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
 
             ~xor_option_container_t() override;
 
-            clapp::int32_param_option_t int32{*this, "i32", "Int32 option."};
+            clapp::option::int32_param_option_t int32{*this, "i32",
+                                                      "Int32 option."};
 
-            clapp::uint32_param_option_t uint32{*this, "u32", "UInt32 option."};
+            clapp::option::uint32_param_option_t uint32{*this, "u32",
+                                                        "UInt32 option."};
 
             explicit xor_option_container_t(const xor_option_container_t &) =
                 delete;
