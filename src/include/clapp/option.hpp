@@ -435,7 +435,7 @@ clapp::option::basic_option_t<T, default_value>::basic_option_t(
     parser::basic_option_container_t& container, callbacks_t&& callbacks,
     Params&&... parameters) {
     opt_conf_container_t<T, opt_conf_t> conf{gen_opt_conf<T, opt_conf_t>(
-        callbacks, std::forward<Params>(parameters)...)};
+        std::move(callbacks), std::forward<Params>(parameters)...)};
     container.reg(std::move(conf.opt_conf));
     if (conf.default_value) {
         _value = conf.default_value.value();
