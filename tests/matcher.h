@@ -17,9 +17,8 @@ std::optional<clapp::parser::types::variant_opt_conf_t> contains_option(
     for (const auto& opt : options) {
         const bool found{std::visit(
             [&option](auto&& visited_option) {
-                if constexpr (std::is_same<
-                                  typename std::decay<decltype(option)>::type,
-                                  char>::value) {
+                if constexpr (std::is_same_v<std::decay_t<decltype(option)>,
+                                             char>) {
                     for (auto& item : visited_option.short_options) {
                         if (option == item.option) {
                             return true;
