@@ -18,9 +18,8 @@
 
 #include <clapp/parser.h>
 
-namespace clapp {
+namespace clapp::parser {
 
-inline namespace parser {
 class basic_main_parser_t : public basic_parser_t {
    public:
     using basic_parser_t::basic_parser_t;
@@ -51,8 +50,6 @@ class basic_main_parser_t : public basic_parser_t {
     std::optional<std::string> executable{};
 };
 
-}  // namespace parser
-
-}  // namespace clapp
+}  // namespace clapp::parser
 
 #endif
