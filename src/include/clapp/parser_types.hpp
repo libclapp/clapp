@@ -221,8 +221,8 @@ clapp::parser::types::help_entry_t clapp::parser::types::
 
 template <typename short_option_func_t, typename long_option_func_t>
 constexpr bool clapp::parser::types::is_param_opt() {
-    return std::is_same<short_option_func_t, short_opt_param_func_t>::value &&
-           std::is_same<long_option_func_t, long_opt_param_func_t>::value;
+    return std::is_same_v<short_option_func_t, short_opt_param_func_t> &&
+           std::is_same_v<long_option_func_t, long_opt_param_func_t>;
 }
 
 #endif
