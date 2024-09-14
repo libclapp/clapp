@@ -134,7 +134,7 @@ class simple_test_parser4_t : public clapp::parser::basic_parser_t {
 
     static clapp::value::found_func_t::ret_t found_cb(
         const std::string_view option) {
-        std::cout << "found cb: " << option << std::endl;
+        std::cout << "found cb: " << option << "\n";
         return clapp::value::exit_t::exit(EXIT_SUCCESS);
     }
 
@@ -179,7 +179,7 @@ class simple_test_parser5_t : public clapp::parser::basic_parser_t {
     static clapp::value::found_func_t::ret_t found_cb(
         const std::string_view option) {
         static std::size_t cnt{0U};
-        std::cout << "found cb: " << option << std::endl;
+        std::cout << "found cb: " << option << "\n";
         cnt++;
         if (cnt == 1U) {
             return clapp::value::found_func_t::ret_t{};
