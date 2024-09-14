@@ -84,7 +84,7 @@ clapp::parser::basic_parser_t::get_optional_argument_descriptions() {
     return optional_argument_descriptions;
 }
 
-void clapp::parser::basic_parser_t::reg(reg_sub_parser_conf_t&& config) {
+void clapp::parser::basic_parser_t::reg(reg_sub_parser_conf_t config) {
     if (!get_optional_argument_descriptions().empty()) {
         std::stringstream string_stream;
         string_stream << "Can't register sub-parser '" << config.sub_parser_name

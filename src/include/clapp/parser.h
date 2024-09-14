@@ -96,7 +96,7 @@ class basic_parser_t : public basic_option_container_t {
 
     template <types::argument_type_t argument_type>
     void reg(types::basic_reg_argument_conf_t<argument_type>&& config);
-    void reg(reg_sub_parser_conf_t&& config);
+    void reg(reg_sub_parser_conf_t config);
 
     struct parse_result_t {
         types::arg_iterator_t it;
