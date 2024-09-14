@@ -18,9 +18,7 @@
 
 #include <clapp/parser_types.h>
 
-namespace clapp {
-
-inline namespace parser {
+namespace clapp::parser {
 
 class basic_parser_t;
 
@@ -137,9 +135,7 @@ class option_container_t : public basic_option_container_t {
     basic_option_container_t& cont;  // TODO(martinw): may use shared ptr.
 };
 
-}  // namespace parser
-
-}  // namespace clapp
+}  // namespace clapp::parser
 
 #include <clapp/option_container.hpp>
 
