@@ -25,9 +25,8 @@
 #include <string_view>
 #include <variant>
 
-namespace clapp {
-inline namespace parser {
-namespace types {
+namespace clapp::parser::types {
+
 struct arg_t : public std::span<const char* const> {
    public:
     using base = std::span<const char* const>;
@@ -180,9 +179,8 @@ using variant_arg_conf_vec_t = std::vector<variant_arg_conf_t>;
 
 template <typename short_option_func_t, typename long_option_func_t>
 constexpr static bool is_param_opt();
-}  // namespace types
-}  // namespace parser
-}  // namespace clapp
+
+}  // namespace clapp::parser::types
 
 #include <clapp/parser_types.hpp>
 
