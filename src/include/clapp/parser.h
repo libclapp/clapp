@@ -26,9 +26,7 @@
 #include <string_view>
 #include <variant>
 
-namespace clapp {
-
-inline namespace parser {
+namespace clapp::parser {
 
 class basic_sub_parser_t;
 
@@ -183,9 +181,7 @@ class basic_parser_t : public basic_option_container_t {
     constexpr static std::size_t num_sub_spaces{2U};
 };
 
-}  // namespace parser
-
-}  // namespace clapp
+}  // namespace clapp::parser
 
 #include <clapp/parser.hpp>
 
