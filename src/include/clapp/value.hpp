@@ -49,7 +49,7 @@ constexpr const char* clapp::value::get_chrono_postfix() noexcept {
 template <typename T>
 std::string clapp::value::to_string(const T& value) {
     std::stringstream string_stream;
-    if constexpr (std::is_integral<T>::value) {
+    if constexpr (std::is_integral_v<T>) {
         string_stream << std::to_string(value);
     } else if constexpr (type_traits::is_chrono_duration<T>::value) {
         string_stream << value.count() << get_chrono_postfix<T>();
