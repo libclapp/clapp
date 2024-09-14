@@ -18,9 +18,8 @@
 
 #include <clapp/parser.h>
 
-namespace clapp {
+namespace clapp::parser {
 
-inline namespace parser {
 class basic_sub_parser_t : public basic_parser_t {
    public:
     basic_sub_parser_t(
@@ -55,9 +54,7 @@ class basic_sub_parser_t : public basic_parser_t {
     bool active{false};
 };
 
-}  // namespace parser
-
-}  // namespace clapp
+}  // namespace clapp::parser
 
 #include <clapp/sub_parser.hpp>
 
