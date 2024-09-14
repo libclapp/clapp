@@ -30,17 +30,17 @@ clapp::value::default_value_t<T>::default_value_t(T _value)
 template <typename T>
 constexpr const char* clapp::value::get_chrono_postfix() noexcept {
     const char* postfix{""};
-    if constexpr (std::is_same<T, std::chrono::nanoseconds>::value) {
+    if constexpr (std::is_same_v<T, std::chrono::nanoseconds>) {
         postfix = "ns";
-    } else if constexpr (std::is_same<T, std::chrono::microseconds>::value) {
+    } else if constexpr (std::is_same_v<T, std::chrono::microseconds>) {
         postfix = "µs";
-    } else if constexpr (std::is_same<T, std::chrono::milliseconds>::value) {
+    } else if constexpr (std::is_same_v<T, std::chrono::milliseconds>) {
         postfix = "ms";
-    } else if constexpr (std::is_same<T, std::chrono::seconds>::value) {
+    } else if constexpr (std::is_same_v<T, std::chrono::seconds>) {
         postfix = "s";
-    } else if constexpr (std::is_same<T, std::chrono::minutes>::value) {
+    } else if constexpr (std::is_same_v<T, std::chrono::minutes>) {
         postfix = "m";
-    } else if constexpr (std::is_same<T, std::chrono::hours>::value) {
+    } else if constexpr (std::is_same_v<T, std::chrono::hours>) {
         postfix = "h";
     }
     return postfix;
