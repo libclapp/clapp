@@ -190,9 +190,9 @@ void clapp::value::path_exists_t::validate(const clapp::fs::path& path,
 
 template <typename T>
 static T convert_uint(const std::string_view param) {
-    static_assert(std::is_integral<T>::value,
+    static_assert(std::is_integral_v<T>,
                   "Integral template parameter required.");
-    static_assert(std::is_unsigned<T>::value,
+    static_assert(std::is_unsigned_v<T>,
                   "Unsigned template parameter required.");
     try {
         const std::uint64_t value{std::stoull(std::string{param}, nullptr, 0)};
@@ -222,10 +222,9 @@ static T convert_uint(const std::string_view param) {
 
 template <typename T>
 static T convert_int(const std::string_view param) {
-    static_assert(std::is_integral<T>::value,
+    static_assert(std::is_integral_v<T>,
                   "Integral template parameter required.");
-    static_assert(std::is_signed<T>::value,
-                  "Signed template parameter required.");
+    static_assert(std::is_signed_v<T>, "Signed template parameter required.");
     try {
         const std::int64_t value{std::stoll(std::string{param}, nullptr, 0)};
 
