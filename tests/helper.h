@@ -4,13 +4,13 @@
 template <typename ARG, typename T>
 bool compare_value(const ARG& arg, const T& value,
                    ::testing::MatchResultListener* result_listener) {
-    if constexpr (std::is_same<T, double>::value) {
+    if constexpr (std::is_same_v<T, double>) {
         const double epsilon{0.0001};
         const bool ret{std::fabs(arg - value) < epsilon};
         *result_listener << (ret ? "true" : "false") << " (" << arg
                          << " == " << value << " (approx, " << epsilon << "))";
         return ret;
-    } else if constexpr (std::is_same<T, float>::value) {
+    } else if constexpr (std::is_same_v<T, float>) {
         const float epsilon{0.01F};
         const bool ret{std::fabs(arg - value) < epsilon};
         *result_listener << (ret ? "true" : "false") << " (" << arg
