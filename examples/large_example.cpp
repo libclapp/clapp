@@ -331,7 +331,7 @@ void process_cmd2(const cli_parser_t::cmd2_parser_t &cmd2) {
                   << cmd2.get_sub_parser_name() << ' ' << cmd2.gen_help_msg(0);
         return;
     }
-    std::cout << "short-bool: " << cmd2.short_bool.value() << std::endl;
+    std::cout << "short-bool: " << cmd2.short_bool.value() << "\n";
 
     cmd2.validate();
 
@@ -437,7 +437,7 @@ using parser_t = clapp::parser::basic_parser_container_t<cli_parser_t>;
 
 int main(int argc, char *argv[]) {
     try {
-        std::cout << clapp::build_info::build_info_string << std::endl;
+        std::cout << clapp::build_info::build_info_string << "\n";
         parser_t parser;
         const std::optional<clapp::value::exit_t> exit{
             parser.parse_and_validate(argc, argv)};
@@ -446,7 +446,8 @@ int main(int argc, char *argv[]) {
         }
 
         if (!*parser) {
-            std::cout << "Parsing failed!" << std::endl;
+            std::cout << "Parsing failed!"
+                      << "\n";
             return EXIT_FAILURE;
         }
 
@@ -464,23 +465,27 @@ int main(int argc, char *argv[]) {
         process_time_container(parser->time);
 
         if (parser->cmd1) {
-            std::cout << "cmd1 given" << std::endl;
+            std::cout << "cmd1 given"
+                      << "\n";
             process_cmd1(parser->cmd1);
         } else {
-            std::cout << "cmd1 not given" << std::endl;
+            std::cout << "cmd1 not given"
+                      << "\n";
         }
 
         if (parser->cmd2) {
-            std::cout << "cmd2 given" << std::endl;
+            std::cout << "cmd2 given"
+                      << "\n";
             process_cmd2(parser->cmd2);
         } else {
-            std::cout << "cmd2 not given" << std::endl;
+            std::cout << "cmd2 not given"
+                      << "\n";
         }
     } catch (clapp::clapp_exception_t &e) {
-        std::cout << "Caught ClaPP-Exception: " << e.what() << std::endl;
+        std::cout << "Caught ClaPP-Exception: " << e.what() << "\n";
         return EXIT_FAILURE;
     } catch (std::exception &e) {
-        std::cout << "Caught Exception: " << e.what() << std::endl;
+        std::cout << "Caught Exception: " << e.what() << "\n";
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
