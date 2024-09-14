@@ -95,15 +95,15 @@ clapp::argument::gen_arg_validate_value_func(
                 validate_funcs_capt = std::move(validate_funcs)](
                    const std::string& argument_string) {
             if (has_value_func()) {
-                if constexpr (std::is_same<VALUE_FUNC,
-                                           variadic_value_func_t<T>>::value) {
+                if constexpr (std::is_same_v<VALUE_FUNC,
+                                             variadic_value_func_t<T>>) {
                     for (const auto& value : value_func()) {
                         for (const auto& func : validate_funcs_capt) {
                             func(value, argument_string);
                         }
                     }
-                } else if constexpr (std::is_same<VALUE_FUNC,
-                                                  value_func_t<T>>::value) {
+                } else if constexpr (std::is_same_v<VALUE_FUNC,
+                                                    value_func_t<T>>) {
                     const T value{value_func()};
                     for (const auto& func : validate_funcs_capt) {
                         func(value, argument_string);
@@ -140,7 +140,7 @@ clapp::argument::gen_arg_conf(CALLBACKS&& callbacks,
                               const std::string& description,
                               Params&&... parameters) {
     arg_params_t<T> arg_params;
-    if (std::is_same<ARG_CONF, parser::types::variadic_arg_conf_t>::value) {
+    if (std::is_same_v<ARG_CONF, parser::types::variadic_arg_conf_t>) {
         arg_params.restrictions.push_back(
             clapp::argument::basic_variadic_argument_t<
                 T>::variadic_argument_restrictions());
