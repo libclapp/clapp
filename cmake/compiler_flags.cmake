@@ -42,11 +42,6 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     list(APPEND libClaPP_TEST_CXX_PEDANTIC_COMPILE_OPTIONS -Wno-global-constructors)
 endif()
 
-CHECK_CXX_COMPILER_FLAG("-lstdc++fs" COMPILER_SUPPORTS_FILESYSTEM)
-if(COMPILER_SUPPORTS_FILESYSTEM)
-    set(libClaPP_CXX_FS_LINKER_FLAG "-lstdc++fs")
-endif()
-
 add_library(libClaPP_CXX_COMPILE_OPTIONS INTERFACE)
 target_compile_features(libClaPP_CXX_COMPILE_OPTIONS INTERFACE cxx_std_20)
 target_link_libraries(libClaPP_CXX_COMPILE_OPTIONS INTERFACE ${libClaPP_LINK_LIBRARIES})

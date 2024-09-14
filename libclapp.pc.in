@@ -5,5 +5,5 @@ Name: @CMAKE_PROJECT_NAME@
 Description: libClaPP is an open source command line argument processing library for C++.
 Version: @libClaPP_VERSION_MAJOR@.@libClaPP_VERSION_MINOR@.@libClaPP_VERSION_PATCH@
 Requires: 
-Libs: -L${libdir} -lclapp @libClaPP_FS_LINKER_FLAG@
+Libs: -L${libdir} -lclapp
 Cflags: -I${includedir}
