@@ -242,10 +242,12 @@ std::ostream &operator<<(std::ostream &out, const entry_t &entry);
 template <>
 entry_t clapp::value::convert_value<entry_t>(std::string_view param);
 
-static void process_options_and_args(const cli_parser_t &parser);
-static void process_time_container(const cli_parser_t::time_container_t &cont);
-static void process_cmd1(const cli_parser_t::cmd1_parser_t &cmd1);
-static void process_cmd2(const cli_parser_t::cmd2_parser_t &cmd2);
+namespace {
+void process_options_and_args(const cli_parser_t &parser);
+void process_time_container(const cli_parser_t::time_container_t &cont);
+void process_cmd1(const cli_parser_t::cmd1_parser_t &cmd1);
+void process_cmd2(const cli_parser_t::cmd2_parser_t &cmd2);
+}  // namespace
 
 cli_parser_t::~cli_parser_t() = default;
 cli_parser_t::cmd1_parser_t::~cmd1_parser_t() = default;
@@ -273,6 +275,8 @@ entry_t clapp::value::convert_value<entry_t>(const std::string_view param) {
     }
     throw std::runtime_error("Invalid enum param type.");
 }
+
+namespace {
 
 void process_time_container(const cli_parser_t::time_container_t &cont) {
     std::cout << "time-container: ";
@@ -426,6 +430,8 @@ void process_options_and_args(const cli_parser_t &parser) {
 
     std::cout << "entry_param: '" << parser.entry_param.value() << "'\n";
 }
+
+}  // namespace
 
 using parser_t = clapp::parser::basic_parser_container_t<cli_parser_t>;
 
