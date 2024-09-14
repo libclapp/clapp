@@ -254,7 +254,7 @@ OPT_CONF clapp::option::gen_opt_conf2(
     const std::vector<char>& short_option,
     std::vector<typename opt_params_t<T>::validate_func_t>&& validate_funcs,
     const std::string& description, parser::types::purpose_t purpose) {
-    std::string option_string{
+    const std::string option_string{
         OPT_CONF::create_option_string(short_option, long_option)};
 
     using short_opt_func_t = typename std::decay_t<CALLBACKS>::short_opt_func_t;
