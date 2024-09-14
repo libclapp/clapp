@@ -22,13 +22,17 @@
 #include <sstream>
 #include <utility>
 
+namespace {
+
 template <typename IT_T>
-static clapp::parser::basic_parser_t::parse_result_t handle_parse_ret(
+clapp::parser::basic_parser_t::parse_result_t handle_parse_ret(
     clapp::value::found_func_t::ret_t ret, IT_T pit);
 
 template <typename IT_T>
-static std::optional<clapp::parser::basic_parser_t::parse_result_t>
+std::optional<clapp::parser::basic_parser_t::parse_result_t>
 handle_parse_ret_or_nullopt(clapp::value::found_func_t::ret_t ret, IT_T pit);
+
+}  // namespace
 
 clapp::parser::basic_parser_t::basic_parser_t()
     : basic_option_container_t{types::logic_operator_type_t::logic_and} {}
@@ -340,8 +344,10 @@ void clapp::parser::basic_parser_t::validate_recursive() const {
     }
 }
 
+namespace {
+
 template <typename IT_T>
-static clapp::parser::basic_parser_t::parse_result_t handle_parse_ret(
+clapp::parser::basic_parser_t::parse_result_t handle_parse_ret(
     const clapp::value::found_func_t::ret_t ret, const IT_T pit) {
     if (ret) {
         return clapp::parser::basic_parser_t::parse_result_t{pit, std::nullopt,
@@ -352,7 +358,7 @@ static clapp::parser::basic_parser_t::parse_result_t handle_parse_ret(
 }
 
 template <typename IT_T>
-static std::optional<clapp::parser::basic_parser_t::parse_result_t>
+std::optional<clapp::parser::basic_parser_t::parse_result_t>
 handle_parse_ret_or_nullopt(const clapp::value::found_func_t::ret_t ret,
                             const IT_T pit) {
     if (ret) {
@@ -361,6 +367,8 @@ handle_parse_ret_or_nullopt(const clapp::value::found_func_t::ret_t ret,
     }
     return {};
 }
+
+}  // namespace
 
 clapp::parser::basic_parser_t::parse_result_t
 clapp::parser::basic_parser_t::parse_arg(const std::string_view argument,
