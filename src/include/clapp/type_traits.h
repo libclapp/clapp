@@ -21,9 +21,8 @@
 #include <type_traits>
 #include <vector>
 
-namespace clapp {
+namespace clapp::type_traits {
 
-inline namespace type_traits {
 template <typename T>
 struct is_chrono_duration : std::false_type {};
 
@@ -67,8 +66,6 @@ template <typename T>
 struct has_found<T, decltype(void(std::declval<T &>().found(std::string{})))>
     : std::true_type {};
 
-}  // namespace type_traits
-
-}  // namespace clapp
+}  // namespace clapp::type_traits
 
 #endif
