@@ -75,7 +75,7 @@ void clapp::parser::basic_parser_t::reg(
             arg);
     }
 
-    arguments.push_back(config);
+    arguments.push_back(std::move(config));
 }
 
 inline bool clapp::parser::basic_parser_t::is_active() const noexcept {
