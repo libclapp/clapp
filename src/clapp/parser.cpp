@@ -539,8 +539,9 @@ clapp::parser::basic_parser_t::parse_short(const std::string_view option,
 clapp::value::found_func_t
 clapp::parser::basic_parser_t::gen_func_print_help_and_req_exit(
     const int exit_code) const {
-    found_func_t found_func{
-        [this, exit_code](const std::string& /*name*/) -> found_func_t::ret_t {
+    value::found_func_t found_func{
+        [this,
+         exit_code](const std::string& /*name*/) -> value::found_func_t::ret_t {
             static constexpr std::size_t max_rec_depth{65535U};
             const std::string usage_prefix{gen_usage_prefix()};
             const std::string msg{usage_prefix + gen_help_msg(max_rec_depth)};
