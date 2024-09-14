@@ -51,7 +51,7 @@ std::string clapp::value::to_string(const T& value) {
     std::stringstream string_stream;
     if constexpr (std::is_integral<T>::value) {
         string_stream << std::to_string(value);
-    } else if constexpr (is_chrono_duration<T>::value) {
+    } else if constexpr (type_traits::is_chrono_duration<T>::value) {
         string_stream << value.count() << get_chrono_postfix<T>();
     } else {
         string_stream << value;
