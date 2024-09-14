@@ -223,7 +223,7 @@ void clapp::parser::basic_option_container_t::validate_options_xor_container(
             if (new_given_and_options.has_value() &&
                 !new_given_and_options.value().empty()) {
                 const std::string xor_option_str{
-                    stringify(new_given_and_options)};
+                    value::stringify(new_given_and_options)};
 
                 // because given_xor_option is checked in the
                 // validate_options_xor() and validate_options_and() function,
@@ -276,8 +276,9 @@ void clapp::parser::basic_option_container_t::validate_options_and(
             return;
         }
         const std::string mandatory_and_options_str{
-            stringify(mandatory_and_options)};
-        const std::string given_and_options_str{stringify(given_and_options)};
+            value::stringify(mandatory_and_options)};
+        const std::string given_and_options_str{
+            value::stringify(given_and_options)};
         if (given_and_options.value().empty()) {
             throw clapp::exception::option_exception_t{
                 std::string{"None of the mandatory options were given, but at "
@@ -353,7 +354,7 @@ void clapp::parser::basic_option_container_t::validate_options_and_container(
             CLAPP_CONTRACT_EXPECTS(my_given_and_options.has_value());
             if (my_given_xor_option.has_value()) {
                 given_and_options.value().push_back(
-                    stringify(my_given_and_options));
+                    value::stringify(my_given_and_options));
             }
         }
     }
