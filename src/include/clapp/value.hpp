@@ -130,7 +130,7 @@ constexpr int clapp::value::exit_t::get_exit_code() const noexcept {
 }
 
 constexpr std::string_view
-clapp::path_exists_t::append_restriction_text() noexcept {
+clapp::value::path_exists_t::append_restriction_text() noexcept {
     return "existing path";
 }
 
