@@ -33,14 +33,14 @@ clapp::parser::basic_sub_parser_t::sub_parse(types::arg_iterator_t begin,
 }
 
 clapp::parser::basic_sub_parser_t::basic_sub_parser_t(
-    clapp::basic_parser_t& parser, std::string sub_parser_name_arg,
+    clapp::parser::basic_parser_t& parser, std::string sub_parser_name_arg,
     std::string description_arg)
     : basic_sub_parser_t{
           parser, std::move(sub_parser_name_arg), std::move(description_arg),
           clapp::parser::types::logic_operator_type_t::logic_and} {}
 
 clapp::parser::basic_sub_parser_t::basic_sub_parser_t(
-    clapp::basic_parser_t& parser, std::string sub_parser_name_arg,
+    clapp::parser::basic_parser_t& parser, std::string sub_parser_name_arg,
     std::string description_arg,
     const clapp::parser::types::logic_operator_type_t logic_operator_type)
     : basic_parser_t{logic_operator_type},
