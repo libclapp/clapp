@@ -140,7 +140,7 @@ class basic_parser_t : public basic_option_container_t {
     [[nodiscard]] inline virtual bool is_active() const noexcept;
     [[nodiscard]] const basic_parser_t& get_active_parser() const;
 
-    [[nodiscard]] static exit_t default_print_and_exit(
+    [[nodiscard]] static value::exit_t default_print_and_exit(
         std::string_view print_msg, int exit_code);
     void set_print_and_exit_func(types::print_and_exit_func_t&& func);
     [[nodiscard]] types::print_and_exit_func_t& get_print_and_exit_func();
