@@ -178,8 +178,8 @@ clapp::fs::path clapp::value::convert_value<clapp::fs::path>(
     return {param};
 }
 
-void clapp::path_exists_t::validate(const clapp::fs::path& path,
-                                    const std::string& param_name) {
+void clapp::value::path_exists_t::validate(const clapp::fs::path& path,
+                                           const std::string& param_name) {
     if (!clapp::fs::exists(path)) {
         std::stringstream string_stream;
         string_stream << "CLI value '" << path << "' for '" << param_name
