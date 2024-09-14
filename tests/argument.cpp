@@ -35,9 +35,10 @@ tiny_sub_parser_t::~tiny_sub_parser_t() = default;
 
 argument_test_parser_t::~argument_test_parser_t() = default;
 
+namespace {
 template <typename ARG_FUNC_T>
-static ARG_FUNC_T get_arg_func(argument_test_parser_t& atp,
-                               const std::string& argument) {
+ARG_FUNC_T get_arg_func(argument_test_parser_t& atp,
+                        const std::string& argument) {
     std::vector<clapp::parser::types::variant_arg_conf_t> arguments{
         atp.get_arguments()};
     std::optional<clapp::parser::types::variant_arg_conf_t> found_arg{
@@ -58,7 +59,7 @@ static ARG_FUNC_T get_arg_func(argument_test_parser_t& atp,
 }
 
 template <typename ARGUMENT_T>
-static argument_test_parser_t::validate_value_func_t get_validate_value_func(
+argument_test_parser_t::validate_value_func_t get_validate_value_func(
     argument_test_parser_t& atp, ARGUMENT_T&& argument) {
     std::string argument_string{argument};
     std::vector<clapp::parser::types::variant_arg_conf_t> arguments{
@@ -77,8 +78,8 @@ static argument_test_parser_t::validate_value_func_t get_validate_value_func(
 }
 
 template <typename ARGUMENT_T>
-static argument_test_parser_t::given_func_t get_given_func(
-    argument_test_parser_t& atp, ARGUMENT_T&& argument) {
+argument_test_parser_t::given_func_t get_given_func(argument_test_parser_t& atp,
+                                                    ARGUMENT_T&& argument) {
     std::string argument_string{argument};
     std::vector<clapp::parser::types::variant_arg_conf_t> arguments{
         atp.get_arguments()};
@@ -93,6 +94,7 @@ static argument_test_parser_t::given_func_t get_given_func(
     return std::visit([](auto&& value_func) { return value_func.given_func; },
                       found_arg.value());
 }
+}  // namespace
 
 std::string argument_test_parser_t::gen_short_line_prefix() const {
     return "arg-test-parser" + gen_short_line();
