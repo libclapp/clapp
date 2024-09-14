@@ -607,10 +607,10 @@ int main(int argc, char *argv[]) {
             clip.bool_opt);  // parser ensures mandatory bool-option is given
         CLAPP_CONTRACT_ENSURES(clip.string_opt);  // parser ensures mandatory
                                                   // string-option is given
-        std::cout << "string-opt: " << clip.string_opt.value() << std::endl;
-        std::cout << "string-arg: " << clip.string_arg.value() << std::endl;
+        std::cout << "string-opt: " << clip.string_opt.value() << "\n";
+        std::cout << "string-arg: " << clip.string_arg.value() << "\n";
     } catch (std::exception &e) {
-        std::cout << "Caught Exception: " << e.what() << std::endl;
+        std::cout << "Caught Exception: " << e.what() << "\n";
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
@@ -729,10 +729,10 @@ int main(int argc, char *argv[]) {
             clip.options.string_opt);  // parser ensures mandatory
                                        // string-option is given
         std::cout << "string-opt: " << clip.options.string_opt.value()
-                  << std::endl;
-        std::cout << "string-arg: " << clip.string_arg.value() << std::endl;
+                  << "\n";
+        std::cout << "string-arg: " << clip.string_arg.value() << "\n";
     } catch (std::exception &e) {
-        std::cout << "Caught Exception: " << e.what() << std::endl;
+        std::cout << "Caught Exception: " << e.what() << "\n";
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
@@ -900,10 +900,10 @@ int main(int argc, char *argv[]) {
             parser->options.string_opt);  // parser ensures mandatory
                                           // string-option is given
         std::cout << "string-opt: " << parser->options.string_opt.value()
-                  << std::endl;
-        std::cout << "string-arg: " << parser->string_arg.value() << std::endl;
+                  << "\n";
+        std::cout << "string-arg: " << parser->string_arg.value() << "\n";
     } catch (std::exception &e) {
-        std::cout << "Caught Exception: " << e.what() << std::endl;
+        std::cout << "Caught Exception: " << e.what() << "\n";
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
@@ -1115,22 +1115,22 @@ int main(int argc, char *argv[]) {
             if (parser->int_opt) {
                 std::cout << "int-opt: '" << parser->int_opt.value() << "' ";
             }
-            std::cout << std::endl;
+            std::cout << "\n";
         } else if (parser->mode2) {
             std::cout << "mode2: ";
             // parser ensures mandatory arguments are given
             CLAPP_CONTRACT_ENSURES(parser->mode2.string_arg);
             std::cout << "string_arg: '" << parser->mode2.string_arg.value()
-                      << "'" << std::endl;
+                      << "'\n";
         } else {
             std::cout << "default mode: ";
             if (parser->int_opt) {
                 std::cout << "int-opt: '" << parser->int_opt.value() << "'";
             }
-            std::cout << std::endl;
+            std::cout << "\n";
         }
     } catch (std::exception &e) {
-        std::cout << "Caught Exception: " << e.what() << std::endl;
+        std::cout << "Caught Exception: " << e.what() << "\n";
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
