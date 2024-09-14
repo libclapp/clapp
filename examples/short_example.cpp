@@ -78,7 +78,7 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
 
 clapp::value::found_func_t::ret_t print_version_and_exit(
     const std::string & /*option*/) {
-    std::cout << clapp::build_info::build_info_string << std::endl;
+    std::cout << clapp::build_info::build_info_string << "\n";
     return clapp::value::exit_t::exit(EXIT_SUCCESS);
 }
 
@@ -104,11 +104,11 @@ int main(int argc, char *argv[]) {
         CLAPP_CONTRACT_EXPECTS(
             parser
                 ->string_arg);  // parser ensures mandatory arguments are given
-        std::cout << "string-arg: " << parser->string_arg.value() << std::endl;
+        std::cout << "string-arg: " << parser->string_arg.value() << "\n";
 
         CLAPP_CONTRACT_EXPECTS(
             parser->int_arg);  // parser ensures mandatory arguments are given
-        std::cout << "int-arg: " << parser->int_arg.value() << std::endl;
+        std::cout << "int-arg: " << parser->int_arg.value() << "\n";
 
         if (parser->variadic_string_arg) {  // if variadic_string_arg is given
             std::cout << "variadic-string-arg (size: "
@@ -117,16 +117,18 @@ int main(int argc, char *argv[]) {
             for (auto &val : parser->variadic_string_arg.value()) {
                 std::cout << val << ", ";
             }
-            std::cout << std::endl;
+            std::cout << "\n";
         } else {
-            std::cout << "variadic-string-arg: not given" << std::endl;
+            std::cout << "variadic-string-arg: not given"
+                      << "\n";
         }
 
         CLAPP_CONTRACT_EXPECTS(
             parser->options.string_param);  // The parser ensures that
                                             // mandatory options are given
         std::cout << "string_param: '" << parser->options.string_param.value()
-                  << "'" << std::endl;
+                  << "'"
+                  << "\n";
 
         if (parser->options
                 .string_vector_param) {  // if string_vector_param is given
@@ -137,15 +139,16 @@ int main(int argc, char *argv[]) {
             for (auto &val : parser->options.string_vector_param.value()) {
                 std::cout << val << ", ";
             }
-            std::cout << std::endl;
+            std::cout << "\n";
         } else {
-            std::cout << "string_vector_param: not given" << std::endl;
+            std::cout << "string_vector_param: not given"
+                      << "\n";
         }
     } catch (clapp::clapp_exception_t &e) {
-        std::cout << "Caught ClaPP-Exception: " << e.what() << std::endl;
+        std::cout << "Caught ClaPP-Exception: " << e.what() << "\n";
         return EXIT_FAILURE;
     } catch (std::exception &e) {
-        std::cout << "Caught Exception: " << e.what() << std::endl;
+        std::cout << "Caught Exception: " << e.what() << "\n";
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
