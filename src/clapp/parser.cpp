@@ -191,7 +191,7 @@ std::string clapp::parser::basic_parser_t::gen_opt_arg_lines(
     const std::size_t num_spaces) const {
     std::string ret;
 
-    types::help_entry_vec_t argument_help_entries{get_argument_help()};
+    const types::help_entry_vec_t argument_help_entries{get_argument_help()};
     if (!argument_help_entries.empty()) {
         ret += "\n" + std::string(num_spaces + num_sub_spaces, ' ') +
                "Arguments:\n";
@@ -207,7 +207,7 @@ std::string clapp::parser::basic_parser_t::gen_opt_arg_lines(
         }
     }
 
-    types::help_entry_vec_t option_help_entries{get_option_help()};
+    const types::help_entry_vec_t option_help_entries{get_option_help()};
     if (!option_help_entries.empty()) {
         ret +=
             "\n" + std::string(num_spaces + num_sub_spaces, ' ') + "Options:\n";
@@ -229,7 +229,7 @@ std::string clapp::parser::basic_parser_t::gen_opt_arg_lines(
 std::string clapp::parser::basic_parser_t::gen_help_desc(
     const std::size_t num_spaces, const std::size_t rec_depth) const {
     std::string ret{};
-    clapp::parser::basic_parser_t::help_contents_t help_contents{
+    const clapp::parser::basic_parser_t::help_contents_t help_contents{
         gen_detailed_help_contents()};
 
     ret += gen_opt_arg_lines(help_contents, num_spaces);
@@ -299,7 +299,7 @@ clapp::parser::basic_parser_t::process_parse_result(
 std::optional<clapp::value::exit_t> clapp::parser::basic_parser_t::parse(
     types::arg_iterator_t begin, types::arg_iterator_t end) {
     for (types::arg_iterator_t ait = begin; ait != end;) {
-        clapp::parser::basic_parser_t::parse_result_t parse_result{
+        const clapp::parser::basic_parser_t::parse_result_t parse_result{
             parse(std::string_view{*ait}, ait, end)};
         if (parse_result.exit) {
             return parse_result.exit;
@@ -426,8 +426,8 @@ clapp::parser::basic_parser_t::parse_long(const std::string_view option,
     return std::visit(
         [option, equal_index, &ait, opt, end](auto&& found_opt) {
             using current_option_type_t = std::decay_t<decltype(found_opt)>;
-            typename current_option_type_t::long_opt_conf_vec_cit_t opt_it{
-                found_opt.find_option(opt)};
+            const typename current_option_type_t::long_opt_conf_vec_cit_t
+                opt_it{found_opt.find_option(opt)};
             CLAPP_CONTRACT_ENSURES(opt_it != std::end(found_opt.long_options));
             if (equal_index != std::string_view::npos) {
                 if constexpr (std::is_same<current_option_type_t,
@@ -477,8 +477,8 @@ clapp::parser::basic_parser_t::parse_short(const std::string_view option,
     std::optional<parse_result_t> ret{std::visit(
         [option, opt, equal_index, &ait, end](auto&& found_opt) {
             using current_option_type_t = std::decay_t<decltype(found_opt)>;
-            typename current_option_type_t::short_opt_conf_vec_cit_t opt_it{
-                found_opt.find_option(opt)};
+            const typename current_option_type_t::short_opt_conf_vec_cit_t
+                opt_it{found_opt.find_option(opt)};
             CLAPP_CONTRACT_ENSURES(opt_it != std::end(found_opt.short_options));
             if (equal_index == 1U) {
                 if constexpr (std::is_same<current_option_type_t,
