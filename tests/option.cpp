@@ -44,9 +44,10 @@ LONG_OPT_FUNC_T process_long_option(OPT_T&& option,
     throw std::runtime_error("found long-opt-func, but iterate failed... wtf");
 }
 
+namespace {
 template <typename LONG_OPT_FUNC_T>
-static LONG_OPT_FUNC_T get_long_opt_func(option_test_parser_t& otp,
-                                         const std::string& long_opt_name) {
+LONG_OPT_FUNC_T get_long_opt_func(option_test_parser_t& otp,
+                                  const std::string& long_opt_name) {
     std::vector<clapp::parser::types::variant_opt_conf_t> options{
         otp.get_options().options};
     std::optional<clapp::parser::types::variant_opt_conf_t> found_opt{
@@ -80,8 +81,8 @@ SHORT_OPT_FUNC_T process_short_option(OPT_T&& option,
 }
 
 template <typename SHORT_OPT_FUNC_T>
-static SHORT_OPT_FUNC_T get_short_opt_func(option_test_parser_t& otp,
-                                           const char short_opt_name) {
+SHORT_OPT_FUNC_T get_short_opt_func(option_test_parser_t& otp,
+                                    const char short_opt_name) {
     std::vector<clapp::parser::types::variant_opt_conf_t> options{
         otp.get_options().options};
     std::optional<clapp::parser::types::variant_opt_conf_t> found_opt{
@@ -99,7 +100,7 @@ static SHORT_OPT_FUNC_T get_short_opt_func(option_test_parser_t& otp,
 }
 
 template <typename OPTION_T>
-static option_test_parser_t::validate_value_func_t get_validate_value_func(
+option_test_parser_t::validate_value_func_t get_validate_value_func(
     option_test_parser_t& otp, OPTION_T&& option) {
     std::string option_string{option};
     std::vector<clapp::parser::types::variant_opt_conf_t> options{
@@ -119,8 +120,8 @@ static option_test_parser_t::validate_value_func_t get_validate_value_func(
 }
 
 template <typename OPTION_T>
-static option_test_parser_t::given_func_t get_given_func(
-    option_test_parser_t& otp, OPTION_T&& option) {
+option_test_parser_t::given_func_t get_given_func(option_test_parser_t& otp,
+                                                  OPTION_T&& option) {
     std::string option_string{option};
     std::vector<clapp::parser::types::variant_opt_conf_t> options{
         otp.get_options().options};
@@ -134,6 +135,7 @@ static option_test_parser_t::given_func_t get_given_func(
     return std::visit([](auto&& given_func) { return given_func.given_func; },
                       found_opt.value());
 }
+}  // namespace
 
 option_test_parser_t::~option_test_parser_t() = default;
 
