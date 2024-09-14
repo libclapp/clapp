@@ -24,9 +24,8 @@
 #include <string>
 #include <string_view>
 
-namespace clapp {
+namespace clapp::value {
 
-inline namespace value {
 template <typename T>
 T convert_value(std::string_view param);
 
@@ -110,9 +109,7 @@ inline std::string concat_str(const std::string &lhs, const std::string &rhs);
 inline std::string stringify(
     const std::optional<std::vector<std::string>> &opt_str_vec);
 
-}  // namespace value
-
-}  // namespace clapp
+}  // namespace clapp::value
 
 #include <clapp/value.hpp>
 
