@@ -18,10 +18,12 @@
 #include <iostream>
 #include <string>
 
+namespace {
 template <typename T>
-static T convert_uint(std::string_view param);
+T convert_uint(std::string_view param);
 template <typename T>
-static T convert_int(std::string_view param);
+T convert_int(std::string_view param);
+}  // namespace
 
 clapp::value::found_func_t::found_func_t(func_t&& func_arg)
     : func{std::move(func_arg)} {}
@@ -188,8 +190,10 @@ void clapp::value::path_exists_t::validate(const clapp::fs::path& path,
     }
 }
 
+namespace {
+
 template <typename T>
-static T convert_uint(const std::string_view param) {
+T convert_uint(const std::string_view param) {
     static_assert(std::is_integral_v<T>,
                   "Integral template parameter required.");
     static_assert(std::is_unsigned_v<T>,
@@ -221,7 +225,7 @@ static T convert_uint(const std::string_view param) {
 }
 
 template <typename T>
-static T convert_int(const std::string_view param) {
+T convert_int(const std::string_view param) {
     static_assert(std::is_integral_v<T>,
                   "Integral template parameter required.");
     static_assert(std::is_signed_v<T>, "Signed template parameter required.");
@@ -258,3 +262,5 @@ static T convert_int(const std::string_view param) {
         throw clapp::invalid_value_t{string_stream.str()};
     }
 }
+
+}  // namespace
