@@ -275,9 +275,9 @@ std::string clapp::parser::basic_parser_t::gen_help_msg(
 }
 
 clapp::parser::types::arg_iterator_t
-clapp::basic_parser_t::process_parse_result(
+clapp::parser::basic_parser_t::process_parse_result(
     const types::arg_iterator_t ait,
-    const clapp::basic_parser_t::parse_result_t& parse_result) {
+    const clapp::parser::basic_parser_t::parse_result_t& parse_result) {
     if (ait == parse_result.it) {
         CLAPP_CONTRACT_EXPECTS(parse_result.long_option ||
                                parse_result.short_option);
@@ -299,7 +299,7 @@ clapp::basic_parser_t::process_parse_result(
 std::optional<clapp::value::exit_t> clapp::parser::basic_parser_t::parse(
     types::arg_iterator_t begin, types::arg_iterator_t end) {
     for (types::arg_iterator_t ait = begin; ait != end;) {
-        clapp::basic_parser_t::parse_result_t parse_result{
+        clapp::parser::basic_parser_t::parse_result_t parse_result{
             parse(std::string_view{*ait}, ait, end)};
         if (parse_result.exit) {
             return parse_result.exit;
@@ -309,9 +309,10 @@ std::optional<clapp::value::exit_t> clapp::parser::basic_parser_t::parse(
     return {};
 }
 
-clapp::parser::basic_parser_t::parse_result_t clapp::basic_parser_t::parse(
-    std::string_view option, types::arg_iterator_t ait,
-    types::arg_iterator_t end) {
+clapp::parser::basic_parser_t::parse_result_t
+clapp::parser::basic_parser_t::parse(std::string_view option,
+                                     types::arg_iterator_t ait,
+                                     types::arg_iterator_t end) {
     if (option.size() >= 3 && option[0] == '-' && option[1] == '-') {
         option.remove_prefix(2);
         return parse_long(option, ait, end);
