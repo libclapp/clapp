@@ -18,8 +18,7 @@
 
 #include <cstddef>
 #include <cstdint>
-namespace clapp {
-inline namespace build_info {
+namespace clapp::build_info {
 constexpr const char * project_name = "@CMAKE_PROJECT_NAME@";
 constexpr std::size_t version_major = @libClaPP_VERSION_MAJOR@;
 constexpr std::size_t version_minor = @libClaPP_VERSION_MINOR@;
@@ -34,7 +33,6 @@ constexpr const char *build_info_string = "@CMAKE_PROJECT_NAME@ "
         "v.@libClaPP_VERSION@ @CMAKE_BUILD_TYPE@-Build: "
         "@libClaPP_GIT_BRANCH@:@libClaPP_GIT_HASH@ "
         "(@libClaPP_GIT_DESCRIPTION@)";
-}  // namespace build_info
-}  // namespace clapp
+}  // namespace clapp::build_info
 
 #endif
