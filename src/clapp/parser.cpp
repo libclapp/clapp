@@ -564,7 +564,7 @@ clapp::value::exit_t clapp::parser::basic_parser_t::default_print_and_exit(
     const std::string_view print_msg, const int exit_code) {
     std::cout << print_msg;
     std::cout.flush();
-    return exit_t::exit(exit_code);
+    return value::exit_t::exit(exit_code);
 }
 
 void clapp::parser::basic_parser_t::set_print_and_exit_func(
