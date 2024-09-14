@@ -92,7 +92,7 @@ class cli_parser_t : public clapp::parser::basic_main_parser_t {
 
 clapp::value::found_func_t::ret_t print_version_and_exit(
     const std::string & /*option*/) {
-    std::cout << clapp::build_info::build_info_string << std::endl;
+    std::cout << clapp::build_info::build_info_string << "\n";
     return clapp::value::exit_t::exit(EXIT_SUCCESS);
 }
 
@@ -127,20 +127,19 @@ int main(int argc, char **argv) {
             parser->options
                 .string_param);  // parser ensures, that string-option is given
         std::cout << "string-param: " << parser->options.string_param.value()
-                  << std::endl;
+                  << "\n";
         if (parser->options.int_options.int32) {
             std::cout << "int32-param: "
-                      << parser->options.int_options.int32.value() << std::endl;
+                      << parser->options.int_options.int32.value() << "\n";
         } else {
             std::cout << "uint32-param: "
-                      << parser->options.int_options.uint32.value()
-                      << std::endl;
+                      << parser->options.int_options.uint32.value() << "\n";
         }
     } catch (clapp::clapp_exception_t &e) {
-        std::cout << "Caught ClaPP-Exception: " << e.what() << std::endl;
+        std::cout << "Caught ClaPP-Exception: " << e.what() << "\n";
         return EXIT_FAILURE;
     } catch (std::exception &e) {
-        std::cout << "Caught Exception: " << e.what() << std::endl;
+        std::cout << "Caught Exception: " << e.what() << "\n";
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
