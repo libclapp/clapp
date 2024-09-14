@@ -53,27 +53,24 @@ template <typename T, typename Param>
 void clapp::argument::gen_arg_conf_process_params(arg_params_t<T>& arg_params,
                                                   Param&& param) {
     if constexpr (type_traits::has_append_restriction_text<
-                      typename std::decay<Param>::type>::value) {
+                      std::decay_t<Param>>::value) {
         arg_params.restrictions.push_back(
             std::string{param.append_restriction_text()});
     }
-    if constexpr (type_traits::has_default_value<
-                      typename std::decay<Param>::type>::value) {
+    if constexpr (type_traits::has_default_value<std::decay_t<Param>>::value) {
         arg_params.default_value = param.default_value();
     }
-    if constexpr (type_traits::has_validate<typename std::decay<Param>::type,
-                                            T>::value) {
+    if constexpr (type_traits::has_validate<std::decay_t<Param>, T>::value) {
         arg_params.validate_funcs.push_back(
             [param](const T& value, const std::string& argument_name) {
                 param.validate(value, argument_name);
             });
     }
-    if constexpr (type_traits::has_found<
-                      typename std::decay<Param>::type>::value) {
+    if constexpr (type_traits::has_found<std::decay_t<Param>>::value) {
         arg_params.found.push_back(param);
     }
-    if constexpr (std::is_same<typename std::decay<Param>::type,
-                               parser::types::purpose_t>::value) {
+    if constexpr (std::is_same_v<std::decay_t<Param>,
+                                 parser::types::purpose_t>) {
         arg_params.purpose = param;
     }
 }
