@@ -3,7 +3,7 @@
 
 TEST(exception, clappExceptionT) {
     static_assert(
-        std::is_base_of<std::runtime_error, clapp::clapp_exception_t>::value);
+        std::is_base_of_v<std::runtime_error, clapp::clapp_exception_t>);
 
     const std::string msg{"message"};
     const std::string msg2{"message2"};
@@ -23,9 +23,9 @@ TEST(exception, clappExceptionT) {
 
 TEST(exception, invalidValueT) {
     static_assert(
-        std::is_base_of<std::runtime_error, clapp::invalid_value_t>::value);
-    static_assert(std::is_base_of<clapp::clapp_exception_t,
-                                  clapp::invalid_value_t>::value);
+        std::is_base_of_v<std::runtime_error, clapp::invalid_value_t>);
+    static_assert(
+        std::is_base_of_v<clapp::clapp_exception_t, clapp::invalid_value_t>);
 
     const std::string msg{"message"};
     const std::string msg2{"message2"};
@@ -45,9 +45,9 @@ TEST(exception, invalidValueT) {
 
 TEST(exception, valueUndefinedT) {
     static_assert(
-        std::is_base_of<std::runtime_error, clapp::value_undefined_t>::value);
-    static_assert(std::is_base_of<clapp::clapp_exception_t,
-                                  clapp::value_undefined_t>::value);
+        std::is_base_of_v<std::runtime_error, clapp::value_undefined_t>);
+    static_assert(
+        std::is_base_of_v<clapp::clapp_exception_t, clapp::value_undefined_t>);
 
     const std::string msg{"message"};
     const std::string msg2{"message2"};
@@ -66,10 +66,9 @@ TEST(exception, valueUndefinedT) {
 }
 
 TEST(exception, outOfRangeT) {
+    static_assert(std::is_base_of_v<std::runtime_error, clapp::out_of_range_t>);
     static_assert(
-        std::is_base_of<std::runtime_error, clapp::out_of_range_t>::value);
-    static_assert(std::is_base_of<clapp::clapp_exception_t,
-                                  clapp::out_of_range_t>::value);
+        std::is_base_of_v<clapp::clapp_exception_t, clapp::out_of_range_t>);
 
     const std::string msg{"message"};
     const std::string msg2{"message2"};
@@ -88,10 +87,10 @@ TEST(exception, outOfRangeT) {
 }
 
 TEST(exception, pathDoesNotExistT) {
-    static_assert(std::is_base_of<std::runtime_error,
-                                  clapp::path_does_not_exist_t>::value);
-    static_assert(std::is_base_of<clapp::clapp_exception_t,
-                                  clapp::path_does_not_exist_t>::value);
+    static_assert(
+        std::is_base_of_v<std::runtime_error, clapp::path_does_not_exist_t>);
+    static_assert(std::is_base_of_v<clapp::clapp_exception_t,
+                                    clapp::path_does_not_exist_t>);
 
     const std::string msg{"message"};
     const std::string msg2{"message2"};
@@ -111,9 +110,9 @@ TEST(exception, pathDoesNotExistT) {
 
 TEST(exception, optionExceptionT) {
     static_assert(
-        std::is_base_of<std::runtime_error, clapp::option_exception_t>::value);
-    static_assert(std::is_base_of<clapp::clapp_exception_t,
-                                  clapp::option_exception_t>::value);
+        std::is_base_of_v<std::runtime_error, clapp::option_exception_t>);
+    static_assert(
+        std::is_base_of_v<clapp::clapp_exception_t, clapp::option_exception_t>);
 
     const std::string msg{"message"};
     const std::string msg2{"message2"};
@@ -132,10 +131,10 @@ TEST(exception, optionExceptionT) {
 }
 
 TEST(exception, optionParamExceptionT) {
-    static_assert(std::is_base_of<std::runtime_error,
-                                  clapp::option_param_exception_t>::value);
-    static_assert(std::is_base_of<clapp::clapp_exception_t,
-                                  clapp::option_param_exception_t>::value);
+    static_assert(
+        std::is_base_of_v<std::runtime_error, clapp::option_param_exception_t>);
+    static_assert(std::is_base_of_v<clapp::clapp_exception_t,
+                                    clapp::option_param_exception_t>);
 
     const std::string msg{"message"};
     const std::string msg2{"message2"};
@@ -154,10 +153,10 @@ TEST(exception, optionParamExceptionT) {
 }
 
 TEST(exception, argumentExceptionT) {
-    static_assert(std::is_base_of<std::runtime_error,
-                                  clapp::argument_exception_t>::value);
-    static_assert(std::is_base_of<clapp::clapp_exception_t,
-                                  clapp::argument_exception_t>::value);
+    static_assert(
+        std::is_base_of_v<std::runtime_error, clapp::argument_exception_t>);
+    static_assert(std::is_base_of_v<clapp::clapp_exception_t,
+                                    clapp::argument_exception_t>);
 
     const std::string msg{"message"};
     const std::string msg2{"message2"};
@@ -177,9 +176,9 @@ TEST(exception, argumentExceptionT) {
 
 TEST(exception, parserExceptionT) {
     static_assert(
-        std::is_base_of<std::runtime_error, clapp::parser_exception_t>::value);
-    static_assert(std::is_base_of<clapp::clapp_exception_t,
-                                  clapp::parser_exception_t>::value);
+        std::is_base_of_v<std::runtime_error, clapp::parser_exception_t>);
+    static_assert(
+        std::is_base_of_v<clapp::clapp_exception_t, clapp::parser_exception_t>);
 
     const std::string msg{"message"};
     const std::string msg2{"message2"};
@@ -198,12 +197,12 @@ TEST(exception, parserExceptionT) {
 }
 
 TEST(exception, subParserExceptionT) {
-    static_assert(std::is_base_of<std::runtime_error,
-                                  clapp::sub_parser_exception_t>::value);
-    static_assert(std::is_base_of<clapp::clapp_exception_t,
-                                  clapp::sub_parser_exception_t>::value);
-    static_assert(std::is_base_of<clapp::parser_exception_t,
-                                  clapp::sub_parser_exception_t>::value);
+    static_assert(
+        std::is_base_of_v<std::runtime_error, clapp::sub_parser_exception_t>);
+    static_assert(std::is_base_of_v<clapp::clapp_exception_t,
+                                    clapp::sub_parser_exception_t>);
+    static_assert(std::is_base_of_v<clapp::parser_exception_t,
+                                    clapp::sub_parser_exception_t>);
 
     const std::string msg{"message"};
     const std::string msg2{"message2"};
@@ -222,12 +221,12 @@ TEST(exception, subParserExceptionT) {
 }
 
 TEST(exception, mainParserExceptionT) {
-    static_assert(std::is_base_of<std::runtime_error,
-                                  clapp::main_parser_exception_t>::value);
-    static_assert(std::is_base_of<clapp::clapp_exception_t,
-                                  clapp::main_parser_exception_t>::value);
-    static_assert(std::is_base_of<clapp::parser_exception_t,
-                                  clapp::main_parser_exception_t>::value);
+    static_assert(
+        std::is_base_of_v<std::runtime_error, clapp::main_parser_exception_t>);
+    static_assert(std::is_base_of_v<clapp::clapp_exception_t,
+                                    clapp::main_parser_exception_t>);
+    static_assert(std::is_base_of_v<clapp::parser_exception_t,
+                                    clapp::main_parser_exception_t>);
 
     const std::string msg{"message"};
     const std::string msg2{"message2"};
@@ -246,14 +245,14 @@ TEST(exception, mainParserExceptionT) {
 }
 
 TEST(exception, noExecutableExceptionT) {
-    static_assert(std::is_base_of<std::runtime_error,
-                                  clapp::no_executable_exception_t>::value);
-    static_assert(std::is_base_of<clapp::clapp_exception_t,
-                                  clapp::no_executable_exception_t>::value);
-    static_assert(std::is_base_of<clapp::parser_exception_t,
-                                  clapp::no_executable_exception_t>::value);
-    static_assert(std::is_base_of<clapp::main_parser_exception_t,
-                                  clapp::no_executable_exception_t>::value);
+    static_assert(std::is_base_of_v<std::runtime_error,
+                                    clapp::no_executable_exception_t>);
+    static_assert(std::is_base_of_v<clapp::clapp_exception_t,
+                                    clapp::no_executable_exception_t>);
+    static_assert(std::is_base_of_v<clapp::parser_exception_t,
+                                    clapp::no_executable_exception_t>);
+    static_assert(std::is_base_of_v<clapp::main_parser_exception_t,
+                                    clapp::no_executable_exception_t>);
 
     const std::string msg{"message"};
     const std::string msg2{"message2"};
@@ -272,12 +271,12 @@ TEST(exception, noExecutableExceptionT) {
 }
 
 TEST(exception, parserContainerExceptionT) {
-    static_assert(std::is_base_of<std::runtime_error,
-                                  clapp::parser_container_exception_t>::value);
-    static_assert(std::is_base_of<clapp::clapp_exception_t,
-                                  clapp::parser_container_exception_t>::value);
-    static_assert(std::is_base_of<clapp::parser_exception_t,
-                                  clapp::parser_container_exception_t>::value);
+    static_assert(std::is_base_of_v<std::runtime_error,
+                                    clapp::parser_container_exception_t>);
+    static_assert(std::is_base_of_v<clapp::clapp_exception_t,
+                                    clapp::parser_container_exception_t>);
+    static_assert(std::is_base_of_v<clapp::parser_exception_t,
+                                    clapp::parser_container_exception_t>);
 
     const std::string msg{"message"};
     const std::string msg2{"message2"};
@@ -296,14 +295,14 @@ TEST(exception, parserContainerExceptionT) {
 }
 
 TEST(exception, notFullyParsedExceptionT) {
-    static_assert(std::is_base_of<std::runtime_error,
-                                  clapp::not_fully_parsed_exception_t>::value);
-    static_assert(std::is_base_of<clapp::clapp_exception_t,
-                                  clapp::not_fully_parsed_exception_t>::value);
-    static_assert(std::is_base_of<clapp::parser_exception_t,
-                                  clapp::not_fully_parsed_exception_t>::value);
-    static_assert(std::is_base_of<clapp::parser_container_exception_t,
-                                  clapp::not_fully_parsed_exception_t>::value);
+    static_assert(std::is_base_of_v<std::runtime_error,
+                                    clapp::not_fully_parsed_exception_t>);
+    static_assert(std::is_base_of_v<clapp::clapp_exception_t,
+                                    clapp::not_fully_parsed_exception_t>);
+    static_assert(std::is_base_of_v<clapp::parser_exception_t,
+                                    clapp::not_fully_parsed_exception_t>);
+    static_assert(std::is_base_of_v<clapp::parser_container_exception_t,
+                                    clapp::not_fully_parsed_exception_t>);
 
     const std::string msg{"message"};
     const std::string msg2{"message2"};
@@ -322,18 +321,14 @@ TEST(exception, notFullyParsedExceptionT) {
 }
 
 TEST(exception, invalidParserStateExceptionT) {
-    static_assert(
-        std::is_base_of<std::runtime_error,
-                        clapp::invalid_parser_state_exception_t>::value);
-    static_assert(
-        std::is_base_of<clapp::clapp_exception_t,
-                        clapp::invalid_parser_state_exception_t>::value);
-    static_assert(
-        std::is_base_of<clapp::parser_exception_t,
-                        clapp::invalid_parser_state_exception_t>::value);
-    static_assert(
-        std::is_base_of<clapp::parser_container_exception_t,
-                        clapp::invalid_parser_state_exception_t>::value);
+    static_assert(std::is_base_of_v<std::runtime_error,
+                                    clapp::invalid_parser_state_exception_t>);
+    static_assert(std::is_base_of_v<clapp::clapp_exception_t,
+                                    clapp::invalid_parser_state_exception_t>);
+    static_assert(std::is_base_of_v<clapp::parser_exception_t,
+                                    clapp::invalid_parser_state_exception_t>);
+    static_assert(std::is_base_of_v<clapp::parser_container_exception_t,
+                                    clapp::invalid_parser_state_exception_t>);
 
     const std::string msg{"message"};
     const std::string msg2{"message2"};
