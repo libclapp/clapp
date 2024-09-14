@@ -34,8 +34,7 @@ LONG_OPT_FUNC_T process_long_option(OPT_T&& option,
                                     const std::string& long_opt_name) {
     for (auto& opt : option.long_options) {
         if (opt.option == long_opt_name) {
-            if constexpr (std::is_same<LONG_OPT_FUNC_T,
-                                       decltype(opt.func)>::value) {
+            if constexpr (std::is_same_v<LONG_OPT_FUNC_T, decltype(opt.func)>) {
                 return opt.func;
             } else {
                 throw std::runtime_error("unexpected long_options-func-type");
@@ -69,8 +68,8 @@ SHORT_OPT_FUNC_T process_short_option(OPT_T&& option,
                                       const char short_opt_name) {
     for (auto& opt : option.short_options) {
         if (opt.option == short_opt_name) {
-            if constexpr (std::is_same<SHORT_OPT_FUNC_T,
-                                       decltype(opt.func)>::value) {
+            if constexpr (std::is_same_v<SHORT_OPT_FUNC_T,
+                                         decltype(opt.func)>) {
                 return opt.func;
             } else {
                 throw std::runtime_error("unexpected short_options-func-type");
