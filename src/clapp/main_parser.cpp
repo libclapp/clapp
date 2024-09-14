@@ -33,13 +33,13 @@ std::string clapp::parser::basic_main_parser_t::get_executable() const {
 
 std::optional<clapp::value::exit_t> clapp::parser::basic_main_parser_t::parse(
     int argc, const char* const* argv) {
-    types::arg_t arg{argv, argc};
+    const types::arg_t arg{argv, argc};
     return parse(arg);
 }
 
 std::optional<clapp::value::exit_t> clapp::parser::basic_main_parser_t::parse(
     const types::arg_t& arg) {
-    types::arg_iterator_t ait{arg.begin()};
+    const types::arg_iterator_t ait{arg.begin()};
     executable = *ait;
     return parse(ait + 1, arg.end());
 }
