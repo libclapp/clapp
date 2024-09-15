@@ -9,9 +9,9 @@ struct with_append_restriction_text_t {
 struct without_append_restriction_text_t {};
 
 TEST(typeTraits, hasAppendRestrictionText) {
-    static_assert(clapp::has_append_restriction_text<
+    static_assert(clapp::type_traits::has_append_restriction_text<
                   with_append_restriction_text_t>::value);
-    static_assert(!clapp::has_append_restriction_text<
+    static_assert(!clapp::type_traits::has_append_restriction_text<
                   without_append_restriction_text_t>::value);
 }
 
@@ -25,12 +25,15 @@ struct with_validate_t {
 struct without_validate_t {};
 
 TEST(typeTraits, hasValidate) {
-    static_assert(clapp::has_validate<with_validate_t, std::string>::value);
-    static_assert(!clapp::has_validate<without_validate_t, std::string>::value);
+    static_assert(
+        clapp::type_traits::has_validate<with_validate_t, std::string>::value);
+    static_assert(!clapp::type_traits::has_validate<without_validate_t,
+                                                    std::string>::value);
 }
 
 struct with_found_t {
-    static clapp::found_func_t::ret_t found(const std::string& /*name*/) {
+    static clapp::value::found_func_t::ret_t found(
+        const std::string& /*name*/) {
         return {};
     }
 };
@@ -38,8 +41,8 @@ struct with_found_t {
 struct without_found_t {};
 
 TEST(typeTraits, hasFound) {
-    static_assert(clapp::has_found<with_found_t>::value);
-    static_assert(!clapp::has_found<without_found_t>::value);
+    static_assert(clapp::type_traits::has_found<with_found_t>::value);
+    static_assert(!clapp::type_traits::has_found<without_found_t>::value);
 }
 
 struct with_default_value_t {
@@ -49,16 +52,19 @@ struct with_default_value_t {
 struct without_default_value_t {};
 
 TEST(typeTraits, hasDefaultValue) {
-    static_assert(clapp::has_default_value<with_default_value_t>::value);
-    static_assert(!clapp::has_default_value<without_default_value_t>::value);
+    static_assert(
+        clapp::type_traits::has_default_value<with_default_value_t>::value);
+    static_assert(
+        !clapp::type_traits::has_default_value<without_default_value_t>::value);
 }
 
 TEST(typeTraits, isVector) {
-    static_assert(clapp::is_vector<std::vector<int>>::value);
-    static_assert(!clapp::is_vector<std::string>::value);
+    static_assert(clapp::type_traits::is_vector<std::vector<int>>::value);
+    static_assert(!clapp::type_traits::is_vector<std::string>::value);
 }
 
 TEST(typeTraits, isChronoDuration) {
-    static_assert(clapp::is_chrono_duration<std::chrono::milliseconds>::value);
-    static_assert(!clapp::is_chrono_duration<std::string>::value);
+    static_assert(clapp::type_traits::is_chrono_duration<
+                  std::chrono::milliseconds>::value);
+    static_assert(!clapp::type_traits::is_chrono_duration<std::string>::value);
 }
