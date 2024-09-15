@@ -10,7 +10,7 @@
 clapp::value::found_func_t::ret_t print_version_and_exit(
     const std::string &option);
 
-class cli_parser_t : public clapp::basic_main_parser_t {
+class cli_parser_t : public clapp::parser::basic_main_parser_t {
    public:
     cli_parser_t();
 
@@ -38,16 +38,16 @@ class cli_parser_t : public clapp::basic_main_parser_t {
     // second mandatory argument of int32_t
     clapp::int32_argument_t int_arg{
         *this, "int-arg", "Int argument",
-        clapp::min_max_value_t<std::int32_t>{5, 10}};
+        clapp::value::min_max_value_t<std::int32_t>{5, 10}};
 
     // third optional variadic arguments of strings
     clapp::variadic_string_argument_t variadic_string_arg{
         *this, "variadic-string-arg", "Variadic String argument",
         purpose_t::optional};
 
-    class and_option_container_t : public clapp::option_container_t {
+    class and_option_container_t : public clapp::parser::option_container_t {
        public:
-        using clapp::option_container_t::option_container_t;
+        using clapp::parser::option_container_t::option_container_t;
 
         ~and_option_container_t() override;
 
@@ -86,7 +86,7 @@ cli_parser_t::~cli_parser_t() = default;
 cli_parser_t::and_option_container_t::~and_option_container_t() = default;
 
 cli_parser_t::cli_parser_t()
-    : clapp::basic_main_parser_t{
+    : clapp::parser::basic_main_parser_t{
           clapp::parser::types::logic_operator_type_t::logic_xor} {}
 
 using parser_t = clapp::parser::basic_parser_container_t<cli_parser_t>;
