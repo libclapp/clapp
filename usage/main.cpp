@@ -1,7 +1,6 @@
 #include <clapp/argument.h>
 #include <clapp/build_info.h>
 #include <clapp/exception.h>
-#include <clapp/filesystem.h>
 #include <clapp/main_parser.h>
 #include <clapp/option.h>
 #include <clapp/parser.h>

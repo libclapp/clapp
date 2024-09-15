@@ -194,10 +194,10 @@ class argumentT : public ::testing::Test {
     inline static constexpr std::uint16_t value_uint16{0xc234};
     inline static constexpr std::uint8_t value_uint8{0xc2};
     inline static constexpr std::uint8_t value_uint8_additional{0xff};
-    inline static const clapp::fs::path value_path{"/this/is/my/path"};
+    inline static const std::filesystem::path value_path{"/this/is/my/path"};
     inline static constexpr const char* value_path_cstring{
         "/this/is/my/cstring/path"};
-    inline static const clapp::fs::path value_path_additional{
+    inline static const std::filesystem::path value_path_additional{
         "/this/is/my/additional/path"};
     inline static constexpr bool value_true{true};
     inline static constexpr bool value_false{false};
@@ -4379,15 +4379,16 @@ TEST_F(argumentT, pathArgumentConstructStrAndCallArgFunc) {
     clapp::argument::path_argument_t arg{tp, arg_str, desc_str};
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(value_path_cstring)));
-    ASSERT_THAT(arg, ArgumentGiven(clapp::fs::path{value_path_cstring}));
+    ASSERT_THAT(arg, ArgumentGiven(std::filesystem::path{value_path_cstring}));
 }
 
 TEST_F(argumentT, pathArgumentConstructStrWithDefaultValueAndCallArgFunc) {
     clapp::argument::path_argument_t arg{
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional,
-        clapp::value::default_value_t<clapp::fs::path>{value_path_additional}};
+        clapp::value::default_value_t<std::filesystem::path>{
+            value_path_additional}};
     ASSERT_THAT(arg, ArgumentNotGivenDefaultValue(
-                         clapp::fs::path{value_path_additional}));
+                         std::filesystem::path{value_path_additional}));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(value_path.string())));
     ASSERT_THAT(arg, ArgumentGiven(value_path));
@@ -4429,7 +4430,7 @@ TEST_F(argumentT,
     clapp::argument::variadic_path_argument_t arg{tp, arg_str, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_str));
     ASSERT_THAT(arg, ArgumentNotGiven());
-    ASSERT_THAT(arg.value(), testing::Eq(std::vector<clapp::fs::path>{}));
+    ASSERT_THAT(arg.value(), testing::Eq(std::vector<std::filesystem::path>{}));
 }
 
 TEST_F(argumentT, variadicPathArgumentConstructWithAlreadyRegisteredArgThrows) {
@@ -4449,12 +4450,12 @@ TEST_F(argumentT,
         tp, arg_str, desc_str, argument_test_parser_t::purpose_t::optional};
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_str)(value_path.string())));
-    ASSERT_THAT(
-        arg, VariadicArgumentGiven(std::vector<clapp::fs::path>{value_path}));
-    ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
-        tp, arg_str)(clapp::fs::path{value_path}.string())));
     ASSERT_THAT(arg, VariadicArgumentGiven(
-                         std::vector<clapp::fs::path>{value_path, value_path}));
+                         std::vector<std::filesystem::path>{value_path}));
+    ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
+        tp, arg_str)(std::filesystem::path{value_path}.string())));
+    ASSERT_THAT(arg, VariadicArgumentGiven(std::vector<std::filesystem::path>{
+                         value_path, value_path}));
 }
 
 TEST_F(argumentT, variadicPathArgumentConstructStrWithoutCallArgFunc) {
@@ -4465,13 +4466,13 @@ TEST_F(argumentT, variadicPathArgumentConstructStrWithoutCallArgFunc) {
 TEST_F(argumentT, variadicPathArgumentConstructStrAndCallArgFuncMultipleTimes) {
     clapp::argument::variadic_path_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
-        tp, arg_cstr)(clapp::fs::path{value_path}.string())));
-    ASSERT_THAT(
-        arg, VariadicArgumentGiven(std::vector<clapp::fs::path>{value_path}));
+        tp, arg_cstr)(std::filesystem::path{value_path}.string())));
+    ASSERT_THAT(arg, VariadicArgumentGiven(
+                         std::vector<std::filesystem::path>{value_path}));
     ASSERT_NO_THROW((get_arg_func<argument_test_parser_t::argument_func_t>(
         tp, arg_cstr)(value_path.string())));
-    ASSERT_THAT(arg, VariadicArgumentGiven(
-                         std::vector<clapp::fs::path>{value_path, value_path}));
+    ASSERT_THAT(arg, VariadicArgumentGiven(std::vector<std::filesystem::path>{
+                         value_path, value_path}));
 }
 
 TEST_F(argumentT, variadicPathArgumentConstructCStrWithoutCallArgFunc) {

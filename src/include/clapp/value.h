@@ -16,8 +16,7 @@
 #ifndef CLAPP_VALUE_H
 #define CLAPP_VALUE_H
 
-#include <clapp/filesystem.h>
-
+#include <filesystem>
 #include <functional>
 #include <numeric>
 #include <optional>
@@ -101,7 +100,8 @@ class path_exists_t {
     [[nodiscard]] static constexpr std::string_view
     append_restriction_text() noexcept;
 
-    static void validate(const fs::path &path, const std::string &param_name);
+    static void validate(const std::filesystem::path &path,
+                         const std::string &param_name);
 };
 
 inline std::string concat_str(const std::string &lhs, const std::string &rhs);

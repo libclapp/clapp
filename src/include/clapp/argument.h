@@ -166,7 +166,7 @@ class basic_variadic_argument_t {
 
 using bool_argument_t = basic_argument_t<bool>;
 using string_argument_t = basic_argument_t<std::string>;
-using path_argument_t = basic_argument_t<clapp::fs::path>;
+using path_argument_t = basic_argument_t<std::filesystem::path>;
 using int8_argument_t = basic_argument_t<std::int8_t>;
 using uint8_argument_t = basic_argument_t<std::uint8_t>;
 using int16_argument_t = basic_argument_t<std::int16_t>;
@@ -188,7 +188,8 @@ using hours_argument_t = basic_argument_t<std::chrono::hours>;
 
 using variadic_bool_argument_t = basic_variadic_argument_t<bool>;
 using variadic_string_argument_t = basic_variadic_argument_t<std::string>;
-using variadic_path_argument_t = basic_variadic_argument_t<clapp::fs::path>;
+using variadic_path_argument_t =
+    basic_variadic_argument_t<std::filesystem::path>;
 using variadic_int8_argument_t = basic_variadic_argument_t<std::int8_t>;
 using variadic_uint8_argument_t = basic_variadic_argument_t<std::uint8_t>;
 using variadic_int16_argument_t = basic_variadic_argument_t<std::int16_t>;

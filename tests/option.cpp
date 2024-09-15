@@ -2179,11 +2179,11 @@ TEST_F(
 
 TEST_F(optionT,
        vectorPathParamOptionConstructLongStringAndShortWithDefaultValueThrows) {
-    ASSERT_THROW(
-        (clapp::option::vector_path_param_option_t{
-            tp, long_opt_str, short_opt, opt_desc_str,
-            clapp::value::default_value_t<clapp::fs::path>{value_cstr_path}}),
-        clapp::option_param_exception_t);
+    ASSERT_THROW((clapp::option::vector_path_param_option_t{
+                     tp, long_opt_str, short_opt, opt_desc_str,
+                     clapp::value::default_value_t<std::filesystem::path>{
+                         value_cstr_path}}),
+                 clapp::option_param_exception_t);
 }
 
 TEST_F(optionT, vectorPathParamOptionConstructShort) {

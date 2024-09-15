@@ -10,8 +10,8 @@ TEST(value, convertValueString) {
 }
 
 TEST(value, convertValuePath) {
-    ASSERT_THAT(clapp::value::convert_value<clapp::fs::path>("/tmp/test"),
-                testing::Eq(clapp::fs::path{"/tmp/test"}));
+    ASSERT_THAT(clapp::value::convert_value<std::filesystem::path>("/tmp/test"),
+                testing::Eq(std::filesystem::path{"/tmp/test"}));
 }
 
 TEST(value, convertValueBool) {
@@ -459,9 +459,10 @@ TEST(value, pathExistsT) {
     clapp::value::path_exists_t path_exists;
     ASSERT_THAT(path_exists.append_restriction_text(),
                 testing::StrEq("existing path"));
-    EXPECT_NO_THROW(path_exists.validate(clapp::fs::path{"/tmp"}, "option"));
+    EXPECT_NO_THROW(
+        path_exists.validate(std::filesystem::path{"/tmp"}, "option"));
     ASSERT_THROW(path_exists.validate(
-                     clapp::fs::path{"/tmp/aba/sadf/aksk/annsp"}, "arg"),
+                     std::filesystem::path{"/tmp/aba/sadf/aksk/annsp"}, "arg"),
                  clapp::path_does_not_exist_t);
 }
 

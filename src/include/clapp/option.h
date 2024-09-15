@@ -16,10 +16,10 @@
 #ifndef CLAPP_OPTION_H
 #define CLAPP_OPTION_H
 
-#include <clapp/filesystem.h>
 #include <clapp/parser.h>
 #include <clapp/value.h>
 
+#include <filesystem>
 #include <functional>
 #include <optional>
 #include <string>
@@ -302,7 +302,7 @@ using help_option_t = basic_help_option_t<EXIT_SUCCESS>;
 
 using string_param_option_t = basic_param_option_t<std::string>;
 
-using path_param_option_t = basic_param_option_t<clapp::fs::path>;
+using path_param_option_t = basic_param_option_t<std::filesystem::path>;
 
 using bool_param_option_t = basic_param_option_t<bool>;
 using int8_param_option_t = basic_param_option_t<std::int8_t>;
@@ -326,7 +326,8 @@ using hours_param_option_t = basic_param_option_t<std::chrono::hours>;
 
 using vector_string_param_option_t = basic_vector_param_option_t<std::string>;
 
-using vector_path_param_option_t = basic_vector_param_option_t<clapp::fs::path>;
+using vector_path_param_option_t =
+    basic_vector_param_option_t<std::filesystem::path>;
 
 using vector_int8_param_option_t = basic_vector_param_option_t<std::int8_t>;
 using vector_uint8_param_option_t = basic_vector_param_option_t<std::uint8_t>;

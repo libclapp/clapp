@@ -175,14 +175,14 @@ double clapp::value::convert_value<double>(const std::string_view param) {
 }
 
 template <>
-clapp::fs::path clapp::value::convert_value<clapp::fs::path>(
+std::filesystem::path clapp::value::convert_value<std::filesystem::path>(
     const std::string_view param) {
     return {param};
 }
 
-void clapp::value::path_exists_t::validate(const clapp::fs::path& path,
+void clapp::value::path_exists_t::validate(const std::filesystem::path& path,
                                            const std::string& param_name) {
-    if (!clapp::fs::exists(path)) {
+    if (!std::filesystem::exists(path)) {
         std::stringstream string_stream;
         string_stream << "CLI value '" << path << "' for '" << param_name
                       << "' does not exist.";
