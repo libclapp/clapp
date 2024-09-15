@@ -172,7 +172,6 @@ double clapp::value::convert_value<double>(const std::string_view param) {
     }
 }
 
-#ifdef CLAPP_FS_AVAIL
 template <>
 clapp::fs::path clapp::value::convert_value<clapp::fs::path>(
     const std::string_view param) {
@@ -188,7 +187,6 @@ void clapp::path_exists_t::validate(const clapp::fs::path& path,
         throw clapp::exception::path_does_not_exist_t{string_stream.str()};
     }
 }
-#endif
 
 template <typename T>
 static T convert_uint(const std::string_view param) {

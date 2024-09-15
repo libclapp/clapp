@@ -166,9 +166,7 @@ class basic_variadic_argument_t {
 
 using bool_argument_t = clapp::basic_argument_t<bool>;
 using string_argument_t = clapp::basic_argument_t<std::string>;
-#ifdef CLAPP_FS_AVAIL
 using path_argument_t = clapp::basic_argument_t<clapp::fs::path>;
-#endif
 using int8_argument_t = clapp::basic_argument_t<std::int8_t>;
 using uint8_argument_t = clapp::basic_argument_t<std::uint8_t>;
 using int16_argument_t = clapp::basic_argument_t<std::int16_t>;
@@ -191,10 +189,8 @@ using hours_argument_t = clapp::basic_argument_t<std::chrono::hours>;
 using variadic_bool_argument_t = clapp::basic_variadic_argument_t<bool>;
 using variadic_string_argument_t =
     clapp::basic_variadic_argument_t<std::string>;
-#ifdef CLAPP_FS_AVAIL
 using variadic_path_argument_t =
     clapp::basic_variadic_argument_t<clapp::fs::path>;
-#endif
 using variadic_int8_argument_t = clapp::basic_variadic_argument_t<std::int8_t>;
 using variadic_uint8_argument_t =
     clapp::basic_variadic_argument_t<std::uint8_t>;

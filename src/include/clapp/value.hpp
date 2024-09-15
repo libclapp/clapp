@@ -129,12 +129,10 @@ constexpr int clapp::value::exit_t::get_exit_code() const noexcept {
     return exit_code;
 }
 
-#ifdef CLAPP_FS_AVAIL
 constexpr std::string_view
 clapp::path_exists_t::append_restriction_text() noexcept {
     return "existing path";
 }
-#endif
 
 template <>
 std::string clapp::value::convert_value<std::string>(std::string_view param);
@@ -199,11 +197,9 @@ float clapp::value::convert_value<float>(std::string_view param);
 template <>
 double clapp::value::convert_value<double>(std::string_view param);
 
-#ifdef CLAPP_FS_AVAIL
 template <>
 clapp::fs::path clapp::value::convert_value<clapp::fs::path>(
     std::string_view param);
-#endif
 
 std::string clapp::value::concat_str(const std::string& lhs,
                                      const std::string& rhs) {

@@ -4372,8 +4372,6 @@ TEST_F(argumentT, variadicHoursArgumentCallFoundFunc) {
     ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
 
-#ifdef CLAPP_FS_AVAIL
-
 TEST_F(argumentT, pathArgumentConstructCStrAndCallValueThrows) {
     clapp::argument::path_argument_t arg{tp, arg_cstr, desc_str};
     ASSERT_THAT(tp, ContainsArgument(arg_cstr));
@@ -4563,8 +4561,6 @@ TEST_F(argumentT, variadicPathArgumentCallFoundFunc) {
     ASSERT_THAT(found_func_called, testing::Eq(2));
     ASSERT_THAT(found_func_arg.value(), testing::StrEq(arg_str));
 }
-
-#endif
 
 TEST_F(argumentT,
        genOptValidateFuncWithoutHasValueFuncAndCallValidateFuncDoesntThrow) {

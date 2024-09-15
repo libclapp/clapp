@@ -202,11 +202,9 @@ class cli_parser_t : public clapp::basic_main_parser_t {
     string_vector_param_t string_vector_param{
         *this, "string-vector", "String vector param.", purpose_t::optional};
 
-#ifdef CLAPP_FS_AVAIL
     clapp::path_param_option_t test_file{*this, "test-file", "Test File.",
                                          clapp::path_exists_t{},
                                          purpose_t::optional};
-#endif
 
     entry_param_t entry_param{*this,
                               "entry",
@@ -398,15 +396,11 @@ void process_options_and_args(const cli_parser_t &parser) {
         std::cout << "count: not given\n";
     }
 
-#ifdef CLAPP_FS_AVAIL
     if (parser.test_file) {
         std::cout << "test-file: " << parser.test_file.value() << "\n";
     } else {
         std::cout << "test-file: not given\n";
     }
-#else
-    std::cout << "without fs\n";
-#endif
 
     if (parser.constrained_int) {
         std::cout << "constrained_int: " << parser.constrained_int.value()

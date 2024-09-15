@@ -1203,7 +1203,6 @@ TEST_F(
     ASSERT_THAT(opt, ParamOptionGiven(value_str));
 }
 
-#ifdef CLAPP_FS_AVAIL
 TEST_F(optionT, pathParamOptionConstructShort) {
     clapp::option::path_param_option_t opt{tp, short_opt, opt_desc_str};
     ASSERT_THAT(tp, ContainsShortOption(short_opt));
@@ -1375,7 +1374,6 @@ TEST_F(
             tp, long_opt_str)(long_opt_str, value_str_path)));
     ASSERT_THAT(opt, ParamOptionGiven(value_str_path));
 }
-#endif
 
 TEST_F(optionT, int64ParamOptionConstructShort) {
     clapp::option::int64_param_option_t opt{tp, short_opt, opt_desc_str};
@@ -2178,7 +2176,6 @@ TEST_F(
     ASSERT_THAT(get_given_func(tp, long_opt_cstr)(), testing::Eq(true));
 }
 
-#ifdef CLAPP_FS_AVAIL
 TEST_F(optionT,
        vectorPathParamOptionConstructLongStringAndShortWithDefaultValueThrows) {
     ASSERT_THROW(
@@ -2399,7 +2396,6 @@ TEST_F(
     ASSERT_NO_THROW(option_validate_value_func("option-str"));
     ASSERT_THAT(get_given_func(tp, long_opt_cstr)(), testing::Eq(true));
 }
-#endif
 
 TEST_F(
     optionT,

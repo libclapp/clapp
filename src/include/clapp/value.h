@@ -97,7 +97,6 @@ class found_func_t {
     func_t func;
 };
 
-#ifdef CLAPP_FS_AVAIL
 class path_exists_t {
    public:
     [[nodiscard]] static constexpr std::string_view
@@ -105,7 +104,6 @@ class path_exists_t {
 
     static void validate(const fs::path &path, const std::string &param_name);
 };
-#endif
 
 inline std::string concat_str(const std::string &lhs, const std::string &rhs);
 

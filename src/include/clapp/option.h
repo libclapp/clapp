@@ -303,9 +303,7 @@ using help_option_t = basic_help_option_t<EXIT_SUCCESS>;
 
 using string_param_option_t = clapp::basic_param_option_t<std::string>;
 
-#ifdef CLAPP_FS_AVAIL
 using path_param_option_t = clapp::basic_param_option_t<clapp::fs::path>;
-#endif
 
 using bool_param_option_t = clapp::basic_param_option_t<bool>;
 using int8_param_option_t = clapp::basic_param_option_t<std::int8_t>;
@@ -332,10 +330,8 @@ using hours_param_option_t = clapp::basic_param_option_t<std::chrono::hours>;
 using vector_string_param_option_t =
     clapp::basic_vector_param_option_t<std::string>;
 
-#ifdef CLAPP_FS_AVAIL
 using vector_path_param_option_t =
     clapp::basic_vector_param_option_t<clapp::fs::path>;
-#endif
 
 using vector_int8_param_option_t =
     clapp::basic_vector_param_option_t<std::int8_t>;
