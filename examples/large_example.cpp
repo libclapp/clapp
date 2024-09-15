@@ -41,7 +41,7 @@ struct restriction_t {
     }
 };
 
-class cli_parser_t : public clapp::basic_main_parser_t {
+class cli_parser_t : public clapp::parser::basic_main_parser_t {
    public:
     cli_parser_t() = default;
 
@@ -52,9 +52,9 @@ class cli_parser_t : public clapp::basic_main_parser_t {
 
     ~cli_parser_t() override;
 
-    class cmd1_parser_t : public clapp::basic_sub_parser_t {
+    class cmd1_parser_t : public clapp::parser::basic_sub_parser_t {
        public:
-        using clapp::basic_sub_parser_t::basic_sub_parser_t;
+        using clapp::parser::basic_sub_parser_t::basic_sub_parser_t;
 
         explicit cmd1_parser_t(const cmd1_parser_t &) = delete;
         explicit cmd1_parser_t(cmd1_parser_t &&) noexcept = delete;
@@ -65,9 +65,10 @@ class cli_parser_t : public clapp::basic_main_parser_t {
 
         clapp::bool_option_t help{*this, "help", 'h', "Show help options."};
 
-        class and_option_container_t : public clapp::option_container_t {
+        class and_option_container_t
+            : public clapp::parser::option_container_t {
            public:
-            using clapp::option_container_t::option_container_t;
+            using clapp::parser::option_container_t::option_container_t;
 
             ~and_option_container_t() override;
 
@@ -100,16 +101,17 @@ class cli_parser_t : public clapp::basic_main_parser_t {
         entry_argument_t entry_arg{*this, "entry-arg", "Entry argument",
                                    entry_value_constraint_t{}};
 
-        int_argument_t int_arg{*this, "int-arg", "Int argument",
-                               clapp::min_max_value_t<std::int32_t>{5, 10}};
+        int_argument_t int_arg{
+            *this, "int-arg", "Int argument",
+            clapp::value::min_max_value_t<std::int32_t>{5, 10}};
         string_argument_t string_arg_x{
             *this, "string-arg-x", "String argument x", purpose_t::optional,
-            clapp::default_value_t<std::string>{"abaa"}};
+            clapp::value::default_value_t<std::string>{"abaa"}};
     };
 
-    class cmd2_parser_t : public clapp::basic_sub_parser_t {
+    class cmd2_parser_t : public clapp::parser::basic_sub_parser_t {
        public:
-        using clapp::basic_sub_parser_t::basic_sub_parser_t;
+        using clapp::parser::basic_sub_parser_t::basic_sub_parser_t;
 
         explicit cmd2_parser_t(const cmd2_parser_t &) = delete;
         explicit cmd2_parser_t(cmd2_parser_t &&) noexcept = delete;
@@ -126,10 +128,10 @@ class cli_parser_t : public clapp::basic_main_parser_t {
 
         string_argument_t string_arg_x{
             *this, "string-arg-x", "String argument x", purpose_t::optional,
-            clapp::default_value_t<std::string>{"default-string-arg-x"}};
+            clapp::value::default_value_t<std::string>{"default-string-arg-x"}};
         variadic_int_argument_t int_arg{
             *this, "variadic-int-arg", "Int argument", purpose_t::optional,
-            clapp::min_max_value_t<std::int32_t>{5, 10}};
+            clapp::value::min_max_value_t<std::int32_t>{5, 10}};
     };
 
     cmd1_parser_t cmd1{*this, "cmd1", "First usable command.",
@@ -162,9 +164,9 @@ class cli_parser_t : public clapp::basic_main_parser_t {
         purpose_t::mandatory,
         restriction_t{}};
 
-    class time_container_t : public clapp::option_container_t {
+    class time_container_t : public clapp::parser::option_container_t {
        public:
-        using clapp::option_container_t::option_container_t;
+        using clapp::parser::option_container_t::option_container_t;
 
         explicit time_container_t(const time_container_t &) = delete;
         explicit time_container_t(time_container_t &&) noexcept = delete;
@@ -179,22 +181,23 @@ class cli_parser_t : public clapp::basic_main_parser_t {
             *this, "time-min", "Time in minutes.", purpose_t::mandatory};
         clapp::sec_param_option_t time_seconds{
             *this, "time-sec", "Time in seconds.", purpose_t::mandatory,
-            clapp::min_max_value_t<std::chrono::seconds>{
+            clapp::value::min_max_value_t<std::chrono::seconds>{
                 std::chrono::seconds{0}, std::chrono::seconds{7}}};
     };
 
     time_container_t time{
         *this, clapp::parser::types::logic_operator_type_t::logic_xor};
 
-    clapp::count_option_t verbose{*this,
-                                  "verbose",
-                                  'v',
-                                  "Verbose option.",
-                                  clapp::min_max_value_t<std::size_t>{0, 7},
-                                  clapp::default_value_t<std::size_t>{2},
-                                  purpose_t::optional};
-    clapp::count_option_t count{*this, 'c', "Count option ",
-                                purpose_t::mandatory};
+    clapp::option::count_option_t verbose{
+        *this,
+        "verbose",
+        'v',
+        "Verbose option.",
+        clapp::value::min_max_value_t<std::size_t>{0, 7},
+        clapp::value::default_value_t<std::size_t>{2},
+        purpose_t::optional};
+    clapp::option::count_option_t count{*this, 'c', "Count option ",
+                                        purpose_t::mandatory};
 
     string_param_t string_param{*this, "string", 's', "String option 1.",
                                 purpose_t::optional};
@@ -202,9 +205,9 @@ class cli_parser_t : public clapp::basic_main_parser_t {
     string_vector_param_t string_vector_param{
         *this, "string-vector", "String vector param.", purpose_t::optional};
 
-    clapp::path_param_option_t test_file{*this, "test-file", "Test File.",
-                                         clapp::path_exists_t{},
-                                         purpose_t::optional};
+    clapp::option::path_param_option_t test_file{
+        *this, "test-file", "Test File.", clapp::value::path_exists_t{},
+        purpose_t::optional};
 
     entry_param_t entry_param{*this,
                               "entry",
@@ -216,18 +219,19 @@ class cli_parser_t : public clapp::basic_main_parser_t {
     int32_param_t mandatory_int{*this, "mandatory-int", "Mandatory Int option.",
                                 purpose_t::mandatory, purpose_t::optional};
     int32_param_t default_int{*this, "default-int", "Default Int option.",
-                              clapp::default_value_t<std::int32_t>{10},
+                              clapp::value::default_value_t<std::int32_t>{10},
                               purpose_t::optional};
     int32_param_t optional_int{*this, "optional-int", "Optional Int option.",
                                purpose_t::optional};
 
-    int32_param_t constrained_int{*this,
-                                  "constrained-int",
-                                  'f',
-                                  "Constrained default Int option.",
-                                  15,
-                                  clapp::min_max_value_t<std::int32_t>{10, 20},
-                                  purpose_t::optional};
+    int32_param_t constrained_int{
+        *this,
+        "constrained-int",
+        'f',
+        "Constrained default Int option.",
+        15,
+        clapp::value::min_max_value_t<std::int32_t>{10, 20},
+        purpose_t::optional};
 };
 
 std::ostream &operator<<(std::ostream &out, const entry_t &entry);
