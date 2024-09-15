@@ -16,7 +16,8 @@ std::string fake_test_parser_t::gen_short_line_prefix() const {
     return "fake-test-parser" + gen_short_line();
 }
 
-class empty_basic_option_container_t : public clapp::parser::basic_option_container_t {
+class empty_basic_option_container_t
+    : public clapp::parser::basic_option_container_t {
    public:
     using clapp::parser::basic_option_container_t::basic_option_container_t;
     ~empty_basic_option_container_t() override;
@@ -68,7 +69,8 @@ class empty_option_container_t : public clapp::parser::option_container_t {
 
 empty_option_container_t::~empty_option_container_t() = default;
 
-class simple_test_option_container_t : public clapp::parser::option_container_t {
+class simple_test_option_container_t
+    : public clapp::parser::option_container_t {
    public:
     using clapp::parser::option_container_t::option_container_t;
     ~simple_test_option_container_t() override;
@@ -90,7 +92,8 @@ class simple_test_option_container_t : public clapp::parser::option_container_t 
 
 simple_test_option_container_t::~simple_test_option_container_t() = default;
 
-class simple_test_option_container2_t : public clapp::parser::option_container_t {
+class simple_test_option_container2_t
+    : public clapp::parser::option_container_t {
    public:
     using clapp::parser::option_container_t::option_container_t;
     ~simple_test_option_container2_t() override;
@@ -111,7 +114,8 @@ class simple_test_option_container2_t : public clapp::parser::option_container_t
 
 simple_test_option_container2_t::~simple_test_option_container2_t() = default;
 
-class optional_test_option_container_t : public clapp::parser::option_container_t {
+class optional_test_option_container_t
+    : public clapp::parser::option_container_t {
    public:
     using clapp::parser::option_container_t::option_container_t;
     ~optional_test_option_container_t() override;
