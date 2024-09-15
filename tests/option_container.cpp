@@ -3,9 +3,9 @@
 #include <clapp/sub_parser.h>
 #include <gmock/gmock.h>
 
-class fake_test_parser_t : public clapp::basic_parser_t {
+class fake_test_parser_t : public clapp::parser::basic_parser_t {
    public:
-    using clapp::basic_parser_t::basic_parser_t;
+    using clapp::parser::basic_parser_t::basic_parser_t;
     ~fake_test_parser_t() override;
     [[nodiscard]] std::string gen_short_line_prefix() const override;
 };
@@ -16,14 +16,14 @@ std::string fake_test_parser_t::gen_short_line_prefix() const {
     return "fake-test-parser" + gen_short_line();
 }
 
-class empty_basic_option_container_t : public clapp::basic_option_container_t {
+class empty_basic_option_container_t : public clapp::parser::basic_option_container_t {
    public:
-    using clapp::basic_option_container_t::basic_option_container_t;
+    using clapp::parser::basic_option_container_t::basic_option_container_t;
     ~empty_basic_option_container_t() override;
 
-    [[nodiscard]] clapp::basic_parser_t& get_parser() override;
+    [[nodiscard]] clapp::parser::basic_parser_t& get_parser() override;
 
-    [[nodiscard]] const clapp::basic_parser_t& get_const_parser()
+    [[nodiscard]] const clapp::parser::basic_parser_t& get_const_parser()
         const override;
 
     empty_basic_option_container_t(const empty_basic_option_container_t& inst) =
@@ -36,9 +36,9 @@ class empty_basic_option_container_t : public clapp::basic_option_container_t {
     empty_basic_option_container_t& operator=(
         empty_basic_option_container_t&& inst) noexcept = default;
 
-    using clapp::basic_option_container_t::get_option_help;
+    using clapp::parser::basic_option_container_t::get_option_help;
 
-    using clapp::basic_option_container_t::gen_short_option_line;
+    using clapp::parser::basic_option_container_t::gen_short_option_line;
 };
 
 empty_basic_option_container_t::~empty_basic_option_container_t() = default;
@@ -53,9 +53,9 @@ const clapp::parser::basic_parser_t& empty_basic_option_container_t::
     throw std::runtime_error("throws get parser");
 }
 
-class empty_option_container_t : public clapp::option_container_t {
+class empty_option_container_t : public clapp::parser::option_container_t {
    public:
-    using clapp::option_container_t::option_container_t;
+    using clapp::parser::option_container_t::option_container_t;
     ~empty_option_container_t() override;
 
     empty_option_container_t(const empty_option_container_t& inst) = default;
@@ -68,9 +68,9 @@ class empty_option_container_t : public clapp::option_container_t {
 
 empty_option_container_t::~empty_option_container_t() = default;
 
-class simple_test_option_container_t : public clapp::option_container_t {
+class simple_test_option_container_t : public clapp::parser::option_container_t {
    public:
-    using clapp::option_container_t::option_container_t;
+    using clapp::parser::option_container_t::option_container_t;
     ~simple_test_option_container_t() override;
 
     static constexpr std::int32_t min_int{10};
@@ -83,16 +83,16 @@ class simple_test_option_container_t : public clapp::option_container_t {
         *this, "int", 'i', "Int option.",
         clapp::value::min_max_value_t<std::int32_t>{min_int, max_int}};
 
-    using clapp::basic_option_container_t::get_option_help;
+    using clapp::parser::basic_option_container_t::get_option_help;
 
-    using clapp::basic_option_container_t::gen_short_option_line;
+    using clapp::parser::basic_option_container_t::gen_short_option_line;
 };
 
 simple_test_option_container_t::~simple_test_option_container_t() = default;
 
-class simple_test_option_container2_t : public clapp::option_container_t {
+class simple_test_option_container2_t : public clapp::parser::option_container_t {
    public:
-    using clapp::option_container_t::option_container_t;
+    using clapp::parser::option_container_t::option_container_t;
     ~simple_test_option_container2_t() override;
 
     clapp::option::string_param_option_t string_option{*this, "str", 's',
@@ -104,25 +104,25 @@ class simple_test_option_container2_t : public clapp::option_container_t {
     clapp::option::uint64_param_option_t uint_option{*this, "uint", 'u',
                                                      "Unsigned int option."};
 
-    using clapp::basic_option_container_t::get_option_help;
+    using clapp::parser::basic_option_container_t::get_option_help;
 
-    using clapp::basic_option_container_t::gen_short_option_line;
+    using clapp::parser::basic_option_container_t::gen_short_option_line;
 };
 
 simple_test_option_container2_t::~simple_test_option_container2_t() = default;
 
-class optional_test_option_container_t : public clapp::option_container_t {
+class optional_test_option_container_t : public clapp::parser::option_container_t {
    public:
-    using clapp::option_container_t::option_container_t;
+    using clapp::parser::option_container_t::option_container_t;
     ~optional_test_option_container_t() override;
 
     clapp::option::string_param_option_t string_option{
         *this, "str", 's', "String option.",
         clapp::parser::types::purpose_t::optional};
 
-    using clapp::basic_option_container_t::get_option_help;
+    using clapp::parser::basic_option_container_t::get_option_help;
 
-    using clapp::basic_option_container_t::gen_short_option_line;
+    using clapp::parser::basic_option_container_t::gen_short_option_line;
 };
 
 optional_test_option_container_t::~optional_test_option_container_t() = default;
