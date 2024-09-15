@@ -14,9 +14,9 @@ clapp::value::found_func_t::ret_t print_version_and_exit(
 clapp::value::found_func_t::ret_t print_not_implemented_and_exit(
     const std::string &option);
 
-class cli_parser_t : public clapp::basic_main_parser_t {
+class cli_parser_t : public clapp::parser::basic_main_parser_t {
    public:
-    using clapp::basic_main_parser_t::basic_main_parser_t;
+    using clapp::parser::basic_main_parser_t::basic_main_parser_t;
     cli_parser_t() = default;
 
     explicit cli_parser_t(const cli_parser_t &) = delete;
@@ -36,13 +36,14 @@ class cli_parser_t : public clapp::basic_main_parser_t {
         clapp::value::found_func_t{print_version_and_exit},
         purpose_t::optional};
 
-    clapp::count_option_t verbose{*this,
-                                  "verbose",
-                                  'v',
-                                  "Verbose option.",
-                                  clapp::min_max_value_t<std::size_t>{0, 7},
-                                  clapp::default_value_t<std::size_t>{2},
-                                  purpose_t::optional};
+    clapp::option::count_option_t verbose{
+        *this,
+        "verbose",
+        'v',
+        "Verbose option.",
+        clapp::value::min_max_value_t<std::size_t>{0, 7},
+        clapp::value::default_value_t<std::size_t>{2},
+        purpose_t::optional};
 
     clapp::bool_option_t debug{
         *this,
@@ -53,9 +54,9 @@ class cli_parser_t : public clapp::basic_main_parser_t {
         purpose_t::optional};
 
     // create a subparser with a registered help option
-    class sub_parser_t : public clapp::basic_sub_parser_t {
+    class sub_parser_t : public clapp::parser::basic_sub_parser_t {
        protected:
-        using clapp::basic_sub_parser_t::basic_sub_parser_t;
+        using clapp::parser::basic_sub_parser_t::basic_sub_parser_t;
 
        public:
         explicit sub_parser_t(const sub_parser_t &) = delete;
@@ -86,14 +87,14 @@ class cli_parser_t : public clapp::basic_main_parser_t {
 
         clapp::double_param_option_t double_opt{
             *this, 'd', "Double param option",
-            clapp::default_value_t<double>{10}, purpose_t::optional};
+            clapp::value::default_value_t<double>{10}, purpose_t::optional};
 
         clapp::string_param_option_t string{*this, 's', "String param option.",
                                             purpose_t::optional};
 
         clapp::string_argument_t string_arg_x{
             *this, "string-arg-x", "String argument x", purpose_t::optional,
-            clapp::default_value_t<std::string>{"abaa"}};
+            clapp::value::default_value_t<std::string>{"abaa"}};
     };
 
     // second subparser declaration (inherits help from sub_parser_t)
@@ -110,19 +111,19 @@ class cli_parser_t : public clapp::basic_main_parser_t {
 
         clapp::int32_argument_t int_arg{
             *this, "int-arg", "Int argument",
-            clapp::min_max_value_t<std::int32_t>{5, 10}};
+            clapp::value::min_max_value_t<std::int32_t>{5, 10}};
 
         clapp::double_argument_t double_arg{
             *this, "double-arg", "Double argument",
-            clapp::min_max_value_t<double>{-1000., 1000.}};
+            clapp::value::min_max_value_t<double>{-1000., 1000.}};
 
         clapp::string_argument_t string_arg_x{
             *this, "string-arg-x", "String argument x", purpose_t::optional,
-            clapp::default_value_t<std::string>{"default-string-arg-x"}};
+            clapp::value::default_value_t<std::string>{"default-string-arg-x"}};
 
         clapp::variadic_int64_argument_t variadic_int_arg{
             *this, "variadic-int-arg", "Int argument", purpose_t::optional,
-            clapp::min_max_value_t<std::int64_t>{5, 10}};
+            clapp::value::min_max_value_t<std::int64_t>{5, 10}};
     };
 
     first_parser_t first{*this, "first", "First parser."};
