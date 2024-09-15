@@ -21,9 +21,7 @@
 #include <atomic>
 #include <optional>
 
-namespace clapp {
-
-inline namespace parser {
+namespace clapp::parser {
 
 template <typename PARSER_T>
 class basic_parser_container_t {
@@ -54,9 +52,7 @@ class basic_parser_container_t {
     parser_t parser;
 };
 
-}  // namespace parser
-
-}  // namespace clapp
+}  // namespace clapp::parser
 
 #include <clapp/parser_container.hpp>
 
