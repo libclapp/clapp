@@ -10,7 +10,7 @@
 clapp::value::found_func_t::ret_t print_version_and_exit(
     const std::string &option);
 
-class cli_parser_t : public clapp::basic_main_parser_t {
+class cli_parser_t : public clapp::parser::basic_main_parser_t {
    public:
     cli_parser_t();
 
@@ -29,29 +29,31 @@ class cli_parser_t : public clapp::basic_main_parser_t {
         *this, "version", "Show version info",
         clapp::value::found_func_t{print_version_and_exit}};
 
-    class and_option_container_t : public clapp::option_container_t {
+    class and_option_container_t : public clapp::parser::option_container_t {
        public:
-        using clapp::option_container_t::option_container_t;
+        using clapp::parser::option_container_t::option_container_t;
 
         ~and_option_container_t() override;
 
-        clapp::count_option_t verbose{*this,
-                                      "verbose",
-                                      'v',
-                                      "Verbose option, can be given multiple "
-                                      "times to increase verbosity.",
-                                      clapp::min_max_value_t<std::size_t>{0, 7},
-                                      clapp::default_value_t<std::size_t>{2},
-                                      purpose_t::optional};
+        clapp::option::count_option_t verbose{
+            *this,
+            "verbose",
+            'v',
+            "Verbose option, can be given multiple "
+            "times to increase verbosity.",
+            clapp::value::min_max_value_t<std::size_t>{0, 7},
+            clapp::value::default_value_t<std::size_t>{2},
+            purpose_t::optional};
 
         // mandatory string option
         clapp::string_param_option_t string_param{
             *this, "string", std::vector<char>{'s', '1'}, "String option 1.",
             purpose_t::mandatory};
 
-        class xor_option_container_t : public clapp::option_container_t {
+        class xor_option_container_t
+            : public clapp::parser::option_container_t {
            public:
-            using clapp::option_container_t::option_container_t;
+            using clapp::parser::option_container_t::option_container_t;
 
             ~xor_option_container_t() override;
 
@@ -93,7 +95,7 @@ clapp::value::found_func_t::ret_t print_version_and_exit(
 }
 
 cli_parser_t::cli_parser_t()
-    : clapp::basic_main_parser_t{
+    : clapp::parser::basic_main_parser_t{
           clapp::parser::types::logic_operator_type_t::logic_xor} {}
 
 cli_parser_t::~cli_parser_t() = default;
