@@ -578,7 +578,7 @@ string argument:
 #include <clapp/main_parser.h>
 #include <clapp/option.h>
 
-class cli_parser_t : public clapp::basic_main_parser_t {
+class cli_parser_t : public clapp::parser::basic_main_parser_t {
    public:
     clapp::help_option_t help{*this, "help", 'h', "Show help options.",
                               clapp::parser::types::purpose_t::optional};
@@ -682,15 +682,15 @@ string argument using option-container.
 #include <clapp/main_parser.h>
 #include <clapp/option.h>
 
-class cli_parser_t : public clapp::basic_main_parser_t {
+class cli_parser_t : public clapp::parser::basic_main_parser_t {
    public:
     cli_parser_t();
 
     clapp::help_option_t help{*this, "help", 'h', "Show help options."};
 
-    class option_container_t : public clapp::option_container_t {
+    class option_container_t : public clapp::parser::option_container_t {
        public:
-        using clapp::option_container_t::option_container_t;
+        using clapp::parser::option_container_t::option_container_t;
 
         clapp::bool_option_t bool_opt{*this, "bool", 'b', "Bool option."};
 
@@ -705,7 +705,7 @@ class cli_parser_t : public clapp::basic_main_parser_t {
 };
 
 cli_parser_t::cli_parser_t()
-    : clapp::basic_main_parser_t{
+    : clapp::parser::basic_main_parser_t{
           clapp::parser::types::logic_operator_type_t::logic_xor} {}
 
 int main(int argc, char *argv[]) {
@@ -847,15 +847,15 @@ parser container:
 
 #include <optional>
 
-class cli_parser_t : public clapp::basic_main_parser_t {
+class cli_parser_t : public clapp::parser::basic_main_parser_t {
    public:
     cli_parser_t();
 
     clapp::help_option_t help{*this, "help", 'h', "Show help options."};
 
-    class option_container_t : public clapp::option_container_t {
+    class option_container_t : public clapp::parser::option_container_t {
        public:
-        using clapp::option_container_t::option_container_t;
+        using clapp::parser::option_container_t::option_container_t;
 
         clapp::bool_option_t bool_opt{*this, "bool", 'b', "Bool option."};
 
@@ -870,7 +870,7 @@ class cli_parser_t : public clapp::basic_main_parser_t {
 };
 
 cli_parser_t::cli_parser_t()
-    : clapp::basic_main_parser_t{
+    : clapp::parser::basic_main_parser_t{
           clapp::parser::types::logic_operator_type_t::logic_xor} {}
 
 using parser_t = clapp::parser::basic_parser_container_t<cli_parser_t>;
@@ -1050,7 +1050,7 @@ this sub-parser.
 
 #include <optional>
 
-class cli_parser_t : public clapp::basic_main_parser_t {
+class cli_parser_t : public clapp::parser::basic_main_parser_t {
    public:
     clapp::help_option_t help{*this, "help", 'h', "Show help options.",
                               clapp::parser::types::purpose_t::optional};
@@ -1058,9 +1058,9 @@ class cli_parser_t : public clapp::basic_main_parser_t {
     clapp::int32_param_option_t int_opt{
         *this, 'i', "Int option", clapp::parser::types::purpose_t::optional};
 
-    class mode1_parser_t : public clapp::basic_sub_parser_t {
+    class mode1_parser_t : public clapp::parser::basic_sub_parser_t {
        public:
-        using clapp::basic_sub_parser_t::basic_sub_parser_t;
+        using clapp::parser::basic_sub_parser_t::basic_sub_parser_t;
 
         clapp::help_option_t help{*this, "help", 'h', "Show help options.",
                                   clapp::parser::types::purpose_t::optional};
@@ -1070,9 +1070,9 @@ class cli_parser_t : public clapp::basic_main_parser_t {
             clapp::parser::types::purpose_t::optional};
     };
 
-    class mode2_parser_t : public clapp::basic_sub_parser_t {
+    class mode2_parser_t : public clapp::parser::basic_sub_parser_t {
        public:
-        using clapp::basic_sub_parser_t::basic_sub_parser_t;
+        using clapp::parser::basic_sub_parser_t::basic_sub_parser_t;
 
         clapp::help_option_t help{*this, "help", 'h', "Show help options.",
                                   clapp::parser::types::purpose_t::optional};
