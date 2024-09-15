@@ -20,9 +20,9 @@ inline clapp::parser::types::arg_t parser_make_arg_t(T (&arg)[N]) {
                                        N - 1};
 }
 
-class empty_basic_parser_t : public clapp::basic_parser_t {
+class empty_basic_parser_t : public clapp::parser::basic_parser_t {
    public:
-    using clapp::basic_parser_t::basic_parser_t;
+    using clapp::parser::basic_parser_t::basic_parser_t;
     ~empty_basic_parser_t() override;
     [[nodiscard]] std::string gen_short_line_prefix() const override;
 };
@@ -33,9 +33,9 @@ std::string empty_basic_parser_t::gen_short_line_prefix() const {
     return "empty-basic-parser" + gen_short_line();
 }
 
-class simple_test_parser_t : public clapp::basic_parser_t {
+class simple_test_parser_t : public clapp::parser::basic_parser_t {
    public:
-    using clapp::basic_parser_t::basic_parser_t;
+    using clapp::parser::basic_parser_t::basic_parser_t;
     ~simple_test_parser_t() override;
 
     static constexpr std::int32_t min_int{10};
@@ -69,9 +69,9 @@ std::string simple_test_parser_t::gen_short_line_prefix() const {
     return "simple-test-parser " + gen_short_line();
 }
 
-class simple_test_parser2_t : public clapp::basic_parser_t {
+class simple_test_parser2_t : public clapp::parser::basic_parser_t {
    public:
-    using clapp::basic_parser_t::basic_parser_t;
+    using clapp::parser::basic_parser_t::basic_parser_t;
     ~simple_test_parser2_t() override;
 
     clapp::option::count_option_t count_option{
@@ -91,9 +91,9 @@ simple_test_parser2_t::~simple_test_parser2_t() = default;
     return "simple-test-parser2 " + gen_short_line();
 }
 
-class simple_test_parser3_t : public clapp::basic_parser_t {
+class simple_test_parser3_t : public clapp::parser::basic_parser_t {
    public:
-    using clapp::basic_parser_t::basic_parser_t;
+    using clapp::parser::basic_parser_t::basic_parser_t;
     ~simple_test_parser3_t() override;
 
     static constexpr std::int32_t min_int{10};
@@ -124,9 +124,9 @@ std::string simple_test_parser3_t::gen_short_line_prefix() const {
     return "simple-test-parser3 " + gen_short_line();
 }
 
-class simple_test_parser4_t : public clapp::basic_parser_t {
+class simple_test_parser4_t : public clapp::parser::basic_parser_t {
    public:
-    using clapp::basic_parser_t::basic_parser_t;
+    using clapp::parser::basic_parser_t::basic_parser_t;
     ~simple_test_parser4_t() override;
 
     static constexpr std::int32_t min_int{10};
@@ -168,9 +168,9 @@ std::string simple_test_parser4_t::gen_short_line_prefix() const {
     return "simple-test-parser4 " + gen_short_line();
 }
 
-class simple_test_parser5_t : public clapp::basic_parser_t {
+class simple_test_parser5_t : public clapp::parser::basic_parser_t {
    public:
-    using clapp::basic_parser_t::basic_parser_t;
+    using clapp::parser::basic_parser_t::basic_parser_t;
     ~simple_test_parser5_t() override;
 
     static constexpr std::int32_t min_int{10};
@@ -204,9 +204,9 @@ std::string simple_test_parser5_t::gen_short_line_prefix() const {
     return "simple-test-parser5 " + gen_short_line();
 }
 
-class mandatory_options_test_parser_t : public clapp::basic_parser_t {
+class mandatory_options_test_parser_t : public clapp::parser::basic_parser_t {
    public:
-    using clapp::basic_parser_t::basic_parser_t;
+    using clapp::parser::basic_parser_t::basic_parser_t;
     ~mandatory_options_test_parser_t() override;
 
     static constexpr std::int32_t min_int{10};
@@ -231,9 +231,9 @@ std::string mandatory_options_test_parser_t::gen_short_line_prefix() const {
     return "mandatory-options-test-parser " + gen_short_line();
 }
 
-class sub_parser_container_t : public clapp::basic_parser_t {
+class sub_parser_container_t : public clapp::parser::basic_parser_t {
    public:
-    using clapp::basic_parser_t::basic_parser_t;
+    using clapp::parser::basic_parser_t::basic_parser_t;
     ~sub_parser_container_t() override;
 
     [[nodiscard]] std::string gen_short_line_prefix() const override;
@@ -277,9 +277,9 @@ std::string sub_parser_container_t::gen_short_line_prefix() const {
     return "sub_parser_container " + gen_short_line();
 }
 
-class help_parser_t : public clapp::basic_parser_t {
+class help_parser_t : public clapp::parser::basic_parser_t {
    public:
-    using clapp::basic_parser_t::basic_parser_t;
+    using clapp::parser::basic_parser_t::basic_parser_t;
     ~help_parser_t() override;
 
     clapp::option::help_option_t help_option{
@@ -296,14 +296,14 @@ std::string help_parser_t::gen_short_line_prefix() const {
     return "help-parser " + gen_short_line();
 }
 
-class container_parser_t : public clapp::basic_parser_t {
+class container_parser_t : public clapp::parser::basic_parser_t {
    public:
-    using clapp::basic_parser_t::basic_parser_t;
+    using clapp::parser::basic_parser_t::basic_parser_t;
     ~container_parser_t() override;
 
-    class container_t : public clapp::option_container_t {
+    class container_t : public clapp::parser::option_container_t {
        public:
-        using clapp::option_container_t::option_container_t;
+        using clapp::parser::option_container_t::option_container_t;
         ~container_t() override;
 
         static constexpr std::int32_t min_int{10};
@@ -336,15 +336,15 @@ std::string container_parser_t::gen_short_line_prefix() const {
     return "container-parser " + gen_short_line();
 }
 
-class container_parser_and_t : public clapp::basic_parser_t {
+class container_parser_and_t : public clapp::parser::basic_parser_t {
    public:
-    using clapp::basic_parser_t::basic_parser_t;
+    using clapp::parser::basic_parser_t::basic_parser_t;
     container_parser_and_t();
     ~container_parser_and_t() override;
 
-    class container_t : public clapp::option_container_t {
+    class container_t : public clapp::parser::option_container_t {
        public:
-        using clapp::option_container_t::option_container_t;
+        using clapp::parser::option_container_t::option_container_t;
         ~container_t() override;
 
         static constexpr std::int32_t min_int{10};
@@ -370,7 +370,7 @@ class container_parser_and_t : public clapp::basic_parser_t {
 };
 
 container_parser_and_t::container_parser_and_t()
-    : clapp::basic_parser_t{
+    : clapp::parser::basic_parser_t{
           clapp::parser::types::logic_operator_type_t::logic_and} {}
 
 container_parser_and_t::container_t::~container_t() = default;
@@ -381,15 +381,15 @@ std::string container_parser_and_t::gen_short_line_prefix() const {
     return "container-parser-and " + gen_short_line();
 }
 
-class container_parser_xor_t : public clapp::basic_parser_t {
+class container_parser_xor_t : public clapp::parser::basic_parser_t {
    public:
-    using clapp::basic_parser_t::basic_parser_t;
+    using clapp::parser::basic_parser_t::basic_parser_t;
     container_parser_xor_t();
     ~container_parser_xor_t() override;
 
-    class container_t : public clapp::option_container_t {
+    class container_t : public clapp::parser::option_container_t {
        public:
-        using clapp::option_container_t::option_container_t;
+        using clapp::parser::option_container_t::option_container_t;
         ~container_t() override;
 
         static constexpr std::int32_t min_int{10};
@@ -415,7 +415,7 @@ class container_parser_xor_t : public clapp::basic_parser_t {
 };
 
 container_parser_xor_t::container_parser_xor_t()
-    : clapp::basic_parser_t{
+    : clapp::parser::basic_parser_t{
           clapp::parser::types::logic_operator_type_t::logic_xor} {}
 
 container_parser_xor_t::container_t::~container_t() = default;
@@ -426,19 +426,19 @@ std::string container_parser_xor_t::gen_short_line_prefix() const {
     return "container-parser-xor " + gen_short_line();
 }
 
-class nested_container_parser_t : public clapp::basic_parser_t {
+class nested_container_parser_t : public clapp::parser::basic_parser_t {
    public:
-    using clapp::basic_parser_t::basic_parser_t;
+    using clapp::parser::basic_parser_t::basic_parser_t;
     ~nested_container_parser_t() override;
 
-    class container_t : public clapp::option_container_t {
+    class container_t : public clapp::parser::option_container_t {
        public:
-        using clapp::option_container_t::option_container_t;
+        using clapp::parser::option_container_t::option_container_t;
         ~container_t() override;
 
-        class test_container_t : public clapp::option_container_t {
+        class test_container_t : public clapp::parser::option_container_t {
            public:
-            using clapp::option_container_t::option_container_t;
+            using clapp::parser::option_container_t::option_container_t;
             ~test_container_t() override;
 
             clapp::option::int64_param_option_t int_option{
@@ -450,9 +450,9 @@ class nested_container_parser_t : public clapp::basic_parser_t {
                 clapp::parser::types::purpose_t::mandatory};
         };
 
-        class test_container2_t : public clapp::option_container_t {
+        class test_container2_t : public clapp::parser::option_container_t {
            public:
-            using clapp::option_container_t::option_container_t;
+            using clapp::parser::option_container_t::option_container_t;
             ~test_container2_t() override;
 
             clapp::option::string_param_option_t string_option{
@@ -495,19 +495,19 @@ std::string nested_container_parser_t::gen_short_line_prefix() const {
     return "container-parser " + gen_short_line();
 }
 
-class nested_container_parser2_t : public clapp::basic_parser_t {
+class nested_container_parser2_t : public clapp::parser::basic_parser_t {
    public:
-    using clapp::basic_parser_t::basic_parser_t;
+    using clapp::parser::basic_parser_t::basic_parser_t;
     ~nested_container_parser2_t() override;
 
-    class container_t : public clapp::option_container_t {
+    class container_t : public clapp::parser::option_container_t {
        public:
-        using clapp::option_container_t::option_container_t;
+        using clapp::parser::option_container_t::option_container_t;
         ~container_t() override;
 
-        class test_container_t : public clapp::option_container_t {
+        class test_container_t : public clapp::parser::option_container_t {
            public:
-            using clapp::option_container_t::option_container_t;
+            using clapp::parser::option_container_t::option_container_t;
             ~test_container_t() override;
 
             clapp::option::int64_param_option_t int_option{
@@ -519,9 +519,9 @@ class nested_container_parser2_t : public clapp::basic_parser_t {
                 clapp::parser::types::purpose_t::mandatory};
         };
 
-        class test_container2_t : public clapp::option_container_t {
+        class test_container2_t : public clapp::parser::option_container_t {
            public:
-            using clapp::option_container_t::option_container_t;
+            using clapp::parser::option_container_t::option_container_t;
             ~test_container2_t() override;
 
             clapp::option::string_param_option_t string_option{
@@ -564,19 +564,19 @@ std::string nested_container_parser2_t::gen_short_line_prefix() const {
     return "container-parser " + gen_short_line();
 }
 
-class nested_container_parser3_t : public clapp::basic_parser_t {
+class nested_container_parser3_t : public clapp::parser::basic_parser_t {
    public:
-    using clapp::basic_parser_t::basic_parser_t;
+    using clapp::parser::basic_parser_t::basic_parser_t;
     ~nested_container_parser3_t() override;
 
-    class container_t : public clapp::option_container_t {
+    class container_t : public clapp::parser::option_container_t {
        public:
-        using clapp::option_container_t::option_container_t;
+        using clapp::parser::option_container_t::option_container_t;
         ~container_t() override;
 
-        class test_container_t : public clapp::option_container_t {
+        class test_container_t : public clapp::parser::option_container_t {
            public:
-            using clapp::option_container_t::option_container_t;
+            using clapp::parser::option_container_t::option_container_t;
             ~test_container_t() override;
 
             clapp::option::int64_param_option_t int_option{
@@ -588,9 +588,9 @@ class nested_container_parser3_t : public clapp::basic_parser_t {
                 clapp::parser::types::purpose_t::mandatory};
         };
 
-        class test_container2_t : public clapp::option_container_t {
+        class test_container2_t : public clapp::parser::option_container_t {
            public:
-            using clapp::option_container_t::option_container_t;
+            using clapp::parser::option_container_t::option_container_t;
             ~test_container2_t() override;
 
             clapp::option::string_param_option_t string_option{
@@ -629,24 +629,25 @@ std::string nested_container_parser3_t::gen_short_line_prefix() const {
     return "container-parser " + gen_short_line();
 }
 
-class super_nested_container_parser_t : public clapp::basic_parser_t {
+class super_nested_container_parser_t : public clapp::parser::basic_parser_t {
    public:
-    using clapp::basic_parser_t::basic_parser_t;
+    using clapp::parser::basic_parser_t::basic_parser_t;
     ~super_nested_container_parser_t() override;
 
-    class container_t : public clapp::option_container_t {
+    class container_t : public clapp::parser::option_container_t {
        public:
-        using clapp::option_container_t::option_container_t;
+        using clapp::parser::option_container_t::option_container_t;
         ~container_t() override;
 
-        class test_container_t : public clapp::option_container_t {
+        class test_container_t : public clapp::parser::option_container_t {
            public:
-            using clapp::option_container_t::option_container_t;
+            using clapp::parser::option_container_t::option_container_t;
             ~test_container_t() override;
 
-            class test_sub_int_container_t : public clapp::option_container_t {
+            class test_sub_int_container_t
+                : public clapp::parser::option_container_t {
                public:
-                using clapp::option_container_t::option_container_t;
+                using clapp::parser::option_container_t::option_container_t;
                 ~test_sub_int_container_t() override;
 
                 clapp::option::int64_param_option_t sub_int_option{
@@ -658,9 +659,10 @@ class super_nested_container_parser_t : public clapp::basic_parser_t {
                     clapp::parser::types::purpose_t::mandatory};
             };
 
-            class test_sub_uint_container_t : public clapp::option_container_t {
+            class test_sub_uint_container_t
+                : public clapp::parser::option_container_t {
                public:
-                using clapp::option_container_t::option_container_t;
+                using clapp::parser::option_container_t::option_container_t;
                 ~test_sub_uint_container_t() override;
 
                 clapp::option::uint64_param_option_t sub_uint_option{
@@ -687,14 +689,15 @@ class super_nested_container_parser_t : public clapp::basic_parser_t {
                 *this, clapp::parser::types::logic_operator_type_t::logic_xor};
         };
 
-        class test_container2_t : public clapp::option_container_t {
+        class test_container2_t : public clapp::parser::option_container_t {
            public:
-            using clapp::option_container_t::option_container_t;
+            using clapp::parser::option_container_t::option_container_t;
             ~test_container2_t() override;
 
-            class test_int_container_t : public clapp::option_container_t {
+            class test_int_container_t
+                : public clapp::parser::option_container_t {
                public:
-                using clapp::option_container_t::option_container_t;
+                using clapp::parser::option_container_t::option_container_t;
                 ~test_int_container_t() override;
 
                 clapp::option::int64_param_option_t int1{
@@ -706,9 +709,10 @@ class super_nested_container_parser_t : public clapp::basic_parser_t {
                     clapp::parser::types::purpose_t::mandatory};
             };
 
-            class test_uint_container_t : public clapp::option_container_t {
+            class test_uint_container_t
+                : public clapp::parser::option_container_t {
                public:
-                using clapp::option_container_t::option_container_t;
+                using clapp::parser::option_container_t::option_container_t;
                 ~test_uint_container_t() override;
 
                 clapp::option::uint64_param_option_t uint1{
@@ -778,19 +782,19 @@ std::string super_nested_container_parser_t::gen_short_line_prefix() const {
     return "container-parser " + gen_short_line();
 }
 
-class invalid_nested_container_parser_t : public clapp::basic_parser_t {
+class invalid_nested_container_parser_t : public clapp::parser::basic_parser_t {
    public:
-    using clapp::basic_parser_t::basic_parser_t;
+    using clapp::parser::basic_parser_t::basic_parser_t;
     ~invalid_nested_container_parser_t() override;
 
-    class container_t : public clapp::option_container_t {
+    class container_t : public clapp::parser::option_container_t {
        public:
-        using clapp::option_container_t::option_container_t;
+        using clapp::parser::option_container_t::option_container_t;
         ~container_t() override;
 
-        class test_container_t : public clapp::option_container_t {
+        class test_container_t : public clapp::parser::option_container_t {
            public:
-            using clapp::option_container_t::option_container_t;
+            using clapp::parser::option_container_t::option_container_t;
             ~test_container_t() override;
 
             clapp::option::int64_param_option_t int_option{
@@ -798,9 +802,9 @@ class invalid_nested_container_parser_t : public clapp::basic_parser_t {
                 clapp::parser::types::purpose_t::mandatory};
         };
 
-        class test_container2_t : public clapp::option_container_t {
+        class test_container2_t : public clapp::parser::option_container_t {
            public:
-            using clapp::option_container_t::option_container_t;
+            using clapp::parser::option_container_t::option_container_t;
             ~test_container2_t() override;
 
             clapp::option::int64_param_option_t int_option{
@@ -836,14 +840,15 @@ std::string invalid_nested_container_parser_t::gen_short_line_prefix() const {
     return "container-parser " + gen_short_line();
 }
 
-class invalid_nested_container_parser2_t : public clapp::basic_parser_t {
+class invalid_nested_container_parser2_t
+    : public clapp::parser::basic_parser_t {
    public:
-    using clapp::basic_parser_t::basic_parser_t;
+    using clapp::parser::basic_parser_t::basic_parser_t;
     ~invalid_nested_container_parser2_t() override;
 
-    class test_container_t : public clapp::option_container_t {
+    class test_container_t : public clapp::parser::option_container_t {
        public:
-        using clapp::option_container_t::option_container_t;
+        using clapp::parser::option_container_t::option_container_t;
         ~test_container_t() override;
 
         clapp::option::int64_param_option_t int_option{
@@ -851,9 +856,9 @@ class invalid_nested_container_parser2_t : public clapp::basic_parser_t {
             clapp::parser::types::purpose_t::mandatory};
     };
 
-    class test_container2_t : public clapp::option_container_t {
+    class test_container2_t : public clapp::parser::option_container_t {
        public:
-        using clapp::option_container_t::option_container_t;
+        using clapp::parser::option_container_t::option_container_t;
         ~test_container2_t() override;
 
         clapp::option::int64_param_option_t int_option{
@@ -883,14 +888,15 @@ std::string invalid_nested_container_parser2_t::gen_short_line_prefix() const {
     return "invalid-container-parser " + gen_short_line();
 }
 
-class invalid_nested_container_parser3_t : public clapp::basic_parser_t {
+class invalid_nested_container_parser3_t
+    : public clapp::parser::basic_parser_t {
    public:
-    using clapp::basic_parser_t::basic_parser_t;
+    using clapp::parser::basic_parser_t::basic_parser_t;
     ~invalid_nested_container_parser3_t() override;
 
-    class test_container_t : public clapp::option_container_t {
+    class test_container_t : public clapp::parser::option_container_t {
        public:
-        using clapp::option_container_t::option_container_t;
+        using clapp::parser::option_container_t::option_container_t;
         ~test_container_t() override;
 
         clapp::option::int64_param_option_t int_option{
