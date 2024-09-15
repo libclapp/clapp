@@ -165,8 +165,8 @@ MATCHER_P(ParamOptionGiven, value, "Checks, if param option is given.") {
     if (!(static_cast<bool>(arg) && arg.has_value() && arg.given())) {
         return false;
     }
-    *result_listener << ", value(): " << clapp::to_string(value)
-                     << "==" << clapp::to_string(arg.value()) << " = ";
+    *result_listener << ", value(): " << clapp::value::to_string(value)
+                     << "==" << clapp::value::to_string(arg.value()) << " = ";
     return compare_value(arg.value(), value, result_listener);
 }
 
@@ -181,8 +181,8 @@ MATCHER_P(ParamOptionNotGivenDefaultValue, default_value,
     if (!(static_cast<bool>(arg) && arg.has_value() && !arg.given())) {
         return false;
     }
-    *result_listener << ", value(): " << clapp::to_string(default_value)
-                     << "==" << clapp::to_string(arg.value()) << " = ";
+    *result_listener << ", value(): " << clapp::value::to_string(default_value)
+                     << "==" << clapp::value::to_string(arg.value()) << " = ";
     return compare_value(arg.value(), default_value, result_listener);
 }
 
@@ -218,7 +218,7 @@ MATCHER_P(VectorParamOptionGiven, value,
     std::string val_str{
         std::accumulate(value.begin(), value.end(), std::string{},
                         [](std::string str, const auto& itm) {
-                            return str += clapp::to_string(itm) + ", ";
+                            return str += clapp::value::to_string(itm) + ", ";
                         })};
     if (!val_str.empty()) {
         val_str = val_str.substr(0, val_str.size() - 2);
@@ -226,7 +226,7 @@ MATCHER_P(VectorParamOptionGiven, value,
     std::string arg_str{
         std::accumulate(argument.begin(), argument.end(), std::string{},
                         [](std::string str, const auto& itm) {
-                            return str += clapp::to_string(itm) + ", ";
+                            return str += clapp::value::to_string(itm) + ", ";
                         })};
     if (!arg_str.empty()) {
         arg_str = arg_str.substr(0, arg_str.size() - 2);
@@ -246,8 +246,9 @@ MATCHER(VectorParamOptionNotGiven,
     if (!(!static_cast<bool>(arg) && !arg.has_value() && !arg.given())) {
         return false;
     }
-    *result_listener << ", size(): 0==" << clapp::to_string(arg.value().size())
-                     << " = " << (arg.value().empty() ? "true" : "false");
+    *result_listener << ", size(): 0=="
+                     << clapp::value::to_string(arg.value().size()) << " = "
+                     << (arg.value().empty() ? "true" : "false");
     return arg.value().empty();
 }
 
@@ -307,8 +308,8 @@ MATCHER_P(ArgumentGiven, value, "Checks, if argument is given.") {
     if (!(static_cast<bool>(arg) && arg.has_value() && arg.given())) {
         return false;
     }
-    *result_listener << ", value(): " << clapp::to_string(value)
-                     << "==" << clapp::to_string(arg.value()) << " = ";
+    *result_listener << ", value(): " << clapp::value::to_string(value)
+                     << "==" << clapp::value::to_string(arg.value()) << " = ";
     return compare_value(arg.value(), value, result_listener);
 }
 
@@ -321,8 +322,8 @@ MATCHER_P(ArgumentNotGivenDefaultValue, default_value, std::string{}) {
     if (!(static_cast<bool>(arg) && arg.has_value() && !arg.given())) {
         return false;
     }
-    *result_listener << ", value(): " << clapp::to_string(default_value)
-                     << "==" << clapp::to_string(arg.value()) << " = ";
+    *result_listener << ", value(): " << clapp::value::to_string(default_value)
+                     << "==" << clapp::value::to_string(arg.value()) << " = ";
     return compare_value(arg.value(), default_value, result_listener);
 }
 
@@ -340,7 +341,7 @@ MATCHER_P(VariadicArgumentGiven, value,
     std::string val_str{
         std::accumulate(value.begin(), value.end(), std::string{},
                         [](std::string str, const auto itm) {
-                            return str += clapp::to_string(itm) + ", ";
+                            return str += clapp::value::to_string(itm) + ", ";
                         })};
 
     if (!val_str.empty()) {
@@ -349,7 +350,7 @@ MATCHER_P(VariadicArgumentGiven, value,
     std::string arg_str{
         std::accumulate(argument.begin(), argument.end(), std::string{},
                         [](std::string str, const auto& itm) {
-                            return str += clapp::to_string(itm) + ", ";
+                            return str += clapp::value::to_string(itm) + ", ";
                         })};
     if (!arg_str.empty()) {
         arg_str = arg_str.substr(0, arg_str.size() - 2);
@@ -369,8 +370,9 @@ MATCHER(VariadicArgumentNotGiven,
     if (!(!static_cast<bool>(arg) && !arg.has_value() && !arg.given())) {
         return false;
     }
-    *result_listener << ", size(): 0==" << clapp::to_string(arg.value().size())
-                     << " = " << (arg.value().empty() ? "true" : "false");
+    *result_listener << ", size(): 0=="
+                     << clapp::value::to_string(arg.value().size()) << " = "
+                     << (arg.value().empty() ? "true" : "false");
     return arg.value().empty();
 }
 
