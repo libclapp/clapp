@@ -330,7 +330,7 @@ clapp::option::basic_param_option_t<T>::found_entry(
         }
     }
     _given = true;
-    _value = convert_value<T>(param);
+    _value = value::convert_value<T>(param);
     return {};
 }
 
@@ -404,7 +404,7 @@ clapp::option::basic_vector_param_option_t<T>::found_entry(
         }
     }
     _given = true;
-    _value.push_back(convert_value<T>(param));
+    _value.push_back(value::convert_value<T>(param));
     return {};
 }
 
