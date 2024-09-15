@@ -106,7 +106,8 @@ class basic_argument_t {
     using arg_conf_t = parser::types::single_arg_conf_t;
 
     template <typename... Params>
-    basic_argument_t(basic_parser_t& parser, const std::string& argument_name,
+    basic_argument_t(parser::basic_parser_t& parser,
+                     const std::string& argument_name,
                      const std::string& description, Params&&... parameters);
     [[nodiscard]] constexpr explicit operator bool() const noexcept;
     [[nodiscard]] constexpr bool has_value() const noexcept;
@@ -140,7 +141,7 @@ class basic_variadic_argument_t {
     using arg_conf_t = parser::types::variadic_arg_conf_t;
 
     template <typename... Params>
-    basic_variadic_argument_t(basic_parser_t& parser,
+    basic_variadic_argument_t(parser::basic_parser_t& parser,
                               const std::string& argument_name,
                               const std::string& description,
                               Params&&... parameters);

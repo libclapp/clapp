@@ -187,7 +187,7 @@ clapp::argument::basic_argument_t<T>::create_callbacks(
 template <typename T>
 template <typename... Params>
 clapp::argument::basic_argument_t<T>::basic_argument_t(
-    basic_parser_t& parser, const std::string& argument_name,
+    parser::basic_parser_t& parser, const std::string& argument_name,
     const std::string& description, Params&&... parameters)
     : _argument_name{argument_name} {
     arg_conf_container_t<T, arg_conf_t> conf{gen_arg_conf<T, arg_conf_t>(
@@ -250,7 +250,7 @@ clapp::argument::basic_variadic_argument_t<T>::create_callbacks(
 template <typename T>
 template <typename... Params>
 clapp::argument::basic_variadic_argument_t<T>::basic_variadic_argument_t(
-    basic_parser_t& parser, const std::string& argument_name,
+    parser::basic_parser_t& parser, const std::string& argument_name,
     const std::string& description, Params&&... parameters)
     : _argument_name{argument_name} {
     arg_conf_container_t<T, arg_conf_t> conf{gen_arg_conf<T, arg_conf_t>(
