@@ -33,7 +33,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     endif()
     set(libClaPP_TEST_CXX_PEDANTIC_COMPILE_OPTIONS ${libClaPP_CXX_PEDANTIC_COMPILE_OPTIONS})
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    list(APPEND libClaPP_CXX_PEDANTIC_COMPILE_OPTIONS -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-padded -Werror -pedantic-errors)
+    list(APPEND libClaPP_CXX_PEDANTIC_COMPILE_OPTIONS -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-padded -Wno-weak-vtables -Werror -pedantic-errors)
     if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "10.0.0")
         #before clang-10, it issues a warning if a range-based-for loop (of const ref) is used.
         list(APPEND libClaPP_CXX_PEDANTIC_COMPILE_OPTIONS -Wno-range-loop-analysis)
