@@ -1,0 +1,45 @@
+test_amd64_ubuntu_24.04:
+    stage: test
+    script:
+        - .ci/test/test.sh --build-dir "build_*"
+    tags:
+        - compiler
+        - ubuntu-24.04-amd64
+    needs:
+        - job: compile_amd64_ubuntu_24.04
+          artifacts: true
+
+test_sanitizer_amd64_ubuntu_24.04:
+    stage: test
+    script:
+        - .ci/test/test.sh --build-dir "build_*"
+    tags:
+        - compiler
+        - ubuntu-24.04-amd64
+    needs:
+        - job: compile_sanitizer_amd64_ubuntu_24.04
+          artifacts: true
+
+test_coverage_amd64_ubuntu_24.04:
+    stage: test
+    script:
+        - .ci/test/test.sh --build-dir "build" --gcov-bin gcov-14
+    tags:
+        - compiler
+        - ubuntu-24.04-amd64
+    variables:
+      GIT_SUBMODULE_STRATEGY: recursive
+    needs:
+        - job: compile_coverage_amd64_ubuntu_24.04
+          artifacts: true
+    coverage: /^\s*lines:\s*\d+.\d+\%/
+    artifacts:
+        when: always
+        expire_in: 1 week
+        paths:
+            - "xml"
+            - "html"
+        reports:
+            coverage_report:
+                coverage_format: cobertura
+                path: "xml/coverage.xml"
