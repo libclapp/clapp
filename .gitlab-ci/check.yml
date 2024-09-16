@@ -1,0 +1,11 @@
+.check-template:
+    stage: check
+    dependencies: []
+
+shellcheck:
+    extends:
+        - .check-template
+    script:
+        - .ci/check/shellcheck.sh
+    tags:
+        - ubuntu-24.04-amd64
