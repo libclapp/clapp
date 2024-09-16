@@ -1,0 +1,35 @@
+.format-template:
+    stage: format
+    variables:
+        FORMAT_PATCH_FILE: "format.patch"
+    artifacts:
+        when: always
+        expire_in: 1 week
+        paths:
+            - ${FORMAT_PATCH_FILE}
+
+clang-format:
+    extends:
+        - .format-template
+    script:
+        - .ci/format/apply_clang_format.sh --output-patch-file "${FORMAT_PATCH_FILE}"
+    variables:
+        CLANG_COMPILER_VERSION: "11"
+    tags:
+        - ubuntu-22.04-amd64
+
+shfmt:
+    extends:
+        - .format-template
+    script:
+        - .ci/format/apply_shfmt.sh --output-patch-file "${FORMAT_PATCH_FILE}"
+    tags:
+        - ubuntu-24.04-amd64
+
+shfmt-bats:
+    extends:
+        - .format-template
+    script:
+        - .ci/format/apply_shfmt_bats.sh --output-patch-file "${FORMAT_PATCH_FILE}"
+    tags:
+        - ubuntu-24.04-amd64
