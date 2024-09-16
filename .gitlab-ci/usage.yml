@@ -1,0 +1,88 @@
+.usage_matrix_template_amd64_ubuntu_24.04:
+    dependencies: []
+    parallel:
+      matrix:
+          - BUILD_TYPE:
+                - "Debug"
+                - "Release"
+            GENERATOR:
+                - "Unix Makefiles"
+            COMPILER:
+                - "clang"
+            COMPILER_VERSION:
+                - 17
+          - BUILD_TYPE:
+                - "Debug"
+                - "Release"
+            GENERATOR:
+                - "Unix Makefiles"
+            COMPILER:
+                - "gcc"
+            COMPILER_VERSION:
+                - 14
+    tags:
+        - compiler
+        - ubuntu-24.04-amd64
+
+usage_cmake_subdir_amd64_ubuntu_24.04:
+    extends:
+        - .usage_matrix_template_amd64_ubuntu_24.04
+    variables:
+      SOURCE_DIR: "usage/cmake_subdir"
+      BUILD_DIR: "${SOURCE_DIR}/build"
+    stage: usage
+    script:
+        - ls
+        - if [ "${COMPILER}" == "gcc" ]; then export CC="gcc-${COMPILER_VERSION}"; export CXX="g++-${COMPILER_VERSION}"; fi
+        - if [ "${COMPILER}" == "clang" ]; then export CC="clang-${COMPILER_VERSION}"; export CXX="clang++-${COMPILER_VERSION}"; fi
+        - echo "Using ${CXX} and ${CC} to build ${BUILD_TYPE}-build using ${GENERATOR}. build-dir=${BUILD_DIR} source-dir=${SOURCE_DIR}"
+        - cmake "-DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE}" "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON" -G "${GENERATOR}" -B "${BUILD_DIR}" -S "${SOURCE_DIR}"
+        - cmake --build "${BUILD_DIR}"
+        - LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib" "${BUILD_DIR}/usage_cmake_subdir" --help
+
+usage_cmake_import_amd64_ubuntu_24.04:
+    extends:
+        - .usage_matrix_template_amd64_ubuntu_24.04
+    variables:
+      SOURCE_DIR: "usage/cmake_import"
+      BUILD_DIR: "${SOURCE_DIR}/build"
+    stage: usage
+    script:
+        - .ci/build/build.sh --compiler "${COMPILER}" --compiler-version "${COMPILER_VERSION}" --build-type "${BUILD_TYPE}" --generator "${GENERATOR}" --verbose --pedantic --install --skip-examples --skip-tests --skip-doc
+        - if [ "${COMPILER}" == "gcc" ]; then export CC="gcc-${COMPILER_VERSION}"; export CXX="g++-${COMPILER_VERSION}"; fi
+        - if [ "${COMPILER}" == "clang" ]; then export CC="clang-${COMPILER_VERSION}"; export CXX="clang++-${COMPILER_VERSION}"; fi
+        - echo "Using ${CXX} and ${CC} to build ${BUILD_TYPE}-build using ${GENERATOR}. build-dir=${BUILD_DIR} source-dir=${SOURCE_DIR}"
+        - cmake "-DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE}" "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON" -G "${GENERATOR}" -B "${BUILD_DIR}" -S "${SOURCE_DIR}"
+        - cmake --build "${BUILD_DIR}"
+        - LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib" "${BUILD_DIR}/usage_cmake_import" --help
+
+usage_cmake_pkgconf_amd64_ubuntu_24.04:
+    extends:
+        - .usage_matrix_template_amd64_ubuntu_24.04
+    variables:
+      SOURCE_DIR: "usage/cmake_pkgconfig"
+      BUILD_DIR: "${SOURCE_DIR}/build"
+    stage: usage
+    script:
+        - .ci/build/build.sh --compiler "${COMPILER}" --compiler-version "${COMPILER_VERSION}" --build-type "${BUILD_TYPE}" --generator "${GENERATOR}" --verbose --pedantic --install --skip-examples --skip-tests --skip-doc
+        - if [ "${COMPILER}" == "gcc" ]; then export CC="gcc-${COMPILER_VERSION}"; export CXX="g++-${COMPILER_VERSION}"; fi
+        - if [ "${COMPILER}" == "clang" ]; then export CC="clang-${COMPILER_VERSION}"; export CXX="clang++-${COMPILER_VERSION}"; fi
+        - echo "Using ${CXX} and ${CC} to build ${BUILD_TYPE}-build using ${GENERATOR}. build-dir=${BUILD_DIR} source-dir=${SOURCE_DIR}"
+        - cmake "-DCMAKE_BUILD_TYPE:STRING=${BUILD_TYPE}" "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON" -G "${GENERATOR}" -B "${BUILD_DIR}" -S "${SOURCE_DIR}"
+        - cmake --build "${BUILD_DIR}"
+        - LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib" "${BUILD_DIR}/usage_cmake_pkgconfig" --help
+
+usage_make_pkgconf_amd64_ubuntu_24.04:
+    extends:
+        - .usage_matrix_template_amd64_ubuntu_24.04
+    variables:
+      SOURCE_DIR: "usage/make_pkgconfig"
+    stage: usage
+    script:
+        - .ci/build/build.sh --compiler "${COMPILER}" --compiler-version "${COMPILER_VERSION}" --build-type "${BUILD_TYPE}" --generator "${GENERATOR}" --verbose --pedantic --install --skip-examples --skip-tests --skip-doc
+        - if [ "${COMPILER}" == "gcc" ]; then export CC="gcc-${COMPILER_VERSION}"; export CXX="g++-${COMPILER_VERSION}"; fi
+        - if [ "${COMPILER}" == "clang" ]; then export CC="clang-${COMPILER_VERSION}"; export CXX="clang++-${COMPILER_VERSION}"; fi
+        - echo "Using ${CXX} and ${CC} to build. source-dir=${SOURCE_DIR}"
+        - cd "${SOURCE_DIR}"
+        - make
+        - LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib" "./usage_make_pkgconfig" --help
