@@ -3,6 +3,7 @@ stages:
     - check
     - build
     - test
+    - install
 
 variables:
     GIT_STRATEGY: clone
@@ -12,3 +13,4 @@ include:
   - local: /.gitlab-ci/check.yml
   - local: /.gitlab-ci/build.yml
   - local: /.gitlab-ci/test.yml
+  - local: /.gitlab-ci/install.yml

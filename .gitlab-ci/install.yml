@@ -1,0 +1,39 @@
+.install_matrix_template_amd64_ubuntu_24.04:
+    dependencies: []
+    parallel:
+      matrix:
+          - BUILD_TYPE:
+                - "Debug"
+                - "Release"
+            GENERATOR:
+                - "Ninja"
+            COMPILER:
+                - "clang"
+            COMPILER_VERSION:
+                - 17
+          - BUILD_TYPE:
+                - "Debug"
+                - "Release"
+            GENERATOR:
+                - "Ninja"
+            COMPILER:
+                - "gcc"
+            COMPILER_VERSION:
+                - 14
+    tags:
+        - compiler
+        - ubuntu-24.04-amd64
+
+.install_template:
+    stage: install
+    variables:
+      GIT_SUBMODULE_STRATEGY: recursive
+    script:
+        - .ci/build/build.sh --compiler "${COMPILER}" --compiler-version "${COMPILER_VERSION}" --build-type "${BUILD_TYPE}" --generator "${GENERATOR}" --verbose --install
+        - export LD_LIBRARY_PATH="/usr/local/lib"
+        - /usr/local/bin/libclapp_tests
+
+install_matrix_amd64_ubuntu_24.04:
+    extends:
+        - .install_template
+        - .install_matrix_template_amd64_ubuntu_24.04
