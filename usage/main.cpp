@@ -13,20 +13,21 @@
 clapp::value::found_func_t::ret_t print_version_and_exit(
     const std::string &option);
 
-class cli_parser_t : public clapp::basic_main_parser_t {
+class cli_parser_t : public clapp::parser::basic_main_parser_t {
    public:
     cli_parser_t() = default;
 
     ~cli_parser_t() override;
 
-    clapp::help_option_t help{*this, "help", 'h', "Show help options."};
+    clapp::option::help_option_t help{*this, "help", 'h', "Show help options."};
 
-    clapp::bool_option_t version{
+    clapp::option::bool_option_t version{
         *this, std::vector<std::string>{"version", "vers"}, 'v',
         "Show version info",
         clapp::value::found_func_t{print_version_and_exit}};
 
-    clapp::string_argument_t string_arg{*this, "string-arg", "String argument"};
+    clapp::argument::string_argument_t string_arg{*this, "string-arg",
+                                                  "String argument"};
 
     explicit cli_parser_t(const cli_parser_t &) = delete;
     explicit cli_parser_t(cli_parser_t &&) noexcept = delete;
