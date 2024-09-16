@@ -1,6 +1,7 @@
 stages:
     - format
     - check
+    - build
 
 variables:
     GIT_STRATEGY: clone
@@ -8,3 +9,4 @@ variables:
 include:
   - local: /.gitlab-ci/format.yml
   - local: /.gitlab-ci/check.yml
+  - local: /.gitlab-ci/build.yml

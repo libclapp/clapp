@@ -1,0 +1,127 @@
+.compile_matrix_template_amd64_ubuntu_24.04:
+    parallel:
+      matrix:
+          - BUILD_TYPE:
+                - "Debug"
+                - "Release"
+            GENERATOR:
+                - "Unix Makefiles"
+                - "Ninja"
+            COMPILER:
+                - "clang"
+            COMPILER_VERSION:
+                - 16
+                - 17
+          - BUILD_TYPE:
+                - "Debug"
+                - "Release"
+            GENERATOR:
+                - "Unix Makefiles"
+                - "Ninja"
+            COMPILER:
+                - "gcc"
+            COMPILER_VERSION:
+                - 11
+                - 12
+                - 13
+                - 14
+    tags:
+        - compiler
+        - ubuntu-24.04-amd64
+
+compile_coverage_amd64_ubuntu_24.04:
+    stage: build
+    script:
+        - .ci/build/build.sh --compiler "${COMPILER}" --compiler-version "${COMPILER_VERSION}" --build-type "${BUILD_TYPE}" --generator "${GENERATOR}" --verbose --pedantic --coverage --build-dir "build"
+    artifacts:
+        when: always
+        expire_in: 1 week
+        paths:
+            - build
+    dependencies: []
+    variables:
+      GIT_SUBMODULE_STRATEGY: recursive
+      GENERATOR: "Ninja"
+      COMPILER: "gcc"
+      COMPILER_VERSION: 14
+      BUILD_TYPE: "Debug"
+    tags:
+        - compiler
+        - ubuntu-24.04-amd64
+
+compile_amd64_ubuntu_24.04:
+    variables:
+      GIT_SUBMODULE_STRATEGY: recursive
+    extends:
+        - .compile_matrix_template_amd64_ubuntu_24.04
+    stage: build
+    script:
+        - .ci/build/build.sh --compiler "${COMPILER}" --compiler-version "${COMPILER_VERSION}" --build-type "${BUILD_TYPE}" --generator "${GENERATOR}" --verbose --pedantic
+    artifacts:
+        when: always
+        expire_in: 1 week
+        paths:
+            - build_*
+    dependencies: []
+
+clang_tidy_amd64_ubuntu_24.04:
+    stage: build
+    script:
+        - .ci/build/build.sh --compiler clang --compiler-version "${COMPILER_VERSION}" --clang-tidy "clang-tidy-${COMPILER_VERSION}" --build-type "${BUILD_TYPE}" --generator "${GENERATOR}"  --verbose --pedantic
+    dependencies: []
+    variables:
+      GIT_SUBMODULE_STRATEGY: recursive
+      GENERATOR: "Ninja"
+      COMPILER_VERSION: 17
+    parallel:
+      matrix:
+          - BUILD_TYPE:
+                - "Debug"
+                - "Release"
+    tags:
+        - compiler
+        - ubuntu-24.04-amd64
+
+compile_sanitizer_amd64_ubuntu_24.04:
+    variables:
+      GIT_SUBMODULE_STRATEGY: recursive
+    stage: build
+    script:
+        - .ci/build/build.sh --compiler "${COMPILER}" --compiler-version "${COMPILER_VERSION}" --build-type "${BUILD_TYPE}" --generator "${GENERATOR}" --verbose "--${SANITIZER}-sanitizer" --build-dir "build_${BUILD_TYPE}_${SANITIZER}_${COMPILER}_${COMPILER_VERSION}"
+    artifacts:
+        when: always
+        expire_in: 1 week
+        paths:
+            - build_*
+    dependencies: []
+    parallel:
+      matrix:
+          - BUILD_TYPE:
+                - "Debug"
+                - "Release"
+            GENERATOR:
+                - "Ninja"
+            COMPILER:
+                - "clang"
+            COMPILER_VERSION:
+                - 17
+            SANITIZER:
+                - "undefined-behavior"
+                - "address"
+                - "thread"
+          - BUILD_TYPE:
+                - "Debug"
+                - "Release"
+            GENERATOR:
+                - "Ninja"
+            COMPILER:
+                - "gcc"
+            COMPILER_VERSION:
+                - 14
+            SANITIZER:
+                - "undefined-behavior"
+                - "thread"
+                - "address"
+    tags:
+        - compiler
+        - ubuntu-24.04-amd64
