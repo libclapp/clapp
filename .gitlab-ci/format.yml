@@ -14,9 +14,9 @@ clang-format:
     script:
         - .ci/format/apply_clang_format.sh --output-patch-file "${FORMAT_PATCH_FILE}"
     variables:
-        CLANG_COMPILER_VERSION: "11"
+        CLANG_COMPILER_VERSION: "18"
     tags:
-        - ubuntu-22.04-amd64
+        - ubuntu-24.04-amd64
 
 shfmt:
     extends:

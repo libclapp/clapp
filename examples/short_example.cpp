@@ -119,16 +119,14 @@ int main(int argc, char *argv[]) {
             }
             std::cout << "\n";
         } else {
-            std::cout << "variadic-string-arg: not given"
-                      << "\n";
+            std::cout << "variadic-string-arg: not given" << "\n";
         }
 
         CLAPP_CONTRACT_EXPECTS(
             parser->options.string_param);  // The parser ensures that
                                             // mandatory options are given
         std::cout << "string_param: '" << parser->options.string_param.value()
-                  << "'"
-                  << "\n";
+                  << "'" << "\n";
 
         if (parser->options
                 .string_vector_param) {  // if string_vector_param is given
@@ -141,8 +139,7 @@ int main(int argc, char *argv[]) {
             }
             std::cout << "\n";
         } else {
-            std::cout << "string_vector_param: not given"
-                      << "\n";
+            std::cout << "string_vector_param: not given" << "\n";
         }
     } catch (clapp::clapp_exception_t &e) {
         std::cout << "Caught ClaPP-Exception: " << e.what() << "\n";

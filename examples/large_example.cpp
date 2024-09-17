@@ -446,8 +446,7 @@ int main(int argc, char *argv[]) {
         }
 
         if (!*parser) {
-            std::cout << "Parsing failed!"
-                      << "\n";
+            std::cout << "Parsing failed!" << "\n";
             return EXIT_FAILURE;
         }
 
@@ -465,21 +464,17 @@ int main(int argc, char *argv[]) {
         process_time_container(parser->time);
 
         if (parser->cmd1) {
-            std::cout << "cmd1 given"
-                      << "\n";
+            std::cout << "cmd1 given" << "\n";
             process_cmd1(parser->cmd1);
         } else {
-            std::cout << "cmd1 not given"
-                      << "\n";
+            std::cout << "cmd1 not given" << "\n";
         }
 
         if (parser->cmd2) {
-            std::cout << "cmd2 given"
-                      << "\n";
+            std::cout << "cmd2 given" << "\n";
             process_cmd2(parser->cmd2);
         } else {
-            std::cout << "cmd2 not given"
-                      << "\n";
+            std::cout << "cmd2 not given" << "\n";
         }
     } catch (clapp::clapp_exception_t &e) {
         std::cout << "Caught ClaPP-Exception: " << e.what() << "\n";

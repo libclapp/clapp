@@ -139,8 +139,7 @@ clapp::value::found_func_t::ret_t print_version_and_exit(
 clapp::value::found_func_t::ret_t print_not_implemented_and_exit(
     const std::string &option) {
     std::cout << "Option '" << option
-              << "' currently not implemented: don't use it!"
-              << "\n";
+              << "' currently not implemented: don't use it!" << "\n";
     return clapp::value::exit_t::exit(EXIT_FAILURE);
 }
 
@@ -218,21 +217,17 @@ int main(int argc, char *argv[]) {
         }
 
         if (parser->first) {  // if the first sub-parser is selected
-            std::cout << "first parser active"
-                      << "\n";
+            std::cout << "first parser active" << "\n";
             process_first(parser->first);
         } else {
-            std::cout << "first parser not active"
-                      << "\n";
+            std::cout << "first parser not active" << "\n";
         }
 
         if (parser->second) {  // if the first sub-parser is selected
-            std::cout << "second parser active"
-                      << "\n";
+            std::cout << "second parser active" << "\n";
             process_second(parser->second);
         } else {
-            std::cout << "second parser not active"
-                      << "\n";
+            std::cout << "second parser not active" << "\n";
         }
     } catch (clapp::clapp_exception_t &e) {
         std::cout << "Caught ClaPP-Exception: " << e.what() << "\n";
