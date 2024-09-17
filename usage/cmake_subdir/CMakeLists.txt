@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.8.0)
 project(libclapp-usage-cmake-pkgconfig)
 
-set(libClaPP_SUBMODULE_DEPENDENCIES On CACHE BOOL "Enable all submodules shipped in libClaPP.")
+set(libClaPP_SUBMODULE_DEPENDENCIES
+    On
+    CACHE BOOL "Enable all submodules shipped in libClaPP.")
 add_subdirectory("clapp" EXCLUDE_FROM_ALL)
 
 add_executable(usage_cmake_subdir ../main.cpp)

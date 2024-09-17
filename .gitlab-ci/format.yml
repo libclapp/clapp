@@ -33,3 +33,11 @@ shfmt-bats:
         - .ci/format/apply_shfmt_bats.sh --output-patch-file "${FORMAT_PATCH_FILE}"
     tags:
         - ubuntu-24.04-amd64
+
+cmake-format:
+    extends:
+        - .format-template
+    script:
+        - .ci/format/apply_cmake_format.sh --output-patch-file "${FORMAT_PATCH_FILE}"
+    tags:
+        - ubuntu-24.04-amd64

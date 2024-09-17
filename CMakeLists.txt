@@ -5,15 +5,17 @@ include(CMakePackageConfigHelpers)
 include(cmake/git.cmake)
 include(cmake/compiler_flags.cmake)
 
-if (NOT CMAKE_BUILD_TYPE)
+if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
-    message(STATUS "Setting build to ${CMAKE_BUILD_TYPE}, because nothing was given.")
+    message(
+        STATUS
+            "Setting build to ${CMAKE_BUILD_TYPE}, because nothing was given.")
 endif()
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(PkgConfig REQUIRED)
 string(TIMESTAMP libClaPP_CONFIG_TIME "%Y-%m-%d %H:%M:%S")
-set (THIRD_PARTY_DIR "${PROJECT_SOURCE_DIR}/third_party")
+set(THIRD_PARTY_DIR "${PROJECT_SOURCE_DIR}/third_party")
 
 option(libClaPP_CLANG_TIDY "Clang-Tidy." Off)
 option(libClaPP_CPPCHECK "CPPCheck." Off)
@@ -21,18 +23,21 @@ option(libClaPP_BUILD_TESTS "Build tests." Off)
 option(libClaPP_BUILD_EXAMPLES "Build examples." Off)
 option(libClaPP_BUILD_DOC_CODE "Build doc code." Off)
 option(libClaPP_BUILD_COVERAGE "Cretae gcov build." Off)
-option(libClaPP_SUBMODULE_DEPENDENCIES "Use dependencies from git submodules." Off)
-option(libClaPP_ENABLE_IPO "Enable Iterprocedural Optimization, aka Link Time Optimization (LTO)" Off)
+option(libClaPP_SUBMODULE_DEPENDENCIES "Use dependencies from git submodules."
+       Off)
+option(libClaPP_ENABLE_IPO
+       "Enable Iterprocedural Optimization, aka Link Time Optimization (LTO)"
+       Off)
 option(libClaPP_PEDANTIC_COMPILER_FLAGS "Enable pedantic compiler flags." Off)
 
 if(libClaPP_ENABLE_IPO)
-  include(CheckIPOSupported)
-  check_ipo_supported(RESULT result OUTPUT output)
-  if(result)
-    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
-  else()
-    message(SEND_ERROR "IPO is not supported: ${output}")
-  endif()
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT result OUTPUT output)
+    if(result)
+        set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+    else()
+        message(SEND_ERROR "IPO is not supported: ${output}")
+    endif()
 endif()
 
 if(libClaPP_CLANG_TIDY)
@@ -40,16 +45,25 @@ if(libClaPP_CLANG_TIDY)
 endif()
 
 if(libClaPP_CPPCHECK)
-  if(CMAKE_VERSION VERSION_GREATER 3.10)
-    find_program(CPPCHECK cppcheck)
-    if(CPPCHECK)
-        set(CMAKE_CXX_CPPCHECK ${CPPCHECK} --enable=all --suppress=*:${CMAKE_CURRENT_SOURCE_DIR}/src/include/clapp/filesystem.h:27 --suppress=*:${THIRD_PARTY_DIR}/* --inconclusive -v -i${THIRD_PARTY_DIR})
+    if(CMAKE_VERSION VERSION_GREATER 3.10)
+        find_program(CPPCHECK cppcheck)
+        if(CPPCHECK)
+            set(CMAKE_CXX_CPPCHECK
+                ${CPPCHECK}
+                --enable=all
+                --suppress=*:${CMAKE_CURRENT_SOURCE_DIR}/src/include/clapp/filesystem.h:27
+                --suppress=*:${THIRD_PARTY_DIR}/*
+                --inconclusive
+                -v
+                -i${THIRD_PARTY_DIR})
+        else()
+            message(SEND_ERROR "CPPCheck requested but executable not found.")
+        endif()
     else()
-      message(SEND_ERROR "CPPCheck requested but executable not found.")
+        message(
+            SEND_ERROR "CPPCheck requested but current CMAKE is not compatible."
+        )
     endif()
-  else()
-    message(SEND_ERROR "CPPCheck requested but current CMAKE is not compatible.")
-  endif()
 endif()
 
 include(cmake/sanitizer.cmake)
@@ -66,8 +80,10 @@ if(libClaPP_BUILD_DOC_CODE)
     add_subdirectory(doc)
 endif()
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libclapp.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libclapp.pc @ONLY)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libclapp.pc DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig/")
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libclapp.pc.in
+               ${CMAKE_CURRENT_BINARY_DIR}/libclapp.pc @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libclapp.pc
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig/")
 
 if(libClaPP_BUILD_TESTS)
     add_subdirectory(tests)

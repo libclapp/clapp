@@ -3,7 +3,10 @@ if(libClaPP_BUILD_TESTS)
     if(libClaPP_SUBMODULE_DEPENDENCIES)
         if(NOT TARGET GTest::gmock_main)
             add_subdirectory("${THIRD_PARTY_DIR}/googletest" EXCLUDE_FROM_ALL)
-            target_compile_features(gtest PUBLIC cxx_std_17)    #changing gtest (and its further libs gmock and gmock_main) to be C++17, otherwise we will get linker error.
+            target_compile_features(
+                gtest PUBLIC cxx_std_17) # changing gtest (and its further libs
+                                         # gmock and gmock_main) to be C++17,
+                                         # otherwise we will get linker error.
         endif()
     else()
         if(NOT TARGET GTest::gmock_main)
@@ -15,7 +18,10 @@ endif()
 target_link_libraries(libClaPP_gmock_main INTERFACE GTest::gmock_main)
 
 if(libClaPP_PEDANTIC_COMPILER_FLAGS)
-    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-        target_compile_options(libClaPP_gmock_main INTERFACE -Wno-used-but-marked-unused -Wno-covered-switch-default -Wno-exit-time-destructors)
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        target_compile_options(
+            libClaPP_gmock_main
+            INTERFACE -Wno-used-but-marked-unused -Wno-covered-switch-default
+                      -Wno-exit-time-destructors)
     endif()
 endif()
